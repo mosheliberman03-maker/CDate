@@ -1473,7 +1473,8 @@ async function nPerm(){const pl=NP();NERR='';
   return true}catch(e){NERR='blocked';return false}}
 /* phone push (hosted web app + small server) */
 const PK='cc_push_srv';
-const pushSrv=()=>{try{return localStorage.getItem(PK)||''}catch(e){return ''}};
+const PUSH_DEFAULT='https://cdate-push.mosheliberman03.workers.dev';
+const pushSrv=()=>{try{return localStorage.getItem(PK)||PUSH_DEFAULT}catch(e){return PUSH_DEFAULT}};
 const pushSet=v=>{try{v?localStorage.setItem(PK,v):localStorage.removeItem(PK)}catch(e){}};
 const pushCan=()=>window.isSecureContext&&location.protocol!=='file:'&&'serviceWorker' in navigator&&'PushManager' in window&&typeof Notification!=='undefined';
 let PSUB=null,PERR='';
@@ -1492,7 +1493,7 @@ async function pushTurnOn(raw){PERR='';const s=(raw||'').trim().replace(/\/+$/,'
   const old=await reg.pushManager.getSubscription();if(old)await old.unsubscribe();
   PSUB=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(v.pub)});pushSet(s);return true}
  catch(e){PERR='Could not connect. Check the server address and try again.';return false}}
-async function pushTurnOff(){try{if(PSUB&&pushSrv())await pushPost('/unsub',{sub:PSUB.toJSON()})}catch(e){}try{if(PSUB)await PSUB.unsubscribe()}catch(e){}PSUB=null;pushSet('')}
+async function pushTurnOff(){PERR='';try{if(PSUB&&pushSrv())await pushPost('/unsub',{sub:PSUB.toJSON()})}catch(e){}try{if(PSUB)await PSUB.unsubscribe()}catch(e){}PSUB=null;pushSet('')}
 function pushItems(c){const all=notifPlan(c,30,{past:true}).sort((a,b)=>a.at-b.at),now=Date.now(),by={};const out=[];
  for(const n of all){const k=n.th.key;(by[k]=by[k]||[]).push(n.text);if(n.at>now+15e3)out.push({id:n.id,at:n.at,title:n.th.title,tag:k,body:by[k].slice().reverse().join('\n')})}
  return out.slice(0,100)}
@@ -1528,9 +1529,9 @@ function rmBody(){const c=nCfg();
   (k=='spec'?`<div class="qopt" ${c.spec?'':'hidden'}><div class="qseg" data-k="specAll">${[['0','Main days'],['1','All days']].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${(c.specAll?'1':'0')==v}">${l}</button>`).join('')}</div><span>at</span><input type="time" class="qtime" data-k="morn" value="${c.morn}"></div>`:'')+
   (k=='learn'?`<div class="qopt" ${c.learn?'':'hidden'}><span>Remind me at</span><input type="time" class="qtime" data-k="learnAt" value="${c.learnAt}"></div>`:'')+`</div>`).join('')}
   <div class="qgrp"><label class="qrow"><span class="t"><b>Quiet on Shabbos and Yom Tov</b><small>Nothing is sent from candle lighting until nightfall at the end</small></span><input type="checkbox" class="qsw" data-k="quiet" ${c.quiet?'checked':''}></label></div></div>
- ${pushCan()?`<div class="qgrp" id="rmPush"><div class="qrow"><span class="t"><b>Phone notifications</b><small id="rmPS"></small></span></div><div class="qopt"><input type="url" class="qsrv" id="rmSrv" placeholder="https://name.workers.dev" value="${pushSrv()}" autocapitalize="off" autocorrect="off" spellcheck="false"><button class="btn gh" id="rmPB" type="button"></button></div></div>`:''}
+ ${pushCan()?`<div class="qgrp" id="rmPush"><div class="qrow"><span class="t"><b>Phone notifications</b><small id="rmPS"></small></span></div><div class="qopt">${PUSH_DEFAULT?'':`<input type="url" class="qsrv" id="rmSrv" placeholder="https://name.workers.dev" value="${pushSrv()}" autocapitalize="off" autocorrect="off" spellcheck="false">`}<button class="btn gh" id="rmPB" type="button"></button></div></div>`:''}
  <button class="btn gh qtest" id="rmTest" type="button" ${c.on?'':'disabled'}>Show a sample</button>`}
-function rmPush(){const s=$('#rmPS'),b=$('#rmPB');if(!s)return;const on=pushActive();s.textContent=PERR||(on?'On. Reminders reach this phone even when the app is closed.':'Paste your server address to get reminders when the app is closed.');b.textContent=on?'Turn off':'Turn on';b.dataset.on=on?'1':''}
+function rmPush(){const s=$('#rmPS'),b=$('#rmPB');if(!s)return;const on=pushActive();s.textContent=PERR||(on?'On. Reminders reach this phone even when the app is closed.':(PUSH_DEFAULT?'Turn on to get reminders even when the app is closed.':'Paste your server address to get reminders when the app is closed.'));b.textContent=on?'Turn off':'Turn on';b.dataset.on=on?'1':''}
 function rmStat(){const e=$('#rmStat');if(!e)return;const c=nCfg();
  e.textContent=NERR=='blocked'?'Blocked. Allow notifications in your phone’s settings.':(NP()||pushActive())?'Delivered to your phone, even when the app is closed.':'Shown while the app is open.'}
 function rmOpen(){let b=$('#rmb');
@@ -1546,7 +1547,7 @@ function rmOpen(){let b=$('#rmb');
    else if(t.classList.contains('qtime')){c[k]=t.value||NDEF[k];nSave(c)}
    rmStat();rmSum();notifSyncSoon(600)});
   b.addEventListener('click',e=>{const s=e.target.closest('.qseg button');if(s){const sg=s.parentNode,k=sg.dataset.k,c=nCfg();c[k]=k=='specAll'?s.dataset.v=='1':+s.dataset.v;nSave(c);sg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===s));notifSyncSoon(600);H.tap();return}
-   if(e.target.closest('#rmPB')){const bt=e.target.closest('#rmPB');bt.disabled=true;(async()=>{if(bt.dataset.on){await pushTurnOff();PERR=''}else{const ok=await pushTurnOn($('#rmSrv').value);if(ok){const c=nCfg();if(!c.on){c.on=true;nSave(c);const m=b.querySelector('[data-k=on]');if(m)m.checked=true;$('#rmList').classList.remove('off');$('#rmTest').disabled=false}notifSync()}}bt.disabled=false;rmPush();rmStat();rmSum()})();return}
+   if(e.target.closest('#rmPB')){const bt=e.target.closest('#rmPB');bt.disabled=true;(async()=>{if(bt.dataset.on){await pushTurnOff();PERR=''}else{const ok=await pushTurnOn(PUSH_DEFAULT||$('#rmSrv').value);if(ok){const c=nCfg();if(!c.on){c.on=true;nSave(c);const m=b.querySelector('[data-k=on]');if(m)m.checked=true;$('#rmList').classList.remove('off');$('#rmTest').disabled=false}notifSync()}}bt.disabled=false;rmPush();rmStat();rmSum()})();return}
    if(e.target.closest('#rmTest')){nTest()}})}
  const dc=b.querySelector('.dmc');dc.style.setProperty('--c','var(--ys)');dc.innerHTML=rmBody();rmStat();if(pushCan()){rmPush();pushCur().then(rmPush)}requestAnimationFrame(()=>b.classList.add('on'))}
 async function nTest(){const n0=NLAST[0],n=n0?{th:n0.th,title:n0.th.title,body:n0.text}:{title:'Reminders are on',body:'This is how they will look.'},pl=NP();
