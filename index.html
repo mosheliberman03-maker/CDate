@@ -201,7 +201,7 @@ body.om #ms .lbl{display:none}
 
 /* Calendar assistant: isolated UI layer, separate from the daily-view renderer. */
 .ai-fab{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:calc(82px + env(safe-area-inset-bottom,0px));z-index:18;width:58px;height:58px;border:0;border-radius:50%;background:var(--ink);color:var(--card);font:400 31px/1 Figtree,system-ui;box-shadow:0 8px 28px #0003;display:grid;place-items:center;cursor:pointer;transition:transform .2s,box-shadow .2s}.ai-fab:active{transform:scale(.93)}
-.ai-backdrop{position:fixed;inset:0;z-index:80;background:#090b18a8;backdrop-filter:blur(7px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}.ai-backdrop.on{opacity:1;pointer-events:auto}.ai-card{width:min(100%,540px);max-height:min(82dvh,760px);overflow:auto;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:25px;padding:20px;box-shadow:0 24px 90px #0004;transform:translateY(20px);transition:transform .25s}.ai-backdrop.on .ai-card{transform:none}.ai-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.ai-head h2{font:500 25px/1.1 'Frank Ruhl Libre',Georgia,serif;margin:0}.ai-close{border:1px solid var(--line);background:transparent;color:inherit;border-radius:50%;width:38px;height:38px;font-size:23px}.ai-hint{color:var(--mut);font-size:13px;margin:0 0 12px}.ai-input{width:100%;box-sizing:border-box;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:14px;font:inherit;min-height:112px;resize:vertical}.ai-actions{display:flex;gap:9px;margin-top:10px}.ai-actions button,.ai-confirm button{border:1px solid var(--line);border-radius:13px;padding:11px 14px;background:var(--bg);color:var(--ink);font:600 14px Figtree,system-ui;cursor:pointer}.ai-actions .ai-primary,.ai-confirm .ai-yes{background:var(--ink);color:var(--card);border-color:var(--ink)}.ai-mic{min-width:48px;font-size:19px!important}.ai-choices{display:flex;flex-direction:column;gap:8px;margin-top:12px}.ai-choices button{border:1px solid var(--line);border-radius:13px;padding:11px 14px;background:var(--bg);color:var(--ink);font:600 14px Figtree,system-ui;cursor:pointer;text-align:left}.ai-choices .ai-yes{background:var(--ink);color:var(--card);border-color:var(--ink)}.ai-undo{border:1px solid var(--line);border-radius:13px;padding:9px 14px;background:var(--bg);color:var(--ink);font:600 14px Figtree,system-ui;cursor:pointer;margin:0 0 8px}.ai-undo[hidden]{display:none}.ai-lang{border:1px solid var(--line);border-radius:13px;background:var(--bg);color:var(--ink);font:600 13px Figtree,system-ui;padding:0 8px}.ai-mic.rec{background:#c0392b!important;color:#fff!important;border-color:#c0392b!important;animation:aiPulse 1.2s ease-in-out infinite}@keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 #c0392b66}50%{box-shadow:0 0 0 9px #c0392b00}}@media(prefers-reduced-motion:reduce){.ai-mic.rec{animation:none}}.ai-status{min-height:20px;color:var(--mut);font-size:13px;margin:10px 0}.ai-preview{display:none;border:1px solid var(--line);border-radius:17px;padding:15px;margin-top:12px;background:color-mix(in srgb,var(--ct) 5%,var(--card))}.ai-preview.show{display:block}.ai-preview h3{font:500 22px 'Frank Ruhl Libre',Georgia,serif;margin:0 0 5px}.ai-preview p{margin:5px 0;color:var(--mut);font-size:14px}.ai-confirm{display:flex;gap:9px;margin-top:13px}.ai-confirm button{flex:1}.ai-memory{border-top:1px solid var(--line);margin-top:15px;padding-top:12px;font-size:12px;color:var(--mut)}.ai-memory button{border:0;background:none;color:var(--ct);font:inherit;text-decoration:underline;padding:0;cursor:pointer}
+.ai-backdrop{position:fixed;inset:0;z-index:80;background:#090b18a8;backdrop-filter:blur(7px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}.ai-backdrop.on{opacity:1;pointer-events:auto}.ai-card{width:min(100%,540px);max-height:min(82dvh,760px);overflow:auto;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:25px;padding:20px;box-shadow:0 24px 90px #0004;transform:translateY(20px);transition:transform .25s}.ai-backdrop.on .ai-card{transform:none}.ai-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.ai-head h2{font:500 25px/1.1 'Frank Ruhl Libre',Georgia,serif;margin:0}.ai-close{border:1px solid var(--line);background:transparent;color:inherit;border-radius:50%;width:38px;height:38px;font-size:23px}.ai-hint{color:var(--mut);font-size:13px;margin:0 0 12px}.ai-input{width:100%;box-sizing:border-box;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:14px;font:inherit;min-height:112px;resize:vertical}.ai-actions{display:flex;gap:9px;margin-top:10px}.ai-actions button,.ai-confirm button{border:1px solid var(--line);border-radius:13px;padding:11px 14px;background:var(--bg);color:var(--ink);font:600 14px Figtree,system-ui;cursor:pointer}.ai-actions .ai-primary,.ai-confirm .ai-yes{background:var(--ink);color:var(--card);border-color:var(--ink)}.ai-mic{min-width:48px;font-size:19px!important}.ai-choices{display:flex;flex-direction:column;gap:8px;margin-top:12px}.ai-choices button{border:1px solid var(--line);border-radius:13px;padding:11px 14px;background:var(--bg);color:var(--ink);font:600 14px Figtree,system-ui;cursor:pointer;text-align:left}.ai-choices .ai-yes{background:var(--ink);color:var(--card);border-color:var(--ink)}.ai-undo{border:1px solid var(--line);border-radius:13px;padding:9px 14px;background:var(--bg);color:var(--ink);font:600 14px Figtree,system-ui;cursor:pointer;margin:0 0 8px}.ai-undo[hidden]{display:none}.ai-lang{border:1px solid var(--line);border-radius:13px;background:var(--bg);color:var(--ink);font:600 13px Figtree,system-ui;padding:0 8px}.ai-mic.rec{background:#c0392b!important;color:#fff!important;border-color:#c0392b!important;animation:aiPulse 1.2s ease-in-out infinite}@keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 #c0392b66}50%{box-shadow:0 0 0 9px #c0392b00}}@media(prefers-reduced-motion:reduce){.ai-mic.rec{animation:none}}.ai-status{min-height:20px;color:var(--mut);font-size:13px;margin:10px 0}.ai-preview{display:none;border:1px solid var(--line);border-radius:17px;padding:15px;margin-top:12px;background:color-mix(in srgb,var(--ct) 5%,var(--card))}.ai-preview.show{display:block}.ai-preview h3{font:500 22px 'Frank Ruhl Libre',Georgia,serif;margin:0 0 5px}.ai-preview p{margin:5px 0;color:var(--mut);font-size:14px}.ai-confirm{display:flex;gap:9px;margin-top:13px}.ai-confirm button{flex:1}.ai-multi{display:none}.ai-multi.show{display:block}.ai-mhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-size:13px;color:var(--mut)}.ai-mhead button{border:1px solid var(--ink);border-radius:13px;padding:9px 13px;background:var(--ink);color:var(--card);font:600 14px Figtree,system-ui;cursor:pointer;flex:none}.ai-mcard{margin-top:10px}.ai-msrc{font-size:12px;color:var(--mut);margin:0 0 6px;overflow-wrap:anywhere}.ai-mcard .ai-confirm{gap:7px}.ai-mcard .ai-confirm button{padding:10px 8px}.ai-mwarn{color:var(--ink)!important;font-weight:600}.ai-mstate{font-weight:600;color:var(--ink)!important;margin-top:8px!important}.ai-mdone{opacity:.62}.ai-memory{border-top:1px solid var(--line);margin-top:15px;padding-top:12px;font-size:12px;color:var(--mut)}.ai-memory button{border:0;background:none;color:var(--ct);font:inherit;text-decoration:underline;padding:0;cursor:pointer}
 @media(min-width:700px){.ai-backdrop{align-items:center}.ai-fab{bottom:28px}}
 /* Device-local profiles: each username gets its own schedule on this browser. */
 .account-shade{position:fixed;inset:0;z-index:100000;background:var(--bg,#f7f5ef);color:var(--ink,#222);display:flex;align-items:center;justify-content:center;padding:22px;overflow:auto}
@@ -448,7 +448,7 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
 <div class="cb" id="cb" aria-hidden="true"><div class="cl" id="cbt"></div><div id="cbr"></div></div>
 <nav class="dock" aria-label="Day navigation"><button id="pd" aria-label="Previous day">‹</button><button id="td" class="tdb">Today</button><button id="nd" aria-label="Next day">›</button><button id="mo">Month</button><button id="mn" aria-label="More: go to a date, add events, settings">⋯</button></nav>
 <button class="ai-fab" id="aiFab" aria-label="Add an event with the calendar assistant" title="Add with assistant">+</button>
-<div class="ai-backdrop" id="aiBackdrop" aria-hidden="true"><section class="ai-card" role="dialog" aria-modal="true" aria-labelledby="aiTitle"><div class="ai-head"><h2 id="aiTitle">Plan something</h2><button class="ai-close" id="aiClose" aria-label="Close">×</button></div><p class="ai-hint">Describe it naturally, e.g. “Tanya chavrusa with Yossi every Sunday and Tuesday at 8pm” or “yahrzeit of my father 20 Av”. To remove one: “cancel my chavrusa with Yossi”. Hebrew dates and terms like kvius, chavrusa and seder are welcome.</p><textarea class="ai-input" id="aiInput" placeholder="e.g. Set a monthly kvius with my chavrusa on the 15th of every Hebrew month…"></textarea><div class="ai-actions"><button class="ai-mic" id="aiMic" aria-label="Speak your request" title="Speak" aria-pressed="false" type="button">🎙</button><select class="ai-lang" id="aiLang" aria-label="Voice language"><option value="en-US">English</option><option value="he-IL">עברית</option></select><button class="ai-primary" id="aiPlan" style="flex:1">Make a plan</button></div><div class="ai-status" id="aiStatus" aria-live="polite"></div><div class="ai-preview" id="aiPreview"><h3 id="aiPreviewTitle"></h3><p id="aiPreviewDate"></p><p id="aiPreviewRepeat"></p><p id="aiPreviewNotes"></p><div class="ai-confirm"><button id="aiNo">No, change it</button><button class="ai-yes" id="aiYes">Yes, add it</button></div></div><div class="ai-preview" id="aiCancel"><h3 id="aiCancelTitle"></h3><p id="aiCancelBody"></p><div class="ai-choices" id="aiChoices"></div></div><button type="button" class="ai-undo" id="aiUndo" hidden>↩ Undo</button><div class="ai-memory">Your approved arrangements and preferences can be remembered on this device. <button id="aiMemoryBtn">View saved preferences</button></div></section></div>
+<div class="ai-backdrop" id="aiBackdrop" aria-hidden="true"><section class="ai-card" role="dialog" aria-modal="true" aria-labelledby="aiTitle"><div class="ai-head"><h2 id="aiTitle">Plan something</h2><button class="ai-close" id="aiClose" aria-label="Close">×</button></div><p class="ai-hint">Describe it naturally, e.g. “Tanya chavrusa with Yossi every Sunday and Tuesday at 8pm” or “yahrzeit of my father 20 Av”. To remove one: “cancel my chavrusa with Yossi”. Hebrew dates and terms like kvius, chavrusa and seder are welcome.</p><textarea class="ai-input" id="aiInput" placeholder="e.g. Set a monthly kvius with my chavrusa on the 15th of every Hebrew month…"></textarea><div class="ai-actions"><button class="ai-mic" id="aiMic" aria-label="Speak your request" title="Speak" aria-pressed="false" type="button">🎙</button><select class="ai-lang" id="aiLang" aria-label="Voice language"><option value="en-US">English</option><option value="he-IL">עברית</option></select><button class="ai-primary" id="aiPlan" style="flex:1">Make a plan</button></div><div class="ai-status" id="aiStatus" aria-live="polite"></div><div class="ai-preview" id="aiPreview"><h3 id="aiPreviewTitle"></h3><p id="aiPreviewDate"></p><p id="aiPreviewRepeat"></p><p id="aiPreviewNotes"></p><div class="ai-confirm"><button id="aiNo">No, change it</button><button class="ai-yes" id="aiYes">Yes, add it</button></div></div><div class="ai-multi" id="aiMulti"></div><div class="ai-preview" id="aiCancel"><h3 id="aiCancelTitle"></h3><p id="aiCancelBody"></p><div class="ai-choices" id="aiChoices"></div></div><button type="button" class="ai-undo" id="aiUndo" hidden>↩ Undo</button><div class="ai-memory">Your approved arrangements and preferences can be remembered on this device. <button id="aiMemoryBtn">View saved preferences</button></div></section></div>
 <div class="bd" id="bd"></div>
 <div class="sheet ms" id="ms" role="dialog" aria-label="Month"><div class="mh"><h2 id="t"></h2><div class="nav"><button id="pv" aria-label="Previous month">‹</button><button id="nx" aria-label="Next month">›</button></div></div><div class="sub" id="s"></div><section class="cal"><div class="dow"></div><div class="grid" id="g"></div></section></div>
 
@@ -469,7 +469,7 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
   var io=function(x){return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2};
   var out=function(x){return 1-Math.pow(1-x,3)};
   var sm=function(x){return x*x*(3-2*x)};
-  var END=10.7,ov=document.getElementById('intro'),app=document.querySelector('main');
+  var END=10.7,SPEED=1.65,ov=document.getElementById('intro'),app=document.querySelector('main');
 
   var ZA=[[512,518],[318,628],[212,550],[120,735]],ZB=[[660,242],[480,472],[300,242],[300,602]];
   var SA=[[556,536],[522,725]],SB=[[660,242],[660,602]];
@@ -624,7 +624,8 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
   }
   function frame(now){
     if(!t0)t0=now;
-    var t=(now-t0)/1000;
+    // SPEED plays the whole timeline faster (10.7 s of animation in about 6.5 s)
+    var t=(now-t0)/1000*SPEED;
     render(Math.min(t,END));
     haptics(t);sound(t);
     if(t<END)raf=requestAnimationFrame(frame);else finish();
@@ -1810,7 +1811,7 @@ lg();render(0);panel();op(false);mo(false);skyIntroInit();
 const AI_PREF_KEY='cc_ai_preferences_v1';
 const aiEl=id=>document.getElementById(id);let aiProposal=null,aiRecognition=null;
 function aiOpen(){aiEl('aiBackdrop').classList.add('on');aiEl('aiBackdrop').setAttribute('aria-hidden','false');setTimeout(()=>aiEl('aiInput').focus(),120)}
-function aiClose(){try{aiCancelReset();aiEl('aiUndo').hidden=true}catch(e){}aiEl('aiBackdrop').classList.remove('on');aiEl('aiBackdrop').setAttribute('aria-hidden','true')}
+function aiClose(){try{aiCancelReset();aiEl('aiUndo').hidden=true;aiBatchReset()}catch(e){}aiEl('aiBackdrop').classList.remove('on');aiEl('aiBackdrop').setAttribute('aria-hidden','true')}
 aiEl('aiFab').addEventListener('click',aiOpen);aiEl('aiClose').addEventListener('click',aiClose);aiEl('aiBackdrop').addEventListener('click',e=>{if(e.target===aiEl('aiBackdrop'))aiClose()});
 function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
 // First-run guided tour (see ccTourStart). Also hooks up profile name / log out.
@@ -2366,11 +2367,9 @@ function aiShowProposal(p){aiProposal=p;
 async function aiPlan(){const raw=aiEl('aiInput').value.trim();if(!raw){aiSetStatus('Type or speak what you want to schedule.');return}
  aiMicStop();if(aiCancelHandleInput(raw))return;aiEl('aiPreview').classList.remove('show');aiSetStatus('Understanding your request…');aiEl('aiPlan').disabled=true;
  try{let data=null;
-  // Optional server-side interpreter. Only tried when the page is actually served over http(s); a missing or slow endpoint falls through to the on-device interpreter.
-  if(/^https?:$/.test(location.protocol)){try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),4000);
-   const response=await fetch('/api/interpret',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,body:JSON.stringify({text:raw,selectedDate:ds(sel),selectedHebrewDate:aiHebrewDate(sel),preferences:aiPrefs(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone})});clearTimeout(to);
-   if(response.ok&&/json/i.test(response.headers.get('content-type')||'')){const d=await response.json();if(d&&d.title)data=d}}catch(e){}}
-  if(!data){data=aiLocalInterpret(raw)}
+  const segs=aiSplitRequests(raw);
+  if(segs.length>1||(aiBatchKeep&&aiBatch.some(it=>it.state==='pending'))){await aiPlanMany(segs.length?segs:[raw]);return}
+  aiBatchReset();data=await aiInterpretOne(raw);
   aiShowProposal(data)}
  catch(err){console.error('Assistant error',err);aiSetStatus('Sorry, I could not read that request. Try rewording it.')}
  finally{aiEl('aiPlan').disabled=false}}
@@ -2610,8 +2609,104 @@ function aiCancelHandleInput(raw){
  aiEl('aiCancel').classList.remove('show');return false}
 aiEl('aiUndo').addEventListener('click',aiCancelUndo);
 
+/* ---- Several requests in one message ----
+   aiSplitRequests() cuts the text into separate requests (new lines, sentences, "and also", "and add…", or two parts that each
+   have their own name and their own day/time). Each part is understood on its own, exactly as if it had been typed alone,
+   and gets its own card to approve or skip. */
+const AI_SPLIT_VERB='(?:please\\s+)?(?:also\\s+)?(?:cancel|delete|remove|add|schedule|remind\\s+me|set\\s*up|create|put|book|plan|make|arrange|i\\s+(?:also\\s+)?(?:have|need|want)|there(?:\'s|\\s+is))\\b';
+const AI_ANCHOR_RE=/\b\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|\bat\s+\d{1,2}(?::\d{2})?\b|\b(?:noon|midnight|tonight|today|tomorrow|tmrw|daily|every\s*day)\b|\b(?:sun|mon|tue|tues|wed|thu|thur|thurs|fri|sat)(?:day)?s?\b|\bshabb(?:os|at)\b|\b\d{1,2}(?:st|nd|rd|th)?\s+(?:of\s+)?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|tishrei|cheshvan|kislev|teves|tevet|shvat|shevat|adar|nissan|nisan|iyar|sivan|tammuz|tamuz|av|elul)|\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+\d{1,2}\b|\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\/\d{1,2}\b/i;
+const AI_SPLIT_FILLER=new Set('at on in every each the a an from to until till by for of and or next this coming week weekly month monthly year yearly day days am pm noon midnight tonight today tomorrow morning afternoon evening night hour hours minute minutes min mins also then plus again same time'.split(' '));
+function aiHasTitle(s){return aiNoPunct(s).some(w=>w.length>=3&&!/^\d/.test(w)&&!AI_SPLIT_FILLER.has(w)&&aiDow(w)<0&&!/^(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/.test(w)&&!aiHebKey(w))}
+function aiHasAnchor(s){return AI_ANCHOR_RE.test(s)}
+function aiSplitRequests(raw){
+ const text=String(raw||'').replace(/\r/g,'').replace(/[‘’`´]/g,"'").trim();if(!text)return[];
+ // 1. lines (with bullets or numbers), semicolons, "1) … 2) …", Hebrew "וגם"
+ let parts=text.split(/\n+/).map(l=>l.replace(/^\s*(?:[•*\-–]|\d{1,2}[.)])\s+/,'')).flatMap(l=>l.split(/\s*;\s*|\s+(?=\d{1,2}\)\s)|\s+וגם\s+/)).map(l=>l.replace(/^\d{1,2}\)\s+/,''));
+ // 2. sentences, but not after abbreviations such as Dr. R. St. or a.m.
+ parts=parts.flatMap(l=>{const out=[];for(const piece of l.split(/(?<=[.!?])\s+(?=\S)/)){
+   const prev=out[out.length-1];
+   if(prev&&/(?:^|\s)(?:dr|mr|mrs|ms|r|rav|reb|rabbi|st|mt|jr|sr|no|vol|ch|[a-z])\.$/i.test(prev)&&!(/[ap]\.m\.$/i.test(prev)&&/^[A-Z]/.test(piece)))out[out.length-1]=prev+' '+piece;
+   else out.push(piece)}return out});
+ // 3. inside one sentence: "and also …", ", and add …", or two parts that each name something and give it a day or time
+ const vRe=new RegExp('^'+AI_SPLIT_VERB,'i');
+ parts=parts.flatMap(l=>{const out=[];let cur='';const bits=l.split(/(\s*,\s*(?:and\s+)?(?:then\s+)?|\s+and\s+(?:then\s+)?|\s+&\s+|\s+plus\s+)/i);
+   cur=bits[0];
+   for(let i=1;i<bits.length;i+=2){const sep=bits[i],rest=bits.slice(i+1).join(''),next=bits[i+1]||'';
+    const also=/^also\b/i.test(next.trim())&&/\band\b|,/i.test(sep);
+    const verb=vRe.test(next.trim());
+    const pair=aiHasTitle(cur)&&aiHasAnchor(cur)&&aiHasTitle(rest)&&aiHasAnchor(rest)&&aiHasTitle(next)&&!/^(?:with|at|on|in|for|from|to|until|every|each)\b/i.test(next.trim());
+    if(cur.trim()&&aiHasTitle(cur)&&(also||verb||pair)){out.push(cur);cur=next.replace(/^\s*also[,]?\s+/i,'')}
+    else cur+=sep+next}
+   out.push(cur);return out});
+ return parts.map(s=>s.replace(/^\s*(?:and|also|then|plus)\b[,]?\s*/i,'').replace(/[\s,.;!]+$/,'').trim()).filter(s=>s&&!/^(?:hi|hello|hey|thanks|thank you|please|ok|okay|that's all|that is all)$/i.test(s))}
+
+async function aiInterpretOne(raw){let data=null;
+ // Optional server-side interpreter. Only tried when the page is actually served over http(s); a missing or slow endpoint falls through to the on-device interpreter.
+ if(/^https?:$/.test(location.protocol)){try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),4000);
+  const response=await fetch('/api/interpret',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,body:JSON.stringify({text:raw,selectedDate:ds(sel),selectedHebrewDate:aiHebrewDate(sel),preferences:aiPrefs(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone})});clearTimeout(to);
+  if(response.ok&&/json/i.test(response.headers.get('content-type')||'')){const d=await response.json();if(d&&d.title)data=d}}catch(e){}}
+ return data||aiLocalInterpret(raw)}
+
+let aiSeq=0;
+// Save one approved plan to the calendar. `source` is the request text it came from (remembered on this device).
+function aiCommit(p,source){const dv=new Date((p.date||ds(sel))+'T12:00:00');if(!p.title||isNaN(+dv))return null;
+ const h=hd(dv),o={id:'ai'+Date.now()+(aiSeq++?'_'+aiSeq:''),t:p.title,x:p.notes||'',person:p.participant||'',kind:p.kind||'event',dt:ds(dv),r:p.recurrence||'once',hk:h.k,hd:p.hd||h.d,interval:p.interval};
+ if(o.r==='weekly'){o.dow=Number.isInteger(p.dow)?p.dow:dv.getDay();if(Array.isArray(p.dows)&&p.dows.length)o.dows=p.dows.filter(Number.isInteger)}
+ if(p.from&&(o.r==='weekly'||o.r==='hmonth'))o.from=p.from;if(o.r==='yomadpagra'||o.r==='custom')o.dates=Array.isArray(p.dates)?p.dates:[];
+ my.push(o);SV();lg();
+ let prefs=aiPrefs();prefs.arrangements=prefs.arrangements||{};prefs.arrangements[String(source||'').trim().toLowerCase().replace(/\s+/g,' ')]={title:o.t,notes:o.x,recurrence:o.r,dt:o.dt,hk:o.hk,hd:o.hd};
+ if(p.remember&&typeof p.remember==='object')prefs={...prefs,...p.remember,arrangements:prefs.arrangements};aiSavePrefs(prefs);
+ return{o,dv}}
+
+// Batch of cards, one per request. Each item: {src, p, state:'pending'|'added'|'skipped'|'note'}
+let aiBatch=[],aiBatchKeep=false,aiBatchAdded=0,aiBatchLast=null;
+function aiBatchReset(){aiBatch=[];aiBatchKeep=false;aiBatchAdded=0;aiBatchLast=null;const m=aiEl('aiMulti');m.classList.remove('show');m.innerHTML=''}
+function aiBatchAdd(it){const r=aiCommit(it.p,it.src);if(!r){it.state='pending';it.p.needsClarification=true;it.p.clarify='This one needs a valid name and date.';return false}
+ it.state='added';aiBatchAdded++;aiBatchLast=r.dv;return true}
+function aiBatchDone(){if(aiBatch.some(it=>it.state==='pending'))return;
+ render(0);if(aiBatchLast)pick(aiBatchLast);
+ const n=aiBatchAdded;aiSetStatus(n?`Added ${n} ${n===1?'plan':'plans'} to your calendar.`:'Nothing was added.');
+ if(n){aiEl('aiInput').value='';setTimeout(()=>{aiBatchReset();aiClose()},1100)}}
+function aiBatchRender(){const m=aiEl('aiMulti');m.innerHTML='';
+ const pend=aiBatch.filter(it=>it.state==='pending'),ok=pend.filter(it=>!it.p.needsClarification);
+ const head=document.createElement('div');head.className='ai-mhead';
+ const ht=document.createElement('span');ht.textContent=`I found ${aiBatch.filter(it=>it.state!=='note').length} separate requests. Each one is its own plan.`;head.appendChild(ht);
+ if(ok.length>1){const all=document.createElement('button');all.type='button';all.className='ai-yes';all.textContent=`Add all ${ok.length}`;
+  all.onclick=()=>{H.ok();ok.forEach(aiBatchAdd);if(aiBatchAdded)render(0);aiBatchRender();aiBatchDone()};head.appendChild(all)}
+ m.appendChild(head);
+ aiBatch.forEach((it,i)=>{const p=it.p,c=document.createElement('div');c.className='ai-preview show ai-mcard'+(it.state!=='pending'?' ai-mdone':'');
+  const src=document.createElement('div');src.className='ai-msrc';src.textContent=`${i+1}. “${it.src}”`;c.appendChild(src);
+  if(it.state==='note'){const n=document.createElement('p');n.textContent=p.clarify;c.appendChild(n);m.appendChild(c);return}
+  const h=document.createElement('h3');h.textContent=(p.kind==='task'?'☑ Task: ':'')+(p.title||'Untitled event');c.appendChild(h);
+  const filed=p.category&&p.category!=='General'?'Filed under: '+p.category+(p.kind==='task'?' (checkable task)':''):'';
+  [p.summaryDate||(p.date?`Date: ${p.date}`:''),p.summary||'One-time event',[p.notes,filed].filter(Boolean).join('\n')].filter(Boolean).forEach(t=>{const e=document.createElement('p');e.style.whiteSpace='pre-line';e.textContent=t;c.appendChild(e)});
+  const w=(p.warnings||[]).join(' ');if(p.needsClarification||w){const e=document.createElement('p');e.className='ai-mwarn';e.textContent=p.needsClarification?(p.clarify||'Something is missing in this one.'):w;c.appendChild(e)}
+  if(it.state==='pending'){const row=document.createElement('div');row.className='ai-confirm';
+   const no=document.createElement('button');no.type='button';no.textContent='Change it';
+   no.onclick=()=>{H.tap();it.state='skipped';aiBatch.splice(aiBatch.indexOf(it),1);aiBatchKeep=true;aiEl('aiInput').value=it.src;aiEl('aiInput').focus();
+    aiBatchRender();aiSetStatus('Fix this one above and tap Make a plan. Your other cards stay here.');if(!aiBatch.length)aiBatchReset()};
+   const sk=document.createElement('button');sk.type='button';sk.textContent='Skip';
+   sk.onclick=()=>{H.tap();it.state='skipped';aiBatchRender();aiBatchDone()};
+   const yes=document.createElement('button');yes.type='button';yes.className='ai-yes';yes.textContent='Add it';
+   if(p.needsClarification){yes.disabled=true;yes.style.opacity='.5'}
+   yes.onclick=()=>{if(p.needsClarification)return;H.ok();aiBatchAdd(it);render(0);aiBatchRender();aiBatchDone()};
+   row.append(no,sk,yes);c.appendChild(row)}
+  else{const s=document.createElement('p');s.className='ai-mstate';s.textContent=it.state==='added'?'✓ Added':'Skipped';c.appendChild(s)}
+  m.appendChild(c)});
+ m.classList.add('show')}
+async function aiPlanMany(segs){
+ aiProposal=null;aiEl('aiPreview').classList.remove('show');aiEl('aiCancel').classList.remove('show');
+ const keep=aiBatchKeep?aiBatch.filter(it=>it.state==='pending'):[];if(!aiBatchKeep)aiBatchReset();aiBatchKeep=false;
+ const items=await Promise.all(segs.map(async src=>{
+  if(AI_CANCEL_RE.test(aiNormalize(src)))return{src,state:'note',p:{clarify:'This asks to cancel something. Send cancellations on their own, one at a time.'}};
+  let p;try{p=await aiInterpretOne(src)}catch(e){p={needsClarification:true,clarify:'I could not read this part. Try rewording it.'}}
+  if(p.unsupported)return{src,state:'note',p};
+  return{src,state:'pending',p}}));
+ aiBatch=keep.concat(items);aiBatchRender();
+ const pend=aiBatch.filter(it=>it.state==='pending'),bad=pend.filter(it=>it.p.needsClarification).length;
+ aiSetStatus('Review each card. Nothing has been added yet.'+(bad?` ${bad===1?'One card needs':bad+' cards need'} more detail: tap Change it.`:''))}
 aiEl('aiNo').addEventListener('click',()=>{aiEl('aiPreview').classList.remove('show');aiSetStatus('Edit your request above and make a new plan.');aiEl('aiInput').focus()});
-aiEl('aiYes').addEventListener('click',()=>{if(!aiProposal||aiProposal.needsClarification)return;const p=aiProposal,dv=new Date((p.date||ds(sel))+'T12:00:00');if(!p.title||isNaN(+dv)){aiSetStatus('The proposed event needs a valid title and date.');return}const h=hd(dv),o={id:'ai'+Date.now(),t:p.title,x:p.notes||'',person:p.participant||'',kind:p.kind||'event',dt:ds(dv),r:p.recurrence||'once',hk:h.k,hd:p.hd||h.d,interval:p.interval};if(o.r==='weekly'){o.dow=Number.isInteger(p.dow)?p.dow:dv.getDay();if(Array.isArray(p.dows)&&p.dows.length)o.dows=p.dows.filter(Number.isInteger)}if(p.from&&(o.r==='weekly'||o.r==='hmonth'))o.from=p.from;if(o.r==='yomadpagra')o.dates=Array.isArray(p.dates)?p.dates:[];if(o.r==='custom')o.dates=Array.isArray(p.dates)?p.dates:[];my.push(o);SV();lg();render(0);pick(dv);
- const prefs=aiPrefs();prefs.arrangements=prefs.arrangements||{};const source=aiEl('aiInput').value.trim();prefs.arrangements[source.toLowerCase().replace(/\s+/g,' ')]={title:o.t,notes:o.x,recurrence:o.r,dt:o.dt,hk:o.hk,hd:o.hd};if(p.remember&&typeof p.remember==='object')prefs={...prefs,...p.remember,arrangements:prefs.arrangements};aiSavePrefs(prefs);aiEl('aiInput').value='';aiEl('aiPreview').classList.remove('show');aiSetStatus('Added to your calendar.');setTimeout(aiClose,850)});
+aiEl('aiYes').addEventListener('click',()=>{if(!aiProposal||aiProposal.needsClarification)return;const r=aiCommit(aiProposal,aiEl('aiInput').value);if(!r){aiSetStatus('The proposed event needs a valid title and date.');return}
+ render(0);pick(r.dv);aiEl('aiInput').value='';aiEl('aiPreview').classList.remove('show');aiSetStatus('Added to your calendar.');setTimeout(aiClose,850)});
 aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object.keys(p.arrangements||{});alert(names.length?'Saved arrangements on this device:\n\n'+names.map((n,i)=>`${i+1}. ${n}`).join('\n')+'\n\nTo reset this memory, clear this site’s local storage.':'No saved arrangements yet. After you approve an event, its request and details will be remembered on this device.')});
 </script></body></html>
