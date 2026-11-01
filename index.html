@@ -2092,6 +2092,7 @@ function aiLocalInterpret(raw){
  let W=original;
  for(const[re,to]of AI_HEB_MAP)W=W.replace(re,to);
  for(const[re,to]of AI_FIXES)W=W.replace(re,to);
+ W=aiFixTimes(W).replace(/^(?:(?:and\s+)?(?:also\s+)?)(?:i|we)(?:\s+also)?\s+(?:have|'ve\s+got|have\s+got|got|ve\s+got)(?:\s+(?:a|an|my|our|the))?\s+(?=\S)/i,'').replace(/^(?:there(?:'s|\s+is)|i'?ve\s+got)(?:\s+(?:a|an|my|our|the))?\s+(?=\S)/i,'');
  W=aiNumberize(W);
  // Protect masechta names ("gemara shabbos") from being read as weekdays
  W=W.replace(new RegExp('\\b(gemara|masechta|maseches|mishnayos|mishna|daf\\s+yomi|daf|tractate)\\s+('+AI_MASECHTOS+')\\b','gi'),(m,k,ms)=>k.toLowerCase().replace(/\s+/g,'-')+'_'+ms.toLowerCase().replace(/\s+/g,'-'));
@@ -2481,6 +2482,7 @@ function aiNormalize(raw){
  let W=String(raw||'').replace(/[‘’`´]/g,"'").replace(/[“”]/g,'"').replace(/[–—]/g,'-').replace(/\s+/g,' ').trim();
  for(const[re,to]of AI_HEB_MAP)W=W.replace(re,to);
  for(const[re,to]of AI_FIXES)W=W.replace(re,to);
+ W=aiFixTimes(W).replace(/^(?:(?:and\s+)?(?:also\s+)?)(?:i|we)(?:\s+also)?\s+(?:have|'ve\s+got|have\s+got|got|ve\s+got)(?:\s+(?:a|an|my|our|the))?\s+(?=\S)/i,'').replace(/^(?:there(?:'s|\s+is)|i'?ve\s+got)(?:\s+(?:a|an|my|our|the))?\s+(?=\S)/i,'');
  W=aiNumberize(W);
  const ab='(?:sun|mon|tues|tue|wed|thurs|thur|thu|fri|sat)',full=n=>AI_DAY_LABEL[AI_DAY_ABBR[n.toLowerCase()]];
  W=W.replace(new RegExp('\\b(every|on|each|next|this|and|through|thru|until|till|to|from|&)\\s+('+ab+')\\b\\.?','gi'),(m,a,b)=>a+' '+full(b));
@@ -2672,8 +2674,10 @@ function aiHasAnchor(s){return AI_ANCHOR_RE.test(s)}
 const AI_SUBJ_CUT=new RegExp('(?:every|each|on|at|@|with|daily|nightly|weekly|monthly|yearly|before|after|from|starting|beginning|tonight|tomorrow|today|this|next|until|till|for\\s+\\d|in\\s+the|around|'+AI_DAY_RE+'s?|\\d)\\b');
 // "Schedule a chavrusa every Monday with JJ" -> "Schedule a chavrusa": the words before the first when/who/where
 function aiSubject(t){const m=new RegExp('\\b'+AI_SUBJ_CUT.source,'i').exec(t);const s=(m?t.slice(0,m.index):t).replace(/[\s,;.]+$/,'').trim();return aiHasTitle(s)?s:''}
+// "730pm" / "at 730" -> "7:30pm" / "at 7:30" (speech and quick typing often drop the colon)
+function aiFixTimes(t){return String(t||'').replace(/\b(1[0-2]|0?[1-9])([0-5]\d)\s*(a\.?m\.?|p\.?m\.?)(?!\w)/gi,'$1:$2 $3').replace(/\b(at|@|around|by|from|until|till)\s+([1-9])([0-5]\d)\b(?![:\d])/gi,'$1 $2:$3')}
 function aiSplitRequests(raw){
- const text=String(raw||'').replace(/\r/g,'').replace(/[‘’`´]/g,"'").trim();if(!text)return[];
+ const text=aiFixTimes(String(raw||'').replace(/\r/g,'').replace(/[‘’`´]/g,"'")).trim();if(!text)return[];
  // 1. lines (with bullets or numbers), semicolons, "1) … 2) …", Hebrew "וגם"
  let parts=text.split(/\n+/).map(l=>l.replace(/^\s*(?:[•*\-–]|\d{1,2}[.)])\s+/,'')).flatMap(l=>l.split(/\s*;\s*|\s+(?=\d{1,2}\)\s)|\s+וגם\s+/)).map(l=>l.replace(/^\d{1,2}\)\s+/,''));
  // 2. sentences, but not after abbreviations such as Dr. R. St. or a.m.
