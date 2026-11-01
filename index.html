@@ -929,7 +929,15 @@ function zmn(){const dt=sel,y=dt.getFullYear(),mo=dt.getMonth()+1,d=dt.getDate()
  {const hh=hd(dt);if(hh.k=='N'&&hh.d==14)R.push(['Stop eating chametz (end of 4th hour)',mn+4*mg],['Burn chametz by (end of 5th hour)',mn+5*mg])}
  ZR=R;$('#zm').innerHTML=`<h2 class="rv">Zmanim</h2><div class="mut rv" style="--i:1">${LC.n}</div>`+R.map((r,i)=>`<div class="dr rv" style="--i:${Math.min(i+2,10)}"><b>${r[0]}</b><span>${tf(r[1])}</span></div>`).join('')+'<small class="rv" style="--i:12">Calculated estimates (alos 16.1°, tzeis 8.5°, candles 18 min before sunset). Confirm with your local luach for halachic use.</small>'}
 const TH=['1–9','10–17','18–22','23–28','29–34','35–38','39–43','44–48','49–54','55–59','60–65','66–68','69–71','72–76','77–78','79–82','83–87','88–89','90–96','97–103','104–105','106–107','108–112','113–118','119:1–96','119:97–176','120–134','135–139','140–144','145–150'];
-function render(dir){if(typeof GLS!=='undefined'&&GLS.kick)requestAnimationFrame(GLS.kick);
+/* Keep the event chips in their own space: just under the week panel and above the + button. On short screens the sky
+   area gives up height (never the chips) so nothing overlaps. */
+function footPlace(){const f=document.getElementById('foot'),w=document.querySelector('#hdr .wk');if(!f||!w||(scrollY||0)>4)return;
+ const sc=document.querySelector('#hdr .sky-scene,#hdr .moon'),H=innerHeight;if(sc)sc.style.height='';f.style.top='';f.style.bottom='';
+ let wb=w.getBoundingClientRect().bottom;const fh=f.offsetHeight||42,lim=H-166;let over=wb+14+fh-lim;
+ if(over>0&&sc){const cur=sc.offsetHeight,nh=Math.max(150,cur-over);if(nh<cur){sc.style.height=nh+'px';wb=w.getBoundingClientRect().bottom;over=wb+14+fh-lim}}
+ f.style.top=Math.round(wb+14)+'px';f.style.bottom='auto';if(typeof skyRedrawTrail==='function')skyRedrawTrail()}
+addEventListener('resize',()=>requestAnimationFrame(footPlace));if(document.fonts)document.fonts.ready.then(()=>footPlace());
+function render(dir){requestAnimationFrame(()=>requestAnimationFrame(footPlace));if(typeof GLS!=='undefined'&&GLS.kick)requestAnimationFrame(GLS.kick);
  const f=V,L=hlen(f),a=ad(f,-f.getDay()),n=Math.ceil((f.getDay()+L)/7)*7,td=+t0;
  const h0=hd(f),e1=ad(f,L-1);$('#t').textContent=h0.n[0]+' '+h0.y;if(dir&&!RM)$('#t').animate([{opacity:0,transform:`translateX(${dir*18}px)`},{opacity:1,transform:'none'}],{duration:380,easing:'cubic-bezier(.2,.8,.2,1)'});
  {const A=f.toLocaleDateString('en',{month:'short'}),B=e1.toLocaleDateString('en',{month:'short'}),y1=f.getFullYear(),y2=e1.getFullYear();$('#s').innerHTML=`${A==B&&y1==y2?A:A+(y1==y2?'':' '+y1)+' – '+B} ${y2} · <b lang="he">${h0.n[1]} ה׳${G(h0.y%1000)}</b>`}
