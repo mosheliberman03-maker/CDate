@@ -1726,6 +1726,18 @@ const pushCan=()=>window.isSecureContext&&location.protocol!=='file:'&&'serviceW
 let PSUB=null,PERR='';
 const u8=s=>{s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u};
 const pushReg=async()=>{try{return await navigator.serviceWorker.register('sw.js')}catch(e){return null}};
+/* Always-fresh app: register the service worker for everyone (it fetches the newest index.html on open),
+   and when the app comes back from the background after 2+ minutes, check whether a newer version was published. */
+const UPD={tag:'',away:0};
+const updTag=async()=>{try{const r=await fetch(location.pathname,{method:'HEAD',cache:'no-store'});return r.ok?(r.headers.get('etag')||r.headers.get('last-modified')||''):''}catch(e){return ''}};
+function updBar(){if(document.getElementById('updBar'))return;const b=document.createElement('button');b.id='updBar';b.type='button';b.textContent='A new version is ready · Tap to update';
+ b.style.cssText='position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:9000;border:1px solid var(--line);border-radius:999px;padding:10px 16px;background:var(--ink);color:var(--card);font:600 14px Figtree,system-ui;box-shadow:0 8px 30px #0003;max-width:calc(100% - 24px)';
+ b.onclick=()=>{try{H.tap()}catch(e){}location.reload()};document.body.appendChild(b)}
+if(window.isSecureContext&&location.protocol!=='file:'&&'serviceWorker' in navigator){
+ addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').then(r=>{try{r.update()}catch(e){}}).catch(()=>{});updTag().then(t=>UPD.tag=t)});
+ document.addEventListener('visibilitychange',async()=>{if(document.hidden){UPD.away=Date.now();return}
+  if(!UPD.tag){UPD.tag=await updTag();return}
+  if(!UPD.away||Date.now()-UPD.away<120000)return;const t=await updTag();if(t&&t!==UPD.tag)updBar()})}
 async function pushCur(){PSUB=null;if(!pushCan()||!pushSrv())return null;
  try{const r=(await navigator.serviceWorker.getRegistration())||(await pushReg());if(r)PSUB=await r.pushManager.getSubscription()}catch(e){}return PSUB}
 const pushPost=async(p,b)=>{const r=await fetch(pushSrv()+p,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b)});return r.json()};
