@@ -526,11 +526,11 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 /* living light: the silk canvas, and glass whose rim glint and glare follow the same light as you scroll */
 #skyGL{position:absolute;inset:0;width:100%;height:100%;display:block}
 #hdr .wk,.hyc{position:relative}
-:is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc)::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;padding:1.2px;z-index:2;
- background:conic-gradient(from var(--ga,-40deg),rgba(255,255,255,var(--gi)) 0deg,rgba(255,255,255,calc(var(--gi)*.35)) 32deg,rgba(255,255,255,0) 85deg,rgba(255,255,255,0) 150deg,rgba(255,255,255,calc(var(--gi)*.22)) 180deg,rgba(255,255,255,0) 212deg,rgba(255,255,255,0) 275deg,rgba(255,255,255,calc(var(--gi)*.35)) 328deg,rgba(255,255,255,var(--gi)) 360deg);
+:is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc)::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;padding:1.6px;z-index:2;
+ background:conic-gradient(from var(--gg,120deg),rgba(255,255,255,0) 0deg,rgba(255,255,255,.35) 7deg,rgba(255,255,255,1) 13deg,#fff 17deg,rgba(255,255,255,.35) 23deg,rgba(255,255,255,0) 30deg,rgba(255,255,255,0) 360deg),conic-gradient(from var(--ga,-40deg),rgba(255,255,255,var(--gi)) 0deg,rgba(255,255,255,calc(var(--gi)*.35)) 32deg,rgba(255,255,255,0) 85deg,rgba(255,255,255,0) 150deg,rgba(255,255,255,calc(var(--gi)*.22)) 180deg,rgba(255,255,255,0) 212deg,rgba(255,255,255,0) 275deg,rgba(255,255,255,calc(var(--gi)*.35)) 328deg,rgba(255,255,255,var(--gi)) 360deg);
  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 :is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc)::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
- background:radial-gradient(80% 110% at var(--gx,30%) var(--gy,-10%),rgba(255,255,255,calc(var(--gi)*.16)),rgba(255,255,255,0) 62%),
+ background:radial-gradient(46px 30px at var(--hx,-99px) var(--hy,-99px),rgba(255,255,255,calc(var(--gi)*.42)),rgba(255,255,255,0) 100%),radial-gradient(80% 110% at var(--gx,30%) var(--gy,-10%),rgba(255,255,255,calc(var(--gi)*.16)),rgba(255,255,255,0) 62%),
  linear-gradient(112deg,rgba(255,255,255,0) calc(var(--gs,40%) - 16%),rgba(255,255,255,calc(var(--gi)*.09)) var(--gs,40%),rgba(255,255,255,0) calc(var(--gs,40%) + 16%))}
 :root{--gi:.55}:root[data-night="1"]{--gi:.62}
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
@@ -1762,16 +1762,31 @@ function skyRibbonsSvg(host){
    translucent silk with a curved cross-section, lit by one light; the light swings as you scroll (and drifts slowly),
    so the sheen slides along the ribbons, and the glass pieces' rims and glare follow the same light (glassShine). */
 const GLS={ang:-2.25,L:[-.47,-.6,.65],t:0,ok:false};
-function glassShine(){const H=innerHeight,W=innerWidth,lx=W/2+GLS.L[0]*H*1.6,ly=H/2+GLS.L[1]*H*1.6;
- for(const e of document.querySelectorAll('#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc')){const r=e.getBoundingClientRect();if(r.bottom<-40||r.top>H+40||!r.width)continue;
-  const cx=r.left+r.width/2,cy=r.top+r.height/2,dx=lx-cx,dy=ly-cy,d=Math.hypot(dx,dy)||1,nx=dx/d,ny=dy/d,s=e.style;
-  s.setProperty('--ga',(Math.atan2(dx,-dy)*57.2958).toFixed(1)+'deg');s.setProperty('--gx',(50+nx*46).toFixed(1)+'%');s.setProperty('--gy',(50+ny*60).toFixed(1)+'%');
-  s.setProperty('--gs',(50+62*Math.sin(GLS.ang*1.6+cy/H*2.4)).toFixed(1)+'%')}}
+/* Every piece lives on its own: a personal float (period, phase, size), a rim glint that travels around its edge as you
+   scroll (own speed and direction) plus a slow orbit of its own, and its glare band on its own phase. */
+const GLSEED=new WeakMap();let GLSI=0;
+function glSeed(e){let k=GLSEED.get(e);if(!k){const n=++GLSI,r=q=>((Math.sin(n*12.9898+q*78.233)*43758.5453)%1+1)%1;
+ k={p:r(1)*6.283,f:.7+r(2)*.55,a:.75+r(3)*.5,dir:r(4)>.5?1:-1,spd:6+r(5)*7,ph:r(6)*360,q:r(7)*6.283};GLSEED.set(e,k)}return k}
+const GL_SEL='#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc',GL_FLOAT={'sky-cap':2.2,'wk':2.4,'dock':1.3,'hint':2.2,'ai-fab':2.8,'hd-he':1.4,'hd-div':1,'hd-en':1.2};
+function glassShine(){const H=innerHeight,W=innerWidth,lx=W/2+GLS.L[0]*H*1.6,ly=H/2+GLS.L[1]*H*1.6,t=GLS.t||0,sy=scrollY||0,mv=!GLS.still;
+ const la=Math.atan2(lx-W/2,-(ly-H/2))*57.2958;
+ for(const e of document.querySelectorAll(GL_SEL+',#hdr .hd-he,#hdr .hd-div,#hdr .hd-en')){const r=e.getBoundingClientRect();if(r.bottom<-40||r.top>H+40||!r.width)continue;
+  const k=glSeed(e),s=e.style,cls=Object.keys(GL_FLOAT).find(c=>e.classList.contains(c));
+  if(mv){const amp=(cls?GL_FLOAT[cls]:1.6)*k.a,w=t*k.f;s.translate=(Math.sin(w*.53+k.q)*amp*.35).toFixed(2)+'px '+(Math.sin(w*.82+k.p)*amp).toFixed(2)+'px'}
+  if(!e.matches(GL_SEL))continue;
+  const cx=r.left+r.width/2,cy=r.top+r.height/2,dx=lx-cx,dy=ly-cy,d=Math.hypot(dx,dy)||1,nx=dx/d,ny=dy/d;
+  s.setProperty('--ga',(Math.atan2(dx,-dy)*57.2958).toFixed(1)+'deg');
+  s.setProperty('--gg',((la+k.ph+sy*.55*k.dir+(mv?t*k.spd*k.dir:0))%360).toFixed(1)+'deg');
+  {const g=(((la+k.ph+sy*.55*k.dir+(mv?t*k.spd*k.dir:0))+15)%360)/57.2958,ux=Math.sin(g),uy=-Math.cos(g),hw=r.width/2,hh=r.height/2,m=Math.min(hw/Math.abs(ux||1e-6),hh/Math.abs(uy||1e-6));
+   s.setProperty('--hx',(hw+ux*m).toFixed(1)+'px');s.setProperty('--hy',(hh+uy*m).toFixed(1)+'px')}
+  s.setProperty('--gx',(50+nx*46).toFixed(1)+'%');s.setProperty('--gy',(50+ny*60).toFixed(1)+'%');
+  s.setProperty('--gs',(50+62*Math.sin(GLS.ang*1.6+cy/H*2.4+k.q+(mv?t*.05*k.f:0)+sy*.004*k.dir)).toFixed(1)+'%')}}
 (function(){const host=document.getElementById('skyWaves');if(!host)return;
- const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;GLS.still=reduce;
  const cv=document.createElement('canvas');cv.id='skyGL';let gl=null;
  try{gl=cv.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:false,powerPreference:'low-power'})}catch(e){}
- if(!gl){skyRibbonsSvg(host);return}
+ const fb=()=>{skyRibbonsSvg(host);GLS.still=true;const f=()=>requestAnimationFrame(glassShine);addEventListener('scroll',f,{passive:true});addEventListener('resize',f);f()};
+ if(!gl){fb();return}
  const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
  const FS=`precision highp float;
 uniform vec2 uR;uniform float uT,uS;uniform vec3 uF,uE,uL;uniform float uO;uniform vec4 uA[6],uB[6],uC[6];
@@ -1800,7 +1815,7 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
  aa=clamp(aa,0.,1.);gl_FragColor=vec4(min(acc,vec3(1.))*uO,aa*uO);}`;
  const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o};
  let pr;try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw 0}
- catch(e){skyRibbonsSvg(host);return}
+ catch(e){fb();return}
  host.appendChild(cv);GLS.ok=true;gl.useProgram(pr);
  const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
  const al=gl.getAttribLocation(pr,'a');gl.enableVertexAttribArray(al);gl.vertexAttribPointer(al,2,gl.FLOAT,false,0,0);
