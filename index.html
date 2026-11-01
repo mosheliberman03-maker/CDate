@@ -471,6 +471,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .sky-body.sun-b{width:214px;height:214px;margin:-107px 0 0 -107px}
 .sky-body.moon-b::before{content:'';position:absolute;inset:-52%;border-radius:50%;pointer-events:none;z-index:-1;background:radial-gradient(circle,rgba(206,218,255,.24) 0%,rgba(160,178,255,.12) 30%,rgba(120,140,255,.05) 48%,transparent 66%)}
 .sky-body.below{opacity:.45}
+#hdr .sky-body{z-index:1}
 .sky-body .skyimg{position:relative}
 .moon .skyimg{width:114px;height:114px;margin:0;filter:drop-shadow(0 0 28px rgba(170,188,255,.28))}
 /* the glass dome that rises behind the date */
@@ -483,7 +484,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
  font:500 15px/1.2 Figtree,system-ui,sans-serif;letter-spacing:.01em;color:var(--gl-tx);white-space:nowrap;z-index:3;
  background:color-mix(in srgb,var(--card) 58%,transparent);border:1px solid color-mix(in srgb,var(--rbe) 26%,transparent);
  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
- box-shadow:0 8px 24px rgba(4,6,26,.30),0 0 20px color-mix(in srgb,var(--rbf) 12%,transparent),inset 0 1px 0 rgba(255,255,255,.07)}
+ box-shadow:0 8px 24px rgba(4,6,26,.30),0 0 20px color-mix(in srgb,var(--rbf) 12%,transparent)}
 :root[data-night="1"] .sky-cap{background:rgba(13,19,50,.56);border-color:rgba(182,172,255,.26)}
 .capi{flex:none;width:19px;height:19px;display:block}
 /* the dates */
@@ -498,7 +499,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 /* week panel */
 #hdr .wk{display:grid;grid-template-columns:repeat(7,1fr);align-items:start;flex:none;width:min(92vw,394px);max-width:none;box-sizing:border-box;margin:clamp(22px,4.2vh,40px) auto 0;padding:15px 8px 9px;gap:0;border-radius:32px;
  background:var(--gl-bg);border:1px solid var(--gl-bd);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
- box-shadow:0 18px 44px rgba(3,6,26,.26),inset 0 1px 0 rgba(255,255,255,.08)}
+ box-shadow:0 18px 44px rgba(3,6,26,.26)}
 .wd,#hdr .wd.ev{display:flex;flex-direction:column;align-items:center;gap:7px;padding:0;margin:0;border:0;border-radius:0;background:none;box-shadow:none;min-height:0}
 .wd u{font:500 13px/1 Figtree,system-ui,sans-serif;letter-spacing:.05em;color:color-mix(in srgb,var(--gl-tx) 66%,transparent)}
 .wd b{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;font:500 20px/1 Figtree,system-ui,sans-serif;color:color-mix(in srgb,var(--gl-tx) 92%,transparent);transition:background .25s,box-shadow .25s}
@@ -507,18 +508,18 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .wd.now u{color:var(--gl-tx);font-weight:600}
 .wd.now b{background:var(--navy);color:#F6EFE6;box-shadow:0 0 0 1.2px rgba(244,218,186,.62),0 0 16px 3px rgba(255,206,160,.18),0 6px 16px rgba(0,0,0,.32)}
 /* bottom controls */
-.hint{width:44px;height:44px;margin-left:-22px;bottom:calc(100px + env(safe-area-inset-bottom,0px));color:var(--gl-tx);background:var(--gl-bg);border:1px solid var(--gl-bd);box-shadow:0 8px 22px rgba(3,6,26,.22),inset 0 1px 0 rgba(255,255,255,.07)}
+.hint{width:44px;height:44px;margin-left:-22px;bottom:calc(100px + env(safe-area-inset-bottom,0px));color:var(--gl-tx);background:var(--gl-bg);border:1px solid var(--gl-bd);box-shadow:0 8px 22px rgba(3,6,26,.22)}
 .hint svg{width:19px;height:19px}
 .ai-fab{width:62px;height:62px;right:max(20px,env(safe-area-inset-right));bottom:calc(94px + env(safe-area-inset-bottom,0px));background:var(--navy);color:#fff;border:1px solid rgba(172,182,255,.34);font:300 38px/1 Figtree,system-ui,sans-serif;
- box-shadow:0 12px 30px rgba(2,4,20,.42),0 0 24px rgba(110,125,255,.14),inset 0 1px 0 rgba(255,255,255,.09)}
-.dock{width:min(88vw,372px);box-sizing:border-box;justify-content:space-between;align-items:center;padding:6px;gap:0;border-radius:34px;background:var(--gl-bg);border:1px solid var(--gl-bd);box-shadow:0 14px 36px rgba(3,6,26,.30),inset 0 1px 0 rgba(255,255,255,.08)}
+ box-shadow:0 12px 30px rgba(2,4,20,.42),0 0 24px rgba(110,125,255,.14)}
+.dock{width:min(88vw,372px);box-sizing:border-box;justify-content:space-between;align-items:center;padding:6px;gap:0;border-radius:34px;background:var(--gl-bg);border:1px solid var(--gl-bd);box-shadow:0 14px 36px rgba(3,6,26,.30)}
 .dock #pd,.dock #nd{display:none}
 .dock #td,.dock #mo{display:inline-flex;align-items:center;gap:10px;height:50px;padding:0 22px;border-radius:26px;font:600 15.5px Figtree,system-ui,sans-serif}
 .dock #td::before,.dock #mo::before{content:'';flex:none;width:20px;height:20px;background:currentColor;
  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'%3E%3Crect x='3.5' y='5' width='17' height='15.5' rx='3'/%3E%3Cpath d='M3.5 10h17M8 3v4M16 3v4'/%3E%3C/svg%3E") center/contain no-repeat;
  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'%3E%3Crect x='3.5' y='5' width='17' height='15.5' rx='3'/%3E%3Cpath d='M3.5 10h17M8 3v4M16 3v4'/%3E%3C/svg%3E") center/contain no-repeat}
 .dock #mo::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'%3E%3Crect x='3.5' y='5' width='17' height='15.5' rx='3'/%3E%3Cpath d='M3.5 10h17M8 3v4M16 3v4'/%3E%3Cpath d='M8 13.5h.01M12 13.5h.01M16 13.5h.01M8 17h.01M12 17h.01M16 17h.01' stroke-width='2.4'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'%3E%3Crect x='3.5' y='5' width='17' height='15.5' rx='3'/%3E%3Cpath d='M3.5 10h17M8 3v4M16 3v4'/%3E%3Cpath d='M8 13.5h.01M12 13.5h.01M16 13.5h.01M8 17h.01M12 17h.01M16 17h.01' stroke-width='2.4'/%3E%3C/svg%3E")}
-.dock .tdb,.dock .tdb:hover{background:var(--navy);color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.07)}
+.dock .tdb,.dock .tdb:hover{background:var(--navy);color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.26)}
 .dock #mo{position:relative;margin-left:10px;color:color-mix(in srgb,var(--gl-tx) 82%,transparent)}
 .dock #mo::after{content:'';position:absolute;left:-6px;top:14px;bottom:14px;width:1px;background:color-mix(in srgb,var(--gl-tx) 22%,transparent)}
 .dock #mn{font-size:22px;letter-spacing:1px;padding:0 18px;color:color-mix(in srgb,var(--gl-tx) 82%,transparent)}
@@ -526,12 +527,11 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 /* living light: the silk canvas, and glass whose rim glint and glare follow the same light as you scroll */
 #skyGL{position:absolute;inset:0;width:100%;height:100%;display:block}
 #hdr .wk,.hyc{position:relative}
-:is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc)::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;padding:1.6px;z-index:2;
- background:conic-gradient(from var(--gg,120deg),rgba(255,255,255,0) 0deg,rgba(255,255,255,.35) 7deg,rgba(255,255,255,1) 13deg,#fff 17deg,rgba(255,255,255,.35) 23deg,rgba(255,255,255,0) 30deg,rgba(255,255,255,0) 360deg),conic-gradient(from var(--ga,-40deg),rgba(255,255,255,var(--gi)) 0deg,rgba(255,255,255,calc(var(--gi)*.35)) 32deg,rgba(255,255,255,0) 85deg,rgba(255,255,255,0) 150deg,rgba(255,255,255,calc(var(--gi)*.22)) 180deg,rgba(255,255,255,0) 212deg,rgba(255,255,255,0) 275deg,rgba(255,255,255,calc(var(--gi)*.35)) 328deg,rgba(255,255,255,var(--gi)) 360deg);
+:is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab)::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;padding:1.6px;z-index:2;
+ background:conic-gradient(from var(--gg,120deg),rgba(255,255,255,0) 0deg,rgba(255,255,255,.35) 7deg,rgba(255,255,255,1) 13deg,#fff 17deg,rgba(255,255,255,.35) 23deg,rgba(255,255,255,0) 30deg,rgba(255,255,255,0) 360deg);
  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
-:is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc)::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
- background:radial-gradient(46px 30px at var(--hx,-99px) var(--hy,-99px),rgba(255,255,255,calc(var(--gi)*.42)),rgba(255,255,255,0) 100%),radial-gradient(80% 110% at var(--gx,30%) var(--gy,-10%),rgba(255,255,255,calc(var(--gi)*.16)),rgba(255,255,255,0) 62%),
- linear-gradient(112deg,rgba(255,255,255,0) calc(var(--gs,40%) - 16%),rgba(255,255,255,calc(var(--gi)*.09)) var(--gs,40%),rgba(255,255,255,0) calc(var(--gs,40%) + 16%))}
+:is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab)::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
+ background:radial-gradient(46px 30px at var(--hx,-99px) var(--hy,-99px),rgba(255,255,255,calc(var(--gi)*.42)),rgba(255,255,255,0) 100%)}
 :root{--gi:.55}:root[data-night="1"]{--gi:.62}
 /* each piece floats on its own clock and sits at its own depth when you scroll; pure CSS so the browser runs it off the main thread */
 @keyframes flY{from{translate:0 calc(var(--fa) * -1)}to{translate:0 var(--fa)}}
@@ -1541,7 +1541,7 @@ function skyCompute(now){
   if(ps.isUp&&ps.rise&&ps.set){kind='moon';frac=Math.max(0,Math.min(1,(now-ps.rise)/(ps.set-ps.rise)));cap='Moon sets '+tf(ps.set);label='The moon is up and sets at '+tf(ps.set)}
   else if(ps.isUp){kind='moon';frac=.5;cap='Moon is up';label='The moon is up'}
   else{kind='below';frac=0;const nxt=ps.rise?(skyLocalYMD(ps.rise).join()!==[y,m,d].join()?' (tomorrow)':''):'';cap=ps.rise?'Moonrise '+tf(ps.rise)+nxt:'Moon is down';if(have&&now<sr){cap='Sunrise '+tf(sr);}label=cap}}
- st.kind=kind;st.frac=frac;st.cap=cap;st.label=label;st.x=50;st.y=56;st.pal=skyPalette(alt,morning);return st}
+ st.kind=kind;st.frac=frac;st.cap=cap;st.label=label;st.x=kind==='below'?50:8+frac*84;st.y=kind==='below'?56:96-40*Math.sin(Math.PI*frac);st.pal=skyPalette(alt,morning);return st}
 
 /* drawing */
 /* ===== Procedural sun & moon artwork (rendered once to canvas, then shown as images) ===== */
@@ -1632,23 +1632,22 @@ const skyHash=n=>{let k=Math.imul(n|0,374761393)^0x5bd1e995;k=Math.imul(k^(k>>>1
 const skyN1=x=>{const i=Math.floor(x),f=x-i,u=f*f*(3-2*f);return skyHash(i)*(1-u)+skyHash(i+1)*u};
 const SKT={key:'',off:null},SK_PAD=26;
 const skyDpr=()=>Math.min(2,window.devicePixelRatio||1);
-const skyPath=(f,W,H)=>[SK_PAD+(8+f*84)/100*W,SK_PAD+(88-78*Math.sin(Math.PI*f))/100*H];
+const skyPath=(f,W,H)=>[SK_PAD+(8+f*84)/100*W,SK_PAD+(96-40*Math.sin(Math.PI*f))/100*H];
 /* the finished streak, drawn once and then only revealed as the body moves along it */
 /* The moon's trail: a faint stream of light and fine dust leaving the moon toward the lower left, densest and brightest
    near the moon and dissolving away from it. Drawn once per size into an offscreen canvas; animation only fades it in. */
 function skyTrailBuild(frac,kind,W,H){
- const dpr=skyDpr(),b=document.getElementById('skyBody'),mr=Math.max(50,(b&&b.clientWidth||158)*.478),key=['mt',W,H,dpr,Math.round(mr)].join();if(SKT.key===key)return SKT.off;
+ const dpr=skyDpr(),b=document.getElementById('skyBody'),mr=Math.max(50,(b&&b.clientWidth||158)*.478),key=['mt',W,H,dpr,Math.round(mr),Math.round(frac*300)].join();if(SKT.key===key)return SKT.off;
  const pw=W+SK_PAD*2,ph=H+SK_PAD*2,o=document.createElement('canvas');o.width=Math.round(pw*dpr);o.height=Math.round(ph*dpr);
  const g=o.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.globalCompositeOperation='lighter';
  let sd=40961;const rnd=()=>{sd=(Math.imul(sd,1664525)+1013904223)>>>0;return sd/4294967296},gau=()=>{let u=0;for(let k=0;k<4;k++)u+=rnd();return(u-2)/.58};
- const cx=SK_PAD+W*.5,cy=SK_PAD+H*.56,P=[[cx-mr*.5,cy+mr*.22],[cx-mr*2.1,cy+mr*.3],[SK_PAD+W*.14,cy+H*.24],[SK_PAD-W*.12,cy+H*.44]];
- const bz=t=>{const u=1-t;return[u*u*u*P[0][0]+3*u*u*t*P[1][0]+3*u*t*t*P[2][0]+t*t*t*P[3][0],u*u*u*P[0][1]+3*u*u*t*P[1][1]+3*u*t*t*P[2][1]+t*t*t*P[3][1]]};
+ const span=Math.min(frac,.42),bz=t=>skyPath(frac-t*span,W,H),lenK=Math.max(.15,span/.42);
  const nrm=t=>{const a=bz(Math.max(0,t-.004)),c=bz(Math.min(1,t+.004)),dx=c[0]-a[0],dy=c[1]-a[1],L=Math.hypot(dx,dy)||1;return[-dy/L,dx/L]};
  for(let k=0;k<=150;k++){const t=k/150,p=bz(t),rad=mr*(.5-.28*t),a=.034*Math.pow(1-t,1.5);if(a<.002)continue;const gr=g.createRadialGradient(p[0],p[1],0,p[0],p[1],rad);
   gr.addColorStop(0,`rgba(176,196,255,${a})`);gr.addColorStop(.5,`rgba(150,172,255,${a*.45})`);gr.addColorStop(1,'rgba(140,160,255,0)');g.fillStyle=gr;g.beginPath();g.arc(p[0],p[1],rad,0,6.2832);g.fill()}
  for(let k=0;k<=70;k++){const t=k/70*.5,p=bz(t),rad=mr*.22*(1-t*1.2),a=.04*Math.pow(1-t/.5,2);const gr=g.createRadialGradient(p[0],p[1],0,p[0],p[1],rad);
   gr.addColorStop(0,`rgba(225,234,255,${a})`);gr.addColorStop(1,'rgba(225,234,255,0)');g.fillStyle=gr;g.beginPath();g.arc(p[0],p[1],rad,0,6.2832);g.fill()}
- const n=Math.round(1150*Math.min(1.4,W/360));
+ const n=Math.round(1150*lenK*Math.min(1.4,W/360));
  for(let k=0;k<n;k++){const t=Math.pow(rnd(),1.12),p=bz(t),nv=nrm(t),sp=mr*(.1+.5*t),off=gau()*sp*.5,tj=(rnd()-.5)*mr*.1,a=(.1+.9*Math.pow(rnd(),1.8))*Math.pow(1-t,1.25)*.62;if(a<.02)continue;
   const x=p[0]+nv[0]*off+tj,y=p[1]+nv[1]*off,sz=.3+Math.pow(rnd(),3.2)*1.05,warm=rnd()>.86;g.fillStyle=warm?`rgba(255,244,226,${a})`:`rgba(214,226,255,${a})`;g.beginPath();g.arc(x,y,sz,0,6.2832);g.fill()}
  for(let k=0;k<20;k++){const t=Math.pow(rnd(),1.1)*.75,p=bz(t),nv=nrm(t),off=gau()*mr*(.1+.3*t)*.5,x=p[0]+nv[0]*off,y=p[1]+nv[1]*off,sz=.6+rnd()*.6,a=(.4+.4*rnd())*(1-t/.75*.85);
@@ -1659,8 +1658,8 @@ function skyTrail(head,final,kind){
  const c=document.getElementById('skyTrailC');if(!c)return;const sc=c.parentNode,W=sc.clientWidth||360,H=sc.clientHeight||140,dpr=skyDpr(),pw=W+SK_PAD*2,ph=H+SK_PAD*2;
  if(c._pw!==pw||c._ph!==ph||c._dpr!==dpr){c.width=Math.round(pw*dpr);c.height=Math.round(ph*dpr);c.style.width=pw+'px';c.style.height=ph+'px';c._pw=pw;c._ph=ph;c._dpr=dpr}
  const g=c.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,c.width,c.height);
- if(kind!=='moon')return;const k=final>.004?Math.min(1,head/final):1;if(k<=.01)return;
- g.globalAlpha=Math.pow(k,1.5);g.drawImage(skyTrailBuild(1,'moon',W,H),0,0);g.globalAlpha=1}
+ if(kind!=='moon'||!(head>.004)||!(final>.004))return;final=Math.min(1,final);head=Math.min(head,final);
+ const off=skyTrailBuild(final,'moon',W,H),px=Math.max(1,Math.min(off.width,Math.ceil(skyPath(head,W,H)[0]*dpr)));g.drawImage(off,0,0,px,off.height,0,0,px,off.height)}
 function skyRedrawTrail(){if(SKYA.run)return;const st=SKY.last;if(!st)return;skyTrail(st.frac,st.frac,st.kind)}
 function skyArcSvg(st){return `<canvas class="sky-trailc" id="skyTrailC" aria-hidden="true"></canvas>`}
 const CAP_MOON='<svg class="capi" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.2 14.6A8 8 0 0 1 9.4 4.8a.6.6 0 0 0-.8-.7A8.6 8.6 0 1 0 19.9 15.4a.6.6 0 0 0-.7-.8z" fill="#F3E7CF"/></svg>',CAP_SUN='<svg class="capi" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 16.5a5.5 5.5 0 0 1 11 0z" fill="#F6B54A"/><path d="M3 17.5h18M12 6.6v2.1M5.6 9.4l1.5 1.4M18.4 9.4l-1.5 1.4" stroke="#F6B54A" stroke-width="1.7" stroke-linecap="round" fill="none"/></svg>';
@@ -1713,10 +1712,10 @@ function skyRun(plan,done){
    b.className='sky-body '+(sun?'sun-b':'moon-b')+' anim';b.style.left='0';b.style.top='0';b.style.willChange='transform,opacity';
    const im=b.querySelector('img');if(im)im.style.visibility='hidden';
    cv=b.querySelector('canvas.skycv');if(!cv){cv=document.createElement('canvas');cv.width=cv.height=ART_N;cv.className='skyimg skycv';cv.style.cssText='position:absolute;left:0;top:0';b.appendChild(cv)}cg=cv.getContext('2d')}
-  const fr=Math.min(1,frac),x=.5*W,y=.56*H+dy+(plan.mode==='set'?H*.26*skySm(.2,1,u):0)+(plan.mode==='moonpass'?H*.08*(1-Math.sin(Math.PI*u)):0);
+  const fr=Math.min(1,frac),x=(8+fr*84)/100*W,y=(96-40*Math.sin(Math.PI*frac))/100*H+dy;
   const key=sun?'s'+artSunKey(alt):'m'+(MOON_PX?'p':'');if(key!==lastKey){lastKey=key;const src=sun?artSunCanvasKey(artSunKey(alt)):artMoonCanvas(Math.min(.999,Math.max(0,st.phase)));if(cv.width!==src.width){cv.width=cv.height=src.width}cg.clearRect(0,0,cv.width,cv.height);cg.drawImage(src,0,0)}
   b.style.transform=`translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;b.style.opacity=Math.max(0,op).toFixed(3);
-  if((fc++)%2===0||u>=1)skyApply({pal,anim:1});
+  if((fc++)%4===0||u>=1)skyApply({pal,anim:1});
   skyTrail(fr,plan.fin,sun?'sun':'moon');
   const tc=document.getElementById('skyTrailC');if(tc)tc.style.opacity=(plan.mode==='set'||plan.mode==='moonpass')?(1-skySm(.8,1,u)).toFixed(3):'';
   if(u<1)requestAnimationFrame(step);else stop()};
@@ -1786,7 +1785,7 @@ const GLS={ang:-2.25,L:[-.47,-.6,.65],t:0,ok:false};
 const GLSEED=new WeakMap();let GLSI=0;
 function glSeed(e){let k=GLSEED.get(e);if(!k){const n=++GLSI,r=q=>((Math.sin(n*12.9898+q*78.233)*43758.5453)%1+1)%1;
  k={dir:r(4)>.5?1:-1,ph:(r(6)-.5)*160};GLSEED.set(e,k)}return k}
-const GL_SEL='#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc';
+const GL_SEL='#hdr .wk,.sky-cap,.dock,.hint,.ai-fab';
 /* float size (px) and scroll depth (how much a piece lags behind when you scroll: the moon is "far", the week panel "near") */
 /* The glint: a small bright spot on each glass chip's rim that slides a little as you swipe (each chip its own way), still when idle.
    Floating and scroll depth are pure CSS (compositor), so no per-frame script work. */
