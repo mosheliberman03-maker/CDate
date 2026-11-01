@@ -1,6 +1,0 @@
-https://www.sefaria.org/api/v3/texts/Tanya,_Part_IV;_Iggeret_HaKodesh.29.19-29.22?version=hebrew&return_format=strip_only_footnotes
-https://www.sefaria.org/api/v3/texts/Tanya,_Part_IV;_Iggeret_HaKodesh.31.1-32.1?version=hebrew&return_format=strip_only_footnotes
-https://www.sefaria.org/api/v3/texts/Tanya,_Part_V;_Kuntres_Acharon.1.1-2.1?version=hebrew&return_format=strip_only_footnotes
-https://www.sefaria.org/api/v3/texts/Tanya,_Part_V;_Kuntres_Acharon.3.2-3.4?version=hebrew&return_format=strip_only_footnotes
-https://www.sefaria.org/api/v3/texts/Mishneh_Torah,_Agents_and_Partners.1?version=hebrew&return_format=strip_only_footnotes
-https://www.sefaria.org/api/v3/texts/Tanya,_Part_II;_Shaar_HaYichud_VehaEmunah.11.6-12.1?version=hebrew&return_format=strip_only_footnotes
