@@ -306,7 +306,7 @@ body.om .foot,body.om .hint{opacity:0!important}
 
 
 <style id="android-blank-screen-fix">#intro{display:none!important;pointer-events:none!important}
-#sky{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}#skyGrad{position:absolute;inset:0}#stars{position:absolute;left:0;top:0;width:1px;height:1px;border-radius:50%;opacity:0;transition:opacity 2s}
+#sky{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}#skyGrad{position:absolute;inset:0}#skyWaves{position:absolute;inset:0;overflow:hidden;opacity:var(--waveo,.5);transition:opacity 1.5s}.wv{position:absolute;left:-12%;width:124%;fill:none;stroke:var(--wavec,#9fb0ff);stroke-linecap:round;stroke-width:5;filter:blur(7px);will-change:transform}@media(prefers-reduced-motion:reduce){.wv{will-change:auto}}#stars{position:absolute;left:0;top:0;width:1px;height:1px;border-radius:50%;opacity:0;transition:opacity 2s}
 .sky-scene{position:relative;flex:0 0 100%;height:140px;margin-bottom:8px}.sky-arc{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.sky-trailc{position:absolute;left:-26px;top:-26px;pointer-events:none}.sky-body.anim{transition:none!important}
 .sky-body{position:absolute;width:112px;height:112px;margin:-56px 0 0 -56px;transition:left 1.2s ease,top 1.2s ease,opacity .6s}.skyimg{display:block;width:100%;height:100%;pointer-events:none;user-select:none}.moon .skyimg{width:96px;height:96px;margin:-18px 0}.sky-body.below{opacity:.4}
 .sky-cap{position:absolute;left:0;right:0;bottom:-6px;text-align:center;font-size:12px;letter-spacing:.02em;color:color-mix(in srgb,var(--ink) 72%,transparent)}
@@ -446,8 +446,22 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
 @font-face{font-family:'Noto Serif Hebrew App';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/noto-serif-hebrew-hebrew-400-normal.woff2) format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face{font-family:'Noto Serif Hebrew App';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/noto-serif-hebrew-hebrew-600-normal.woff2) format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face{font-family:'Noto Serif Hebrew App';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/noto-serif-hebrew-hebrew-700-normal.woff2) format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
 html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accountGate{display:none!important}
 </style>
+<style id="cc-night-ui">
+/* ---- fluid glass home (night mockup) ---- */
+/* soft glass ellipse behind the moon + date */
+.hero::before{top:3%;height:72%;background:radial-gradient(58% 50% at 50% 42%,color-mix(in srgb,var(--card) 30%,transparent),transparent 70%);animation:aur 11s ease-in-out infinite alternate;opacity:.9}
+.hero::after{content:'';position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:min(540px,116vw);height:min(680px,82vh);border-radius:50%;z-index:0;pointer-events:none;background:radial-gradient(54% 50% at 50% 46%,color-mix(in srgb,var(--card) 26%,transparent),transparent 72%);box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 10%,transparent)}
+/* caption as a floating glass pill under the moon */
+.sky-cap{left:50%;right:auto;bottom:-22px;transform:translateX(-50%);width:max-content;max-width:88vw;display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:999px;font-size:13px;letter-spacing:.01em;color:color-mix(in srgb,var(--ink) 90%,transparent);background:color-mix(in srgb,var(--card) 50%,transparent);border:1px solid color-mix(in srgb,var(--ink) 12%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 10px 30px color-mix(in srgb,#000 16%,transparent),inset 0 1px 0 color-mix(in srgb,#fff 16%,transparent);z-index:3}
+.capi{flex:none;width:15px;height:15px;border-radius:50%;position:relative}
+.capi.moon,.capi.below{box-shadow:inset -5px -2px 0 0 color-mix(in srgb,var(--ink) 78%,transparent)}
+.capi.sun{background:radial-gradient(circle at 50% 50%,#f5b43c 0 42%,transparent 46%);box-shadow:0 0 0 1.5px color-mix(in srgb,#f5b43c 55%,transparent)}
+/* week strip as a floating glass pill */
+#hdr .wk{flex:0 0 auto;margin:26px auto 0;gap:2px;padding:9px 12px;border-radius:26px;width:max-content;max-width:94vw;background:color-mix(in srgb,var(--card) 46%,transparent);border:1px solid color-mix(in srgb,var(--ink) 11%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 12px 34px color-mix(in srgb,#000 16%,transparent),inset 0 1px 0 color-mix(in srgb,#fff 14%,transparent)}
+.wd{padding:5px 9px}
+</style>
 </head><body>
-<div id="sky" hidden><div id="skyGrad"></div><div id="stars"></div></div>
+<div id="sky" hidden><div id="skyGrad"></div><div id="skyWaves" aria-hidden="true"><svg class="wv" data-s="4" style="top:6%;height:46%" viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M-6 24 C 22 6 58 34 106 12"/></svg><svg class="wv" data-s="9" style="top:34%;height:52%" viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M-6 16 C 30 34 66 6 106 26"/></svg><svg class="wv" data-s="6" style="top:60%;height:56%" viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M-6 22 C 26 38 60 10 106 30"/></svg></div><div id="stars"></div></div>
 <div class="account-shade" id="accountGate" role="dialog" aria-modal="true" aria-labelledby="accountTitle"><form class="account-card" id="accountForm"><h1 id="accountTitle">Your Chabad Calendar</h1><p id="accountSub">Sign in or create a private profile for this device.</p><label for="accountUser">Username</label><input id="accountUser" autocomplete="username" minlength="3" maxlength="32" required placeholder="Choose a username"><label for="accountPass">Password</label><input id="accountPass" type="password" autocomplete="current-password" minlength="4" required placeholder="At least 4 characters"><div class="account-buttons"><button id="accountSubmit" type="submit">Log in</button><button id="accountMode" class="alt" type="button">Create account</button></div><div class="account-error" id="accountError" role="status"></div><p class="account-note">Your profile and schedule stay in this browser on this device. This is not a cloud account: another person or device has separate data, and your schedule will not sync between devices. This simple offline lock is not suitable for sensitive information.</p></form></div>
 <div id="intro"><svg id="in-logo" viewBox="95 85 770 675" role="img" aria-label="Logo">
   <defs><linearGradient id="in-fade" gradientUnits="userSpaceOnUse" x1="556" y1="536" x2="548" y2="590"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient></defs>
@@ -1547,7 +1561,7 @@ const skyBodyKey=st=>st.kind+(st.kind==='sun'?Math.round(st.alt/4):Math.round(st
 function skyScene(h,df){
  if(!SKY.on||df!==0)return `<div class="moon rv" aria-hidden="true">${moonSvg(h.d)}</div>`;
  const st=SKY.last=skyCompute(Date.now());setTimeout(skyRedrawTrail,0);
- return `<div class="sky-scene rv" id="skyScene" role="img" aria-label="${st.label}">${skyArcSvg(st)}<div class="sky-body ${st.kind==='sun'?'sun-b':'moon-b'}${st.kind==='below'?' below':''}${SKYA.run||SKYA.arm?' anim':''}" id="skyBody" data-key="${skyBodyKey(st)}" style="left:${st.x.toFixed(1)}%;top:${st.y.toFixed(1)}%${SKYA.arm?';opacity:0':''}">${skyBodySvg(st)}</div><div class="sky-cap" id="skyCap">${st.cap}</div></div>`}
+ return `<div class="sky-scene rv" id="skyScene" role="img" aria-label="${st.label}">${skyArcSvg(st)}<div class="sky-body ${st.kind==='sun'?'sun-b':'moon-b'}${st.kind==='below'?' below':''}${SKYA.run||SKYA.arm?' anim':''}" id="skyBody" data-key="${skyBodyKey(st)}" style="left:${st.x.toFixed(1)}%;top:${st.y.toFixed(1)}%${SKYA.arm?';opacity:0':''}">${skyBodySvg(st)}</div><div class="sky-cap" id="skyCap" data-kind="${st.kind}"><i class="capi ${st.kind}"></i>${st.cap.replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]))}</div></div>`}
 function skyUpdateScene(st){if(SKYA.run||SKYA.arm)return;const b=document.getElementById('skyBody');if(!b)return;
  const key=skyBodyKey(st);
  if(b.dataset.key!==key){b.dataset.key=key;b.className='sky-body '+(st.kind==='sun'?'sun-b':'moon-b')+(st.kind==='below'?' below':'');b.innerHTML=skyBodySvg(st)}
@@ -1606,6 +1620,15 @@ function skyIntroInit(){
   if(ov&&Date.now()-t00<40000){setTimeout(go,80);return}
   const pl=skyPlan(Date.now());if(!pl||!document.getElementById('skyBody')){SKYA.arm=false;skyTick();return}skyRun(pl)};
  go()}
+(function(){const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;if(reduce)return;
+ let waves=null,tgt=0,cur=0,run=false;
+ const grab=()=>{if(!waves||!waves.length)waves=[...document.querySelectorAll('#skyWaves .wv')];return waves.length};
+ const frame=()=>{cur+=(tgt-cur)*0.08;
+  for(const w of waves){const s=+w.dataset.s||6,ty=-(cur*s*0.012),tx=Math.sin(cur*0.0016+s)*s*0.9;
+   w.style.transform=`translate3d(${tx.toFixed(2)}px,${ty.toFixed(2)}px,0)`}
+  if(Math.abs(tgt-cur)>0.4)requestAnimationFrame(frame);else run=false};
+ const onScroll=()=>{if(!grab())return;tgt=window.scrollY||document.documentElement.scrollTop||0;if(!run){run=true;requestAnimationFrame(frame)}};
+ addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll,{passive:true})})();
 function skyReplay(){if(SKYA.run||SKYA.arm||!SKY.on||+sel!==+t0)return;const b=document.getElementById('skyBody');if(!b||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
  const pl=skyPlan(Date.now());if(!pl)return;b.style.opacity='0';SKYA.arm=true;setTimeout(()=>skyRun(pl),60)}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)SKYA.hiddenAt=Date.now();else if(SKYA.hiddenAt&&Date.now()-SKYA.hiddenAt>3e5){SKYA.hiddenAt=0;skyReplay()}});
@@ -1613,7 +1636,7 @@ addEventListener('resize',()=>{skyRedrawTrail()});
 function skyApply(st){
  if(SKYA.run&&!st.anim)return;
  const p=st.pal,r=document.documentElement;if(st.anim){document.getElementById('sky').hidden=false;document.getElementById('skyGrad').style.background=`linear-gradient(180deg,${p.top} 0%,${p.bot} 100%)`;document.getElementById('stars').style.opacity=p.stars.toFixed(2);const n=performance.now();if(p.dark===SKYA.lastDark&&n-SKYA.rootT<1500)return;SKYA.rootT=n}SKYA.lastDark=p.dark;r.dataset.theme=p.dark?'dark':'light';r.style.setProperty('--bg',p.mid);
- r.style.setProperty('--card',`color-mix(in srgb,${p.dark?'#161a30':'#ffffff'} 90%,${p.mid})`);
+ r.style.setProperty('--card',`color-mix(in srgb,${p.dark?'#161a30':'#ffffff'} 90%,${p.mid})`);r.style.setProperty('--wavec',p.dark?'#9fb0ff':'#8ea2e6');r.style.setProperty('--waveo',(p.dark?.55:.3).toString());
  const sky=document.getElementById('sky');sky.hidden=false;document.getElementById('skyGrad').style.background=`linear-gradient(180deg,${p.top} 0%,${p.bot} 100%)`;
  document.getElementById('stars').style.opacity=p.stars.toFixed(2);
  const tc=document.querySelector('meta[name=theme-color]');if(tc&&(!st.anim||performance.now()-(SKYA.tcT||0)>250)){tc.content=p.top;SKYA.tcT=performance.now()}}
