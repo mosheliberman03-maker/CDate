@@ -1,0 +1,26 @@
+name: Save the coming days' shiurim from Sefaria
+# Every night (about 03:15 in China) and on demand. Writes sefaria/*.json, which the app's shiur reader reads first.
+on:
+  schedule:
+    - cron: "17 19 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: shiurim
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --no-save playwright@1.49.1 && npx playwright install chromium
+      - run: node tools/prefetch-shiurim.js 8
+      - run: |
+          git config user.name "shiurim-bot"; git config user.email "actions@users.noreply.github.com"
+          git add -A sefaria
+          git diff --cached --quiet && echo "nothing new" && exit 0
+          git commit -m "Shiurim texts for the coming days (from Sefaria)"
+          git pull --rebase -q && git push
