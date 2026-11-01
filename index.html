@@ -578,18 +578,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #hdr.sky-side .hd-big{display:flex;flex-direction:column;align-items:center;font-size:min(31vw,16.5vh,150px);line-height:.98;letter-spacing:-.01em}
 #hdr.sky-side .hd-big>span{display:block;white-space:nowrap}
 #hdr.sky-side .hd-m{font-size:.86em;max-width:94vw}
-/* the Hebrew date as liquid glass: a translucent fill that lets the sky show through toward the bottom, a fine glassy edge,
-   a soft shadow for depth, and a glint that sweeps across the letters only while you scroll (none at rest: owner's rule) */
-:root{--gt1:rgba(22,30,74,.97);--gt2:rgba(26,36,86,.86);--gt3:rgba(44,66,140,.58);--gst:rgba(255,255,255,.55);--gsh:rgba(20,40,90,.22)}
-:root[data-night="1"]{--gt1:rgba(255,250,242,.97);--gt2:rgba(245,233,215,.88);--gt3:rgba(186,182,255,.6);--gst:rgba(255,255,255,.4);--gsh:rgba(2,4,24,.5)}
-:root:not(.tt-off-gdate) #hdr .hd-big{color:transparent;-webkit-text-fill-color:transparent;text-shadow:none;
- background-image:linear-gradient(105deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0) 44%,rgba(255,255,255,.9) 50%,rgba(255,255,255,0) 56%,rgba(255,255,255,0) 100%),linear-gradient(180deg,var(--gt1) 0%,var(--gt2) 52%,var(--gt3) 100%);
- background-size:300% 100%,100% 100%;background-position:95% 0,0 0;background-repeat:no-repeat;-webkit-background-clip:text;background-clip:text;
- -webkit-text-stroke:.7px var(--gst);filter:drop-shadow(0 5px 14px var(--gsh)) drop-shadow(0 1px 1px var(--gsh))}
 :root.tt-off-dome #hdr .sky-scene::after{animation-name:flY,flX,flP,none!important}
-@keyframes gDate{from{background-position:95% 0,0 0}to{background-position:5% 0,0 0}}
-@supports (animation-timeline:scroll()){:root:not(.tt-off-gdate) #hdr .hd-big{animation:gDate 1s linear both;animation-timeline:scroll(root block);animation-range:0px 260px}}
-@media(prefers-reduced-motion:reduce){#hdr .hd-big{animation:none!important}}
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
 </style>
 </head><body>
@@ -1719,7 +1708,10 @@ function skyTrail(head,final,kind){
  if(c._pw!==pw||c._ph!==ph||c._dpr!==dpr){c.width=Math.round(pw*dpr);c.height=Math.round(ph*dpr);c.style.width=pw+'px';c.style.height=ph+'px';c._pw=pw;c._ph=ph;c._dpr=dpr}
  const g=c.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,c.width,c.height);
  if(kind!=='moon'||!(head>.004)||!(final>.004))return;final=Math.min(1,final);head=Math.min(head,final);
- const off=skyTrailBuild(final,'moon',W,H),px=Math.max(1,Math.min(off.width,Math.ceil(skyPath(head,W,H)[0]*dpr)));g.drawImage(off,0,0,px,off.height,0,0,px,off.height)}
+ const off=skyTrailBuild(final,'moon',W,H),px=Math.max(1,Math.min(off.width,Math.ceil(skyPath(head,W,H)[0]*dpr)));g.drawImage(off,0,0,px,off.height,0,0,px,off.height);
+ /* clear the dust under the moon itself (its dark side is see-through by day), with a soft edge so the cut never shows */
+ const bd=document.getElementById('skyBody'),mr=Math.max(50,(bd&&bd.clientWidth||158)*.478),p=skyPath(head,W,H);g.setTransform(dpr,0,0,dpr,0,0);g.globalCompositeOperation='destination-out';
+ const er=g.createRadialGradient(p[0],p[1],mr*.92,p[0],p[1],mr*1.3);er.addColorStop(0,'rgba(0,0,0,1)');er.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=er;g.beginPath();g.arc(p[0],p[1],mr*1.3,0,6.2832);g.fill();g.globalCompositeOperation='source-over';g.setTransform(1,0,0,1,0,0)}
 function skyRedrawTrail(){if(SKYA.run)return;const st=SKY.last;if(!st)return;skyTrail(st.frac,st.frac,st.kind)}
 function skyArcSvg(st){return `<canvas class="sky-trailc" id="skyTrailC" aria-hidden="true"></canvas>`}
 const CAP_MOON='<svg class="capi" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.2 14.6A8 8 0 0 1 9.4 4.8a.6.6 0 0 0-.8-.7A8.6 8.6 0 1 0 19.9 15.4a.6.6 0 0 0-.7-.8z" fill="#F3E7CF"/></svg>',CAP_SUN='<svg class="capi" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 16.5a5.5 5.5 0 0 1 11 0z" fill="#F6B54A"/><path d="M3 17.5h18M12 6.6v2.1M5.6 9.4l1.5 1.4M18.4 9.4l-1.5 1.4" stroke="#F6B54A" stroke-width="1.7" stroke-linecap="round" fill="none"/></svg>';
@@ -3394,7 +3386,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['gdate','Liquid-glass Hebrew date'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const FLAGS=[['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id]of FLAGS)document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}}});flApply();
