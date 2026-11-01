@@ -11,6 +11,8 @@ This repository is a hosted web app: a Chabad/Jewish calendar that is installed 
 |---|---|
 | `index.html` | The whole app in one file (HTML + CSS + JS, about 380 KB). Edit it directly. |
 | `sw.js` | Service worker (registered for every user on load): shows push notifications, focuses the app on tap, and keeps one saved copy of the app (cache `cdate-app-v1`): opening answers instantly from it and fetches the newest copy in the background; if that changed, it messages the page (`cdate-update`) and a "Tap to update" button appears. No other caching. |
+| `hayomyom-en.json` | English Hayom Yom (Chabad.org translation, used with permission; the owner holds the written permission), keyed `"<monthKey>-<day>"` like `Ki-19`, `AI-14`. Each entry `{h: original date heading, p: [paragraph HTML with only b/i/br], t: 1 if translated in the app}`. 12 entries (13 dates) were translated from the Hebrew/Yiddish because the collector picked up the original. Loaded by `hyFill()`; the service worker keeps a saved copy. |
+| `tools/` | The phone-browser bookmark tools used to collect it (Chabad.org blocks server downloads, 403). |
 | `manifest.webmanifest`, `icon-*.png`, `apple-touch-icon.png` | Install metadata and icons (a plain aleph in a serif font). |
 | `server/worker.js` | Cloudflare Worker source. **Not served from here**: changes must be pasted into the Cloudflare dashboard by the owner (Workers & Pages, then cdate-push, then Edit code, then Deploy). Needs KV binding `KV` and cron `* * * * *`. |
 

@@ -31,8 +31,9 @@ self.addEventListener('fetch', (e) => {
   if (u.origin !== self.location.origin) return;
   const scope = new URL(self.registration.scope);
   const isApp = r.mode === 'navigate' || u.pathname === scope.pathname || u.pathname === scope.pathname + 'index.html';
-  if (!isApp || (u.pathname !== scope.pathname && u.pathname !== scope.pathname + 'index.html')) return;
-  const key = scope.href; // one saved copy of the app, whatever ?query the link had
+  const isHy = u.pathname === scope.pathname + 'hayomyom-en.json'; // the English Hayom Yom text: same treatment, so it works offline
+  if (!isHy && (!isApp || (u.pathname !== scope.pathname && u.pathname !== scope.pathname + 'index.html'))) return;
+  const key = isHy ? scope.href + 'hayomyom-en.json' : scope.href; // one saved copy each, whatever ?query the link had
   e.respondWith((async () => {
     const cache = await caches.open(APP_CACHE);
     const saved = await cache.match(key);
@@ -45,7 +46,7 @@ self.addEventListener('fetch', (e) => {
           changed = a && b ? a !== b : (await saved.clone().text()) !== (await res.clone().text());
         }
         await cache.put(key, res.clone());
-        if (changed) {
+        if (changed && !isHy) {
           const cs = await self.clients.matchAll({ type: 'window' });
           cs.forEach((c) => c.postMessage({ type: 'cdate-update' }));
         }

@@ -115,6 +115,7 @@ main{max-width:640px;padding:6px 16px 140px}
 .about .nospec{margin:14px 0 0;color:var(--mut)}
 .hyc{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-top:12px}
 .hyc h2{font:500 20px/1.2 'Frank Ruhl Libre',serif;margin:0 0 2px}.hyc p{margin:8px 0 0}
+.hyt p{margin:10px 0 0;line-height:1.6}.hyt .hyh{font-size:12px;letter-spacing:.04em;color:var(--mut);margin-top:10px}.hyx.cut{max-height:15.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}.hym{border:0;background:none;color:var(--ct);font:600 14px Figtree,system-ui;padding:8px 0 0;cursor:pointer}.hyn,.hyc2{font-size:11.5px;color:var(--mut);margin-top:8px}
 .hyr{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.hyr .btn{margin:0;display:inline-block;text-decoration:none}
 .btn.on{background:var(--ys);color:#fff;border-color:transparent}
 .rail{align-self:stretch;position:relative;z-index:1}
@@ -1129,7 +1130,18 @@ function study(h){const u='https://www.chabad.org/dailystudy/default.asp?tdate='
  th=h.d==29&&hd(ad(sel,1)).d==1?'140–150':TH[h.d-1],al=['Rishon','Sheini','Shlishi','Revii','Chamishi','Shishi','Shevii'][sel.getDay()],ps=parsha(sel),
  R=[['chumash','Chumash with Rashi',ps?al+' · '+ps.p.map(x=>x[0]).join('-'):al],['tehillim','Tehillim',th],['tanya','Tanya','Daily portion'],['rambam3','Rambam · 3 chapters','Daily portion'],['rambam1','Rambam · 1 chapter','Daily portion']];
  $('#sd').innerHTML=`<div class="ph rv"><div><h2>Today’s shiurim</h2><div class="mut" id="sdn"></div></div>${ring(0,4)}</div>`+stkHtml()+R.map((r,i)=>row(r[0],r[1],r[2],u,i+1)).join('')+`<small class="rv" style="--i:7">The ↗ opens that day’s exact text on Chabad.org.</small>`;
- $('#hy').innerHTML=`<div class="hyc rv"><h2>Hayom Yom</h2><div class="heb" lang="he" dir="rtl">${G(h.d)} ${h.n[1]}</div><p class="mut">The Rebbe’s daily collection of Chassidic teachings, one entry for each day of the year.</p><div class="hyr"><a class="btn" href="${u}" target="_blank" rel="noopener">Read ${h.d} ${h.n[0]} ↗</a><button class="btn gh" id="hyb"></button></div></div>`}
+ $('#hy').innerHTML=`<div class="hyc rv"><h2>Hayom Yom</h2><div class="heb" lang="he" dir="rtl">${G(h.d)} ${h.n[1]}</div><div class="hyt" id="hyt"><p class="mut">The Rebbe’s daily collection of Chassidic teachings, one entry for each day of the year.</p></div><div class="hyr"><a class="btn" href="${u}" target="_blank" rel="noopener">Read ${h.d} ${h.n[0]} ↗</a><button class="btn gh" id="hyb"></button></div></div>`;hyFill(h)}
+/* English Hayom Yom text (Chabad.org translation, used with permission) from hayomyom-en.json, keyed "month-day".
+   Loaded once, after the app opens. In a regular (non-leap) year Adar shows the Adar I and Adar II entries, as Chabad.org does. */
+let HYT=null,HYL=null;
+const hyLeap=y=>((7*y+1)%19)<7;
+function hyFill(h){const el=$('#hyt');if(!el)return;
+ if(!HYT){if(!HYL)HYL=fetch('hayomyom-en.json').then(r=>r.ok?r.json():null).then(j=>{HYT=j&&j.days||{};const h2=hd(sel);hyFill(h2)}).catch(()=>{HYL=null});return}
+ const ks=h.k==='A'&&!hyLeap(h.y)?['AI-'+h.d,'A-'+h.d]:[h.k+'-'+h.d],es=ks.map(k=>HYT[k]).filter(Boolean);if(!es.length)return;
+ const body=es.map(e=>(es.length>1&&e.h?`<div class="hyh">${e.h}</div>`:'')+e.p.map(x=>`<p>${x}</p>`).join('')+(e.t?'<div class="hyn">Translated in the app from the original.</div>':'')).join('');
+ const long=body.replace(/<[^>]+>/g,'').length>520;
+ el.innerHTML=`${es.length===1&&/,/.test(es[0].h||'')?`<div class="hyh">${es[0].h.replace(/^[^,]*,\s*/,'')}</div>`:''}<div class="hyx${long?' cut':''}">${body}</div>${long?'<button type="button" class="hym">Read more</button>':''}<div class="hyc2">Translation © Chabad.org, used with permission</div>`;
+ const m=el.querySelector('.hym');if(m)m.onclick=()=>{H.tap();el.querySelector('.hyx').classList.remove('cut');m.remove()}}
 const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');if(e.target.dataset.sectionStart==='1'&&!document.getElementById('intro'))H.rev();io.unobserve(e.target)}})},{threshold:.08,rootMargin:'0px 0px -5% 0px'});
 function reveal(c){const x=c.querySelectorAll('.rv');x.forEach((n,i)=>{n.classList.remove('in');io.unobserve(n);n.dataset.sectionStart=i===0?'1':'0'});requestAnimationFrame(()=>requestAnimationFrame(()=>x.forEach(n=>io.observe(n))))}
 /* Your own repeating plans (daily, every other day, weekly) show only on today. Everywhere else (month grid, week strip,
