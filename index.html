@@ -534,10 +534,10 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 /* living light: the silk canvas, and glass whose rim glint and glare follow the same light as you scroll */
 #skyGL{position:absolute;inset:0;width:100%;height:100%;display:block}
 #hdr .wk,.hyc{position:relative}
-:is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab)::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;padding:1.6px;z-index:2;
+:is(#hdr .wk,.sky-cap,.sky-cap2,.dock,.hint,.ai-fab)::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;padding:1.6px;z-index:2;
  background:conic-gradient(from var(--gg,120deg),rgba(190,230,255,0) 0deg,rgba(190,230,255,.22) 8deg,rgba(225,242,255,.75) 18deg,rgba(225,242,255,.75) 22deg,rgba(190,230,255,.22) 32deg,rgba(190,230,255,0) 42deg,rgba(190,230,255,0) 360deg);
  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
-:is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab)::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
+:is(#hdr .wk,.sky-cap,.sky-cap2,.dock,.hint,.ai-fab)::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
  background:radial-gradient(70px 46px at var(--hx,-99px) var(--hy,-99px),rgba(175,225,255,calc(var(--gi)*.32)),rgba(150,200,255,calc(var(--gi)*.1)) 55%,rgba(150,200,255,0) 100%)}
 :root{--gi:.55}:root[data-night="1"]{--gi:.62}
 /* each piece floats on its own clock and sits at its own depth when you scroll; pure CSS so the browser runs it off the main thread */
@@ -562,7 +562,8 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 /* the semicircle swivels as you scroll down: it is the top half of a true circle, so turning it clockwise around the circle's centre keeps every
    point on the same circle (nothing rises above its top); it turns, whole, into a backwards C, then keeps turning while it is eaten away from its lower end */
 @property --dl{syntax:'<angle>';inherits:false;initial-value:180deg}
-@keyframes dmW{0%{rotate:0deg;--dl:180deg}50%{rotate:90deg;--dl:180deg}100%{rotate:180deg;--dl:0deg}}
+@keyframes dmW{0%{rotate:var(--dma,0deg);--dl:180deg}50%{rotate:calc(var(--dma,0deg) + 90deg);--dl:180deg}100%{rotate:calc(var(--dma,0deg) + 180deg);--dl:0deg}}
+#hdr .sky-scene::after{rotate:var(--dma,0deg);transition:rotate .9s ease}
 @supports (animation-timeline:scroll()){
  #hdr .sky-scene::after{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both,dmW 1s linear both;animation-timeline:auto,auto,scroll(root block),scroll(root block);animation-range:normal,normal,0px 1000px,0px 380px;animation-composition:replace,add,add,replace}}
 @media(prefers-reduced-motion:reduce){#skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab,.dock,#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk,:is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:none!important}}
@@ -573,12 +574,18 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .foot .c2{flex:none;white-space:nowrap;max-width:none}
 /* empty middle of the sky (body far to one side or below the horizon): like a big lock-screen clock, the date becomes a tall block,
    day above month, filling the middle; the sky scene shrinks to make room and the week panel stays put */
-#hdr.sky-side .sky-scene{height:clamp(110px,14vh,150px)}
+#hdr.sky-side .sky-scene{height:clamp(84px,10vh,120px)}
 #hdr.sky-side .hd-he{margin-top:clamp(14px,2.4vh,26px)}
 #hdr.sky-side .hd-big{display:flex;flex-direction:column;align-items:center;font-size:min(31vw,16.5vh,150px);line-height:.98;letter-spacing:-.01em}
 #hdr.sky-side .hd-big>span{display:block;white-space:nowrap}
 #hdr.sky-side .hd-m{font-size:.86em;max-width:94vw}
 :root.tt-off-dome #hdr .sky-scene::after{animation-name:flY,flX,flP,none!important}
+.sky-cap2{display:none}
+:root:not(.tt-off-capdate) #hdr.sky-side .sky-cap{display:none}
+:root.tt-off-capdate .sky-cap2{display:none!important}
+#hdr.sky-side .sky-cap2:not([hidden]){display:flex;align-items:center;gap:10px;width:max-content;max-width:88vw;margin:clamp(10px,1.8vh,16px) auto 0;padding:9px 20px 9px 16px;border-radius:999px;position:relative;
+ font:500 15px/1.2 Figtree,system-ui,sans-serif;color:var(--gl-tx);white-space:nowrap;background:color-mix(in srgb,var(--card) 58%,transparent);border:1px solid color-mix(in srgb,var(--rbe) 26%,transparent);box-shadow:0 8px 24px rgba(4,6,26,.22)}
+:root[data-night="1"] #hdr.sky-side .sky-cap2{background:rgba(13,19,50,.56);border-color:rgba(182,172,255,.26)}
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
 </style>
 </head><body>
@@ -949,8 +956,8 @@ const TH=['1–9','10–17','18–22','23–28','29–34','35–38','39–43','4
 function footPlace(){const f=document.getElementById('foot'),w=document.querySelector('#hdr .wk');if(!f||!w||(scrollY||0)>4)return;
  const sc=document.querySelector('#hdr .sky-scene,#hdr .moon'),H=innerHeight;if(sc)sc.style.height='';f.style.top='';f.style.bottom='';
  let wb=w.getBoundingClientRect().bottom;const fh=f.offsetHeight||42,lim=H-166;let over=wb+14+fh-lim;
- if(over>0&&sc){const cur=sc.offsetHeight,nh=Math.max(150,cur-over);if(nh<cur){sc.style.height=nh+'px';wb=w.getBoundingClientRect().bottom;over=wb+14+fh-lim}}
- f.style.top=Math.round(wb+14)+'px';f.style.bottom='auto';if(typeof skyRedrawTrail==='function')skyRedrawTrail()}
+ if(over>0&&sc){const cur=sc.offsetHeight,nh=Math.max(document.getElementById('hdr').classList.contains('sky-side')?64:150,cur-over);if(nh<cur){sc.style.height=nh+'px';wb=w.getBoundingClientRect().bottom;over=wb+14+fh-lim}}
+ f.style.top=Math.round(wb+14)+'px';f.style.bottom='auto';if(typeof skyRedrawTrail==='function')skyRedrawTrail();if(SKY.last&&!SKYA.run)skyDomeAim(SKY.last)}
 addEventListener('resize',()=>requestAnimationFrame(footPlace));if(document.fonts)document.fonts.ready.then(()=>footPlace());
 function render(dir){requestAnimationFrame(()=>requestAnimationFrame(footPlace));if(typeof GLS!=='undefined'&&GLS.kick)requestAnimationFrame(GLS.kick);
  const f=V,L=hlen(f),a=ad(f,-f.getDay()),n=Math.ceil((f.getDay()+L)/7)*7,td=+t0;
@@ -1457,7 +1464,7 @@ function panel(dir){const{h,ev,rc}=infoD(sel),w=sel.getDay()==6,ps=parsha(sel),d
  rel=df==0?'Today':df==1?'Tomorrow':df==-1?'Yesterday':df>0?'In '+df+' days':-df+' days ago',
  pr=ps?`<div class="pr rv" style="--i:3">${ps.yt?'(':''}Parshas ${ps.p.map(x=>x[0]).join('-')}${ps.yt?')':''} <span class="heb" lang="he" dir="rtl">${ps.yt?'(':''}פרשת ${ps.p.map(x=>x[1]).join('־')}${ps.yt?')':''}</span>${ps.yt?'<span class="pn">Chitas only · no leining this Shabbos</span>':''}</div>`:'';
  const lead=`<div class="lead rv" style="--i:2"><span>${rel}${w?' · Shabbos':''}</span><span>${h.d} ${h.n[0]} ${h.y} · ${sel.getFullYear()}</span></div>`;
- $('#hdr').innerHTML=`${skyScene(h,df)}<h1 class="hd-he rv" lang="he" dir="rtl"><span class="hd-big"><span class="hd-d">${G(h.d)}</span> <span class="hd-m">${h.n[1]}</span></span></h1><div class="hd-div rv" style="--i:1"><i></i><b class="dm"></b><span class="hd-yr" lang="he" dir="rtl">${G(h.y%1000)}</span><b class="dm"></b><i></i></div><div class="hd-en rv" style="--i:1">${sel.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric'})}</div><div class="wk rv" style="--i:2">${wkStrip()}</div>`;$('#hero').style.setProperty('--aura','var(--'+(ev.length?ev[0].k:w?'yt':'ct')+')');
+ $('#hdr').innerHTML=`${skyScene(h,df)}<h1 class="hd-he rv" lang="he" dir="rtl"><span class="hd-big"><span class="hd-d">${G(h.d)}</span> <span class="hd-m">${h.n[1]}</span></span></h1><div class="sky-cap2" id="skyCap2" aria-hidden="true"></div><div class="hd-div rv" style="--i:1"><i></i><b class="dm"></b><span class="hd-yr" lang="he" dir="rtl">${G(h.y%1000)}</span><b class="dm"></b><i></i></div><div class="hd-en rv" style="--i:1">${sel.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric'})}</div><div class="wk rv" style="--i:2">${wkStrip()}</div>`;capSync();$('#hero').style.setProperty('--aura','var(--'+(ev.length?ev[0].k:w?'yt':'ct')+')');
  $('#gh').textContent=sel.getDate();
  $('#cbt').innerHTML=`${sel.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})}<span lang="he" dir="rtl">${G(h.d)} ${h.n[1]}</span>`;
  $('#p').innerHTML=(editing?'<div class="eb">Editing mode <button class="ed" id="ex">Done</button></div>':'')+lead+pr+(ev.length?ev.map((e,i)=>`<div class="ev mc k-${e.k}" style="--i:${i+3}"><small><i class="m k-${e.k}"></i>${KN[e.k]}</small>${e.isTask?`<button class="task-check" data-task="${e.id}" data-date="${ds(sel)}" aria-pressed="${e.done?'true':'false'}" style="float:right;border:1px solid var(--line);border-radius:9px;padding:6px 10px;background:${e.done?'var(--my)':'transparent'};color:inherit">${e.done?'✓ Done':'□ Mark done'}</button>`:''}${editing?`<button class="ed" data-e="${e.id}">Edit</button>`:''}<h3 style="${e.isTask&&e.done?'text-decoration:line-through;opacity:.65':''}">${e.t}${e.h?` <span class="heb" lang="he">${e.h}</span>`:''}</h3>${lt(e)?`<p class="sm" role="button" tabindex="0" data-i="${i}">${e.x} <span class="mr">More ›</span></p>`:`<p>${e.x}</p>`}</div>`).join(''):'<p class="nospec rv" style="--i:3">No special date on this day.</p>');
@@ -1717,6 +1724,13 @@ function skyArcSvg(st){return `<canvas class="sky-trailc" id="skyTrailC" aria-hi
 const CAP_MOON='<svg class="capi" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.2 14.6A8 8 0 0 1 9.4 4.8a.6.6 0 0 0-.8-.7A8.6 8.6 0 1 0 19.9 15.4a.6.6 0 0 0-.7-.8z" fill="#F3E7CF"/></svg>',CAP_SUN='<svg class="capi" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 16.5a5.5 5.5 0 0 1 11 0z" fill="#F6B54A"/><path d="M3 17.5h18M12 6.6v2.1M5.6 9.4l1.5 1.4M18.4 9.4l-1.5 1.4" stroke="#F6B54A" stroke-width="1.7" stroke-linecap="round" fill="none"/></svg>';
 const capIco=k=>k==='sun'?CAP_SUN:CAP_MOON;
 const skyBodyKey=st=>st.kind+(st.kind==='sun'?Math.round(st.alt/4):Math.round(st.phase*60));
+/* When the date is shown big (.sky-side), the rise/set caption sits under it instead of up in the sky. */
+function capSync(){const c=document.getElementById('skyCap'),c2=document.getElementById('skyCap2');if(c2){c2.innerHTML=c?c.innerHTML:'';c2.hidden=!c}}
+/* The semicircle is the lit atmosphere: its top faces the sun or moon (--dma on the scene; the scroll swivel adds to it). */
+function skyDomeAim(st){const sc=document.getElementById('skyScene');if(!sc)return;let a=0;
+ if(st&&!document.documentElement.classList.contains('tt-off-aim')){const W=sc.offsetWidth,H=sc.offsetHeight,D=Math.min(innerWidth*.9,400),cx=W/2,cy=H-62+D/2,bx=st.x/100*W,by=st.y/100*H;
+  a=Math.max(-100,Math.min(100,Math.atan2(bx-cx,cy-by)*57.2958))}
+ const v=a.toFixed(1)+'deg';if(sc.style.getPropertyValue('--dma')!==v)sc.style.setProperty('--dma',v)}
 /* When the sun/moon is far to one side (or below the horizon) the middle of the sky is empty: the date moves up and grows into it.
    Applied as a state, not animated. */
 function skySideSet(st){const h=document.getElementById('hdr');if(!h)return;const on=!!st&&!document.documentElement.classList.contains('tt-off-side')&&(st.kind==='below'||Math.abs(st.x-50)>34);
@@ -1729,7 +1743,7 @@ function skyUpdateScene(st){if(SKYA.run||SKYA.arm)return;const b=document.getEle
  const key=skyBodyKey(st);
  if(b.dataset.key!==key){b.dataset.key=key;b.className='sky-body '+(st.kind==='sun'?'sun-b':'moon-b')+(st.kind==='below'?' below':'');b.innerHTML=skyBodySvg(st)}
  skyTrail(st.frac,st.frac,st.kind);b.style.opacity='';b.style.left=st.x.toFixed(1)+'%';b.style.top=st.y.toFixed(1)+'%';
- const c=document.getElementById('skyCap');if(c){c.dataset.kind=st.kind;c.innerHTML=capIco(st.kind)+'<span>'+st.cap.replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]))+'</span>'}const s=document.getElementById('skyScene');if(s)s.setAttribute('aria-label',st.label)}
+ const c=document.getElementById('skyCap');if(c){c.dataset.kind=st.kind;c.innerHTML=capIco(st.kind)+'<span>'+st.cap.replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]))+'</span>'}capSync();skyDomeAim(st);const s=document.getElementById('skyScene');if(s)s.setAttribute('aria-label',st.label)}
 
 /* the opening: the sun (or moon) travels from the horizon to where it is now */
 function skyPlan(now){
@@ -1770,7 +1784,7 @@ function skyRun(plan,done){
    cv=b.querySelector('canvas.skycv');if(!cv){cv=document.createElement('canvas');cv.width=cv.height=ART_N;cv.className='skyimg skycv';cv.style.cssText='position:absolute;left:0;top:0';b.appendChild(cv)}cg=cv.getContext('2d')}
   const fr=Math.min(1,frac),x=skyArcX(frac)/100*W,y=skyArcY(frac)/100*H+dy;
   const key=sun?'s'+artSunKey(alt):'m'+(MOON_PX?'p':'');if(key!==lastKey){lastKey=key;const src=sun?artSunCanvasKey(artSunKey(alt)):artMoonCanvas(Math.min(.999,Math.max(0,st.phase)));if(cv.width!==src.width){cv.width=cv.height=src.width}cg.clearRect(0,0,cv.width,cv.height);cg.drawImage(src,0,0)}
-  b.style.transform=`translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;b.style.opacity=Math.max(0,op).toFixed(3);
+  b.style.transform=`translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;if((fc&1)===0)skyDomeAim({x:skyArcX(frac),y:skyArcY(frac)});b.style.opacity=Math.max(0,op).toFixed(3);
   if((fc++)%4===0||u>=1)skyApply({pal,anim:1});
   skyTrail(fr,plan.fin,sun?'sun':'moon');
   const tc=document.getElementById('skyTrailC');if(tc)tc.style.opacity=(plan.mode==='set'||plan.mode==='moonpass')?(1-skySm(.8,1,u)).toFixed(3):'';
@@ -1841,7 +1855,7 @@ const GLS={ang:-2.25,L:[-.47,-.6,.65],t:0,ok:false};
 const GLSEED=new WeakMap();let GLSI=0;
 function glSeed(e){let k=GLSEED.get(e);if(!k){const n=++GLSI,r=q=>((Math.sin(n*12.9898+q*78.233)*43758.5453)%1+1)%1;
  k={dir:r(4)>.5?1:-1,ph:(r(6)-.5)*160};GLSEED.set(e,k)}return k}
-const GL_SEL='#hdr .wk,.sky-cap,.dock,.hint,.ai-fab';
+const GL_SEL='#hdr .wk,.sky-cap,.sky-cap2,.dock,.hint,.ai-fab';
 /* float size (px) and scroll depth (how much a piece lags behind when you scroll: the moon is "far", the week panel "near") */
 /* The glint: a small bright spot on each glass chip's rim that slides a little as you swipe (each chip its own way), still when idle.
    Floating and scroll depth are pure CSS (compositor), so no per-frame script work. */
@@ -3388,10 +3402,10 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['swave','Softer, quieter night waves'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const FLAGS=[['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id]of FLAGS)document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
- box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick()}});flApply();
+ box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
  box.querySelector('#ttPlay').onclick=()=>{op(false);setTimeout(()=>{const pl=skyPlan(Date.now()),b=document.getElementById('skyBody');if(!pl||!b)return;b.style.opacity='0';SKYA.arm=true;setTimeout(()=>skyRun(pl),60)},450)};
  box.querySelector('#ttIntro').onclick=()=>location.reload();
  box.querySelector('#ttReset').onclick=()=>{if(confirm('Reset the test account? Its plans and progress go back to the starting examples.'))reset()};
