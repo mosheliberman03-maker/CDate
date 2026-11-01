@@ -614,7 +614,7 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
       for(k=0;k<ev.length;k++)note(ev[k][0],ev[k][1],ev[k][2],ev[k][3]);
     }
   }
-  var raf=0,t0=0,done=false;
+  var raf=0,t0=0,lastNow=0,done=false;
   function finish(){
     if(done)return;done=true;cancelAnimationFrame(raf);
     app.style.transform='';app.style.transformOrigin='';
@@ -624,6 +624,8 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
   }
   function frame(now){
     if(!t0)t0=now;
+    // if the phone was busy (still loading the app) and a frame came late, hold the animation instead of jumping ahead
+    if(lastNow&&now-lastNow>50)t0+=now-lastNow-16.7;lastNow=now;
     // SPEED plays the whole timeline faster (10.7 s of animation in about 6.5 s)
     var t=(now-t0)/1000*SPEED;
     render(Math.min(t,END));
@@ -1737,6 +1739,7 @@ function updBar(){if(document.getElementById('updBar'))return;const b=document.c
  b.style.cssText='position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:9000;border:1px solid var(--line);border-radius:999px;padding:10px 16px;background:var(--ink);color:var(--card);font:600 14px Figtree,system-ui;box-shadow:0 8px 30px #0003;max-width:calc(100% - 24px)';
  b.onclick=()=>{try{H.tap()}catch(e){}location.reload()};document.body.appendChild(b)}
 if(window.isSecureContext&&location.protocol!=='file:'&&'serviceWorker' in navigator){
+ navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='cdate-update')updBar()});try{navigator.serviceWorker.startMessages()}catch(e){}
  addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').then(r=>{try{r.update()}catch(e){}}).catch(()=>{});updTag().then(t=>UPD.tag=t)});
  document.addEventListener('visibilitychange',async()=>{if(document.hidden){UPD.away=Date.now();return}
   if(!UPD.tag){UPD.tag=await updTag();return}

@@ -19,21 +19,44 @@ self.addEventListener('notificationclick', (e) => {
   }));
 });
 
+// Opening the app: answer at once with the copy saved on the phone (no waiting on the network), and fetch the newest
+// copy from GitHub in the background. If it changed, tell the open app so it can offer "Tap to update".
+// First open (nothing saved yet) or no saved copy: wait for the network. Offline with nothing saved: normal browser behaviour.
+const APP_CACHE = 'cdate-app-v1';
+const sig = (res) => res.headers.get('etag') || res.headers.get('last-modified') || '';
 self.addEventListener('fetch', (e) => {
   const r = e.request;
   if (r.method !== 'GET') return;
   const u = new URL(r.url);
   if (u.origin !== self.location.origin) return;
-  if (r.mode !== 'navigate' && !/(?:\/|\.html|\.webmanifest|\/sw\.js)$/.test(u.pathname)) return;
+  const scope = new URL(self.registration.scope);
+  const isApp = r.mode === 'navigate' || u.pathname === scope.pathname || u.pathname === scope.pathname + 'index.html';
+  if (!isApp || (u.pathname !== scope.pathname && u.pathname !== scope.pathname + 'index.html')) return;
+  const key = scope.href; // one saved copy of the app, whatever ?query the link had
   e.respondWith((async () => {
+    const cache = await caches.open(APP_CACHE);
+    const saved = await cache.match(key);
+    const net = (async () => {
+      const res = await fetch(key, { cache: 'no-cache', credentials: 'same-origin' });
+      if (res.ok && !res.redirected) {
+        let changed = false;
+        if (saved) {
+          const a = sig(saved), b = sig(res);
+          changed = a && b ? a !== b : (await saved.clone().text()) !== (await res.clone().text());
+        }
+        await cache.put(key, res.clone());
+        if (changed) {
+          const cs = await self.clients.matchAll({ type: 'window' });
+          cs.forEach((c) => c.postMessage({ type: 'cdate-update' }));
+        }
+      }
+      return res;
+    })();
+    if (saved) { e.waitUntil(net.catch(() => {})); return saved; }
     try {
-      const res = await fetch(r.url, { cache: 'no-cache', credentials: 'same-origin' });
-      // a navigation may not be answered with a followed redirect; send the redirect itself instead
+      const res = await net;
       if (res.redirected && r.mode === 'navigate') return Response.redirect(res.url, 302);
       return res;
-    } catch (x) {
-      try { return await fetch(r.url, { cache: 'force-cache', credentials: 'same-origin' }); }
-      catch (y) { return fetch(r); }
-    }
+    } catch (x) { return fetch(r); }
   })());
 });
