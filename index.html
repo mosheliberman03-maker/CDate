@@ -1415,7 +1415,9 @@ function rail(){const h0=hd(sel),a=[];
  {const hn=$('#hintN');hn.textContent=a.length>9?'9+':a.length;hn.hidden=!a.length;$('#hint').setAttribute('aria-label',a.length?'See details and '+a.length+' coming up':'See details')}
  reveal(r)}
 const routine=e=>{if(e.k!='my')return false;const c=my.find(m=>m.id==e.id);return !!c&&(c.r=='weekly'||c.r=='every2'||(c.r=='custom'&&Number.isInteger(c.interval)&&c.interval<=7))};
-function nextUp(){const b=$('#nxc');let f=null;
+/* The round "next special day" button is no longer shown on the home screen (owner's choice): upcoming days live in the
+   Coming Up column further down. Kept hidden so the card animation starts from the arrow instead. */
+function nextUp(){const b=$('#nxc');b.hidden=true;b.removeAttribute('data-t');return;let f=null;
  for(let i=1;i<=400&&!f;i++){const dt=ad(sel,i),v=info(dt).ev.filter(e=>on[e.k]&&!routine(e));if(v.length)f={dt,v,df:i}}
  if(!f){b.hidden=true;b.removeAttribute('data-t');return}
  const p=f.v[0],lbl='Next: '+f.v.map(e=>e.t).join(', ')+' · '+f.dt.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})+(f.df==1?' (tomorrow)':' (in '+f.df+' days)');
