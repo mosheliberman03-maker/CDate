@@ -765,7 +765,7 @@ function info(dt){const b=infoBase(dt),h=b.h,rc=b.rc,ev=b.ev.slice(),wd=dt.getDa
 let t0=ad(new Date(),0);const hm1=dt=>ad(dt,1-hd(dt).d),hlen=f=>hd(ad(f,29)).d==30?30:29;let V=hm1(t0),sel=t0;const on={yt:1,ct:1,yb:1,ys:1,fs:1,my:1};
 const g=$('#g');
 const ds=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-const AK=k=>window.ccProfileKey?window.ccProfileKey(k):k;const ST=(k,d)=>{try{return JSON.parse(localStorage.getItem(AK(k)))||d}catch(e){return d}},SV=()=>{try{localStorage.setItem(AK('cc_my'),JSON.stringify(my));localStorage.setItem(AK('cc_ov'),JSON.stringify(ov))}catch(e){}};
+const AK=k=>window.ccProfileKey?window.ccProfileKey(k):k;const ST=(k,d)=>{try{return JSON.parse(localStorage.getItem(AK(k)))||d}catch(e){return d}},SV=()=>{try{localStorage.setItem(AK('cc_my'),JSON.stringify(my));localStorage.setItem(AK('cc_ov'),JSON.stringify(ov))}catch(e){}try{if(typeof notifSyncSoon=='function'&&nCfg().on)notifSyncSoon()}catch(e){}};
 let my=ST('cc_my',[]),ov=ST('cc_ov',{}),editing=false,eid=null;
 const TASK_DONE_KEY='cc_task_done_v1';function taskDone(){return ST(TASK_DONE_KEY,{})}function setTaskDone(id,date,value){const x=taskDone(),k=id+'@'+date;if(value)x[k]=true;else delete x[k];try{localStorage.setItem(AK(TASK_DONE_KEY),JSON.stringify(x))}catch(e){}}
 let LC=ST('cc_loc',{n:'Foshan',la:23.02,lo:113.12,tz:'Asia/Shanghai'});
@@ -1612,7 +1612,7 @@ function stsOpen(){STS_F=undefined;let b=$('#sts');
 document.addEventListener('click',e=>{if(e.target.closest('#stk')){H.tap();stsOpen()}});
 
 /* ---------- Reminders ---------- */
-const NDEF={on:false,quiet:true,cand:true,candLead:30,omer:true,hanu:true,fast:true,spec:true,specAll:false,morn:'08:00',prep:true,learn:false,learnAt:'20:00'};
+const NDEF={on:false,quiet:true,cand:true,candLead:30,omer:true,hanu:true,fast:true,spec:true,specAll:false,morn:'08:00',prep:true,learn:false,learnAt:'20:00',mine:true};
 const nCfg=()=>Object.assign({},NDEF,ST('cc_notif',{}));
 const nSave=c=>{try{localStorage.setItem(AK('cc_notif'),JSON.stringify(c))}catch(e){}};
 let _lnp;const NP=()=>{try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;return _lnp||(_lnp=(C.Plugins&&C.Plugins.LocalNotifications)||C.registerPlugin('LocalNotifications'))}catch(e){return null}};
@@ -1694,6 +1694,19 @@ function notifPlan(c,days=30,opt){
    if(i==0){const left=dayLeft(k);if(left>0)add(th,'learn:'+k,wallMs(d,lh,lm),left+(left==1?' shiur':' shiurim')+' left today'+(st.cur?' · '+st.cur+'-day streak':''),'learn')}
    else add(th,'learn:'+k,wallMs(d,lh,lm),st.cur?'Keep your streak going':'Time for today’s shiurim','learn')}
  }
+ /* your own plans: the reminders you asked for ("2 hours before", "the night before", ...) */
+ if(c.mine!==false){const R=my.filter(p=>Array.isArray(p.rem)&&p.rem.length);
+  if(R.length){const [mh2,mm2]=(c.morn||'08:00').split(':').map(Number),hm=s=>{const[a,b]=s.split(':').map(Number);return aiFmtTime(a%12||12,b,a<12?'AM':'PM')};
+   for(let i=opt.past?-2:-1;i<=days+8;i++){const D=ad(today,i),ids=new Set(info(D).ev.filter(e=>e.k=='my').map(e=>e.id)),k=ds(D);
+    for(const p of R){if(!ids.has(p.id))continue;const tm=p.tm?p.tm.split(':').map(Number):null,ev=tm?wallMs(D,tm[0],tm[1]):null,tt=p.tm?hm(p.tm):'',who=p.person&&!String(p.t).toLowerCase().includes(String(p.person).toLowerCase())?' · with '+p.person:'';
+     p.rem.forEach((r,j)=>{let at=null,tx='';
+      if(r.type=='rel'){if(ev!=null)at=ev-r.min*6e4;else at=wallMs(ad(D,-Math.floor(r.min/1440)),mh2,mm2);
+       tx=r.min===0?(tt?'Starting now · '+tt:'Today'):r.min<1440?'In '+aiRemDur(r.min)+(tt?', at '+tt:''):r.min===1440?'Tomorrow'+(tt?' at '+tt:''):'In '+aiRemDur(r.min)+' · '+D.toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'})+(tt?' at '+tt:'')}
+      else if(r.type=='nightBefore'){at=wallMs(ad(D,-1),20,0);tx='Tomorrow'+(tt?' at '+tt:'')}
+      else if(r.type=='dayBefore'){at=wallMs(ad(D,-1),mh2,mm2);tx='Tomorrow'+(tt?' at '+tt:'')}
+      else if(r.type=='morningOf'){at=wallMs(D,mh2,mm2);tx='Today'+(tt?' at '+tt:'')}
+      else if(r.type=='at'){at=wallMs(ad(D,r.day||0),r.h,r.m);tx=(r.day<0?'Tomorrow':'Today')+(tt?' at '+tt:'')}
+      if(at!=null)add(T('my:'+p.id,k,p.t),'myr:'+p.id+':'+k+':'+j,at,tx+who,'mine')})}}}}
  let res=out;
  if(c.quiet)res=res.filter(n=>!wins.some(w=>n.at>=w[0]&&n.at<w[1]));
  res.sort((a,b)=>a.at-b.at);return opt.past?res:res.slice(0,60)}
@@ -1788,7 +1801,7 @@ setInterval(()=>{if(nCfg().on)notifSync()},6*36e5);
 {const pl=NP();if(pl){try{pl.addListener('localNotificationActionPerformed',()=>{try{pick(t0)}catch(e){}})}catch(e){}}}
 
 /* settings UI */
-const RMR=[['cand','Candle lighting','Shabbos, Yom Tov and Yom Kippur'],['omer','Omer count','Each night of the Omer, at nightfall'],['hanu','Chanukah menorah','Each night, at lighting time'],['fast','Fast days','The evening before, and when it ends'],['spec','Special days','A morning note on the day'],['prep','Yom Tov prep','Eruv Tavshilin, chametz times, V’sein Tal'],['learn','Daily learning','A nudge to finish Chitas']];
+const RMR=[['mine','Your plans','Reminders you asked for in Plan something'],['cand','Candle lighting','Shabbos, Yom Tov and Yom Kippur'],['omer','Omer count','Each night of the Omer, at nightfall'],['hanu','Chanukah menorah','Each night, at lighting time'],['fast','Fast days','The evening before, and when it ends'],['spec','Special days','A morning note on the day'],['prep','Yom Tov prep','Eruv Tavshilin, chametz times, V’sein Tal'],['learn','Daily learning','A nudge to finish Chitas']];
 const rmSumText=()=>{const c=nCfg();if(!c.on)return 'Off';const n=RMR.filter(r=>c[r[0]]).length;return 'On · '+n+(n==1?' type':' types')};
 function rmSum(){const e=$('#rmSum');if(e)e.textContent=rmSumText()}
 function rmBody(){const c=nCfg();
@@ -2683,19 +2696,63 @@ const AI_ANCHOR_RE=/\b\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|\bat\s+\d{1,2
 const AI_SPLIT_FILLER=new Set('at on in every each the a an from to until till by for of and or next this coming week weekly month monthly year yearly day days am pm noon midnight tonight today tomorrow morning afternoon evening night hour hours minute minutes min mins also then plus again same time'.split(' '));
 function aiHasTitle(s){return aiNoPunct(s).some(w=>w.length>=3&&!/^\d/.test(w)&&!AI_SPLIT_FILLER.has(w)&&aiDow(w)<0&&!/^(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/.test(w)&&!aiHebKey(w))}
 function aiHasAnchor(s){return AI_ANCHOR_RE.test(s)}
+/* ---- "Remind me 2 hours before", "let me know the night before", "notify me at 6pm the day before" ----
+   aiRemParse() finds reminder requests in a request, removes them from the text (so they don't become part of the plan),
+   and returns a list of reminder rules. They are saved on the plan (o.rem) and sent as push notifications by notifPlan(). */
+const AI_REM_NUM={a:1,an:1,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,fifteen:15,twenty:20,thirty:30,forty:40,'forty five':45,'forty-five':45,fifty:50,sixty:60,ninety:90,couple:2,'couple of':2,few:3};
+const AI_REM_TRIG=/(?:\b(?:and|also|then|please|pls)\s+|,\s*)*\b(?:remind\s+me(?:\s+(?:about|of)\s+(?:it|this|that))?|let\s+me\s+know|notify\s+me|alert\s+me|ping\s+me|buzz\s+me|text\s+me|warn\s+me|give\s+me\s+(?:a\s+|an\s+)?(?:reminder|heads[\s-]?up|notification|ping|alert)|send\s+(?:me\s+)?(?:a\s+|an\s+)?(?:push\s+)?(?:reminder|notification|alert|push)|(?:with\s+)?(?:a\s+|an\s+)?(?:push\s+)?(?:reminder|notification|alert)s?)\b/gi;
+function aiRemSpec(s){let m;const at=(h,mn,ap)=>{let H=+h,M=+(mn||0);ap=aiNormAp(ap);if(H<1||H>12&&ap||H>23||M>59)return null;if(ap==='PM'&&H<12)H+=12;if(ap==='AM'&&H===12)H=0;if(!ap&&H>=1&&H<=6)H+=12;return[H,M]};
+ if(m=/^(?:about\s+|around\s+|like\s+)?(\d+(?:\.\d+)?|an?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty[\s-]five|forty|fifty|sixty|ninety|couple(?:\s+of)?|few|half\s+an?)\s*(?:(and\s+a\s+half)\s+)?(minutes?|mins?|hours?|hrs?|days?|weeks?)(?:\s+(and\s+a\s+half))?\s+(?:before(?:hand)?|ahead(?:\s+of\s+time)?|earlier|prior|in\s+advance|early)(?:\s+(?:it\s+starts|that|the\s+event|the\s+time|of\s+time|it))?/i.exec(s)){
+  const w=m[1].toLowerCase().replace(/\s+/g,' ');let n=/^half/.test(w)?.5:/^\d/.test(w)?+w:AI_REM_NUM[w]||1;if(m[2]||m[4])n+=.5;
+  const u=m[3].toLowerCase(),mult=/^m/.test(u)?1:/^h/.test(u)?60:/^d/.test(u)?1440:10080;return{len:m[0].length,r:{type:'rel',min:Math.round(n*mult)}}}
+ if(m=/^(?:at\s+the\s+(?:start|time)|when\s+it\s+(?:starts|begins)|on\s+time|right\s+(?:before|when\s+it\s+starts)|as\s+it\s+(?:starts|begins)|at\s+that\s+time)/i.exec(s))return{len:m[0].length,r:{type:'rel',min:0}};
+ if(m=/^(?:on\s+)?(?:the\s+)?(?:night|evening)\s+before(?:\s+(?:it|that))?/i.exec(s))return{len:m[0].length,r:{type:'nightBefore'}};
+ if(m=/^(?:on\s+)?(?:the\s+)?(?:day|morning)\s+before(?:\s+(?:it|that))?/i.exec(s))return{len:m[0].length,r:{type:'dayBefore'}};
+ if(m=/^(?:on\s+|in\s+)?(?:the\s+)?morning\s+of(?:\s+(?:it|the\s+day))?|^that\s+morning|^in\s+the\s+morning(?=$|[\s,.;])/i.exec(s))return{len:m[0].length,r:{type:'morningOf'}};
+ if(m=/^at\s+(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)?(?![\w:])(?:\s+(?:on\s+)?((?:the\s+)?(?:day|night|evening)\s+before|the\s+previous\s+(?:day|night|evening)|that\s+(?:day|morning|evening|night)|on\s+the\s+day|the\s+same\s+day))?/i.exec(s)){
+  const t=at(m[1],m[2],m[3]);if(!t)return null;return{len:m[0].length,r:{type:'at',h:t[0],m:t[1],day:m[4]&&/before|previous/i.test(m[4])?-1:0}}}
+ return null}
+function aiRemParse(text){let t=String(text||''),rem=[],found=false,mm;const re=new RegExp(AI_REM_TRIG.source,'gi'),cuts=[];
+ while(mm=re.exec(t)){let pos=mm.index+mm[0].length,specs=[],end=pos;
+  for(;;){const rest=t.slice(end),sep=(/^(?:\s*(?:,|and|&|also|plus|as\s+well\s+as|or)\s*|\s+)?/i.exec(rest)||[''])[0],r2=rest.slice(sep.length);
+   const lead=(/^(?:me\s+|it\s+|for\s+it\s+|about\s+it\s+)/i.exec(r2)||[''])[0],d=aiRemSpec(r2),sp=d||aiRemSpec(r2.slice(lead.length));
+   if(!sp)break;specs.push(sp.r);end+=sep.length+(d?0:lead.length)+sp.len}
+  const verb=!/reminder|notification|alert|push|heads/i.test(mm[0])||/^\s*(?:give|send)/i.test(mm[0].replace(/^[\s,]*(?:and|also|then|please|pls)\s+/i,''));
+  if(!specs.length&&verb&&/^\s*(?:$|[,.;!]|too\b|as\s+well\b)/i.test(t.slice(pos))&&!/\b(?:to|about|of)\s*$/i.test(mm[0])){specs.push({type:'rel',min:0});end=pos}
+  if(specs.length){found=true;rem.push(...specs);cuts.push([mm.index,end])}}
+ for(const[a,b]of cuts.reverse())t=t.slice(0,a)+' '+t.slice(b);
+ t=t.replace(/\s*\b(?:too|as\s+well)\b\s*$/i,'').replace(/(?:\s*\b(?:and|also|then)\b)+\s*$/i,'').replace(/\s+([,.;!])/g,'$1').replace(/[\s,;]+$/,'').replace(/\s+/g,' ').trim();
+ const seen=new Set();rem=rem.filter(r=>{const k=JSON.stringify(r);if(seen.has(k))return false;seen.add(k);return true});
+ return{text:t,rem,found}}
+function aiRemOnly(s){const r=aiRemParse(s);return r.found&&!r.text.replace(/\b(?:and|also|please|pls|then|too|as\s+well)\b|[\s,.;!]/gi,'')}
+const aiClock=t=>{const m=/(\d{1,2}):(\d{2})\s*(AM|PM)/i.exec(t||'');if(!m)return null;let h=+m[1]%12;if(/pm/i.test(m[3]))h+=12;return String(h).padStart(2,'0')+':'+m[2]};
+const aiHM=hm=>{const[h,m]=hm.split(':').map(Number);return aiFmtTime(h%12||12,m,h<12?'AM':'PM')};
+function aiRemDur(min){if(min%10080===0)return min/10080===1?'a week':min/10080+' weeks';if(min%1440===0)return min/1440===1?'a day':min/1440+' days';if(min%60===0)return min/60===1?'an hour':min/60+' hours';if(min>60&&min%30===0)return (min/60)+' hours';return min+' minutes'}
+function aiRemLabel(r,tm){const mo=aiHM((nCfg().morn)||'08:00');
+ if(r.type==='rel')return r.min===0?'when it starts':aiRemDur(r.min)+' before';
+ if(r.type==='nightBefore')return 'the night before (8:00 PM)';if(r.type==='dayBefore')return 'the day before ('+mo+')';if(r.type==='morningOf')return 'that morning ('+mo+')';
+ if(r.type==='at')return 'at '+aiHM(String(r.h).padStart(2,'0')+':'+String(r.m).padStart(2,'0'))+(r.day<0?' the day before':' that day');return ''}
+function aiRemAttach(q,rem){const tm=aiClock(q.time);q.rem=rem.map(r=>r.auto&&!tm?{type:'morningOf'}:r);q.tm=tm||undefined;
+ q.notes=[q.notes,'🔔 Reminder: '+q.rem.map(r=>aiRemLabel(r,tm)).join(', ')].filter(Boolean).join(' · ');
+ const w=q.warnings=q.warnings||[];
+ if(!tm&&q.rem.some(r=>r.type==='rel'&&r.min<1440))w.push('There is no clock time for this, so “'+q.rem.filter(r=>r.type==='rel'&&r.min<1440).map(r=>aiRemLabel(r)).join(', ')+'” will come at '+aiHM(nCfg().morn||'08:00')+' that day. Add a time to fix it.');
+ let ready=false;try{ready=nCfg().on&&nCfg().mine!==false&&(!!NP()||pushActive())}catch(e){}
+ if(!ready)w.push('Reminders are not on yet on this phone. After adding, open Settings → Reminders and turn on “Send reminders” so this reaches you.')}
 const AI_SUBJ_CUT=new RegExp('(?:every|each|on|at|@|with|daily|nightly|weekly|monthly|yearly|before|after|from|starting|beginning|tonight|tomorrow|today|this|next|until|till|for\\s+\\d|in\\s+the|around|'+AI_DAY_RE+'s?|\\d)\\b');
 // "Schedule a chavrusa every Monday with JJ" -> "Schedule a chavrusa": the words before the first when/who/where
 function aiSubject(t){const m=new RegExp('\\b'+AI_SUBJ_CUT.source,'i').exec(t);const s=(m?t.slice(0,m.index):t).replace(/[\s,;.]+$/,'').trim();return aiHasTitle(s)?s:''}
 // "730pm" / "at 730" -> "7:30pm" / "at 7:30" (speech and quick typing often drop the colon)
 function aiFixTimes(t){return String(t||'').replace(/\b(1[0-2]|0?[1-9])([0-5]\d)\s*(a\.?m\.?|p\.?m\.?)(?!\w)/gi,'$1:$2 $3').replace(/\b(at|@|around|by|from|until|till)\s+([1-9])([0-5]\d)\b(?![:\d])/gi,'$1 $2:$3')}
 function aiSplitRequests(raw){
- const text=aiFixTimes(String(raw||'').replace(/\r/g,'').replace(/[‘’`´]/g,"'")).trim();if(!text)return[];
+ let text=aiFixTimes(String(raw||'').replace(/\r/g,'').replace(/[‘’`´]/g,"'")).trim();if(!text)return[];
+ // a last sentence that is only a reminder ("Remind me 15 minutes before.") belongs to every request in the message
+ let tail='';{const ss=text.split(/(?<=[.!?])\s+|\n+/);if(ss.length>1&&aiRemOnly(ss[ss.length-1])){tail=ss[ss.length-1].replace(/[.!\s]+$/,'');text=text.slice(0,text.lastIndexOf(ss[ss.length-1])).trim()}}
  // 1. lines (with bullets or numbers), semicolons, "1) … 2) …", Hebrew "וגם"
  let parts=text.split(/\n+/).map(l=>l.replace(/^\s*(?:[•*\-–]|\d{1,2}[.)])\s+/,'')).flatMap(l=>l.split(/\s*;\s*|\s+(?=\d{1,2}\)\s)|\s+וגם\s+/)).map(l=>l.replace(/^\d{1,2}\)\s+/,''));
  // 2. sentences, but not after abbreviations such as Dr. R. St. or a.m.
  parts=parts.flatMap(l=>{const out=[];for(const piece of l.split(/(?<=[.!?])\s+(?=\S)/)){
    const prev=out[out.length-1];
-   const cont=/^(?:with|except|but|and|because|'?cause|since|on|at|for|until|till|from|every|each|in|so|besides|unless|other\s+than|apart\s+from|starting|beginning|then\s+at|instead|or|excluding|which|that|where|when|after|before|around|by|through|thru)\b/i.test(piece);
+   const cont=aiRemOnly(piece)||/^(?:with|except|but|and|because|'?cause|since|on|at|for|until|till|from|every|each|in|so|besides|unless|other\s+than|apart\s+from|starting|beginning|then\s+at|instead|or|excluding|which|that|where|when|after|before|around|by|through|thru)\b/i.test(piece);
    if(prev&&(cont||/(?:^|\s)(?:dr|mr|mrs|ms|r|rav|reb|rabbi|st|mt|jr|sr|no|vol|ch|[a-z])\.$/i.test(prev)&&!(/[ap]\.m\.$/i.test(prev)&&/^[A-Z]/.test(piece))))out[out.length-1]=prev+' '+piece;
    else out.push(piece)}return out});
  // 3. inside one sentence: "and also …", ", and add …", or two parts that each name something and give it a day or time
@@ -2703,6 +2760,7 @@ function aiSplitRequests(raw){
  parts=parts.flatMap(l=>{const out=[];let cur='';const bits=l.split(/(\s*,\s*(?:and\s+)?(?:then\s+)?|\s+and\s+(?:then\s+)?|\s+&\s+|\s+plus\s+|\s+(?=also\b))/i);
    cur=bits[0];
    for(let i=1;i<bits.length;i+=2){const sep=bits[i],rest=bits.slice(i+1).join(''),next=bits[i+1]||'';
+    if(aiRemOnly(next)){cur+=sep+next;continue}
     const also=/^also\b/i.test(next.trim())&&(/\band\b|,/i.test(sep)||(aiHasAnchor(cur)&&aiHasAnchor(rest)));
     const verb=vRe.test(next.trim());
     const pair=aiHasTitle(cur)&&aiHasAnchor(cur)&&aiHasTitle(rest)&&aiHasAnchor(rest)&&aiHasTitle(next)&&!/^(?:with|at|on|in|for|from|to|until|every|each)\b/i.test(next.trim());
@@ -2713,6 +2771,7 @@ function aiSplitRequests(raw){
  parts=parts.map(t=>t.trim());
  for(let i=1;i<parts.length;i++){const body=parts[i].replace(/^(?:and\s+|then\s+|plus\s+)*(?:also\s+)?/i,'').replace(/^[,\s]+/,'');
   if(new RegExp('^'+AI_SUBJ_CUT.source,'i').test(body)){const subj=aiSubject(parts[i-1]);if(subj)parts[i]=subj+' '+body}}
+ if(tail)parts=parts.map(x=>x.replace(/[\s.]+$/,'')+'. '+tail);
  return parts.map(s=>s.replace(/^\s*(?:and|also|then|plus)\b[,]?\s*/i,'').replace(/[\s,.;!]+$/,'').trim()).filter(s=>s&&!/^(?:hi|hello|hey|thanks|thank you|please|ok|okay|that's all|that is all)$/i.test(s))}
 
 async function aiInterpretOne(raw){let data=null;
@@ -2729,7 +2788,7 @@ const AI_EXCEPT_RE=/\s*[,;]?\s*\b(?:except(?:\s+for)?(?:\s+on)?|but\s+not\s+(?:o
 const AI_REASON_RE=/\s*[,;]?\s*(?:\b(?:because|'?cause|cuz|coz|cos|bc|since|as)\b|\bb\/c)\s+(?:i|i'm|i've|we|we're|he|she|they|there|there's|it's|my|our)\b.*$/i;
 function aiExceptParse(src){
  let text=String(src||''),reason='';
- const rm=AI_REASON_RE.exec(text);if(rm){reason=rm[0].replace(/^[\s,;]*(?:'?cause|cuz|coz|cos|bc|b\/c|since|as)(?=\s)/i,'because').replace(/^[\s,;]+/,'').trim();text=text.slice(0,rm.index)}
+ const rm=AI_REASON_RE.exec(text);if(rm){reason=rm[0].replace(/[.!\s]+$/,'').replace(/^[\s,;]*(?:'?cause|cuz|coz|cos|bc|b\/c|since|as)(?=\s)/i,'because').replace(/^[\s,;]+/,'').trim();text=text.slice(0,rm.index)}
  const em=AI_EXCEPT_RE.exec(text);let ex=null;
  if(em){const clause=em[1],days=[];const r=new RegExp('\\b('+AI_DOW_TOK+')\\b','gi');let m;while(m=r.exec(clause)){const d=aiDow(m[1].replace(/s$/i,''));if(d>=0&&!days.includes(d))days.push(d)}
   if(days.length){const tm=/(?:^|\s)(?:at\s+|@\s*)?(\d{1,2})(?::(\d{2})|(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)?(?![\w:])/i.exec(clause.replace(new RegExp('\\b'+AI_DOW_TOK+'\\b','gi'),' '));
@@ -2774,15 +2833,18 @@ function aiReasonEvent(reason,ex,mainNotes){
  if(!hasDay){if(!ex||!ex.days.length)return '';ev+=' every '+ex.days.map(d=>AI_DAY_LABEL[d]).join(' and ')}
  if(!hasTime){const t=(/Time:\s*(\d{1,2}:\d{2}\s*[AP]M)/.exec(mainNotes||'')||[])[1];if(t)ev+=' at '+t;else if(ex&&ex.night)ev+=' night'}
  return ev}
-async function aiInterpretSeg(src){const e=aiExceptParse(src);const p=await aiInterpretOne(e.ex||e.reason?e.base:src);
+async function aiInterpretSeg(src0){const R=aiRemParse(src0),src=R.found?R.text:src0;const e=aiExceptParse(src);const p=await aiInterpretOne(e.ex||e.reason||R.found?e.base:src);
  const out=aiApplyException(p,e.ex,e.reason);
  const rs=e.reason&&!p.unsupported&&!p.needsClarification?aiReasonEvent(e.reason,e.ex,p.notes):'';
+ let rem=R.rem;if(!rem.length&&/^(?:please\s+)?(?:remind\s+me|(?:set|add|make|create)\s+(?:a|an|me\s+a)\s+reminder|reminder)\s+(?:to|about|of|for)\b/i.test(src0.trim()))rem=[{type:'rel',min:0,auto:true}];
+ if(rem.length)out.forEach(q=>{if(!q.unsupported&&!q.needsClarification)aiRemAttach(q,rem)});
  if(rs){try{const q=await aiInterpretOne(rs);if(q&&!q.unsupported&&q.title){q.fromReason=true;q.reasonSrc=rs;out.push(q)}}catch(x){}}
  return out}
 let aiSeq=0;
 // Save one approved plan to the calendar. `source` is the request text it came from (remembered on this device).
 function aiCommit(p,source){const dv=new Date((p.date||ds(sel))+'T12:00:00');if(!p.title||isNaN(+dv))return null;
  const h=hd(dv),o={id:'ai'+Date.now()+(aiSeq++?'_'+aiSeq:''),t:p.title,x:p.notes||'',person:p.participant||'',kind:p.kind||'event',dt:ds(dv),r:p.recurrence||'once',hk:h.k,hd:p.hd||h.d,interval:p.interval};
+ if(Array.isArray(p.rem)&&p.rem.length){o.rem=p.rem.map(r=>{const c={...r};delete c.auto;return c});const tm=p.tm||aiClock(p.time);if(tm)o.tm=tm}
  if(o.r==='weekly'){o.dow=Number.isInteger(p.dow)?p.dow:dv.getDay();if(Array.isArray(p.dows)&&p.dows.length)o.dows=p.dows.filter(Number.isInteger)}
  if(p.from&&(o.r==='weekly'||o.r==='hmonth'))o.from=p.from;if(o.r==='yomadpagra'||o.r==='custom')o.dates=Array.isArray(p.dates)?p.dates:[];
  my.push(o);SV();lg();
