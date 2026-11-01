@@ -480,7 +480,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .sky-body .skyimg{position:relative}
 .moon .skyimg{width:114px;height:114px;margin:0;filter:drop-shadow(0 0 28px rgba(170,188,255,.28))}
 /* the glass dome that rises behind the date */
-#hdr .sky-scene::after{content:'';position:absolute;--dd:min(90vw,400px);left:calc(50% - var(--dd) / 2);top:calc(100% - 62px);translate:var(--dmx,0) var(--dmy,0);width:var(--dd);height:var(--dd);box-sizing:border-box;border-radius:50%;z-index:-1;pointer-events:none;
+#hdr .sky-scene::after{content:'';position:absolute;--dd:min(90vw,400px);left:calc(50% - var(--dd) / 2 + var(--dsx,0px));top:calc(100% - 62px + var(--dsy,0px));translate:var(--dmx,0) var(--dmy,0);width:var(--dd);height:var(--dd);box-sizing:border-box;border-radius:50%;z-index:-1;pointer-events:none;
  border:1px solid color-mix(in srgb,var(--rbe) 36%,transparent);
  background:radial-gradient(90% 60% at 50% 0%,color-mix(in srgb,var(--rbf) 14%,transparent) 0%,color-mix(in srgb,var(--rbf) 5%,transparent) 42%,transparent 72%);
  box-shadow:inset 0 10px 30px -18px color-mix(in srgb,var(--rbe) 30%,transparent);
@@ -563,7 +563,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
    point on the same circle (nothing rises above its top); it turns, whole, into a backwards C, then keeps turning while it is eaten away from its lower end */
 @property --dl{syntax:'<angle>';inherits:false;initial-value:180deg}
 @keyframes dmW{0%{rotate:var(--dma,0deg);--dl:180deg}50%{rotate:calc(var(--dma,0deg) + 90deg);--dl:180deg}100%{rotate:calc(var(--dma,0deg) + 180deg);--dl:0deg}}
-#hdr .sky-scene::after{rotate:var(--dma,0deg);transition:rotate .9s ease}
+#hdr .sky-scene::after{rotate:var(--dma,0deg);transition:rotate .9s ease,left .9s ease,top .9s ease}
 @supports (animation-timeline:scroll()){
  #hdr .sky-scene::after{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both,dmW 1s linear both;animation-timeline:auto,auto,scroll(root block),scroll(root block);animation-range:normal,normal,0px 1000px,0px 380px;animation-composition:replace,add,add,replace}}
 @media(prefers-reduced-motion:reduce){#skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab,.dock,#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk,:is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:none!important}}
@@ -586,6 +586,24 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #hdr.sky-side .sky-cap2:not([hidden]){display:flex;align-items:center;gap:10px;width:max-content;max-width:88vw;margin:clamp(10px,1.8vh,16px) auto 0;padding:9px 20px 9px 16px;border-radius:999px;position:relative;
  font:500 15px/1.2 Figtree,system-ui,sans-serif;color:var(--gl-tx);white-space:nowrap;background:color-mix(in srgb,var(--card) 58%,transparent);border:1px solid color-mix(in srgb,var(--rbe) 26%,transparent);box-shadow:0 8px 24px rgba(4,6,26,.22)}
 :root[data-night="1"] #hdr.sky-side .sky-cap2{background:rgba(13,19,50,.56);border-color:rgba(182,172,255,.26)}
+/* ===== One look for every card, sheet and button, matched to the sky (dark sky = night glass, light sky = day glass) =====
+   Cards that scroll with the page use translucent fills without blur (smooth scrolling); overlays may blur what is behind them. */
+:root[data-theme="dark"]{--gx-bg:linear-gradient(180deg,rgba(46,56,128,.44),rgba(22,30,80,.40));--gx-bd:rgba(172,182,255,.16);--gx-sh:0 14px 40px rgba(3,6,26,.26);
+ --gx-sheet:linear-gradient(180deg,rgba(24,32,78,.86),rgba(14,20,54,.9));--gx-in:rgba(6,10,32,.5);--gx-inb:rgba(172,182,255,.2);--gx-pri:#F0E4D4;--gx-prit:#0b1233;--gx-gh:rgba(255,255,255,.04)}
+:root[data-theme="light"]{--gx-bg:linear-gradient(180deg,rgba(255,255,255,.74),rgba(242,247,255,.62));--gx-bd:rgba(255,255,255,.78);--gx-sh:0 12px 34px rgba(36,64,130,.12);
+ --gx-sheet:linear-gradient(180deg,rgba(252,253,255,.92),rgba(241,246,255,.94));--gx-in:rgba(255,255,255,.7);--gx-inb:rgba(60,90,160,.18);--gx-pri:#0a1131;--gx-prit:#fff;--gx-gh:rgba(255,255,255,.45)}
+:root[data-theme]:not(.tt-off-glassui) :is(.panel,.hyc,#p .ev){background:var(--gx-bg);border:1px solid var(--gx-bd);border-radius:24px;box-shadow:var(--gx-sh)}
+:root[data-theme]:not(.tt-off-glassui) #rail .rt.mc{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 16%,transparent),color-mix(in srgb,var(--c) 6%,transparent)),var(--gx-bg);border:1px solid color-mix(in srgb,var(--c) 30%,var(--gx-bd));border-radius:18px;box-shadow:var(--gx-sh)}
+:root[data-theme]:not(.tt-off-glassui) .cb{background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 88%,transparent),color-mix(in srgb,var(--bg) 58%,transparent));border-bottom:1px solid var(--gx-bd)}
+:root[data-theme]:not(.tt-off-glassui) :is(.sheet,.ai-card,.dmc,.stsp){background:var(--gx-sheet);border:1px solid var(--gx-bd);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+:root[data-theme]:not(.tt-off-glassui) .dmc{border-top:2px solid color-mix(in srgb,var(--c) 70%,transparent)}
+:root[data-theme]:not(.tt-off-glassui) :is(.sheet,.ai-card,.dmc,#rdr) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea){background:var(--gx-in);border:1px solid var(--gx-inb);border-radius:14px;color:var(--ink)}
+:root[data-theme]:not(.tt-off-glassui) .btn:not(.gh){background:var(--gx-pri);color:var(--gx-prit);border-color:transparent;border-radius:14px}
+:root[data-theme]:not(.tt-off-glassui) .btn.gh{background:var(--gx-gh);border:1px solid var(--gx-bd);border-radius:14px}
+:root[data-theme]:not(.tt-off-glassui) #g .day{background:color-mix(in srgb,var(--ink) 3%,transparent);border-color:color-mix(in srgb,var(--ink) 10%,transparent)}
+:root[data-theme="light"]:not(.tt-off-glassui) #g .day{background:rgba(255,255,255,.42);border-color:rgba(255,255,255,.7)}
+:root[data-theme="light"]:not(.tt-off-glassui) #g .day.day[class*="w-"]{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 9%,rgba(255,255,255,.62)),rgba(255,255,255,.45))!important;border-color:color-mix(in srgb,var(--c) 45%,rgba(255,255,255,.7))}
+:root[data-theme="dark"]:not(.tt-off-glassui) #g .day.day[class*="w-"]{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 9%,rgba(46,56,128,.35)),rgba(22,30,80,.3))!important;border-color:color-mix(in srgb,var(--c) 42%,transparent)}
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
 </style>
 </head><body>
@@ -1727,10 +1745,14 @@ const skyBodyKey=st=>st.kind+(st.kind==='sun'?Math.round(st.alt/4):Math.round(st
 /* When the date is shown big (.sky-side), the rise/set caption sits under it instead of up in the sky. */
 function capSync(){const c=document.getElementById('skyCap'),c2=document.getElementById('skyCap2');if(c2){c2.innerHTML=c?c.innerHTML:'';c2.hidden=!c}}
 /* The semicircle is the lit atmosphere: its top faces the sun or moon (--dma on the scene; the scroll swivel adds to it). */
-function skyDomeAim(st){const sc=document.getElementById('skyScene');if(!sc)return;let a=0;
- if(st&&!document.documentElement.classList.contains('tt-off-aim')){const W=sc.offsetWidth,H=sc.offsetHeight,D=Math.min(innerWidth*.9,400),cx=W/2,cy=H-62+D/2,bx=st.x/100*W,by=st.y/100*H;
-  a=Math.max(-100,Math.min(100,Math.atan2(bx-cx,cy-by)*57.2958))}
- const v=a.toFixed(1)+'deg';if(sc.style.getPropertyValue('--dma')!==v)sc.style.setProperty('--dma',v)}
+function skyDomeAim(st){const sc=document.getElementById('skyScene');if(!sc)return;let a=0,sx=0,sy=0;
+ if(st){const W=sc.offsetWidth,H=sc.offsetHeight,D=Math.min(innerWidth*.9,400),R=D/2,cx=W/2,cy=H-62+R,bx=st.x/100*W,by=st.y/100*H,b=document.getElementById('skyBody');
+  /* never overlap: if the sun/moon would sit on or inside the circle, slide the circle away from it along the same line */
+  const rb=b?(b.classList.contains('sun-b')?b.offsetWidth*.36:b.offsetWidth*.5):60,dx=bx-cx,dy=by-cy,d=Math.hypot(dx,dy)||1,need=R+rb+10;
+  if(d<need){sx=-dx/d*(need-d);sy=-dy/d*(need-d)}
+  if(!document.documentElement.classList.contains('tt-off-aim'))a=Math.max(-100,Math.min(100,Math.atan2(bx-cx-sx,cy+sy-by)*57.2958))}
+ const v=a.toFixed(1)+'deg',vx=sx.toFixed(1)+'px',vy=sy.toFixed(1)+'px',ss=sc.style;
+ if(ss.getPropertyValue('--dma')!==v)ss.setProperty('--dma',v);if(ss.getPropertyValue('--dsx')!==vx)ss.setProperty('--dsx',vx);if(ss.getPropertyValue('--dsy')!==vy)ss.setProperty('--dsy',vy)}
 /* When the sun/moon is far to one side (or below the horizon) the middle of the sky is empty: the date moves up and grows into it.
    Applied as a state, not animated. */
 function skySideSet(st){const h=document.getElementById('hdr');if(!h)return;const on=!!st&&!document.documentElement.classList.contains('tt-off-side')&&(st.kind==='below'||Math.abs(st.x-50)>34);
@@ -3402,7 +3424,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id]of FLAGS)document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
