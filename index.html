@@ -571,6 +571,13 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 12px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 12px),transparent 100%)}
 .foot .chips2::-webkit-scrollbar{display:none}
 .foot .c2{flex:none;white-space:nowrap;max-width:none}
+/* empty middle of the sky (body far to one side or below the horizon): like a big lock-screen clock, the date becomes a tall block,
+   day above month, filling the middle; the sky scene shrinks to make room and the week panel stays put */
+#hdr.sky-side .sky-scene{height:clamp(110px,14vh,150px)}
+#hdr.sky-side .hd-he{margin-top:clamp(14px,2.4vh,26px)}
+#hdr.sky-side .hd-big{display:flex;flex-direction:column;align-items:center;font-size:min(31vw,16.5vh,150px);line-height:.98;letter-spacing:-.01em}
+#hdr.sky-side .hd-big>span{display:block;white-space:nowrap}
+#hdr.sky-side .hd-m{font-size:.86em;max-width:94vw}
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
 </style>
 </head><body>
@@ -1441,7 +1448,7 @@ function panel(dir){const{h,ev,rc}=infoD(sel),w=sel.getDay()==6,ps=parsha(sel),d
  rel=df==0?'Today':df==1?'Tomorrow':df==-1?'Yesterday':df>0?'In '+df+' days':-df+' days ago',
  pr=ps?`<div class="pr rv" style="--i:3">${ps.yt?'(':''}Parshas ${ps.p.map(x=>x[0]).join('-')}${ps.yt?')':''} <span class="heb" lang="he" dir="rtl">${ps.yt?'(':''}פרשת ${ps.p.map(x=>x[1]).join('־')}${ps.yt?')':''}</span>${ps.yt?'<span class="pn">Chitas only · no leining this Shabbos</span>':''}</div>`:'';
  const lead=`<div class="lead rv" style="--i:2"><span>${rel}${w?' · Shabbos':''}</span><span>${h.d} ${h.n[0]} ${h.y} · ${sel.getFullYear()}</span></div>`;
- $('#hdr').innerHTML=`${skyScene(h,df)}<h1 class="hd-he rv" lang="he" dir="rtl"><span class="hd-big">${G(h.d)} ${h.n[1]}</span></h1><div class="hd-div rv" style="--i:1"><i></i><b class="dm"></b><span class="hd-yr" lang="he" dir="rtl">${G(h.y%1000)}</span><b class="dm"></b><i></i></div><div class="hd-en rv" style="--i:1">${sel.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric'})}</div><div class="wk rv" style="--i:2">${wkStrip()}</div>`;$('#hero').style.setProperty('--aura','var(--'+(ev.length?ev[0].k:w?'yt':'ct')+')');
+ $('#hdr').innerHTML=`${skyScene(h,df)}<h1 class="hd-he rv" lang="he" dir="rtl"><span class="hd-big"><span class="hd-d">${G(h.d)}</span> <span class="hd-m">${h.n[1]}</span></span></h1><div class="hd-div rv" style="--i:1"><i></i><b class="dm"></b><span class="hd-yr" lang="he" dir="rtl">${G(h.y%1000)}</span><b class="dm"></b><i></i></div><div class="hd-en rv" style="--i:1">${sel.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric'})}</div><div class="wk rv" style="--i:2">${wkStrip()}</div>`;$('#hero').style.setProperty('--aura','var(--'+(ev.length?ev[0].k:w?'yt':'ct')+')');
  $('#gh').textContent=sel.getDate();
  $('#cbt').innerHTML=`${sel.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})}<span lang="he" dir="rtl">${G(h.d)} ${h.n[1]}</span>`;
  $('#p').innerHTML=(editing?'<div class="eb">Editing mode <button class="ed" id="ex">Done</button></div>':'')+lead+pr+(ev.length?ev.map((e,i)=>`<div class="ev mc k-${e.k}" style="--i:${i+3}"><small><i class="m k-${e.k}"></i>${KN[e.k]}</small>${e.isTask?`<button class="task-check" data-task="${e.id}" data-date="${ds(sel)}" aria-pressed="${e.done?'true':'false'}" style="float:right;border:1px solid var(--line);border-radius:9px;padding:6px 10px;background:${e.done?'var(--my)':'transparent'};color:inherit">${e.done?'✓ Done':'□ Mark done'}</button>`:''}${editing?`<button class="ed" data-e="${e.id}">Edit</button>`:''}<h3 style="${e.isTask&&e.done?'text-decoration:line-through;opacity:.65':''}">${e.t}${e.h?` <span class="heb" lang="he">${e.h}</span>`:''}</h3>${lt(e)?`<p class="sm" role="button" tabindex="0" data-i="${i}">${e.x} <span class="mr">More ›</span></p>`:`<p>${e.x}</p>`}</div>`).join(''):'<p class="nospec rv" style="--i:3">No special date on this day.</p>');
@@ -1698,11 +1705,15 @@ function skyArcSvg(st){return `<canvas class="sky-trailc" id="skyTrailC" aria-hi
 const CAP_MOON='<svg class="capi" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.2 14.6A8 8 0 0 1 9.4 4.8a.6.6 0 0 0-.8-.7A8.6 8.6 0 1 0 19.9 15.4a.6.6 0 0 0-.7-.8z" fill="#F3E7CF"/></svg>',CAP_SUN='<svg class="capi" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 16.5a5.5 5.5 0 0 1 11 0z" fill="#F6B54A"/><path d="M3 17.5h18M12 6.6v2.1M5.6 9.4l1.5 1.4M18.4 9.4l-1.5 1.4" stroke="#F6B54A" stroke-width="1.7" stroke-linecap="round" fill="none"/></svg>';
 const capIco=k=>k==='sun'?CAP_SUN:CAP_MOON;
 const skyBodyKey=st=>st.kind+(st.kind==='sun'?Math.round(st.alt/4):Math.round(st.phase*60));
+/* When the sun/moon is far to one side (or below the horizon) the middle of the sky is empty: the date moves up and grows into it.
+   Applied as a state, not animated. */
+function skySideSet(st){const h=document.getElementById('hdr');if(!h)return;const on=!!st&&(st.kind==='below'||Math.abs(st.x-50)>34);
+ if(h.classList.contains('sky-side')!==on){h.classList.toggle('sky-side',on);requestAnimationFrame(()=>{if(typeof footPlace==='function')footPlace()})}}
 function skyScene(h,df){
- if(!SKY.on||df!==0)return `<div class="moon rv" aria-hidden="true">${moonSvg(h.d)}</div>`;
- const st=SKY.last=skyCompute(Date.now());setTimeout(skyRedrawTrail,0);
+ if(!SKY.on||df!==0){skySideSet(null);return `<div class="moon rv" aria-hidden="true">${moonSvg(h.d)}</div>`}
+ const st=SKY.last=skyCompute(Date.now());skySideSet(st);setTimeout(skyRedrawTrail,0);
  return `<div class="sky-scene rv" id="skyScene" role="img" aria-label="${st.label}">${skyArcSvg(st)}<div class="sky-body ${st.kind==='sun'?'sun-b':'moon-b'}${st.kind==='below'?' below':''}${SKYA.run||SKYA.arm?' anim':''}" id="skyBody" data-key="${skyBodyKey(st)}" style="left:${st.x.toFixed(1)}%;top:${st.y.toFixed(1)}%${SKYA.arm?';opacity:0':''}">${skyBodySvg(st)}</div><div class="sky-cap" id="skyCap" data-kind="${st.kind}">${capIco(st.kind)}<span>${st.cap.replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]))}</span></div></div>`}
-function skyUpdateScene(st){if(SKYA.run||SKYA.arm)return;const b=document.getElementById('skyBody');if(!b)return;
+function skyUpdateScene(st){if(SKYA.run||SKYA.arm)return;const b=document.getElementById('skyBody');if(!b)return;skySideSet(st);
  const key=skyBodyKey(st);
  if(b.dataset.key!==key){b.dataset.key=key;b.className='sky-body '+(st.kind==='sun'?'sun-b':'moon-b')+(st.kind==='below'?' below':'');b.innerHTML=skyBodySvg(st)}
  skyTrail(st.frac,st.frac,st.kind);b.style.opacity='';b.style.left=st.x.toFixed(1)+'%';b.style.top=st.y.toFixed(1)+'%';
