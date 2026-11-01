@@ -1,0 +1,29 @@
+name: Download Hayom Yom (English)
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "probe (look at one day) or full (download every day)"
+        required: true
+        default: probe
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyluach==2.2.0
+      - run: python tools/hayomyom_fetch.py "${{ github.event.inputs.mode }}"
+      - name: Save the result into the project (full mode only)
+        if: github.event.inputs.mode == 'full'
+        run: |
+          git config user.name "hayomyom-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add hayomyom-en.json
+          git commit -m "Hayom Yom (English) from Chabad.org, used with permission" || echo "nothing new"
+          git push
