@@ -1140,7 +1140,7 @@ function hyFill(h){const el=$('#hyt');if(!el)return;
  const ks=h.k==='A'&&!hyLeap(h.y)?['AI-'+h.d,'A-'+h.d]:[h.k+'-'+h.d],es=ks.map(k=>HYT[k]).filter(Boolean);if(!es.length)return;
  const body=es.map(e=>(es.length>1&&e.h?`<div class="hyh">${e.h}</div>`:'')+e.p.map(x=>`<p>${x}</p>`).join('')+(e.t?'<div class="hyn">Translated in the app from the original.</div>':'')).join('');
  const long=body.replace(/<[^>]+>/g,'').length>520;
- el.innerHTML=`${es.length===1&&/,/.test(es[0].h||'')?`<div class="hyh">${es[0].h.replace(/^[^,]*,\s*/,'')}</div>`:''}<div class="hyx${long?' cut':''}">${body}</div>${long?'<button type="button" class="hym">Read more</button>':''}<div class="hyc2">Translation © Chabad.org, used with permission</div>`;
+ el.innerHTML=`${es.length===1&&/,/.test(es[0].h||'')?`<div class="hyh">${es[0].h.replace(/^[^,]*,\s*/,'')}</div>`:''}<div class="hyx${long?' cut':''}">${body}</div>${long?'<button type="button" class="hym">Read more</button>':''}`;
  const m=el.querySelector('.hym');if(m)m.onclick=()=>{H.tap();el.querySelector('.hyx').classList.remove('cut');m.remove()}}
 const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');if(e.target.dataset.sectionStart==='1'&&!document.getElementById('intro'))H.rev();io.unobserve(e.target)}})},{threshold:.08,rootMargin:'0px 0px -5% 0px'});
 function reveal(c){const x=c.querySelectorAll('.rv');x.forEach((n,i)=>{n.classList.remove('in');io.unobserve(n);n.dataset.sectionStart=i===0?'1':'0'});requestAnimationFrame(()=>requestAnimationFrame(()=>x.forEach(n=>io.observe(n))))}
