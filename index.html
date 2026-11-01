@@ -2382,6 +2382,45 @@ const AI_LANG_KEY='cc_ai_voice_lang';
 (function(){const sel_=aiEl('aiLang');if(!sel_)return;try{const v=localStorage.getItem(AI_LANG_KEY);if(v)sel_.value=v}catch(e){}sel_.addEventListener('change',()=>{try{localStorage.setItem(AI_LANG_KEY,sel_.value)}catch(e){}})})();
 function aiMicUI(on){const b=aiEl('aiMic');b.classList.toggle('rec',on);b.setAttribute('aria-pressed',on?'true':'false');b.setAttribute('aria-label',on?'Stop listening':'Speak your request');b.title=on?'Stop listening':'Speak';b.textContent=on?'■':'🎙'}
 function aiMicStop(){try{if(aiMic.rec)aiMic.rec.stop()}catch(e){}}
+/* ---- Voice: Jewish / Yiddish words the phone's speech engine mishears ----
+   A web app cannot add words to Android's recognizer, so we fix its usual mistakes as the words arrive, and ask for several
+   guesses (alternatives) and keep the one that contains the most of these terms. Used only on spoken English text. */
+const AI_VOICE_FIX=[
+ [/\b(?:have|half|hav|hot|cover|carver|harvard|javier|kava|kav|khav|hab|hap)\s*-?\s*(?:a\s+)?(?:rusa|roosa|rousa|ruza|rosa|ruso|russa|roosah|rusah|ruta|rooza)s?\b/gi,'chavrusa'],
+ [/\b(?:haverusa|havrusa|havruta|habrusa|kavrusa|chavrusah|chavruta|havrousa|havrooza|javrusa)s?\b/gi,'chavrusa'],
+ [/\b(?:q|queue|cue|kay|k|kev|key|kv)\s*-?\s*(?:views?|vues?|vius|viewers|vious|vus)\b/gi,'kvius'],[/\b(?:kvius|kvious|kvuse|cavious|kevious|kvetus)\b/gi,'kvius'],
+ [/\b(?:far|for|fur|fa)\s*-?\s*(?:bringing|bringin|brengen|brangen|bring\s+in|bren\s+gun|brenden|brennan|brain\s+gun)\b/gi,'farbrengen'],
+ [/\b(?:chi\s*tass|she\s+toss|she\s+tass|he\s+tass|chit\s+us|hit\s+toss|chitass|hitas|hittas|chitis)\b/gi,'Chitas'],
+ [/\b(?:ram\s*-?\s*bam|rum\s*-?\s*bum|ram\s+bomb|rambo\s+m|rumbam|rambaum)\b/gi,'Rambam'],
+ [/\b(?:who\s+mash|cool\s+mash|hoo\s+mash|humash|homash|houmash|khumash)\b/gi,'Chumash'],
+ [/\b(?:(?:te|the|teh|tay|t)\s*-?\s*hill?(?:im|um|em)|tehilim|tahillim|teh\s+hilim|tillim|tilim|t\s+hilim|tehilem|t'hillim)\b/gi,'Tehillim'],
+ [/\b(?:hasidus|hassidus|hasidis|hassidis|chasidis|khasidus|hosidus|hasidut)\b/gi,'Chassidus'],
+ [/\b(?:she\s*-?\s*ore|shi\s*-?\s*ur|she\s*-?\s*ur|shea\s+or|she\s+oor|shiore|shuir|shir\s+ur)\b/gi,'shiur'],
+ [/\b(?:gomorrah|gamora|gamorah|gamara|gamorra|gemarra|g\s+mara)\b/gi,'Gemara'],
+ [/\b(?:mish\s*-?\s*nyos|mish\s+nayos|mish\s+knee\s+os|mishnaios|mishnayot|mishnayes|mishnah\s+use)\b/gi,'Mishnayos'],
+ [/\b(?:min\s*-?\s*cha|min\s*-?\s*ha|minka|minchah|minha|mincah)\b/gi,'Mincha'],
+ [/\b(?:ma\s*-?\s*ariv|mah\s+reeve|ma\s+reeve|maarev|mariv|ma'ariv)\b/gi,'Maariv'],
+ [/\b(?:shocker\s+is|shack\s+harris|shah\s+harris|shakharis|shacharit|shaharit|shacharith|shachris|shacharees)\b/gi,'Shacharis'],
+ [/\b(?:yards?\s+(?:ight|sight|site|eight|height)|yard\s*-?\s*zeit|yor\s+sight|yore\s+site|yahr\s+zeit|yarzeit|yahrzeit|yartzeit|yortzeit|yahrtzeit)\b/gi,'yahrzeit'],
+ [/\b(?:hi|hey|ha)\s*-?\s*(?:yom|yum|young|om)\s+(?:yom|yum|young)\b/gi,'Hayom Yom'],
+ [/\b(?:lick\s*(?:a|ee|uh)?\s*tay|liku\s*tay|lekutei|likutei|likuttei|lik\s+kutei|lick\s+who\s+tay)\s+(?:see\s*hos|sickos|sichos|sicos|seek\s+hos|si\s+hos|seahorse)\b/gi,'Likkutei Sichos'],
+ [/\b(?:rush|rosh)\s+(?:hoe|ho|ha)\s*-?\s*desh\b|\brosh\s+hodesh\b|\brosh\s+codesh\b/gi,'Rosh Chodesh'],
+ [/\b(?:sha\s*-?\s*boss|shah\s+boss|shabbas|shabus|shabos|shobbos|shah\s+bus)\b/gi,'Shabbos'],
+ [/\b(?:put\s+on|lay|laying|putting\s+on|wrap|wrapping)\s+(?:to|the|two|da)\s+fill\s*-?\s*in\b/gi,(m)=>m.replace(/\s+(?:to|the|two|da)\s+fill\s*-?\s*in$/i,' tefillin')],[/\b(?:tefilin|tfillin|tefillen|t'fillin|tephillin)\b/gi,'tefillin'],
+ [/\b(?:ha\s*-?\s*bad|habad|khabad)\s+(?:house|center|centre|rabbi)\b/gi,m=>'Chabad '+m.split(/\s+/).pop()],[/\bhabad\b/gi,'Chabad'],
+ [/\b(?:mikva|mick\s*-?\s*va|mik\s+vah|mikve)\b/gi,'mikvah'],
+ [/\b(?:melave|melava|mela\s+va|malave)\s+(?:malka|malkah|mulka|malca)\b/gi,'Melave Malka'],
+ [/\b(?:mush\s*-?\s*pia|mash\s+pia|mashpiya|mashpee\s*a)\b/gi,'mashpia'],
+ [/\b(?:miv\s*-?\s*tz?o(?:y|i)\s*im|mitz\s+voim|mivtzoyim|mivtsoim)\b/gi,'mivtzoim'],
+ [/\b(?:pay\s+sock|pay\s+sack|pesach|pesah|paysach)\b/gi,'Pesach'],[/\b(?:sue\s+coast|sue\s+coats|succos|sukkot|sukos)\b/gi,'Sukkos'],[/\b(?:shavuot|shavuoth|sha\s+voo\s+os|shavuos)\b/gi,'Shavuos'],
+ [/\b(?:a\s+rev|err?\s+rev|ereve?)\s+(Shabbos|Pesach|Sukkos|Shavuos|Rosh\s+Hashana(?:h)?|Yom\s+Kippur)\b/gi,(m,x)=>'Erev '+x],
+ [/\b(?:the\s+rebbe|rebbie|reb\s+bay)\b/gi,'the Rebbe'],[/\b(?:davening|devening|davenning|daven\s+ing)\b/gi,'davening'],
+ [/\b(?:tanya|tania|tonya(?=\s+(?:shiur|chavrusa|class|learning|with))|tanyah)\b/gi,'Tanya']];
+const AI_VOICE_TERMS=/\b(?:chavrusa|kvius|farbrengen|chitas|rambam|chumash|tehillim|chassidus|shiur|gemara|mishnayos|mincha|maariv|shacharis|yahrzeit|hayom yom|likkutei sichos|rosh chodesh|shabbos|tefillin|chabad|mikvah|melave malka|mashpia|mivtzoim|pesach|sukkos|shavuos|erev|rebbe|davening|tanya|seder|kiddush|daf yomi|sicha|maamar)\b/gi;
+function aiVoiceFix(t,lang){if(!t||(lang&&!/^en/i.test(lang)))return t;let s=' '+t+' ';for(const[re,to]of AI_VOICE_FIX)s=s.replace(re,to);return s.replace(/\s+/g,' ').trim()}
+function aiVoiceBest(res,lang){let best='',score=-1;for(let k=0;k<res.length;k++){const raw=res[k]&&res[k].transcript||'';if(!raw)continue;
+  const fixed=aiVoiceFix(raw,lang),hits=(fixed.match(AI_VOICE_TERMS)||[]).length,sc=hits*2-k*.5+(res[k].confidence||0);
+  if(sc>score){score=sc;best=fixed}}return best}
 // Some engines accept start() and then never fire any event (no permission prompt, speech service unreachable). Don't sit on "Listening…" forever.
 function aiMicFail(r,msg){clearTimeout(aiMic.timer);if(aiMic.rec!==r)return;aiMic.err='no-start';try{r.abort()}catch(e){}aiMic.rec=null;aiMic.listening=false;aiMicUI(false);aiSetStatus(msg)}
 function aiMicWatch(r){
@@ -2411,10 +2450,10 @@ aiEl('aiMic').addEventListener('click',()=>{
  if(!SR){aiSetStatus(aiMicUnsupported());return}
  let r;try{r=new SR()}catch(e){aiSetStatus(aiMicUnsupported());return}
  const lang=(aiEl('aiLang')&&aiEl('aiLang').value)||'en-US';
- r.lang=lang;r.interimResults=true;r.continuous=false;r.maxAlternatives=1;
+ r.lang=lang;r.interimResults=true;r.continuous=false;r.maxAlternatives=5;
  aiMic.rec=r;aiMic.started=false;aiMic.base=aiEl('aiInput').value.replace(/\s+$/,'');aiMic.err='';aiMic.heard=false;
  r.onstart=()=>{aiMic.started=true;clearTimeout(aiMic.timer);aiMic.listening=true;aiMicUI(true);aiSetStatus('Listening… speak now.')};
- r.onresult=e=>{let t='';for(let i=0;i<e.results.length;i++)t+=(i?' ':'')+e.results[i][0].transcript;t=t.trim();
+ r.onresult=e=>{let t='';for(let i=0;i<e.results.length;i++)t+=(i?' ':'')+aiVoiceBest(e.results[i],lang);t=t.trim();
   if(t){aiMic.heard=true;aiEl('aiInput').value=(aiMic.base?aiMic.base+' ':'')+t}};
  r.onerror=e=>{clearTimeout(aiMic.timer);const code=(e&&e.error)||'unknown';aiMic.err=code;const msg=aiMicErrorText(code);if(msg)aiSetStatus(msg)};
  r.onend=()=>{clearTimeout(aiMic.timer);if(aiMic.rec&&aiMic.rec!==r)return;const had=aiMic.err;aiMic.listening=false;aiMic.rec=null;aiMicUI(false);
