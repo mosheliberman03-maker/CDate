@@ -474,7 +474,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .sky-body .skyimg{position:relative}
 .moon .skyimg{width:114px;height:114px;margin:0;filter:drop-shadow(0 0 28px rgba(170,188,255,.28))}
 /* the glass dome that rises behind the date */
-#hdr .sky-scene::after{content:'';position:absolute;left:50%;top:calc(100% - 62px);transform:translateX(-50%);width:130%;height:clamp(340px,44vh,440px);border-radius:50%;z-index:-1;pointer-events:none;
+#hdr .sky-scene::after{content:'';position:absolute;left:50%;top:calc(100% - 62px);transform:translateX(-50%);translate:var(--dmx,0) var(--dmy,0);width:130%;height:clamp(340px,44vh,440px);border-radius:50%;z-index:-1;pointer-events:none;
  border:1px solid transparent;border-top-color:color-mix(in srgb,var(--rbe) 34%,transparent);
  background:radial-gradient(110% 60% at 50% 0%,color-mix(in srgb,var(--rbf) 14%,transparent) 0%,color-mix(in srgb,var(--rbf) 5%,transparent) 42%,transparent 72%);
  box-shadow:inset 0 10px 30px -18px color-mix(in srgb,var(--rbe) 30%,transparent);-webkit-mask-image:linear-gradient(#000 0%,#000 30%,transparent 62%);mask-image:linear-gradient(#000 0%,#000 30%,transparent 62%)}
@@ -497,7 +497,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #hdr .hd-en{display:block;margin:clamp(12px,2vh,18px) 0 0;text-align:center;font:400 clamp(18px,5.1vw,21px)/1.3 'FRL App','Frank Ruhl Libre',Georgia,serif;letter-spacing:.12em;color:var(--dtc)}
 /* week panel */
 #hdr .wk{display:grid;grid-template-columns:repeat(7,1fr);align-items:start;flex:none;width:min(92vw,394px);max-width:none;box-sizing:border-box;margin:clamp(22px,4.2vh,40px) auto 0;padding:15px 8px 9px;gap:0;border-radius:32px;
- background:var(--gl-bg);border:1px solid var(--gl-bd);-webkit-backdrop-filter:blur(18px) saturate(1.25);backdrop-filter:blur(18px) saturate(1.25);
+ background:var(--gl-bg);border:1px solid var(--gl-bd);-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);
  box-shadow:0 18px 44px rgba(3,6,26,.26),inset 0 1px 0 rgba(255,255,255,.08)}
 .wd,#hdr .wd.ev{display:flex;flex-direction:column;align-items:center;gap:7px;padding:0;margin:0;border:0;border-radius:0;background:none;box-shadow:none;min-height:0}
 .wd u{font:500 13px/1 Figtree,system-ui,sans-serif;letter-spacing:.05em;color:color-mix(in srgb,var(--gl-tx) 66%,transparent)}
@@ -1766,25 +1766,31 @@ const GLS={ang:-2.25,L:[-.47,-.6,.65],t:0,ok:false};
    scroll (own speed and direction) plus a slow orbit of its own, and its glare band on its own phase. */
 const GLSEED=new WeakMap();let GLSI=0;
 function glSeed(e){let k=GLSEED.get(e);if(!k){const n=++GLSI,r=q=>((Math.sin(n*12.9898+q*78.233)*43758.5453)%1+1)%1;
- k={p:r(1)*6.283,f:.7+r(2)*.55,a:.75+r(3)*.5,dir:r(4)>.5?1:-1,spd:6+r(5)*7,ph:r(6)*360,q:r(7)*6.283};GLSEED.set(e,k)}return k}
-const GL_SEL='#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc',GL_FLOAT={'sky-cap':2.2,'wk':2.4,'dock':1.3,'hint':2.2,'ai-fab':2.8,'hd-he':1.4,'hd-div':1,'hd-en':1.2};
-function glassShine(){const H=innerHeight,W=innerWidth,lx=W/2+GLS.L[0]*H*1.6,ly=H/2+GLS.L[1]*H*1.6,t=GLS.t||0,sy=scrollY||0,mv=!GLS.still;
- const la=Math.atan2(lx-W/2,-(ly-H/2))*57.2958;
- for(const e of document.querySelectorAll(GL_SEL+',#hdr .hd-he,#hdr .hd-div,#hdr .hd-en')){const r=e.getBoundingClientRect();if(r.bottom<-40||r.top>H+40||!r.width)continue;
-  const k=glSeed(e),s=e.style,cls=Object.keys(GL_FLOAT).find(c=>e.classList.contains(c));
-  if(mv){const amp=(cls?GL_FLOAT[cls]:1.6)*k.a,w=t*k.f;s.translate=(Math.sin(w*.53+k.q)*amp*.35).toFixed(2)+'px '+(Math.sin(w*.82+k.p)*amp).toFixed(2)+'px'}
+ k={p:r(1)*6.283,f:.7+r(2)*.55,a:.75+r(3)*.5,dir:r(4)>.5?1:-1,spd:24+r(5)*22,ph:r(6)*360,q:r(7)*6.283};GLSEED.set(e,k)}return k}
+const GL_SEL='#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc';
+/* float size (px) and scroll depth (how much a piece lags behind when you scroll: the moon is "far", the week panel "near") */
+const GL_FLOAT={skyBody:[5,.2],skyScene:[3.2,.1],'sky-cap':[3,.05],'hd-he':[2.6,.03],'hd-div':[2,.015],'hd-en':[2.2,0],wk:[2.6,-.015],dock:[1.5,0],hint:[2.6,0],'ai-fab':[3,0]};
+const glSet=(s,k,v)=>{if(s.getPropertyValue(k)!==v)s.setProperty(k,v)};
+function glassShine(){const H=innerHeight,W=innerWidth,lx=W/2+GLS.L[0]*H*1.6,ly=H/2+GLS.L[1]*H*1.6,t=GLS.t||0,sy=GLS.sc!=null?GLS.sc:(scrollY||0),mv=!GLS.still;
+ const la=Math.atan2(lx-W/2,-(ly-H/2))*57.2958,dep=Math.min(sy,H*1.2);
+ for(const e of document.querySelectorAll(GL_SEL+',#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#skyBody,#skyScene')){const r=e.getBoundingClientRect();if(r.bottom<-60||r.top>H+60||!r.width)continue;
+  const k=glSeed(e),s=e.style,key=e.id&&GL_FLOAT[e.id]?e.id:Object.keys(GL_FLOAT).find(c=>e.classList.contains(c)),fp=key?GL_FLOAT[key]:[1.8,0];
+  if(mv||fp[1]){const amp=fp[0]*k.a,w=t*k.f*1.35,x=mv?Math.sin(w*.53+k.q)*amp*.45:0,y=(mv?Math.sin(w*.82+k.p)*amp:0)+dep*fp[1],v=x.toFixed(2)+'px '+y.toFixed(2)+'px';
+   if(e.id==='skyScene'){glSet(s,'--dmx',x.toFixed(2)+'px');glSet(s,'--dmy',y.toFixed(2)+'px')}
+   else if(s.translate!==v){s.translate=v;if(e.id==='skyBody'){const c=document.getElementById('skyTrailC');if(c)c.style.translate=v}}}
   if(!e.matches(GL_SEL))continue;
   const cx=r.left+r.width/2,cy=r.top+r.height/2,dx=lx-cx,dy=ly-cy,d=Math.hypot(dx,dy)||1,nx=dx/d,ny=dy/d;
-  s.setProperty('--ga',(Math.atan2(dx,-dy)*57.2958).toFixed(1)+'deg');
-  s.setProperty('--gg',((la+k.ph+sy*.55*k.dir+(mv?t*k.spd*k.dir:0))%360).toFixed(1)+'deg');
-  {const g=(((la+k.ph+sy*.55*k.dir+(mv?t*k.spd*k.dir:0))+15)%360)/57.2958,ux=Math.sin(g),uy=-Math.cos(g),hw=r.width/2,hh=r.height/2,m=Math.min(hw/Math.abs(ux||1e-6),hh/Math.abs(uy||1e-6));
-   s.setProperty('--hx',(hw+ux*m).toFixed(1)+'px');s.setProperty('--hy',(hh+uy*m).toFixed(1)+'px')}
-  s.setProperty('--gx',(50+nx*46).toFixed(1)+'%');s.setProperty('--gy',(50+ny*60).toFixed(1)+'%');
-  s.setProperty('--gs',(50+62*Math.sin(GLS.ang*1.6+cy/H*2.4+k.q+(mv?t*.05*k.f:0)+sy*.004*k.dir)).toFixed(1)+'%')}}
+  /* the travelling glint: scroll spins it around the edge, and it also wanders on its own, speeding up and slowing down */
+  const gg=la+k.ph+sy*1.5*k.dir+(mv?(t*k.spd+38*Math.sin(t*.6*k.f+k.q))*k.dir:0);
+  glSet(s,'--ga',(Math.atan2(dx,-dy)*57.2958).toFixed(0)+'deg');glSet(s,'--gg',(((gg%360)+360)%360).toFixed(1)+'deg');
+  {const g=(gg+15)/57.2958,ux=Math.sin(g),uy=-Math.cos(g),hw=r.width/2,hh=r.height/2,m=Math.min(hw/Math.abs(ux||1e-6),hh/Math.abs(uy||1e-6));
+   glSet(s,'--hx',(hw+ux*m).toFixed(0)+'px');glSet(s,'--hy',(hh+uy*m).toFixed(0)+'px')}
+  glSet(s,'--gx',(50+nx*46).toFixed(0)+'%');glSet(s,'--gy',(50+ny*60).toFixed(0)+'%');
+  glSet(s,'--gs',(50+62*Math.sin(GLS.ang*1.6+cy/H*2.4+k.q+(mv?t*.12*k.f:0)+sy*.006*k.dir)).toFixed(0)+'%')}}
 (function(){const host=document.getElementById('skyWaves');if(!host)return;
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;GLS.still=reduce;
  const cv=document.createElement('canvas');cv.id='skyGL';let gl=null;
- try{gl=cv.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:false,powerPreference:'low-power'})}catch(e){}
+ try{gl=cv.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:false,depth:false,stencil:false,powerPreference:'low-power',desynchronized:true})}catch(e){}
  const fb=()=>{skyRibbonsSvg(host);GLS.still=true;const f=()=>requestAnimationFrame(glassShine);addEventListener('scroll',f,{passive:true});addEventListener('resize',f);f()};
  if(!gl){fb();return}
  const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
@@ -1804,7 +1810,7 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
   float nh=max(dot(n,Hv),0.),sp=pow(nh,60.),sp2=pow(nh,9.),dif=.3+.7*max(dot(n,uL),0.);
   float ins=smoothstep(-.5,1.6,epx),rim=exp(-abs(epx)/1.15);
   float top=u<0.?1.:.42,fade=.55+.45*sin(x*2.1+A.w*1.3+t*.5);
-  float fib=.55*pow(.5+.5*sin(u*41.+x*2.3),7.)+.45*pow(.5+.5*sin(u*15.-x*1.6+A.w),4.);
+  float wp=w/px,fib=.55*pow(.5+.5*sin(u*41.+x*2.3),7.)*smoothstep(70.,190.,wp)+.45*pow(.5+.5*sin(u*15.-x*1.6+A.w),4.)*smoothstep(24.,70.,wp)+.12;
   float lit=mix(1.,.3,clamp((u+1.)*.5,0.,1.));
   float body=ins*(.085+.13*fib*dif*lit+.26*sp2*lit+.8*sp)*(.55+.45*dif);
   float edge=rim*top*(.45+1.3*sp2+.6*sp);
@@ -1832,14 +1838,16 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
  gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
  const hex=v=>{v=(v||'').trim();const m=/^#?([0-9a-f]{6})$/i.exec(v);if(!m)return[1,1,1];const n=parseInt(m[1],16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]};
  let colT=-1e9,W=0,Hh=0,sc=0,scT=0,last=0,raf=0,t0=performance.now();
- const size=()=>{const d=Math.min(devicePixelRatio||1,1.75),w=Math.round(host.clientWidth*d),h=Math.round(host.clientHeight*d);if(w&&h&&(w!==W||h!==Hh)){W=cv.width=w;Hh=cv.height=h;gl.viewport(0,0,w,h)}};
+ let Q=.5;const size=()=>{const d=Math.min(devicePixelRatio||1,2)*Q,w=Math.round(host.clientWidth*d),h=Math.round(host.clientHeight*d);if(w&&h&&(w!==W||h!==Hh)){W=cv.width=w;Hh=cv.height=h;gl.viewport(0,0,w,h)}};
  const colors=()=>{const cs=getComputedStyle(document.documentElement);gl.uniform3fv(U.uF,hex(cs.getPropertyValue('--rbf')));gl.uniform3fv(U.uE,hex(cs.getPropertyValue('--rbe')));gl.uniform1f(U.uO,document.documentElement.dataset.night==='1'?1:.8)};
  const draw=now=>{size();if(!W)return;GLS.drawn=1;if(now-colT>2000||colT<0){colT=now;colors()}
-  sc+=(scT-sc)*(reduce?1:.09);const t=reduce?0:(now-t0)/1000;GLS.t=t;
+  sc+=(scT-sc)*(reduce?1:.14);GLS.sc=sc;const t=reduce?0:(now-t0)/1000;GLS.t=t;
   GLS.ang=-2.25+sc/innerHeight*.85+(reduce?0:.18*Math.sin(t*.07));const ca=Math.cos(GLS.ang),sa=Math.sin(GLS.ang);GLS.L=[ca*.76,sa*.76,.65];
   gl.uniform2f(U.uR,W,Hh);gl.uniform1f(U.uT,t);gl.uniform1f(U.uS,sc/host.clientWidth);gl.uniform3fv(U.uL,GLS.L);
   gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);glassShine()};
- const loop=now=>{raf=0;if(document.hidden)return;if(document.getElementById('intro')){setTimeout(kick,300);return}if(now-last>=40){last=now;draw(now)}
+ let gap=0,slow=0,prev=0;
+ const loop=now=>{raf=0;if(document.hidden){prev=0;return}if(document.getElementById('intro')){setTimeout(kick,300);return}
+  const busy=Math.abs(scT-sc)>.5;if(now-last>=(busy?15:32)){if(prev&&!reduce){const g=now-prev;gap=gap?gap*.9+g*.1:g;if(gap>(busy?34:60)){if(++slow>45&&Q>.3){Q=Math.max(.3,Q*.8);slow=0}}else slow=Math.max(0,slow-1)}prev=now;last=now;draw(now)}
   if(!reduce||!GLS.drawn||Math.abs(scT-sc)>.5)raf=requestAnimationFrame(loop)};
  const kick=()=>{if(!raf)raf=requestAnimationFrame(loop)};
  addEventListener('scroll',()=>{scT=scrollY||document.documentElement.scrollTop||0;kick()},{passive:true});
