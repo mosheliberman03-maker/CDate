@@ -2714,10 +2714,10 @@ async function aiInterpretOne(raw){let data=null;
    The main plan skips the exception days; if the exception gives its own time, a second plan covers those days at that time.
    A "because I …" reason is kept as a note and not read as part of the plan. */
 const AI_EXCEPT_RE=/\s*[,;]?\s*\b(?:except(?:\s+for)?(?:\s+on)?|but\s+not\s+(?:on\s+)?|other\s+than|apart\s+from|aside\s+from|besides|excluding)\s+(.+)$/i;
-const AI_REASON_RE=/\s*[,;]?\s*\b(?:because|'?cause|since|as)\s+(?:i|i'm|i've|we|we're|he|she|they|there|there's|it's|my|our)\b.*$/i;
+const AI_REASON_RE=/\s*[,;]?\s*(?:\b(?:because|'?cause|cuz|coz|cos|bc|since|as)\b|\bb\/c)\s+(?:i|i'm|i've|we|we're|he|she|they|there|there's|it's|my|our)\b.*$/i;
 function aiExceptParse(src){
  let text=String(src||''),reason='';
- const rm=AI_REASON_RE.exec(text);if(rm){reason=rm[0].replace(/^[\s,;]*(?:'?cause|since|as)\b/i,'because').replace(/^[\s,;]+/,'').trim();text=text.slice(0,rm.index)}
+ const rm=AI_REASON_RE.exec(text);if(rm){reason=rm[0].replace(/^[\s,;]*(?:'?cause|cuz|coz|cos|bc|b\/c|since|as)(?=\s)/i,'because').replace(/^[\s,;]+/,'').trim();text=text.slice(0,rm.index)}
  const em=AI_EXCEPT_RE.exec(text);let ex=null;
  if(em){const clause=em[1],days=[];const r=new RegExp('\\b('+AI_DOW_TOK+')\\b','gi');let m;while(m=r.exec(clause)){const d=aiDow(m[1].replace(/s$/i,''));if(d>=0&&!days.includes(d))days.push(d)}
   if(days.length){const tm=/(?:^|\s)(?:at\s+|@\s*)?(\d{1,2})(?::(\d{2})|(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)?(?![\w:])/i.exec(clause.replace(new RegExp('\\b'+AI_DOW_TOK+'\\b','gi'),' '));
@@ -2751,8 +2751,22 @@ function aiApplyException(p,ex,reason){
  if(reason)addNote(exc,'Note: '+reason);exc.isException=true;
  out.push(exc);return out}
 // Understand one request; may give two plans when it has an exception
+// "because I have an English shiur then" -> also offer the English shiur as its own plan (same days; "then" = the clashing time)
+function aiReasonEvent(reason,ex,mainNotes){
+ const m=/^because\s+(?:i|we)(?:'ve|\s+have|\s+also\s+have|\s+got|\s+have\s+got|'ve\s+got)?\s+(?:got\s+)?(?:(?:a|an|my|our|the)\s+)?(.+)$/i.exec(reason||'');if(!m)return '';
+ let ev=m[1].replace(/[.!\s]+$/,'');const then=/\b(?:then|at\s+that\s+time|at\s+the\s+same\s+time|that\s+(?:night|day|evening|morning)|on\s+that\s+day)\s*$/i.test(ev);
+ ev=ev.replace(/\s*\b(?:then|at\s+that\s+time|at\s+the\s+same\s+time|that\s+(?:night|day|evening|morning)|on\s+that\s+day)\s*$/i,'').trim();
+ if(!ev||!aiHasTitle(ev)||/^(?:to|no|nothing|work|school|class|time|plans?|something)$/i.test(ev))return '';
+ const hasDay=/\b(?:sun|mon|tues?|wednes|thurs?|fri|satur)day/i.test(ev)||/\b(?:every|each|daily|nightly|tomorrow|today|tonight)\b/i.test(ev);
+ const hasTime=/\d/.test(ev);
+ if(!hasDay){if(!ex||!ex.days.length)return '';ev+=' every '+ex.days.map(d=>AI_DAY_LABEL[d]).join(' and ')}
+ if(!hasTime){const t=(/Time:\s*(\d{1,2}:\d{2}\s*[AP]M)/.exec(mainNotes||'')||[])[1];if(t)ev+=' at '+t;else if(ex&&ex.night)ev+=' night'}
+ return ev}
 async function aiInterpretSeg(src){const e=aiExceptParse(src);const p=await aiInterpretOne(e.ex||e.reason?e.base:src);
- return aiApplyException(p,e.ex,e.reason)}
+ const out=aiApplyException(p,e.ex,e.reason);
+ const rs=e.reason&&!p.unsupported&&!p.needsClarification?aiReasonEvent(e.reason,e.ex,p.notes):'';
+ if(rs){try{const q=await aiInterpretOne(rs);if(q&&!q.unsupported&&q.title){q.fromReason=true;q.reasonSrc=rs;out.push(q)}}catch(x){}}
+ return out}
 let aiSeq=0;
 // Save one approved plan to the calendar. `source` is the request text it came from (remembered on this device).
 function aiCommit(p,source){const dv=new Date((p.date||ds(sel))+'T12:00:00');if(!p.title||isNaN(+dv))return null;
@@ -2781,7 +2795,7 @@ function aiBatchRender(){const m=aiEl('aiMulti');m.innerHTML='';
   all.onclick=()=>{H.ok();ok.forEach(aiBatchAdd);if(aiBatchAdded)render(0);aiBatchRender();aiBatchDone()};head.appendChild(all)}
  m.appendChild(head);
  aiBatch.forEach((it,i)=>{const p=it.p,c=document.createElement('div');c.className='ai-preview show ai-mcard'+(it.state!=='pending'?' ai-mdone':'');
-  const src=document.createElement('div');src.className='ai-msrc';{const gs=[...new Set(aiBatch.map(x=>x.group))],gn=gs.indexOf(it.group)+1;src.textContent=it.p&&it.p.isException?`${gn}b. The exception in request ${gn}`:`${gn}. “${it.src}”`}c.appendChild(src);
+  const src=document.createElement('div');src.className='ai-msrc';{const gs=[...new Set(aiBatch.map(x=>x.group))],gn=gs.indexOf(it.group)+1;const sub=aiBatch.filter(x=>x.group===it.group).indexOf(it),L=sub>0?String.fromCharCode(97+sub):'';src.textContent=it.p&&it.p.isException?`${gn}${L}. The exception in request ${gn}`:it.p&&it.p.fromReason?`${gn}${L}. You also mentioned: “${it.p.reasonSrc}”. Add it too?`:`${gn}. “${it.src}”`}c.appendChild(src);
   if(it.state==='note'){const n=document.createElement('p');n.textContent=p.clarify;c.appendChild(n);m.appendChild(c);return}
   const h=document.createElement('h3');h.textContent=(p.kind==='task'?'☑ Task: ':'')+(p.title||'Untitled event');c.appendChild(h);
   const filed=p.category&&p.category!=='General'?'Filed under: '+p.category+(p.kind==='task'?' (checkable task)':''):'';
