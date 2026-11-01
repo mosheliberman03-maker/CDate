@@ -576,7 +576,7 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
       var cv=AC.createConvolver();cv.buffer=ir;
       var wet=AC.createGain();wet.gain.value=.32;
       mst.connect(AC.destination);mst.connect(cv);cv.connect(wet);wet.connect(AC.destination);
-      var wake=function(){try{if(AC&&AC.state!=='running')AC.resume()}catch(e){}};
+      var wake=function(){try{if(AC&&AC.state==='suspended')AC.resume().catch(function(){})}catch(e){}};
       ['pointerup','touchend','click','keydown'].forEach(function(e){addEventListener(e,wake,true)});
       wake();
     }catch(e){AC=null}
@@ -2169,7 +2169,7 @@ function aiLocalInterpret(raw){
    const cand=pm[1];if(!new RegExp('^(?:'+AI_HMONTH_RE+'|'+AI_MONTH_RE+'|'+AI_DAY_RE+'|mincha|maariv|shacharis|shkia|the|my|our|I)$','i').test(cand.split(' ')[0])&&!AI_TOPICS.some(([re])=>re.test(cand))){
     place=pm[2]?cand.replace(/['’]s$/,'')+'’s '+pm[2].toLowerCase():cand;W=(W.slice(0,pm.index)+' '+W.slice(pm.index+pm[0].length)).replace(/\s+/g,' ')}}}
  // ---- 7. People
- const STOP=new RegExp('^(?:every|each|once|twice|weekly|daily|monthly|yearly|annually|at|in|on|from|starting|beginning|for|tomorrow|today|tonight|next|this|after|before|until|till|through|to|by|around|about|during|over|since|per|then|so|but|if|when|while|because|please|chavrusa|kvius|seder|sedarim|shiur|davening|shacharis|mincha|maariv|farbrengen|learn|learning|study|time|session|sessions|'+AI_DAY_RE+'s?|'+AI_MONTH_RE+'|'+AI_HMONTH_RE+'|\\d+(?:st|nd|rd|th|:\\d+)?)$','i');
+ const STOP=new RegExp('^(?:every|each|once|twice|weekly|daily|monthly|yearly|annually|at|in|on|from|starting|beginning|for|tomorrow|today|tonight|next|this|after|before|until|till|through|to|by|around|about|during|over|since|per|then|so|but|if|when|while|because|except|besides|unless|excluding|apart|aside|other|instead|please|chavrusa|kvius|seder|sedarim|shiur|davening|shacharis|mincha|maariv|farbrengen|learn|learning|study|time|session|sessions|'+AI_DAY_RE+'s?|'+AI_MONTH_RE+'|'+AI_HMONTH_RE+'|\\d+(?:st|nd|rd|th|:\\d+)?)$','i');
  const REL=/^(?:father|mother|dad|mom|wife|husband|son|daughter|brother|sister|grandfather|grandmother|zaidy|zeide|bubby|bubbe|rebbe|rebbetzin|teacher|mashpia|friend|boss|doctor)$/i;
  const isTopic=t=>AI_TOPICS.some(([re])=>re.test(t));
  const nameChain=(s)=>{const toks=s.split(/\s+/).filter(Boolean),out=[];let i=0;
@@ -2368,8 +2368,8 @@ async function aiPlan(){const raw=aiEl('aiInput').value.trim();if(!raw){aiSetSta
  aiMicStop();if(aiCancelHandleInput(raw))return;aiEl('aiPreview').classList.remove('show');aiSetStatus('Understanding your request…');aiEl('aiPlan').disabled=true;
  try{let data=null;
   const segs=aiSplitRequests(raw);
-  if(segs.length>1||(aiBatchKeep&&aiBatch.some(it=>it.state==='pending'))){await aiPlanMany(segs.length?segs:[raw]);return}
-  aiBatchReset();data=await aiInterpretOne(raw);
+  if(segs.length>1||(segs.length===1&&aiExceptParse(segs[0]).ex)||(aiBatchKeep&&aiBatch.some(it=>it.state==='pending'))){await aiPlanMany(segs.length?segs:[raw]);return}
+  aiBatchReset();data=(await aiInterpretSeg(segs[0]||raw))[0];
   aiShowProposal(data)}
  catch(err){console.error('Assistant error',err);aiSetStatus('Sorry, I could not read that request. Try rewording it.')}
  finally{aiEl('aiPlan').disabled=false}}
@@ -2664,7 +2664,8 @@ function aiSplitRequests(raw){
  // 2. sentences, but not after abbreviations such as Dr. R. St. or a.m.
  parts=parts.flatMap(l=>{const out=[];for(const piece of l.split(/(?<=[.!?])\s+(?=\S)/)){
    const prev=out[out.length-1];
-   if(prev&&/(?:^|\s)(?:dr|mr|mrs|ms|r|rav|reb|rabbi|st|mt|jr|sr|no|vol|ch|[a-z])\.$/i.test(prev)&&!(/[ap]\.m\.$/i.test(prev)&&/^[A-Z]/.test(piece)))out[out.length-1]=prev+' '+piece;
+   const cont=/^(?:with|except|but|and|because|'?cause|since|on|at|for|until|till|from|every|each|in|so|besides|unless|other\s+than|apart\s+from|starting|beginning|then\s+at|instead|or|excluding|which|that|where|when|after|before|around|by|through|thru)\b/i.test(piece);
+   if(prev&&(cont||/(?:^|\s)(?:dr|mr|mrs|ms|r|rav|reb|rabbi|st|mt|jr|sr|no|vol|ch|[a-z])\.$/i.test(prev)&&!(/[ap]\.m\.$/i.test(prev)&&/^[A-Z]/.test(piece))))out[out.length-1]=prev+' '+piece;
    else out.push(piece)}return out});
  // 3. inside one sentence: "and also …", ", and add …", or two parts that each name something and give it a day or time
  const vRe=new RegExp('^'+AI_SPLIT_VERB,'i');
@@ -2686,6 +2687,49 @@ async function aiInterpretOne(raw){let data=null;
   if(response.ok&&/json/i.test(response.headers.get('content-type')||'')){const d=await response.json();if(d&&d.title)data=d}}catch(e){}}
  return data||aiLocalInterpret(raw)}
 
+/* ---- Exceptions inside one request: "every night at 8 with Adam, except Wednesday at 8:30 because …" ----
+   The main plan skips the exception days; if the exception gives its own time, a second plan covers those days at that time.
+   A "because I …" reason is kept as a note and not read as part of the plan. */
+const AI_EXCEPT_RE=/\s*[,;]?\s*\b(?:except(?:\s+for)?(?:\s+on)?|but\s+not\s+(?:on\s+)?|other\s+than|apart\s+from|aside\s+from|besides|excluding)\s+(.+)$/i;
+const AI_REASON_RE=/\s*[,;]?\s*\b(?:because|'?cause|since|as)\s+(?:i|i'm|i've|we|we're|he|she|they|there|there's|it's|my|our)\b.*$/i;
+function aiExceptParse(src){
+ let text=String(src||''),reason='';
+ const rm=AI_REASON_RE.exec(text);if(rm){reason=rm[0].replace(/^[\s,;]*(?:'?cause|since|as)\b/i,'because').replace(/^[\s,;]+/,'').trim();text=text.slice(0,rm.index)}
+ const em=AI_EXCEPT_RE.exec(text);let ex=null;
+ if(em){const clause=em[1],days=[];const r=new RegExp('\\b('+AI_DOW_TOK+')\\b','gi');let m;while(m=r.exec(clause)){const d=aiDow(m[1].replace(/s$/i,''));if(d>=0&&!days.includes(d))days.push(d)}
+  if(days.length){const tm=/(?:^|\s)(?:at\s+|@\s*)?(\d{1,2})(?::(\d{2})|(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)?(?![\w:])/i.exec(clause.replace(new RegExp('\\b'+AI_DOW_TOK+'\\b','gi'),' '));
+   const off=/\b(?:no|off|free|skip|not|none|without|nothing)\b/i.test(clause);
+   ex={days,off:off&&!tm,h:tm?+tm[1]:null,mn:tm?+(tm[2]||tm[3]||0):0,ap:tm?aiNormAp(tm[4]):'',night:/\b(?:night|evening|afternoon)s?\b/i.test(clause),morning:/\bmornings?\b/i.test(clause)};
+   if(ex.h!=null&&(ex.h<1||ex.h>12||ex.mn>59))ex.h=null;
+   text=text.slice(0,em.index)}}
+ return{base:text.replace(/[\s,;.]+$/,'').trim(),ex,reason}}
+// Turn one interpreted plan into "main plan minus the exception days" (+ an exception plan with its own time, if one was given)
+function aiApplyException(p,ex,reason){
+ const out=[p],addNote=(q,t)=>{q.notes=[q.notes,t].filter(Boolean).join(' · ')};
+ if(!ex){if(reason)addNote(p,'Note: '+reason);return out}
+ if(p.unsupported||p.needsClarification||p.recurrence==='once'){if(reason)addNote(p,'Note: '+reason);return out}
+ let all=null;if(p.recurrence==='weekly'&&Array.isArray(p.dows)&&p.dows.length)all=p.dows.slice();else if(p.recurrence==='custom'&&(p.interval||1)===1)all=[0,1,2,3,4,5,6];
+ if(!all){(p.warnings=p.warnings||[]).push('I could not leave out '+ex.days.map(d=>AI_DAY_LABEL[d]).join(' & ')+' for this kind of repeat. Add that change separately.');if(reason)addNote(p,'Note: '+reason);return out}
+ const exDays=ex.days.filter(d=>all.includes(d)),keep=all.filter(d=>!exDays.includes(d));if(!exDays.length||!keep.length)return out;
+ const pod=(/\((morning|afternoon|evening|night)\)/.exec(p.summary||'')||[])[1];
+ const listD=a=>a.length===1?AI_DAY_LABEL[a[0]]:a.slice(0,-1).map(d=>AI_DAY_LABEL[d]).join(', ')+' & '+AI_DAY_LABEL[a[a.length-1]];
+ const setDays=(q,days,summary)=>{const from=new Date((q.from||q.date)+'T12:00:00');let f=from;for(let i=0;i<7&&!days.includes(f.getDay());i++)f=ad(from,i+1);
+  q.recurrence='weekly';q.dows=days.slice();q.dow=days[0];q.interval=undefined;q.from=ds(f);q.date=ds(f);q.summary=summary+(pod?' ('+pod+')':'');
+  q.summaryDate=`${q.category==='Learning'?'First session':'Starts'}: ${aiFmtDate(f)} · ${aiHebrewDate(f)}`};
+ const exc=JSON.parse(JSON.stringify(p));
+ setDays(p,keep,keep.length>=4&&all.length===7?'Every day except '+listD(exDays):'Every '+listD(keep));
+ if(ex.off||ex.h==null){if(reason)addNote(p,'Note: '+reason);return out}
+ // exception plan: same as the main one, on the exception days, at the new time (AM/PM taken from what was said, or from the main time)
+ const baseAp=(/Time:\s*\d{1,2}:\d{2}\s*(AM|PM)/.exec(p.notes||'')||[])[1]||'';
+ const ap=ex.ap||(ex.night?'PM':ex.morning?'AM':baseAp);
+ const t='Time: '+aiFmtTime(ex.h,ex.mn,ap);
+ exc.notes=/Time:\s*[^·]+/.test(exc.notes||'')?exc.notes.replace(/Time:\s*[^·]+?(?=\s*·|$)/,t):[t,exc.notes].filter(Boolean).join(' · ');exc.time=t.slice(6);
+ setDays(exc,exDays,'Every '+listD(exDays));exc.warnings=(p.warnings||[]).filter(w=>!/No AM\/PM/.test(w));
+ if(reason)addNote(exc,'Note: '+reason);exc.isException=true;
+ out.push(exc);return out}
+// Understand one request; may give two plans when it has an exception
+async function aiInterpretSeg(src){const e=aiExceptParse(src);const p=await aiInterpretOne(e.ex||e.reason?e.base:src);
+ return aiApplyException(p,e.ex,e.reason)}
 let aiSeq=0;
 // Save one approved plan to the calendar. `source` is the request text it came from (remembered on this device).
 function aiCommit(p,source){const dv=new Date((p.date||ds(sel))+'T12:00:00');if(!p.title||isNaN(+dv))return null;
@@ -2709,12 +2753,12 @@ function aiBatchDone(){if(aiBatch.some(it=>it.state==='pending'))return;
 function aiBatchRender(){const m=aiEl('aiMulti');m.innerHTML='';
  const pend=aiBatch.filter(it=>it.state==='pending'),ok=pend.filter(it=>!it.p.needsClarification);
  const head=document.createElement('div');head.className='ai-mhead';
- const ht=document.createElement('span');ht.textContent=`I found ${aiBatch.filter(it=>it.state!=='note').length} separate requests. Each one is its own plan.`;head.appendChild(ht);
+ const ht=document.createElement('span');{const groups=new Set(aiBatch.map(it=>it.group)).size,plans=aiBatch.filter(it=>it.state!=='note').length;ht.textContent=plans>groups?`I made ${plans} plans from ${groups===1?'your request':groups+' requests'}. Each one has its own card.`:groups>1?`I found ${groups} separate requests. Each one is its own plan.`:'Here is your plan.'}head.appendChild(ht);
  if(ok.length>1){const all=document.createElement('button');all.type='button';all.className='ai-yes';all.textContent=`Add all ${ok.length}`;
   all.onclick=()=>{H.ok();ok.forEach(aiBatchAdd);if(aiBatchAdded)render(0);aiBatchRender();aiBatchDone()};head.appendChild(all)}
  m.appendChild(head);
  aiBatch.forEach((it,i)=>{const p=it.p,c=document.createElement('div');c.className='ai-preview show ai-mcard'+(it.state!=='pending'?' ai-mdone':'');
-  const src=document.createElement('div');src.className='ai-msrc';src.textContent=`${i+1}. “${it.src}”`;c.appendChild(src);
+  const src=document.createElement('div');src.className='ai-msrc';{const gs=[...new Set(aiBatch.map(x=>x.group))],gn=gs.indexOf(it.group)+1;src.textContent=it.p&&it.p.isException?`${gn}b. The exception in request ${gn}`:`${gn}. “${it.src}”`}c.appendChild(src);
   if(it.state==='note'){const n=document.createElement('p');n.textContent=p.clarify;c.appendChild(n);m.appendChild(c);return}
   const h=document.createElement('h3');h.textContent=(p.kind==='task'?'☑ Task: ':'')+(p.title||'Untitled event');c.appendChild(h);
   const filed=p.category&&p.category!=='General'?'Filed under: '+p.category+(p.kind==='task'?' (checkable task)':''):'';
@@ -2722,7 +2766,7 @@ function aiBatchRender(){const m=aiEl('aiMulti');m.innerHTML='';
   const w=(p.warnings||[]).join(' ');if(p.needsClarification||w){const e=document.createElement('p');e.className='ai-mwarn';e.textContent=p.needsClarification?(p.clarify||'Something is missing in this one.'):w;c.appendChild(e)}
   if(it.state==='pending'){const row=document.createElement('div');row.className='ai-confirm';
    const no=document.createElement('button');no.type='button';no.textContent='Change it';
-   no.onclick=()=>{H.tap();it.state='skipped';aiBatch.splice(aiBatch.indexOf(it),1);aiBatchKeep=true;aiEl('aiInput').value=it.src;aiEl('aiInput').focus();
+   no.onclick=()=>{H.tap();it.state='skipped';aiBatch=aiBatch.filter(x=>!(x.group===it.group&&x.state==='pending')&&x!==it);aiBatchKeep=true;aiEl('aiInput').value=it.src;aiEl('aiInput').focus();
     aiBatchRender();aiSetStatus('Fix this one above and tap Make a plan. Your other cards stay here.');if(!aiBatch.length)aiBatchReset()};
    const sk=document.createElement('button');sk.type='button';sk.textContent='Skip';
    sk.onclick=()=>{H.tap();it.state='skipped';aiBatchRender();aiBatchDone()};
@@ -2736,11 +2780,11 @@ function aiBatchRender(){const m=aiEl('aiMulti');m.innerHTML='';
 async function aiPlanMany(segs){
  aiProposal=null;aiEl('aiPreview').classList.remove('show');aiEl('aiCancel').classList.remove('show');
  const keep=aiBatchKeep?aiBatch.filter(it=>it.state==='pending'):[];if(!aiBatchKeep)aiBatchReset();aiBatchKeep=false;
- const items=await Promise.all(segs.map(async src=>{
-  if(AI_CANCEL_RE.test(aiNormalize(src)))return{src,state:'note',p:{clarify:'This asks to cancel something. Send cancellations on their own, one at a time.'}};
-  let p;try{p=await aiInterpretOne(src)}catch(e){p={needsClarification:true,clarify:'I could not read this part. Try rewording it.'}}
-  if(p.unsupported)return{src,state:'note',p};
-  return{src,state:'pending',p}}));
+ const g0=Date.now();
+ const items=(await Promise.all(segs.map(async(src,gi)=>{const group=g0+'_'+gi;
+  if(AI_CANCEL_RE.test(aiNormalize(src)))return[{src,group,state:'note',p:{clarify:'This asks to cancel something. Send cancellations on their own, one at a time.'}}];
+  let ps;try{ps=await aiInterpretSeg(src)}catch(e){ps=[{needsClarification:true,clarify:'I could not read this part. Try rewording it.'}]}
+  return ps.map(p=>p.unsupported?{src,group,state:'note',p}:{src,group,state:'pending',p})}))).flat();
  aiBatch=keep.concat(items);aiBatchRender();
  const pend=aiBatch.filter(it=>it.state==='pending'),bad=pend.filter(it=>it.p.needsClarification).length;
  aiSetStatus('Review each card. Nothing has been added yet.'+(bad?` ${bad===1?'One card needs':bad+' cards need'} more detail: tap Change it.`:''))}
