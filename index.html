@@ -456,7 +456,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 @font-face{font-family:'FRL App';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/frank-ruhl-libre-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'FRL App';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/frank-ruhl-libre-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 :root{--dtc:var(--ink);--gl-bg:color-mix(in srgb,var(--card) 50%,transparent);--gl-bd:color-mix(in srgb,var(--ink) 13%,transparent);--gl-tx:var(--ink);--rbf:#ffffff;--rbe:#ffffff;--waveo:.55;--navy:#0a1131}
-:root[data-night="1"]{--ink:#ECEAF6;--mut:#A6AACB;--line:rgba(168,178,255,.16);--dtc:#F0E4D4;--gl-bg:linear-gradient(180deg,rgba(52,62,130,.34),rgba(24,31,80,.30));--gl-bd:rgba(168,178,255,.21);--gl-tx:#E8E6F4;--rbf:#8c94ef;--rbe:#d0d9ff;--waveo:1}
+:root[data-night="1"]{--ink:#ECEAF6;--mut:#A6AACB;--line:rgba(168,178,255,.16);--dtc:#F0E4D4;--gl-bg:linear-gradient(180deg,rgba(58,70,150,.30),rgba(28,40,96,.28) 62%,rgba(60,108,180,.22));--gl-bd:rgba(168,178,255,.21);--gl-tx:#E8E6F4;--rbf:#7f86f2;--rbe:#a9e2ff;--waveo:1}
 /* the sky */
 #skyNight{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease;background:
  radial-gradient(62% 34% at 50% 23%,rgba(84,100,190,.20) 0%,rgba(60,74,160,.08) 45%,transparent 72%),
@@ -535,10 +535,10 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #skyGL{position:absolute;inset:0;width:100%;height:100%;display:block}
 #hdr .wk,.hyc{position:relative}
 :is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab)::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;padding:1.6px;z-index:2;
- background:conic-gradient(from var(--gg,120deg),rgba(255,255,255,0) 0deg,rgba(255,255,255,.35) 7deg,rgba(255,255,255,1) 13deg,#fff 17deg,rgba(255,255,255,.35) 23deg,rgba(255,255,255,0) 30deg,rgba(255,255,255,0) 360deg);
+ background:conic-gradient(from var(--gg,120deg),rgba(190,230,255,0) 0deg,rgba(190,230,255,.22) 8deg,rgba(225,242,255,.75) 18deg,rgba(225,242,255,.75) 22deg,rgba(190,230,255,.22) 32deg,rgba(190,230,255,0) 42deg,rgba(190,230,255,0) 360deg);
  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 :is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab)::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
- background:radial-gradient(46px 30px at var(--hx,-99px) var(--hy,-99px),rgba(255,255,255,calc(var(--gi)*.42)),rgba(255,255,255,0) 100%)}
+ background:radial-gradient(70px 46px at var(--hx,-99px) var(--hy,-99px),rgba(175,225,255,calc(var(--gi)*.32)),rgba(150,200,255,calc(var(--gi)*.1)) 55%,rgba(150,200,255,0) 100%)}
 :root{--gi:.55}:root[data-night="1"]{--gi:.62}
 /* each piece floats on its own clock and sits at its own depth when you scroll; pure CSS so the browser runs it off the main thread */
 @keyframes flY{from{translate:0 calc(var(--fa) * -1)}to{translate:0 var(--fa)}}
@@ -1869,16 +1869,16 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
   if(epx<-90.)continue;
   vec3 T=normalize(vec3(1.,dc,0.)),N2=normalize(vec3(-dc,1.,0.)),Bv=ct*N2+st*vec3(0.,0.,1.);
   vec3 n=normalize(cross(T,Bv));if(n.z<0.)n=-n;float uc=clamp(u,-1.,1.);n=normalize(n-Bv*uc*.7);
-  float nh=max(dot(n,Hv),0.),sp=pow(nh,60.),sp2=pow(nh,9.),dif=.3+.7*max(dot(n,uL),0.);
-  float ins=smoothstep(-.5,1.6,epx),rim=exp(-abs(epx)/1.15);
+  float nh=max(dot(n,Hv),0.),sp=pow(nh,24.),sp2=pow(nh,5.),dif=.3+.7*max(dot(n,uL),0.),fr=pow(1.-abs(n.z),1.6);
+  float ins=smoothstep(-.5,2.4,epx),rim=exp(-abs(epx)/2.4);
   float top=u<0.?1.:.42,fade=.55+.45*sin(x*2.1+A.w*1.3+t*.5);
   float wp=w/px,fib=.55*pow(.5+.5*sin(u*41.+x*2.3),7.)*smoothstep(70.,190.,wp)+.45*pow(.5+.5*sin(u*15.-x*1.6+A.w),4.)*smoothstep(24.,70.,wp)+.12;
   float lit=mix(1.,.3,clamp((u+1.)*.5,0.,1.));
-  float body=ins*(.085+.13*fib*dif*lit+.26*sp2*lit+.8*sp)*(.55+.45*dif);
-  float edge=rim*top*(.45+1.3*sp2+.6*sp);
-  float halo=(1.-ins)*exp(epx/(w/px*.35+6.))*.05*top;
+  float body=ins*(.05+.03*fib+.2*fr+.16*sp2*lit+.42*sp)*(.6+.4*dif);
+  float edge=rim*top*(.28+.7*sp2+.3*sp);
+  float halo=(1.-ins)*exp(epx/(w/px*.45+10.))*.07*top;
   float al=(body+edge+halo)*C.z*fade;
-  vec3 col=mix(uF,uE,clamp(sp2*.9+edge*.8,0.,1.))+vec3(sp*.7);
+  vec3 irid=mix(uF,uE,.5+.5*sin(u*2.4+x*3.1+A.w+t*.3)),col=mix(irid,mix(uE,vec3(1.),.35),clamp(sp2*.7+edge*.5,0.,1.))+vec3(sp*.28);
   acc+=col*al;aa+=al;}
  aa=clamp(aa,0.,1.);gl_FragColor=vec4(min(acc,vec3(1.))*uO,aa*uO);}`;
  const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o};
