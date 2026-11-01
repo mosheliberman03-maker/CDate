@@ -483,7 +483,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #hdr .sky-scene::after{content:'';position:absolute;left:50%;top:calc(100% - 62px);transform:translateX(-50%);translate:var(--dmx,0) var(--dmy,0);width:130%;height:clamp(340px,44vh,440px);border-radius:50%;z-index:-1;pointer-events:none;
  border:1px solid transparent;border-top-color:color-mix(in srgb,var(--rbe) 34%,transparent);
  background:radial-gradient(110% 60% at 50% 0%,color-mix(in srgb,var(--rbf) 14%,transparent) 0%,color-mix(in srgb,var(--rbf) 5%,transparent) 42%,transparent 72%);
- box-shadow:inset 0 10px 30px -18px color-mix(in srgb,var(--rbe) 30%,transparent);-webkit-mask-image:linear-gradient(#000 0%,#000 30%,transparent 62%);mask-image:linear-gradient(#000 0%,#000 30%,transparent 62%)}
+ box-shadow:inset 0 10px 30px -18px color-mix(in srgb,var(--rbe) 30%,transparent);-webkit-mask-image:linear-gradient(#000 0%,#000 30%,transparent 62%),conic-gradient(from 180deg,transparent 0deg,transparent var(--dw),#000 calc(var(--dw) + 12deg));-webkit-mask-composite:source-in;mask-image:linear-gradient(#000 0%,#000 30%,transparent 62%),conic-gradient(from 180deg,transparent 0deg,transparent var(--dw),#000 calc(var(--dw) + 12deg));mask-composite:intersect}
 /* moon-set pill */
 .sky-cap{left:50%;right:auto;bottom:4px;transform:translateX(-50%);width:max-content;max-width:88vw;display:inline-flex;align-items:center;gap:10px;padding:10px 22px 10px 18px;border-radius:999px;
  font:500 15px/1.2 Figtree,system-ui,sans-serif;letter-spacing:.01em;color:var(--gl-tx);white-space:nowrap;z-index:3;
@@ -558,6 +558,11 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
  #skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both;animation-timeline:auto,auto,scroll(root block);animation-range:normal,normal,0px 1000px;animation-composition:replace,add,add}
  :is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:rv .75s cubic-bezier(.2,.8,.2,1) calc(var(--i,0)*70ms) backwards,flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both;animation-timeline:auto,auto,auto,scroll(root block);animation-range:normal,normal,normal,0px 1000px;animation-composition:replace,replace,add,add}}
 .cc-away :is(#skyBody,#skyTrailC,.sky-cap,#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk),.cc-away #hdr .sky-scene::after{animation-play-state:paused!important}
+/* the semicircle rolls away as you scroll down: its left end runs along the curve and is swallowed at the right end while it turns */
+@property --dw{syntax:'<angle>';inherits:false;initial-value:100deg}
+@keyframes dmW{from{--dw:100deg;rotate:0deg}to{--dw:252deg;rotate:16deg}}
+@supports (animation-timeline:scroll()){
+ #hdr .sky-scene::after{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both,dmW 1s linear both;animation-timeline:auto,auto,scroll(root block),scroll(root block);animation-range:normal,normal,0px 1000px,0px 300px;animation-composition:replace,add,add,replace}}
 @media(prefers-reduced-motion:reduce){#skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab,.dock,#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk,:is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:none!important}}
 /* event labels at the bottom: one tidy row that scrolls sideways, never stacked over the week panel */
 .foot .chips2{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;justify-content:safe center;padding:3px 12px;margin:0 -12px;
