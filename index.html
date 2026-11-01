@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><style>html.cc-boot{background:#0a0b10}</style><script>/* Logged in already? From the very first frame keep the screen the intro's dark colour and the login box hidden,
+<!doctype html><html lang="en"><head><meta charset="utf-8"><script>/* Test account: a movable clock (see the test tools further down). Only when the active profile is "test". */(function(){try{if(localStorage.getItem('cc_local_active_profile_v1')!=='test')return;var D=Date;window.__RealDate=D;window.CC_TEST=1;window.__TOFF=+localStorage.getItem('cc_test_toff')||0;function TD(){if(!(this instanceof TD))return new D(D.now()+window.__TOFF).toString();var a=[].slice.call(arguments);return a.length?new (Function.prototype.bind.apply(D,[null].concat(a)))():new D(D.now()+window.__TOFF)}TD.prototype=D.prototype;TD.now=function(){return D.now()+window.__TOFF};TD.UTC=D.UTC;TD.parse=D.parse;window.Date=TD}catch(e){}})();</script><style>html.cc-boot{background:#0a0b10}</style><script>/* Logged in already? From the very first frame keep the screen the intro's dark colour and the login box hidden,
    so Android's launch screen fades straight into the intro. Removed when the intro ends. */
 try{var u0=localStorage.getItem('cc_local_active_profile_v1'),d0=JSON.parse(localStorage.getItem('cc_local_profiles_v1')||'{}');if(u0&&d0[u0]&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('cc-boot')}catch(e){}</script><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Chabad Calendar</title><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Chabad Calendar"><meta name="theme-color" content="#0a0b10">
 <link rel="preload" href="fonts/figtree-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/frank-ruhl-libre-hebrew-500-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -822,7 +822,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
  let creating=false;
  function mode(v){creating=v;$('accountSubmit').textContent=v?'Create account':'Log in';$('accountMode').textContent=v?'Back to login':'Create account';$('accountTitle').textContent=v?'Create your calendar profile':'Your Chabad Calendar';$('accountSub').textContent=v?'Choose a username and password for this device.':'Sign in or create a private profile for this device.';$('accountPass').autocomplete=v?'new-password':'current-password';msg('')}
  $('accountMode').addEventListener('click',()=>mode(!creating));
- $('accountForm').addEventListener('submit',e=>{e.preventDefault();const u=clean($('accountUser').value),p=$('accountPass').value;if(!/^[a-z0-9_.-]{3,32}$/.test(u)){msg('Use 3–32 characters: letters, numbers, dot, dash, or underscore.');return}if(p.length<4){msg('Choose a password with at least 4 characters.');return}const db=users();if(creating){if(db[u]){msg('That username already exists on this device.');return}db[u]={passwordHash:hash(u+'|'+p),created:Date.now()};localStorage.setItem(USERS_KEY,JSON.stringify(db));localStorage.setItem(ACTIVE_KEY,u);location.reload();return}if(!db[u]||db[u].passwordHash!==hash(u+'|'+p)){msg('Username or password is incorrect on this device.');return}localStorage.setItem(ACTIVE_KEY,u);location.reload()});
+ $('accountForm').addEventListener('submit',e=>{e.preventDefault();const u=clean($('accountUser').value),p=$('accountPass').value;if(!/^[a-z0-9_.-]{3,32}$/.test(u)){msg('Use 3–32 characters: letters, numbers, dot, dash, or underscore.');return}if(p.length<4){msg('Choose a password with at least 4 characters.');return}const db=users();if(creating){if(db[u]){msg('That username already exists on this device.');return}db[u]={passwordHash:hash(u+'|'+p),created:Date.now()};localStorage.setItem(USERS_KEY,JSON.stringify(db));localStorage.setItem(ACTIVE_KEY,u);location.reload();return}if(u==='test'&&p==='test'&&!db[u]){db[u]={passwordHash:hash('test|test'),created:Date.now()};localStorage.setItem(USERS_KEY,JSON.stringify(db));localStorage.setItem('cc_local_tour_done_test','1')}if(!db[u]||db[u].passwordHash!==hash(u+'|'+p)){msg('Username or password is incorrect on this device.');return}localStorage.setItem(ACTIVE_KEY,u);location.reload()});
  // Account-specific key names mean test entries from the old shared schedule are not imported.
  window.ccProfileKey=function(k){const u=localStorage.getItem(ACTIVE_KEY);return u?'cc_profile_'+u+'_'+k:k};
  const active=localStorage.getItem(ACTIVE_KEY),db=users();if(active&&db[active]){$('accountGate').style.display='none';}
@@ -3335,4 +3335,58 @@ aiEl('aiNo').addEventListener('click',()=>{aiEl('aiPreview').classList.remove('s
 aiEl('aiYes').addEventListener('click',()=>{if(!aiProposal||aiProposal.needsClarification)return;const r=aiCommit(aiProposal,aiEl('aiInput').value);if(!r){aiSetStatus('The proposed event needs a valid title and date.');return}
  render(0);pick(r.dv);aiEl('aiInput').value='';aiEl('aiPreview').classList.remove('show');aiSetStatus('Added to your calendar.');setTimeout(aiClose,850)});
 aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object.keys(p.arrangements||{});alert(names.length?'Saved arrangements on this device:\n\n'+names.map((n,i)=>`${i+1}. ${n}`).join('\n')+'\n\nTo reset this memory, clear this site’s local storage.':'No saved arrangements yet. After you approve an event, its request and details will be remembered on this device.')});
-</script></body></html>
+</script>
+<script>
+/* ===== Test account (username "test", password "test") =====
+   Its clock can be moved (the Date patch at the top of <head> adds window.__TOFF), it opens on a "demo day" chosen to show as many
+   kinds of days as possible (missing kinds are added there as test examples, in this account only), and it is seeded with
+   plans, reminders, shiurim progress and a streak. Test tools sit in the ⋯ sheet. */
+(function(){
+ if(!window.CC_TEST)return;
+ const RD=window.__RealDate||Date,KEY=AK('cc_test_demo'),KINDS=['yt','ct','yb','ys','fs'];
+ const EXN={yt:['Example festival','חג (דוגמה)'],ct:['Example Chabad Yom Tov','יום טוב חב״די (דוגמה)'],yb:['Example yoma d’pagra','יומא דפגרא (דוגמה)'],ys:['Example special day','יום מיוחד (דוגמה)'],fs:['Example fast day','תענית (דוגמה)']};
+ const getDemo=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){return null}};
+ function augment(dm){if(!dm)return;const id=dm.hk+'-'+dm.hd,L=(idx[id]??=[]);
+  for(const k of dm.add||[])if(!L.some(e=>e.id==='test-'+k))L.push({k,t:EXN[k][0],h:EXN[k][1],x:'Added only in the test account, so this day shows every kind of event.',id:'test-'+k});IBC.clear()}
+ function findDemo(){const base=new RD();base.setHours(12,0,0,0);let best=null;
+  for(let i=1;i<=420;i++){const dt=new RD(base.getFullYear(),base.getMonth(),base.getDate()+i,12),b=infoBase(dt),ks=new Set(b.ev.map(e=>e.k).filter(k=>KINDS.includes(k)));
+   const sc=ks.size*3+(b.rc?2:0)+(dt.getDay()===6?1:0)+(b.ev.length>2?1:0);if(!best||sc>best.sc)best={sc,dt,ks}}
+  const h=hd(best.dt);return{ds:ds(best.dt),hk:h.k,hd:h.d,add:KINDS.filter(k=>!best.ks.has(k))}}
+ function setClock(target){window.__TOFF=+target-RD.now();try{localStorage.setItem('cc_test_toff',String(window.__TOFF))}catch(e){}}
+ function applyClock(jump){if(SKY.on){SKY.last=null;skyTick()}const nt=SKY.on?t0:ad(new Date(),0);if(!SKY.on)t0=nt;if(jump||+sel!==+t0){sel=t0;V=hm1(t0);render(0);panel(0)}else{render(0);panel(0)}fill_()}
+ async function seed(){const dm=findDemo();localStorage.setItem(KEY,JSON.stringify(dm));augment(dm);
+  const D=new RD(dm.ds+'T15:00:00');setClock(D);t0=ad(new Date(),0);sel=t0;V=hm1(t0);
+  const say=['Chavrusa with Adam every night at 8pm, remind me 2 hours before','Farbrengen today at 9pm, remind me 1 hour before','Call Mendy about the shiur tomorrow at 10am','Tanya shiur every Monday at 7:30pm, remind me the night before'];
+  for(const s of say){try{const segs=aiSplitRequests(s);for(const g of segs){const p=await aiInterpretSeg(g);const arr=Array.isArray(p)?p:[p];for(const q of arr)if(q&&q.title)aiCommit(q,g)}}catch(e){}}
+  my.push({id:'c'+RD.now(),t:'My birthday (test)',x:'A yearly event of your own.',dt:dm.ds,r:'greg',hk:dm.hk,hd:dm.hd});SV();
+  for(let i=1;i<=6;i++){const k=ds(ad(t0,-i));DN[k]={chumash:1,tehillim:1,tanya:1,rambam3:1,hy:1}}DN[ds(t0)]={chumash:1,tehillim:1};SVD();
+  try{rdPosSet(ds(t0),'tanya',{p:.4,m:.4})}catch(e){}
+  localStorage.setItem(AK('cc_test_seeded'),'1');lg&&lg();applyClock(true)}
+ function reset(){const pre='cc_profile_test_';Object.keys(localStorage).filter(k=>k.startsWith(pre)).forEach(k=>localStorage.removeItem(k));localStorage.removeItem('cc_test_toff');location.reload()}
+ /* tools in the ⋯ sheet */
+ const help=[...document.querySelectorAll('#sh h2')].find(h=>h.textContent==='Help');
+ const box=document.createElement('div');box.id='testTools';
+ box.innerHTML=`<h2 style="margin-top:24px">Test tools</h2><p class="mut" style="margin:4px 0 10px">Only in the test account. Move the clock to see the sky, the sun and moon, and the animations at any time.</p>
+ <label for="ttD">Date</label><input type="date" id="ttD">
+ <label for="ttT">Time <b id="ttV" style="font-weight:600"></b></label><input type="range" id="ttT" min="0" max="1435" step="5" style="width:100%;accent-color:#8c94ef">
+ <div class="rw" style="flex-wrap:wrap;gap:8px;margin-top:10px"><button class="btn gh" type="button" data-q="sr">Sunrise</button><button class="btn gh" type="button" data-q="noon">Midday</button><button class="btn gh" type="button" data-q="ss">Sunset</button><button class="btn gh" type="button" data-q="night">Night (same day)</button><button class="btn gh" type="button" data-q="demo">Demo day</button><button class="btn gh" type="button" data-q="now">Real now</button></div>
+ <div class="rw" style="flex-wrap:wrap;gap:8px;margin-top:10px"><button class="btn" type="button" id="ttPlay">Play sun/moon opening</button><button class="btn gh" type="button" id="ttIntro">Play logo intro</button><button class="btn gh" type="button" id="ttReset">Reset test account</button></div>`;
+ if(help)help.parentNode.insertBefore(box,help);
+ const $d=box.querySelector('#ttD'),$t=box.querySelector('#ttT'),$v=box.querySelector('#ttV');
+ window.fill_=function(){const n=new Date();$d.value=ds(n);$t.value=n.getHours()*60+n.getMinutes();$v.textContent=n.toLocaleTimeString('en',{hour:'numeric',minute:'2-digit'})};
+ let raf=0;const fromUI=jump=>{const[y,m,d]=$d.value.split('-').map(Number);if(!y)return;const mins=+$t.value;setClock(new RD(y,m-1,d,Math.floor(mins/60),mins%60));if(!raf)raf=requestAnimationFrame(()=>{raf=0;applyClock(jump)})};
+ $t.addEventListener('input',()=>{fromUI(false);H.sel()});$d.addEventListener('change',()=>fromUI(true));
+ box.addEventListener('click',e=>{const q=e.target.closest('[data-q]');if(!q)return;H.tap();const k=q.dataset.q,n=new Date(),T=skySunTimes(n.getFullYear(),n.getMonth()+1,n.getDate());
+  if(k==='now'){window.__TOFF=0;localStorage.setItem('cc_test_toff','0');applyClock(true);return}
+  if(k==='demo'){const dm=getDemo();if(dm){setClock(new RD(dm.ds+'T15:00:00'));applyClock(true)}return}
+  let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
+  if(tg){setClock(tg);applyClock(false)}});
+ box.querySelector('#ttPlay').onclick=()=>{op(false);setTimeout(()=>{const pl=skyPlan(Date.now()),b=document.getElementById('skyBody');if(!pl||!b)return;b.style.opacity='0';SKYA.arm=true;setTimeout(()=>skyRun(pl),60)},450)};
+ box.querySelector('#ttIntro').onclick=()=>location.reload();
+ box.querySelector('#ttReset').onclick=()=>{if(confirm('Reset the test account? Its plans and progress go back to the starting examples.'))reset()};
+ augment(getDemo());
+ if(!localStorage.getItem(AK('cc_test_seeded')))seed();else{render(0);panel(0)}
+ fill_();document.getElementById('mn').addEventListener('click',()=>setTimeout(fill_,50));
+})();
+</script>
+</body></html>
