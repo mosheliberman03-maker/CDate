@@ -4,19 +4,20 @@
 (async()=>{
 if(window.__hyRun)return;window.__hyRun=1;
 if(!/chabad\.org$/.test(location.hostname)){alert('Open www.chabad.org first, then tap the bookmark again.');window.__hyRun=0;return}
-const KEY='cdate_hy_v1',days=[],add=(a,b)=>{for(let d=new Date(a+'T12:00:00');d<=new Date(b+'T12:00:00');d.setDate(d.getDate()+1))days.push(new Date(d))};
-add('2023-09-16','2024-10-02');add('2024-12-01','2024-12-01');add('2024-12-31','2024-12-31');add('2025-03-01','2025-03-29');
+const KEY='cdate_hy_v2',days=[],add=(a,b)=>{for(let d=new Date(a+'T12:00:00');d<=new Date(b+'T12:00:00');d.setDate(d.getDate()+1))days.push(new Date(d))};
+// second pass: only the days where the first pass picked up the Hebrew original instead of the English
+['2023-10-26','2023-11-02','2023-11-24','2023-12-31','2024-02-01','2024-02-23','2024-03-24','2024-04-17','2024-05-27','2024-06-12','2024-08-13','2024-09-23','2025-03-14'].forEach(x=>add(x,x));
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 let got={};try{got=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
 const box=document.createElement('div');box.style.cssText='position:fixed;left:10px;right:10px;bottom:10px;z-index:2147483647;background:#161a2e;color:#fff;font:16px/1.4 system-ui,sans-serif;padding:16px;border-radius:16px;box-shadow:0 8px 40px #0008';
 box.innerHTML='<b>Collecting Hayom Yom</b><div id="hyS" style="margin:8px 0">Starting…</div><div style="height:8px;background:#fff3;border-radius:4px"><div id="hyB" style="height:8px;width:0;background:#8c9bff;border-radius:4px"></div></div><div style="margin-top:8px;font-size:13px;opacity:.8">Keep this screen on and Chrome open.</div><button id="hyD" style="margin-top:10px;padding:10px 14px;border-radius:10px;border:0;font:600 15px system-ui">Save what I have now</button>';
 document.body.appendChild(box);const S=t=>box.querySelector('#hyS').textContent=t,B=p=>box.querySelector('#hyB').style.width=(p*100).toFixed(1)+'%';
-const save=()=>{const blob=new Blob([JSON.stringify({source:'chabad.org Hayom Yom (English), used with permission',collected:new Date().toISOString(),days:got},null,0)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hayomyom-en.json';document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),2000)};
+const save=()=>{const blob=new Blob([JSON.stringify({source:'chabad.org Hayom Yom (English), used with permission',collected:new Date().toISOString(),days:got},null,0)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hayomyom-en-2.json';document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),2000)};
 box.querySelector('#hyD').onclick=save;
 let wl=null;try{wl=await navigator.wakeLock.request('screen')}catch(e){}
 document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'){try{wl=await navigator.wakeLock.request('screen')}catch(e){}}});
 const clean=el=>{const c=el.cloneNode(true);c.querySelectorAll('script,style,iframe,img,svg,button,form,noscript').forEach(x=>x.remove());c.querySelectorAll('*').forEach(x=>{for(const a of [...x.attributes])if(a.name!=='href')x.removeAttribute(a.name)});return c.innerHTML.replace(/\s+/g,' ').trim()};
-const pick=doc=>{let best=null,score=0;doc.querySelectorAll('div,article,section,main,td').forEach(el=>{let s=0;for(const ch of el.children)if(/^(P|BLOCKQUOTE|H2|H3|H4)$/.test(ch.tagName))s+=ch.textContent.trim().length;if(s>score){score=s;best=el}});return best};
+const pick=doc=>{let best=null,score=0;doc.querySelectorAll('div,article,section,main,td').forEach(el=>{let s=0;for(const ch of el.children)if(/^(P|BLOCKQUOTE|H2|H3|H4)$/.test(ch.tagName))s+=(ch.textContent.match(/[A-Za-z]/g)||[]).length;if(s>score){score=s;best=el}});return best};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let fails=0;
 for(let i=0;i<days.length;i++){const d=days[i],k=iso(d);B(i/days.length);if(got[k])continue;
@@ -34,5 +35,5 @@ for(let i=0;i<days.length;i++){const d=days[i],k=iso(d);B(i/days.length);if(got[
  try{localStorage.setItem(KEY,JSON.stringify(got))}catch(e){}
  await sleep(900)}
 B(1);S('Done: '+Object.keys(got).length+' days. Saving the file…');save();
-setTimeout(()=>S('Done. The file hayomyom-en.json is in your Downloads. Upload it in the chat.'),1500);
+setTimeout(()=>S('Done. The file hayomyom-en-2.json is in your Downloads. Upload it in the chat.'),1500);
 window.__hyRun=0})();
