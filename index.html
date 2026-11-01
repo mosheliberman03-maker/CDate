@@ -136,6 +136,7 @@ main{max-width:640px;padding:6px 16px 140px}
 .rds{margin:-2px 0 16px;padding:10px 14px 4px;border-right:3px solid color-mix(in srgb,var(--ct) 45%,transparent);border-radius:4px 0 0 4px;background:color-mix(in srgb,var(--ct) 4.5%,transparent);font-size:calc(var(--rdfs) * .8);line-height:1.85;color:color-mix(in srgb,var(--ink) 86%,transparent)}
 .rds p{margin:0 0 8px;text-align:justify}.rds p+p{padding-top:8px;border-top:1px dashed color-mix(in srgb,var(--ink) 12%,transparent)}.rds b{color:var(--ink)}.rdsl{font:700 calc(var(--rdfs) * .62)/1 'Noto Serif Hebrew App',serif;color:var(--ct);margin-bottom:6px;letter-spacing:.04em}
 .rdfs{flex:none;border:1px solid var(--line);background:transparent;color:inherit;border-radius:99px;height:34px;padding:0 11px;font:600 14px Figtree,system-ui;margin-left:auto}.rdfs+.rdpc{margin-left:0}
+.cload{display:flex;align-items:center;justify-content:center;min-height:46vh;color:var(--ct)}.cload svg{width:58px;height:auto;overflow:visible;filter:drop-shadow(0 0 11px color-mix(in srgb,var(--ct) 50%,transparent));animation:cpulse 1.5s ease-in-out infinite}.cload path{fill:none;stroke:currentColor;stroke-width:25;stroke-linecap:round;stroke-linejoin:round}@keyframes cpulse{0%,100%{opacity:.3;transform:scale(.88)}50%{opacity:1;transform:scale(1.05)}}@media(prefers-reduced-motion:reduce){.cload svg{animation:none;opacity:.75}}.hyt .cload{min-height:120px}.hyt .cload svg{width:46px}
 .rdl{font:15px/1.5 Figtree,system-ui;color:var(--mut);text-align:center;margin-top:30px}.rdl button{border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:10px 14px;font:600 14px Figtree,system-ui}.rdf{font:12.5px Figtree,system-ui;color:var(--mut);text-align:center;margin-top:24px}.rdf a{color:var(--ct)}
 .hyt p{margin:10px 0 0;line-height:1.6}.hyt .hyh{font-size:12px;letter-spacing:.04em;color:var(--mut);margin-top:10px}.hyx.cut{max-height:15.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}.hym{border:0;background:none;color:var(--ct);font:600 14px Figtree,system-ui;padding:8px 0 0;cursor:pointer}.hyn,.hyc2{font-size:11.5px;color:var(--mut);margin-top:8px}
 .hyr{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.hyr .btn{margin:0;display:inline-block;text-decoration:none}
@@ -1151,6 +1152,8 @@ function tog(k){const d=dkey();(DN[d]??={});if(DN[d][k])delete DN[d][k];else{if(
 /* ===== Shiur reader: the day's Hebrew text from Sefaria (free texts, open API).
    Tap a shiur row to open it; leaving the reader (← or the phone's back) checks it off, once the text has loaded.
    Tap the circle to check it off without opening. ===== */
+/* Pulsing M logo loader (the monogram from the opening animation), shown while things load. */
+const LOAD='<div class="cload" role="status" aria-label="Loading"><svg viewBox="283 225 394 394" aria-hidden="true"><path d="M660 242 L480 472 L300 242 L300 602"/><path d="M660 242 L660 602"/></svg></div>';
 const RD_KEYS=['chumash','tehillim','tanya','rambam3','rambam1'];
 const RD_TITLE={chumash:'חומש עם פירוש רש״י',tehillim:'תהלים',tanya:'תניא',rambam3:'רמב״ם · שלושה פרקים',rambam1:'רמב״ם · פרק אחד'};
 const SEF='https://www.sefaria.org/api/';
@@ -1225,7 +1228,7 @@ function rdOpen(k){const d=new Date(sel),dk=dkey(),st=RDS={k,d,dk,ok:false};
  let b=$('#rdr');if(!b){b=document.createElement('div');b.id='rdr';b.className='rdr';b.innerHTML='<div class="rdb"><button type="button" class="rdx" aria-label="Back">←</button><div class="rdt"><b></b><small></small></div><button type="button" class="rdfs" aria-label="Text size">Aa</button><div class="rdpc" aria-live="off">0%</div><div class="rdp"><i></i></div></div><div class="rdw"><div class="rdm" dir="rtl" lang="he"></div><div class="rdsb" aria-hidden="true"><div class="rdth"><span></span></div></div></div>';document.body.appendChild(b);b.querySelector('.rdx').onclick=()=>history.back();rdScrollUI(b);b.querySelector('.rdfs').onclick=()=>{const S=[18,20.5,23,26],i=(S.indexOf(rdFS())+1)%S.length;try{localStorage.setItem('cc_rd_fs',S[i])}catch(e){}H.sel();b.querySelector('.rdm').style.setProperty('--rdfs',S[i]+'px');b._rdUpd&&b._rdUpd()}}
  b.querySelector('.rdm').style.setProperty('--rdfs',rdFS()+'px');
  b.querySelector('.rdt b').textContent=RD_TITLE[k];b.querySelector('.rdt small').textContent=d.toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'})+' · '+hd(d).d+' '+hd(d).n[0];
- const m=b.querySelector('.rdm');m.scrollTop=0;m.innerHTML='<p class="rdl">Loading…</p>';b._rdUpd&&b._rdUpd();
+ const m=b.querySelector('.rdm');m.scrollTop=0;m.innerHTML=LOAD;b._rdUpd&&b._rdUpd();
  requestAnimationFrame(()=>b.classList.add('on'));document.body.classList.add('rdo');H.tap();
  history.pushState({rdr:1},'');
  rdBuild(k,d).then(html=>{if(RDS!==st)return;st.ok=true;requestAnimationFrame(()=>b._rdUpd&&b._rdUpd());m.innerHTML=html+`<p class="rdf" dir="ltr">Text from Sefaria · <a href="https://www.chabad.org/dailystudy/default.asp?tdate=${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}" target="_blank" rel="noopener">Open on Chabad.org ↗</a></p>`})
@@ -1265,7 +1268,7 @@ function study(h){const u='https://www.chabad.org/dailystudy/default.asp?tdate='
 let HYT=null,HYL=null;
 const hyLeap=y=>((7*y+1)%19)<7;
 function hyFill(h){const el=$('#hyt');if(!el)return;
- if(!HYT){if(!HYL)HYL=fetch('hayomyom-en.json').then(r=>r.ok?r.json():null).then(j=>{HYT=j&&j.days||{};const h2=hd(sel);hyFill(h2)}).catch(()=>{HYL=null});return}
+ if(!HYT){if(!HYL){el.innerHTML=LOAD;HYL=fetch('hayomyom-en.json').then(r=>r.ok?r.json():null).then(j=>{HYT=j&&j.days||{};const h2=hd(sel);hyFill(h2)}).catch(()=>{HYL=null;el.innerHTML=''});}return}
  const ks=h.k==='A'&&!hyLeap(h.y)?['AI-'+h.d,'A-'+h.d]:[h.k+'-'+h.d],es=ks.map(k=>HYT[k]).filter(Boolean);if(!es.length)return;
  const body=es.map(e=>(es.length>1&&e.h?`<div class="hyh">${e.h}</div>`:'')+e.p.map(x=>`<p>${x}</p>`).join('')+(e.t?'<div class="hyn">Translated in the app from the original.</div>':'')).join('');
  const long=body.replace(/<[^>]+>/g,'').length>520;
