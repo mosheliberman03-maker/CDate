@@ -1861,7 +1861,7 @@ function glassShine(){const H=innerHeight,W=innerWidth,lx=W/2+GLS.L[0]*H*1.6,ly=
  if(!gl){fb();return}
  const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
  const FS=`precision highp float;
-uniform vec2 uR;uniform float uT,uS;uniform vec3 uF,uE,uL;uniform float uO;uniform vec4 uA[6],uB[6],uC[6];
+uniform vec2 uR;uniform float uT,uS;uniform vec3 uF,uE,uL;uniform float uO,uK;uniform vec4 uA[6],uB[6],uC[6];
 void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px=1./uR.x;
  vec3 acc=vec3(0.);float aa=0.;vec3 Hv=normalize(uL+vec3(0.,0.,1.));
  for(int i=0;i<6;i++){vec4 A=uA[i],B=uB[i],C=uC[i];float x=p.x,t=uT*C.w;
@@ -1874,15 +1874,15 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
   vec3 T=normalize(vec3(1.,dc,0.)),N2=normalize(vec3(-dc,1.,0.)),Bv=ct*N2+st*vec3(0.,0.,1.);
   vec3 n=normalize(cross(T,Bv));if(n.z<0.)n=-n;float uc=clamp(u,-1.,1.);n=normalize(n-Bv*uc*.7);
   float nh=max(dot(n,Hv),0.),sp=pow(nh,24.),sp2=pow(nh,5.),dif=.3+.7*max(dot(n,uL),0.),fr=pow(1.-abs(n.z),1.6);
-  float ins=smoothstep(-.5,2.4,epx),rim=exp(-abs(epx)/2.4);
+  float ins=smoothstep(-.5,2.4+5.*uK,epx),rim=exp(-abs(epx)/(2.4+4.5*uK));sp*=1.-.8*uK;sp2*=1.-.55*uK;
   float top=u<0.?1.:.42,fade=.55+.45*sin(x*2.1+A.w*1.3+t*.5);
   float wp=w/px,fib=.55*pow(.5+.5*sin(u*41.+x*2.3),7.)*smoothstep(70.,190.,wp)+.45*pow(.5+.5*sin(u*15.-x*1.6+A.w),4.)*smoothstep(24.,70.,wp)+.12;
   float lit=mix(1.,.3,clamp((u+1.)*.5,0.,1.));
   float body=ins*(.05+.03*fib+.2*fr+.16*sp2*lit+.42*sp)*(.6+.4*dif);
-  float edge=rim*top*(.28+.7*sp2+.3*sp);
+  float edge=rim*top*(.28+.7*sp2+.3*sp)*(1.-.55*uK);
   float halo=(1.-ins)*exp(epx/(w/px*.45+10.))*.07*top;
-  float al=(body+edge+halo)*C.z*fade;
-  vec3 irid=mix(uF,uE,.5+.5*sin(u*2.4+x*3.1+A.w+t*.3)),col=mix(irid,mix(uE,vec3(1.),.35),clamp(sp2*.7+edge*.5,0.,1.))+vec3(sp*.28);
+  float al=(body+edge+halo)*C.z*fade*(1.-.3*uK);
+  vec3 irid=mix(uF,uE,.5+.5*sin(u*2.4+x*3.1+A.w+t*.3)),col=mix(irid,mix(uE,vec3(1.),.35),clamp(sp2*.7+edge*.5,0.,1.))+vec3(sp*.28*(1.-uK));
   acc+=col*al;aa+=al;}
  aa=clamp(aa,0.,1.);gl_FragColor=vec4(min(acc,vec3(1.))*uO,aa*uO);}`;
  const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o};
@@ -1891,7 +1891,7 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
  host.appendChild(cv);GLS.ok=true;gl.useProgram(pr);
  const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
  const al=gl.getAttribLocation(pr,'a');gl.enableVertexAttribArray(al);gl.vertexAttribPointer(al,2,gl.FLOAT,false,0,0);
- const U={};for(const k of['uR','uT','uS','uF','uE','uL','uO','uA','uB','uC'])U[k]=gl.getUniformLocation(pr,k);
+ const U={};for(const k of['uR','uT','uS','uF','uE','uL','uO','uK','uA','uB','uC'])U[k]=gl.getUniformLocation(pr,k);
  /* per ribbon: A=(height, sway, sway freq, phase)  B=(2nd sway, 2nd freq, half width, twist freq)  C=(twist phase, parallax, strength, drift speed) */
  const R=[[.62,.42,2.5,1.25, .06,5.2,.085,3.1, .4,.32,.95,.05],
   [.18,.10,3.3,2.6, .04,6.,.05,4.2, 2.1,.22,.55,.04],
@@ -1906,7 +1906,9 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
  /* Drawn only when something changes (scroll, size, colours): no idle animation, so nothing runs while you just look. */
  let colT=-1e9,W=0,Hh=0,sc=-1,raf=0,Q=.4,dirty=true,lastD=0,lastG=0,gT=0;const T0=7.0;
  const size=()=>{const d=Math.min(devicePixelRatio||1,2)*Q,w=Math.round(host.clientWidth*d),h=Math.round(host.clientHeight*d);if(w&&h&&(w!==W||h!==Hh)){W=cv.width=w;Hh=cv.height=h;gl.viewport(0,0,w,h);dirty=true}};
- const colors=()=>{const cs=getComputedStyle(document.documentElement);gl.uniform3fv(U.uF,hex(cs.getPropertyValue('--rbf')));gl.uniform3fv(U.uE,hex(cs.getPropertyValue('--rbe')));gl.uniform1f(U.uO,document.documentElement.dataset.night==='1'?1:.8)};
+ const colors=()=>{const cs=getComputedStyle(document.documentElement);gl.uniform3fv(U.uF,hex(cs.getPropertyValue('--rbf')));gl.uniform3fv(U.uE,hex(cs.getPropertyValue('--rbe')));const nightW=document.documentElement.dataset.night==='1';gl.uniform1f(U.uO,nightW?1:.8);
+  /* night waves are kept soft and quiet so they stay in the background (owner); Test tools switch "swave" turns that off */
+  gl.uniform1f(U.uK,nightW&&!document.documentElement.classList.contains('tt-off-swave')?1:0)};
  const draw=()=>{size();if(!W)return false;if(colT<0){colT=1;colors()}
   const y=scrollY||document.documentElement.scrollTop||0;if(y===sc&&!dirty)return true;sc=y;dirty=false;GLS.sc=y;GLS.t=0;
   GLS.ang=-2.25+y/innerHeight*.5;const ca=Math.cos(GLS.ang),sa=Math.sin(GLS.ang);GLS.L=[ca*.76,sa*.76,.65];
@@ -1919,7 +1921,7 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
  let scT0=0;addEventListener('scroll',()=>{GLS.scrolling=true;clearTimeout(scT0);scT0=setTimeout(()=>{GLS.scrolling=false},180);scrollKick()},{passive:true});
  addEventListener('resize',()=>{colT=-1;dirty=true;kick()},{passive:true});document.addEventListener('visibilitychange',()=>{colT=-1;dirty=true;kick()});
  new MutationObserver(()=>{colT=-1;dirty=true;kick()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-night','data-theme']});
- GLS.kick=()=>{GLS.szDirty=true;dirty=true;kick()};kick()})();
+ GLS.kick=()=>{GLS.szDirty=true;dirty=true;colT=-1;kick()};kick()})();
 if(SKY.on){const st0=skyCompute(Date.now());SKY.last=st0;SKY.shift=st0.shift;t0=new Date(st0.ymd[0],st0.ymd[1]-1,st0.ymd[2]+st0.shift,12);sel=t0;V=hm1(t0);skyApply(st0)}else skyOff();
 setInterval(skyTick,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)skyTick()});addEventListener('focus',skyTick);
@@ -3386,10 +3388,10 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const FLAGS=[['swave','Softer, quieter night waves'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id]of FLAGS)document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
- box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}}});flApply();
+ box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick()}});flApply();
  box.querySelector('#ttPlay').onclick=()=>{op(false);setTimeout(()=>{const pl=skyPlan(Date.now()),b=document.getElementById('skyBody');if(!pl||!b)return;b.style.opacity='0';SKYA.arm=true;setTimeout(()=>skyRun(pl),60)},450)};
  box.querySelector('#ttIntro').onclick=()=>location.reload();
  box.querySelector('#ttReset').onclick=()=>{if(confirm('Reset the test account? Its plans and progress go back to the starting examples.'))reset()};
