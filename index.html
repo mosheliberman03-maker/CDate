@@ -578,6 +578,18 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #hdr.sky-side .hd-big{display:flex;flex-direction:column;align-items:center;font-size:min(31vw,16.5vh,150px);line-height:.98;letter-spacing:-.01em}
 #hdr.sky-side .hd-big>span{display:block;white-space:nowrap}
 #hdr.sky-side .hd-m{font-size:.86em;max-width:94vw}
+/* the Hebrew date as liquid glass: a translucent fill that lets the sky show through toward the bottom, a fine glassy edge,
+   a soft shadow for depth, and a glint that sweeps across the letters only while you scroll (none at rest: owner's rule) */
+:root{--gt1:rgba(22,30,74,.97);--gt2:rgba(26,36,86,.86);--gt3:rgba(44,66,140,.58);--gst:rgba(255,255,255,.55);--gsh:rgba(20,40,90,.22)}
+:root[data-night="1"]{--gt1:rgba(255,250,242,.97);--gt2:rgba(245,233,215,.88);--gt3:rgba(186,182,255,.6);--gst:rgba(255,255,255,.4);--gsh:rgba(2,4,24,.5)}
+:root:not(.tt-off-gdate) #hdr .hd-big{color:transparent;-webkit-text-fill-color:transparent;text-shadow:none;
+ background-image:linear-gradient(105deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0) 44%,rgba(255,255,255,.9) 50%,rgba(255,255,255,0) 56%,rgba(255,255,255,0) 100%),linear-gradient(180deg,var(--gt1) 0%,var(--gt2) 52%,var(--gt3) 100%);
+ background-size:300% 100%,100% 100%;background-position:95% 0,0 0;background-repeat:no-repeat;-webkit-background-clip:text;background-clip:text;
+ -webkit-text-stroke:.7px var(--gst);filter:drop-shadow(0 5px 14px var(--gsh)) drop-shadow(0 1px 1px var(--gsh))}
+:root.tt-off-dome #hdr .sky-scene::after{animation-name:flY,flX,flP,none!important}
+@keyframes gDate{from{background-position:95% 0,0 0}to{background-position:5% 0,0 0}}
+@supports (animation-timeline:scroll()){:root:not(.tt-off-gdate) #hdr .hd-big{animation:gDate 1s linear both;animation-timeline:scroll(root block);animation-range:0px 260px}}
+@media(prefers-reduced-motion:reduce){#hdr .hd-big{animation:none!important}}
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
 </style>
 </head><body>
@@ -1715,7 +1727,7 @@ const capIco=k=>k==='sun'?CAP_SUN:CAP_MOON;
 const skyBodyKey=st=>st.kind+(st.kind==='sun'?Math.round(st.alt/4):Math.round(st.phase*60));
 /* When the sun/moon is far to one side (or below the horizon) the middle of the sky is empty: the date moves up and grows into it.
    Applied as a state, not animated. */
-function skySideSet(st){const h=document.getElementById('hdr');if(!h)return;const on=!!st&&(st.kind==='below'||Math.abs(st.x-50)>34);
+function skySideSet(st){const h=document.getElementById('hdr');if(!h)return;const on=!!st&&!document.documentElement.classList.contains('tt-off-side')&&(st.kind==='below'||Math.abs(st.x-50)>34);
  if(h.classList.contains('sky-side')!==on){h.classList.toggle('sky-side',on);requestAnimationFrame(()=>{if(typeof footPlace==='function')footPlace()})}}
 function skyScene(h,df){
  if(!SKY.on||df!==0){skySideSet(null);return `<div class="moon rv" aria-hidden="true">${moonSvg(h.d)}</div>`}
@@ -3370,7 +3382,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
  <label for="ttD">Date</label><input type="date" id="ttD">
  <label for="ttT">Time <b id="ttV" style="font-weight:600"></b></label><input type="range" id="ttT" min="0" max="1435" step="5" style="width:100%;accent-color:#8c94ef">
  <div class="rw" style="flex-wrap:wrap;gap:8px;margin-top:10px"><button class="btn gh" type="button" data-q="sr">Sunrise</button><button class="btn gh" type="button" data-q="noon">Midday</button><button class="btn gh" type="button" data-q="ss">Sunset</button><button class="btn gh" type="button" data-q="night">Night (same day)</button><button class="btn gh" type="button" data-q="demo">Demo day</button><button class="btn gh" type="button" data-q="now">Real now</button></div>
- <div class="rw" style="flex-wrap:wrap;gap:8px;margin-top:10px"><button class="btn" type="button" id="ttPlay">Play sun/moon opening</button><button class="btn gh" type="button" id="ttIntro">Play logo intro</button><button class="btn gh" type="button" id="ttReset">Reset test account</button></div>`;
+ <label style="margin-top:14px">Features (test account only)</label><div id="ttFlags" style="display:grid;gap:8px;margin:6px 0 4px"></div><div class="rw" style="flex-wrap:wrap;gap:8px;margin-top:10px"><button class="btn" type="button" id="ttPlay">Play sun/moon opening</button><button class="btn gh" type="button" id="ttIntro">Play logo intro</button><button class="btn gh" type="button" id="ttReset">Reset test account</button></div>`;
  if(help)help.parentNode.insertBefore(box,help);
  const $d=box.querySelector('#ttD'),$t=box.querySelector('#ttT'),$v=box.querySelector('#ttV');
  window.fill_=function(){const n=new Date();$d.value=ds(n);$t.value=n.getHours()*60+n.getMinutes();$v.textContent=n.toLocaleTimeString('en',{hour:'numeric',minute:'2-digit'})};
@@ -3381,6 +3393,11 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   if(k==='demo'){const dm=getDemo();if(dm){setClock(new RD(dm.ds+'T15:00:00'));applyClock(true)}return}
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
+ /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
+ const FLAGS=[['gdate','Liquid-glass Hebrew date'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id]of FLAGS)document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)};
+ box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
+ box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}}});flApply();
  box.querySelector('#ttPlay').onclick=()=>{op(false);setTimeout(()=>{const pl=skyPlan(Date.now()),b=document.getElementById('skyBody');if(!pl||!b)return;b.style.opacity='0';SKYA.arm=true;setTimeout(()=>skyRun(pl),60)},450)};
  box.querySelector('#ttIntro').onclick=()=>location.reload();
  box.querySelector('#ttReset').onclick=()=>{if(confirm('Reset the test account? Its plans and progress go back to the starting examples.'))reset()};
