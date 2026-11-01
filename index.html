@@ -125,9 +125,17 @@ main{max-width:640px;padding:6px 16px 140px}
 .rdth span{position:absolute;right:16px;top:50%;transform:translateY(-50%) scale(.85);opacity:0;pointer-events:none;font:600 13px/1 Figtree,system-ui;color:var(--card);background:var(--ink);padding:7px 9px;border-radius:10px;white-space:nowrap;transition:opacity .15s,transform .15s}
 .rdsb.drag::before{width:6px;right:5px}.rdsb.drag .rdth{width:10px;right:3px;background:var(--ct)}.rdsb.drag .rdth span{opacity:1;transform:translateY(-50%) scale(1)}
 @media(prefers-reduced-motion:reduce){.rdp i,.rdsb,.rdth,.rdth span{transition:none}}.rdx{border:1px solid var(--line);background:transparent;color:inherit;border-radius:50%;width:40px;height:40px;font-size:20px;flex:none}.rdt{display:flex;flex-direction:column;min-width:0}.rdt b{font:500 19px/1.2 'Frank Ruhl Libre',serif}.rdt small{color:var(--mut);font-size:12.5px}
-.rdw{position:relative;flex:1;min-height:0}.rdm{height:100%;box-sizing:border-box;overflow:auto;scrollbar-width:none;padding:8px 20px calc(40px + env(safe-area-inset-bottom,0px));font:21px/1.85 'Frank Ruhl Libre','Noto Serif Hebrew','David',serif;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.rdh{font:600 17px/1.4 'Frank Ruhl Libre',serif;color:var(--ct);margin:18px 0 6px;text-align:center}.rdc{font-size:15px;color:var(--mut);text-align:center;margin:16px 0 4px}.rdv{margin:0 0 8px}.rdn{font-size:13px;color:var(--mut);margin-left:4px;font-family:Figtree,system-ui}
-.rds{font-size:16.5px;line-height:1.75;color:color-mix(in srgb,var(--ink) 82%,transparent);background:color-mix(in srgb,var(--ct) 6%,transparent);border-radius:12px;padding:8px 12px;margin:0 0 12px}.rdsl{font-weight:700;color:var(--ct);margin-left:4px}
+.rdw{position:relative;flex:1;min-height:0}.rdm{height:100%;box-sizing:border-box;overflow:auto;scrollbar-width:none;padding:6px 22px calc(48px + env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch;overscroll-behavior:contain;--rdfs:20.5px;font:400 var(--rdfs)/2 'Noto Serif Hebrew App','Noto Serif Hebrew','Taamey Frank CLM','SBL Hebrew',serif;font-feature-settings:'kern';text-rendering:optimizeLegibility}
+.rdin{max-width:640px;margin:0 auto}
+.rdhd{display:block;text-align:center;padding:22px 6px 14px;margin-bottom:6px}.rdk{font:600 12.5px/1.4 'Noto Serif Hebrew App',serif;color:var(--ct);letter-spacing:.02em;background:color-mix(in srgb,var(--ct) 9%,transparent);display:inline-block;padding:5px 12px;border-radius:99px}
+.rdhd h2{font:700 calc(var(--rdfs) * 1.45)/1.3 'Noto Serif Hebrew App',serif;margin:12px 0 2px;color:var(--ink)}.rdsub{font-size:calc(var(--rdfs) * .72);color:var(--mut);line-height:1.5}
+.rdhd+.rdhd,.rdin>.rdv~.rdhd,.rdin>.rds~.rdhd{margin-top:28px;border-top:1px solid var(--line)}
+.rdc{display:flex;align-items:center;gap:12px;margin:26px 0 12px;color:var(--mut);font:600 calc(var(--rdfs) * .72)/1 'Noto Serif Hebrew App',serif}.rdc::before,.rdc::after{content:'';flex:1;height:1px;background:var(--line)}.rdc span{padding:6px 12px;border:1px solid var(--line);border-radius:99px;background:var(--card)}
+.rdv{margin:0 0 10px;text-align:start}.rdvj{text-align:justify;text-justify:inter-word}.rdp2{margin:0 0 16px;text-align:justify;line-height:2.05}
+.rdn{display:inline-flex;align-items:center;justify-content:center;min-width:1.85em;height:1.85em;padding:0 .3em;box-sizing:border-box;margin-left:.45em;vertical-align:.18em;border-radius:99px;font:600 calc(var(--rdfs) * .56)/1 'Noto Serif Hebrew App',serif;color:var(--ct);background:color-mix(in srgb,var(--ct) 10%,transparent)}
+.rds{margin:-2px 0 16px;padding:10px 14px 4px;border-right:3px solid color-mix(in srgb,var(--ct) 45%,transparent);border-radius:4px 0 0 4px;background:color-mix(in srgb,var(--ct) 4.5%,transparent);font-size:calc(var(--rdfs) * .8);line-height:1.85;color:color-mix(in srgb,var(--ink) 86%,transparent)}
+.rds p{margin:0 0 8px;text-align:justify}.rds p+p{padding-top:8px;border-top:1px dashed color-mix(in srgb,var(--ink) 12%,transparent)}.rds b{color:var(--ink)}.rdsl{font:700 calc(var(--rdfs) * .62)/1 'Noto Serif Hebrew App',serif;color:var(--ct);margin-bottom:6px;letter-spacing:.04em}
+.rdfs{flex:none;border:1px solid var(--line);background:transparent;color:inherit;border-radius:99px;height:34px;padding:0 11px;font:600 14px Figtree,system-ui;margin-left:auto}.rdfs+.rdpc{margin-left:0}
 .rdl{font:15px/1.5 Figtree,system-ui;color:var(--mut);text-align:center;margin-top:30px}.rdl button{border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:10px 14px;font:600 14px Figtree,system-ui}.rdf{font:12.5px Figtree,system-ui;color:var(--mut);text-align:center;margin-top:24px}.rdf a{color:var(--ct)}
 .hyt p{margin:10px 0 0;line-height:1.6}.hyt .hyh{font-size:12px;letter-spacing:.04em;color:var(--mut);margin-top:10px}.hyx.cut{max-height:15.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}.hym{border:0;background:none;color:var(--ct);font:600 14px Figtree,system-ui;padding:8px 0 0;cursor:pointer}.hyn,.hyc2{font-size:11.5px;color:var(--mut);margin-top:8px}
 .hyr{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.hyr .btn{margin:0;display:inline-block;text-decoration:none}
@@ -434,6 +442,7 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
 .qri{padding:9px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.4}
 .qrx{margin-top:4px;border:0;background:transparent;color:var(--mut);font:inherit;font-size:12px;padding:6px 0;cursor:pointer}
 @keyframes qin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@font-face{font-family:'Noto Serif Hebrew App';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/noto-serif-hebrew-hebrew-400-normal.woff2) format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face{font-family:'Noto Serif Hebrew App';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/noto-serif-hebrew-hebrew-600-normal.woff2) format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face{font-family:'Noto Serif Hebrew App';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/noto-serif-hebrew-hebrew-700-normal.woff2) format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
 html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accountGate{display:none!important}
 </style>
 </head><body>
@@ -1174,7 +1183,7 @@ async function rdRefs(k,d){const cal=await rdCal(d),it=(cal.calendar_items||[]);
   const ps=parsha(d);if(ps&&ps.p.length>1){try{const book=p.ref.split(' ')[0],ix=await rdJ(`${SEF}v2/raw/index/${book}`),R=p.ref.match(/(\d+):(\d+)-(\d+):(\d+)/),a=[+R[1],+R[2]],z=[+R[3],+R[4]],le=(x,y)=>x[0]<y[0]||x[0]==y[0]&&x[1]<=y[1];
    const ns=(ix.alt_structs&&ix.alt_structs.Parasha&&ix.alt_structs.Parasha.nodes||[]).filter(n=>{const m=(n.wholeRef||'').match(/(\d+):(\d+)-(\d+):(\d+)/);return m&&le(a,[+m[1],+m[2]])&&le([+m[3],+m[4]],z)});
    if(ns.length>1)refs=ns.map(n=>n.refs[wd]).filter(Boolean)}catch(e){}}
-  return refs.map(r=>({url:rdUrl(r),kind:'ch'}))}
+  const phs=((p.displayValue&&p.displayValue.he)||'').split('-');return refs.map((r,i)=>({url:rdUrl(r),kind:'ch',ph:phs[refs.length>1?i:0]||phs[0]||''}))}
  return[]}
 const rdSplit=r=>{const m=/^(.*?) (\d+):(\d+)(?:-[\d:]+)?$/.exec(String(r||'').trim());return m?{n:m[1],c:+m[2],s:+m[3]}:null};
 const rdNextRef=j=>typeof j.next==='string'?j.next:j.next&&(j.next.ref||j.next.url)||null;
@@ -1189,16 +1198,32 @@ async function rdTanya(part){const A=rdSplit(part.from),B=rdSplit(part.to);if(!A
 const heN=n=>{const L=[[400,'ת'],[300,'ש'],[200,'ר'],[100,'ק'],[90,'צ'],[80,'פ'],[70,'ע'],[60,'ס'],[50,'נ'],[40,'מ'],[30,'ל'],[20,'כ'],[10,'י'],[9,'ט'],[8,'ח'],[7,'ז'],[6,'ו'],[5,'ה'],[4,'ד'],[3,'ג'],[2,'ב'],[1,'א']];let x=n,t='';
  for(const[v,c]of L){if(x%100===15&&v<=10){t+='טו';x-=15;break}if(x%100===16&&v<=10){t+='טז';x-=16;break}while(x>=v){t+=c;x-=v}}return t.length<2?t+'׳':t.slice(0,-1)+'״'+t.slice(-1)};
 const rdNum=n=>`<span class="rdn">${heN(n)}</span>`;
-async function rdBuild(k,d){const parts=await rdRefs(k,d);if(!parts.length)throw new Error('none');let html='';
- for(const part of parts){let j,F;if(part.kind==='tn'){const T=await rdTanya(part);j={heRef:T.he};F=T.F}else{j=await rdText(part.url);F=rdFlat(j)}html+=`<h3 class="rdh">${part.kind==='tn'?(j.heRef||'תניא').replace(/\s+[^\s]*\d[^\s]*$|\s+[א-ת׳״\-:]+$/,''):j.heRef||part.he||''}</h3>`;let lastC=null;
-  if(part.kind==='ch'){let rs=[];try{rs=rdFlat(await rdText('Rashi_on_'+part.url))}catch(e){}const RM=new Map();for(const r of rs){const key=r.p[0]+':'+r.p[1];(RM.get(key)||RM.set(key,[]).get(key)).push(rdClean(r.t))}
-   for(const x of F){const[c,v]=x.p;if(c!==lastC&&lastC!==null)html+=`<div class="rdc">פרק ${heN(c)}</div>`;lastC=c;html+=`<p class="rdv">${rdNum(v)} ${rdClean(x.t)}</p>`;const rr=RM.get(c+':'+v);if(rr&&rr.length)html+=`<div class="rds"><span class="rdsl">רש״י</span> ${rr.join(' ')}</div>`}}
-  else if(part.kind==='ps'){for(const x of F){const[c,v]=x.p;if(c!==lastC)html+=`<div class="rdc">מזמור ${heN(c)}</div>`;lastC=c;html+=`<p class="rdv">${rdNum(v)} ${rdClean(x.t)}</p>`}}
-  else{const deep=F.some(x=>x.p.length>1);for(const x of F){const c=x.p[0],n=x.p[x.p.length-1];if(deep&&c!==lastC&&(F.length>1||part.kind==='rm'))html+=`<div class="rdc">פרק ${heN(c)}</div>`;lastC=c;html+=`<p class="rdv">${part.kind==='rm'?rdNum(n)+' ':''}${rdClean(x.t)}</p>`}}}
- return html}
-let RDS=null;
+const RD_ALIYA=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שביעי'];
+const rdHead=(kick,title,sub)=>`<header class="rdhd"><div class="rdk">${kick}</div><h2>${title}</h2>${sub?`<div class="rdsub">${sub}</div>`:''}</header>`;
+const rdChip=t=>`<div class="rdc"><span>${t}</span></div>`;
+// Rashi: one comment per line; the quoted opening words (dibbur hamaschil) stay bold
+const rdRashi=a=>`<aside class="rds"><div class="rdsl">רש״י</div>${a.map(t=>`<p>${t}</p>`).join('')}</aside>`;
+async function rdBuild(k,d){const parts=await rdRefs(k,d);if(!parts.length)throw new Error('none');let html='';const h=hd(d);
+ for(const part of parts){let j,F;if(part.kind==='tn'){const T=await rdTanya(part);j={heRef:T.he};F=T.F}else{j=await rdText(part.url);F=rdFlat(j)}
+  let lastC=null;
+  if(part.kind==='ch'){
+   html+=rdHead('חומש עם פירוש רש״י · '+RD_ALIYA[d.getDay()],part.ph?'פרשת '+part.ph:'',j.heRef||'');
+   let rs=[];try{rs=rdFlat(await rdText('Rashi_on_'+part.url))}catch(e){}const RM=new Map();for(const r of rs){const key=r.p[0]+':'+r.p[1];(RM.get(key)||RM.set(key,[]).get(key)).push(rdClean(r.t))}
+   for(const x of F){const[c,v]=x.p;if(c!==lastC&&lastC!==null)html+=rdChip('פרק '+heN(c));lastC=c;html+=`<p class="rdv">${rdNum(v)}${rdClean(x.t)}</p>`;const rr=RM.get(c+':'+v);if(rr&&rr.length)html+=rdRashi(rr)}}
+  else if(part.kind==='ps'){const cs=[...new Set(F.map(x=>x.p[0]))];
+   html+=rdHead('תהלים · יום '+heN(h.d)+' לחודש',cs.length>1?'מזמורים '+heN(cs[0])+' – '+heN(cs[cs.length-1]):'מזמור '+heN(cs[0]),'');
+   for(const x of F){const[c,v]=x.p;if(c!==lastC)html+=rdChip('מזמור '+heN(c));lastC=c;html+=`<p class="rdv">${rdNum(v)}${rdClean(x.t)}</p>`}}
+  else if(part.kind==='tn'){const nm=(j.heRef||'').replace(/^תניא,?\s*/,'').replace(/\s+[^\s]*\d[^\s]*$|\s+[א-ת׳״\-:]+$/,'');
+   html+=rdHead('תניא יומי · '+heN(h.d)+' '+h.n[1],nm||'תניא','');
+   for(const x of F){const c=x.p[0];if(c!==lastC)html+=rdChip((x.n2?'':'')+'פרק '+heN(c));lastC=c;html+=`<p class="rdp2">${rdClean(x.t)}</p>`}}
+  else{const he=(part.he||j.heRef||'').replace(/^משנה תורה,?\s*/,''),nm=he.replace(/\s+[א-ת׳״]+(?:-[א-ת׳״]+)?$/,'');
+   html+=rdHead('רמב״ם · '+(k==='rambam3'?'שלושה פרקים':'פרק אחד'),nm||'רמב״ם','');
+   for(const x of F){const c=x.p[0],n=x.p[x.p.length-1];if(c!==lastC)html+=rdChip('פרק '+heN(c));lastC=c;html+=`<p class="rdv rdvj">${rdNum(n)}${rdClean(x.t)}</p>`}}}
+ return `<div class="rdin">${html}</div>`}
+let RDS=null;const rdFS=()=>{try{return +localStorage.getItem('cc_rd_fs')||20.5}catch(e){return 20.5}};
 function rdOpen(k){const d=new Date(sel),dk=dkey(),st=RDS={k,d,dk,ok:false};
- let b=$('#rdr');if(!b){b=document.createElement('div');b.id='rdr';b.className='rdr';b.innerHTML='<div class="rdb"><button type="button" class="rdx" aria-label="Back">←</button><div class="rdt"><b></b><small></small></div><div class="rdpc" aria-live="off">0%</div><div class="rdp"><i></i></div></div><div class="rdw"><div class="rdm" dir="rtl" lang="he"></div><div class="rdsb" aria-hidden="true"><div class="rdth"><span></span></div></div></div>';document.body.appendChild(b);b.querySelector('.rdx').onclick=()=>history.back();rdScrollUI(b)}
+ let b=$('#rdr');if(!b){b=document.createElement('div');b.id='rdr';b.className='rdr';b.innerHTML='<div class="rdb"><button type="button" class="rdx" aria-label="Back">←</button><div class="rdt"><b></b><small></small></div><button type="button" class="rdfs" aria-label="Text size">Aa</button><div class="rdpc" aria-live="off">0%</div><div class="rdp"><i></i></div></div><div class="rdw"><div class="rdm" dir="rtl" lang="he"></div><div class="rdsb" aria-hidden="true"><div class="rdth"><span></span></div></div></div>';document.body.appendChild(b);b.querySelector('.rdx').onclick=()=>history.back();rdScrollUI(b);b.querySelector('.rdfs').onclick=()=>{const S=[18,20.5,23,26],i=(S.indexOf(rdFS())+1)%S.length;try{localStorage.setItem('cc_rd_fs',S[i])}catch(e){}H.sel();b.querySelector('.rdm').style.setProperty('--rdfs',S[i]+'px');b._rdUpd&&b._rdUpd()}}
+ b.querySelector('.rdm').style.setProperty('--rdfs',rdFS()+'px');
  b.querySelector('.rdt b').textContent=RD_TITLE[k];b.querySelector('.rdt small').textContent=d.toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'})+' · '+hd(d).d+' '+hd(d).n[0];
  const m=b.querySelector('.rdm');m.scrollTop=0;m.innerHTML='<p class="rdl">Loading…</p>';b._rdUpd&&b._rdUpd();
  requestAnimationFrame(()=>b.classList.add('on'));document.body.classList.add('rdo');H.tap();
