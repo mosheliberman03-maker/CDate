@@ -115,6 +115,12 @@ main{max-width:640px;padding:6px 16px 140px}
 .about .nospec{margin:14px 0 0;color:var(--mut)}
 .hyc{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-top:12px}
 .hyc h2{font:500 20px/1.2 'Frank Ruhl Libre',serif;margin:0 0 2px}.hyc p{margin:8px 0 0}
+.rdr{position:fixed;inset:0;z-index:95;background:var(--card);color:var(--ink);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.2,.8,.2,1);padding-top:env(safe-area-inset-top,0px)}.rdr.on{transform:none}body.rdo{overflow:hidden}
+.rdb{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line)}.rdx{border:1px solid var(--line);background:transparent;color:inherit;border-radius:50%;width:40px;height:40px;font-size:20px;flex:none}.rdt{display:flex;flex-direction:column;min-width:0}.rdt b{font:500 19px/1.2 'Frank Ruhl Libre',serif}.rdt small{color:var(--mut);font-size:12.5px}
+.rdm{flex:1;overflow:auto;padding:8px 20px calc(40px + env(safe-area-inset-bottom,0px));font:21px/1.85 'Frank Ruhl Libre','Noto Serif Hebrew','David',serif;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.rdh{font:600 17px/1.4 'Frank Ruhl Libre',serif;color:var(--ct);margin:18px 0 6px;text-align:center}.rdc{font-size:15px;color:var(--mut);text-align:center;margin:16px 0 4px}.rdv{margin:0 0 8px}.rdn{font-size:13px;color:var(--mut);margin-left:4px;font-family:Figtree,system-ui}
+.rds{font-size:16.5px;line-height:1.75;color:color-mix(in srgb,var(--ink) 82%,transparent);background:color-mix(in srgb,var(--ct) 6%,transparent);border-radius:12px;padding:8px 12px;margin:0 0 12px}.rdsl{font-weight:700;color:var(--ct);margin-left:4px}
+.rdl{font:15px/1.5 Figtree,system-ui;color:var(--mut);text-align:center;margin-top:30px}.rdl button{border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:10px 14px;font:600 14px Figtree,system-ui}.rdf{font:12.5px Figtree,system-ui;color:var(--mut);text-align:center;margin-top:24px}.rdf a{color:var(--ct)}
 .hyt p{margin:10px 0 0;line-height:1.6}.hyt .hyh{font-size:12px;letter-spacing:.04em;color:var(--mut);margin-top:10px}.hyx.cut{max-height:15.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}.hym{border:0;background:none;color:var(--ct);font:600 14px Figtree,system-ui;padding:8px 0 0;cursor:pointer}.hyn,.hyc2{font-size:11.5px;color:var(--mut);margin-top:8px}
 .hyr{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.hyr .btn{margin:0;display:inline-block;text-decoration:none}
 .btn.on{background:var(--ys);color:#fff;border-color:transparent}
@@ -1125,11 +1131,74 @@ function upd(){const sd=['chumash','tehillim','tanya'].filter(ck).length+(['ramb
  const sp=document.querySelectorAll('#sp .ck'),a=[...sp].filter(x=>x.classList.contains('on')).length,sn=$('#spn');if(sn)sn.textContent=a==sp.length&&sp.length?'All done. Hatzlacha!':a+' of '+sp.length+' done';
  stkRefresh();const hb=$('#hyb');if(hb){hb.classList.toggle('on',ck('hy'));hb.textContent=ck('hy')?'✓ Read':'Mark as read'}}
 function tog(k){const d=dkey();(DN[d]??={});if(DN[d][k])delete DN[d][k];else{if(k==='rambam3'||k==='rambam1')delete DN[d][k==='rambam3'?'rambam1':'rambam3'];DN[d][k]=1}if(!Object.keys(DN[d]).length)delete DN[d];SVD();upd();H.ok();if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}
-document.addEventListener('click',e=>{const r=e.target.closest('.ck');if(r&&!e.target.closest('a'))return tog(r.dataset.k);if(e.target.closest('#hyb'))tog('hy')});
+/* ===== Shiur reader: the day's Hebrew text from Sefaria (free texts, open API).
+   Tap a shiur row to open it; leaving the reader (← or the phone's back) checks it off, once the text has loaded.
+   Tap the circle to check it off without opening. ===== */
+const RD_KEYS=['chumash','tehillim','tanya','rambam3','rambam1'];
+const RD_TITLE={chumash:'חומש עם פירוש רש״י',tehillim:'תהלים',tanya:'תניא',rambam3:'רמב״ם · שלושה פרקים',rambam1:'רמב״ם · פרק אחד'};
+const SEF='https://www.sefaria.org/api/';
+const RDC=new Map();
+const rdJ=url=>{if(!RDC.has(url))RDC.set(url,fetch(url).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).catch(e=>{RDC.delete(url);throw e}));return RDC.get(url)};
+const rdCal=d=>rdJ(`${SEF}calendars?year=${d.getFullYear()}&month=${d.getMonth()+1}&day=${d.getDate()}&diaspora=${LC.tz==='Asia/Jerusalem'?0:1}`);
+const rdUrl=ref=>ref.replace(/ (?=[\d:]+(?:-[\d:]+)?$)/,'.').replace(/ /g,'_').replace(/:/g,'.');
+const rdText=url=>rdJ(`${SEF}v3/texts/${encodeURI(url)}?version=hebrew&return_format=strip_only_footnotes`);
+const rdClean=s=>String(s||'').replace(/<sup[^>]*>.*?<\/sup>/gs,'').replace(/<i[^>]*class="footnote"[^>]*>.*?<\/i>/gs,'').replace(/<(?!\/?(?:b|i|small|big|br|strong|em)\b)[^>]*>/g,'').replace(/\{[פס]\}/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
+// Sefaria text (nested arrays) -> [{p:[chapter,verse,...], t}] with real chapter/verse numbers
+function rdFlat(j){const v=(j.versions||[])[0];if(!v)return[];const s=(j.sections||[]).map(Number),e=(j.toSections||j.sections||[]).map(Number),out=[];
+ if(typeof v.text==='string')return[{p:s.slice(),t:v.text}];
+ let d=0;while(d<s.length&&s[d]===e[d])d++;
+ const walk=(node,path,first)=>{if(Array.isArray(node)){node.forEach((x,i)=>{const lv=path.length,b=first&&s[lv]!=null?s[lv]:1;walk(x,[...path,b+i],first&&i===0)})}else if(node)out.push({p:path,t:node})};
+ walk(v.text,s.slice(0,d),true);return out}
+// which Sefaria refs make up this shiur on this day
+async function rdRefs(k,d){const cal=await rdCal(d),it=(cal.calendar_items||[]);
+ if(k==='tehillim'){const h=hd(d),th=h.d==29&&hd(ad(d,1)).d==1?'140–150':TH[h.d-1];return[{url:'Psalms.'+th.replace(/–/g,'-').replace(/:/g,'.'),kind:'ps'}]}
+ if(k==='tanya'){const a=it.find(x=>x.title.en==='Tanya Yomi');if(!a)return[];const b=((await rdCal(ad(d,1))).calendar_items||[]).find(x=>x.title.en==='Tanya Yomi');return[{kind:'tn',from:a.ref,to:b&&b.ref}]}
+ if(k==='rambam3'||k==='rambam1'){const t=k==='rambam3'?'Daily Rambam (3 Chapters)':'Daily Rambam';return it.filter(x=>x.title.en===t).map(x=>({url:x.url,kind:'rm',he:x.displayValue&&x.displayValue.he}))}
+ if(k==='chumash'){const p=it.find(x=>x.title.en==='Parashat Hashavua');if(!p)return[];const wd=d.getDay();let refs=[(p.extraDetails&&p.extraDetails.aliyot||[])[wd]].filter(Boolean);
+  // a combined parsha week: each day has the day's aliyah of both parshiyos
+  const ps=parsha(d);if(ps&&ps.p.length>1){try{const book=p.ref.split(' ')[0],ix=await rdJ(`${SEF}v2/raw/index/${book}`),R=p.ref.match(/(\d+):(\d+)-(\d+):(\d+)/),a=[+R[1],+R[2]],z=[+R[3],+R[4]],le=(x,y)=>x[0]<y[0]||x[0]==y[0]&&x[1]<=y[1];
+   const ns=(ix.alt_structs&&ix.alt_structs.Parasha&&ix.alt_structs.Parasha.nodes||[]).filter(n=>{const m=(n.wholeRef||'').match(/(\d+):(\d+)-(\d+):(\d+)/);return m&&le(a,[+m[1],+m[2]])&&le([+m[3],+m[4]],z)});
+   if(ns.length>1)refs=ns.map(n=>n.refs[wd]).filter(Boolean)}catch(e){}}
+  return refs.map(r=>({url:rdUrl(r),kind:'ch'}))}
+ return[]}
+const rdSplit=r=>{const m=/^(.*) (\d+):(\d+)$/.exec(r||'');return m?{n:m[1],c:+m[2],s:+m[3]}:null};
+const rdNextRef=j=>typeof j.next==='string'?j.next:j.next&&(j.next.ref||j.next.url)||null;
+async function rdTanya(part){const A=rdSplit(part.from),B=rdSplit(part.to);if(!A)throw new Error('tanya');const out=[];let he='';
+ const take=(j,keep)=>{he=he||j.heRef;for(const x of rdFlat(j))if(keep(x))out.push(x)};
+ if(B&&B.n===A.n&&(B.c>A.c||B.c===A.c&&B.s>A.s)){const j=await rdText(rdUrl(`${A.n} ${A.c}:${A.s}-${B.c}:${B.s}`));take(j,x=>!(x.p[0]===B.c&&x.p[1]===B.s))}
+ else{let j=await rdText(rdUrl(`${A.n} ${A.c}`));take(j,x=>x.p[1]>=A.s);
+  for(let i=0;i<12;i++){const nx=rdNextRef(j);if(!nx||!nx.replace(/_/g,' ').startsWith(A.n+' '))break;const C=/ (\d+)$/.exec(nx.replace(/_/g,' '));if(!C)break;j=await rdText(rdUrl(`${A.n} ${C[1]}`));take(j,()=>true)}
+  if(B&&B.n!==A.n&&(B.c>1||B.s>1)){const j2=await rdText(rdUrl(`${B.n} 1:1-${B.c}:${B.s}`));for(const x of rdFlat(j2))if(!(x.p[0]===B.c&&x.p[1]===B.s))out.push({...x,n2:1})}}
+ return{he,F:out}}
+// Hebrew numerals for chapter and verse numbers (1-999), with ט״ו / ט״ז
+const heN=n=>{const L=[[400,'ת'],[300,'ש'],[200,'ר'],[100,'ק'],[90,'צ'],[80,'פ'],[70,'ע'],[60,'ס'],[50,'נ'],[40,'מ'],[30,'ל'],[20,'כ'],[10,'י'],[9,'ט'],[8,'ח'],[7,'ז'],[6,'ו'],[5,'ה'],[4,'ד'],[3,'ג'],[2,'ב'],[1,'א']];let x=n,t='';
+ for(const[v,c]of L){if(x%100===15&&v<=10){t+='טו';x-=15;break}if(x%100===16&&v<=10){t+='טז';x-=16;break}while(x>=v){t+=c;x-=v}}return t.length<2?t+'׳':t.slice(0,-1)+'״'+t.slice(-1)};
+const rdNum=n=>`<span class="rdn">${heN(n)}</span>`;
+async function rdBuild(k,d){const parts=await rdRefs(k,d);if(!parts.length)throw new Error('none');let html='';
+ for(const part of parts){let j,F;if(part.kind==='tn'){const T=await rdTanya(part);j={heRef:T.he};F=T.F}else{j=await rdText(part.url);F=rdFlat(j)}html+=`<h3 class="rdh">${part.kind==='tn'?(j.heRef||'תניא').replace(/\s+[^\s]*\d[^\s]*$|\s+[א-ת׳״\-:]+$/,''):j.heRef||part.he||''}</h3>`;let lastC=null;
+  if(part.kind==='ch'){let rs=[];try{rs=rdFlat(await rdText('Rashi_on_'+part.url))}catch(e){}const RM=new Map();for(const r of rs){const key=r.p[0]+':'+r.p[1];(RM.get(key)||RM.set(key,[]).get(key)).push(rdClean(r.t))}
+   for(const x of F){const[c,v]=x.p;if(c!==lastC&&lastC!==null)html+=`<div class="rdc">פרק ${heN(c)}</div>`;lastC=c;html+=`<p class="rdv">${rdNum(v)} ${rdClean(x.t)}</p>`;const rr=RM.get(c+':'+v);if(rr&&rr.length)html+=`<div class="rds"><span class="rdsl">רש״י</span> ${rr.join(' ')}</div>`}}
+  else if(part.kind==='ps'){for(const x of F){const[c,v]=x.p;if(c!==lastC)html+=`<div class="rdc">מזמור ${heN(c)}</div>`;lastC=c;html+=`<p class="rdv">${rdNum(v)} ${rdClean(x.t)}</p>`}}
+  else{const deep=F.some(x=>x.p.length>1);for(const x of F){const c=x.p[0],n=x.p[x.p.length-1];if(deep&&c!==lastC&&(F.length>1||part.kind==='rm'))html+=`<div class="rdc">פרק ${heN(c)}</div>`;lastC=c;html+=`<p class="rdv">${part.kind==='rm'?rdNum(n)+' ':''}${rdClean(x.t)}</p>`}}}
+ return html}
+let RDS=null;
+function rdOpen(k){const d=new Date(sel),dk=dkey(),st=RDS={k,d,dk,ok:false};
+ let b=$('#rdr');if(!b){b=document.createElement('div');b.id='rdr';b.className='rdr';b.innerHTML='<div class="rdb"><button type="button" class="rdx" aria-label="Back">←</button><div class="rdt"><b></b><small></small></div></div><div class="rdm" dir="rtl" lang="he"></div>';document.body.appendChild(b);b.querySelector('.rdx').onclick=()=>history.back()}
+ b.querySelector('.rdt b').textContent=RD_TITLE[k];b.querySelector('.rdt small').textContent=d.toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'})+' · '+hd(d).d+' '+hd(d).n[0];
+ const m=b.querySelector('.rdm');m.scrollTop=0;m.innerHTML='<p class="rdl">Loading…</p>';
+ requestAnimationFrame(()=>b.classList.add('on'));document.body.classList.add('rdo');H.tap();
+ history.pushState({rdr:1},'');
+ rdBuild(k,d).then(html=>{if(RDS!==st)return;st.ok=true;m.innerHTML=html+`<p class="rdf" dir="ltr">Text from Sefaria · <a href="https://www.chabad.org/dailystudy/default.asp?tdate=${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}" target="_blank" rel="noopener">Open on Chabad.org ↗</a></p>`})
+  .catch(()=>{if(RDS!==st)return;m.innerHTML=`<p class="rdl" dir="ltr">Could not load the text. Check your connection (in China, Sefaria may need your VPN), then try again.</p><p class="rdl" dir="ltr"><button type="button" class="rdr2">Try again</button></p>`;m.querySelector('.rdr2').onclick=()=>{history.back();setTimeout(()=>rdOpen(k),350)}})}
+function rdClose(){const st=RDS,b=$('#rdr');RDS=null;if(b)b.classList.remove('on');document.body.classList.remove('rdo');
+ // leaving after reading checks it off (only when the text actually loaded)
+ if(st&&st.ok){const D=(DN[st.dk]??={});if(!D[st.k]){if(st.k==='rambam3'||st.k==='rambam1')delete D[st.k==='rambam3'?'rambam1':'rambam3'];D[st.k]=1;SVD();upd();H.ok();if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}}}
+addEventListener('popstate',()=>{if(RDS)rdClose()});
+document.addEventListener('click',e=>{const r=e.target.closest('.ck');if(r&&!e.target.closest('a')){if(RD_KEYS.includes(r.dataset.k)&&!e.target.closest('.bx'))return rdOpen(r.dataset.k);return tog(r.dataset.k)}if(e.target.closest('#hyb'))tog('hy')});
 function study(h){const u='https://www.chabad.org/dailystudy/default.asp?tdate='+encodeURIComponent(`${sel.getMonth()+1}/${sel.getDate()}/${sel.getFullYear()}`),
  th=h.d==29&&hd(ad(sel,1)).d==1?'140–150':TH[h.d-1],al=['Rishon','Sheini','Shlishi','Revii','Chamishi','Shishi','Shevii'][sel.getDay()],ps=parsha(sel),
  R=[['chumash','Chumash with Rashi',ps?al+' · '+ps.p.map(x=>x[0]).join('-'):al],['tehillim','Tehillim',th],['tanya','Tanya','Daily portion'],['rambam3','Rambam · 3 chapters','Daily portion'],['rambam1','Rambam · 1 chapter','Daily portion']];
- $('#sd').innerHTML=`<div class="ph rv"><div><h2>Today’s shiurim</h2><div class="mut" id="sdn"></div></div>${ring(0,4)}</div>`+stkHtml()+R.map((r,i)=>row(r[0],r[1],r[2],u,i+1)).join('')+`<small class="rv" style="--i:7">The ↗ opens that day’s exact text on Chabad.org.</small>`;
+ $('#sd').innerHTML=`<div class="ph rv"><div><h2>Today’s shiurim</h2><div class="mut" id="sdn"></div></div>${ring(0,4)}</div>`+stkHtml()+R.map((r,i)=>row(r[0],r[1],r[2],'',i+1)).join('')+`<small class="rv" style="--i:7">Tap a shiur to read it in Hebrew. Tap the circle to check it off.</small>`;
  $('#hy').innerHTML=`<div class="hyc rv"><h2>Hayom Yom</h2><div class="heb" lang="he" dir="rtl">${G(h.d)} ${h.n[1]}</div><div class="hyt" id="hyt"><p class="mut">The Rebbe’s daily collection of Chassidic teachings, one entry for each day of the year.</p></div><div class="hyr"><a class="btn" href="${u}" target="_blank" rel="noopener">Read ${h.d} ${h.n[0]} ↗</a><button class="btn gh" id="hyb"></button></div></div>`;hyFill(h)}
 /* English Hayom Yom text (Chabad.org translation, used with permission) from hayomyom-en.json, keyed "month-day".
    Loaded once, after the app opens. In a regular (non-leap) year Adar shows the Adar I and Adar II entries, as Chabad.org does. */
