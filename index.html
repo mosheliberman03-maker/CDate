@@ -482,7 +482,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .sky-cap{left:50%;right:auto;bottom:4px;transform:translateX(-50%);width:max-content;max-width:88vw;display:inline-flex;align-items:center;gap:10px;padding:10px 22px 10px 18px;border-radius:999px;
  font:500 15px/1.2 Figtree,system-ui,sans-serif;letter-spacing:.01em;color:var(--gl-tx);white-space:nowrap;z-index:3;
  background:color-mix(in srgb,var(--card) 58%,transparent);border:1px solid color-mix(in srgb,var(--rbe) 26%,transparent);
- -webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);
+ -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
  box-shadow:0 8px 24px rgba(4,6,26,.30),0 0 20px color-mix(in srgb,var(--rbf) 12%,transparent),inset 0 1px 0 rgba(255,255,255,.07)}
 :root[data-night="1"] .sky-cap{background:rgba(13,19,50,.56);border-color:rgba(182,172,255,.26)}
 .capi{flex:none;width:19px;height:19px;display:block}
@@ -497,7 +497,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #hdr .hd-en{display:block;margin:clamp(12px,2vh,18px) 0 0;text-align:center;font:400 clamp(18px,5.1vw,21px)/1.3 'FRL App','Frank Ruhl Libre',Georgia,serif;letter-spacing:.12em;color:var(--dtc)}
 /* week panel */
 #hdr .wk{display:grid;grid-template-columns:repeat(7,1fr);align-items:start;flex:none;width:min(92vw,394px);max-width:none;box-sizing:border-box;margin:clamp(22px,4.2vh,40px) auto 0;padding:15px 8px 9px;gap:0;border-radius:32px;
- background:var(--gl-bg);border:1px solid var(--gl-bd);-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);
+ background:var(--gl-bg);border:1px solid var(--gl-bd);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
  box-shadow:0 18px 44px rgba(3,6,26,.26),inset 0 1px 0 rgba(255,255,255,.08)}
 .wd,#hdr .wd.ev{display:flex;flex-direction:column;align-items:center;gap:7px;padding:0;margin:0;border:0;border-radius:0;background:none;box-shadow:none;min-height:0}
 .wd u{font:500 13px/1 Figtree,system-ui,sans-serif;letter-spacing:.05em;color:color-mix(in srgb,var(--gl-tx) 66%,transparent)}
@@ -533,6 +533,25 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
  background:radial-gradient(46px 30px at var(--hx,-99px) var(--hy,-99px),rgba(255,255,255,calc(var(--gi)*.42)),rgba(255,255,255,0) 100%),radial-gradient(80% 110% at var(--gx,30%) var(--gy,-10%),rgba(255,255,255,calc(var(--gi)*.16)),rgba(255,255,255,0) 62%),
  linear-gradient(112deg,rgba(255,255,255,0) calc(var(--gs,40%) - 16%),rgba(255,255,255,calc(var(--gi)*.09)) var(--gs,40%),rgba(255,255,255,0) calc(var(--gs,40%) + 16%))}
 :root{--gi:.55}:root[data-night="1"]{--gi:.62}
+/* each piece floats on its own clock and sits at its own depth when you scroll; pure CSS so the browser runs it off the main thread */
+@keyframes flY{from{translate:0 calc(var(--fa) * -1)}to{translate:0 var(--fa)}}
+@keyframes flX{from{translate:calc(var(--fa) * -.45) 0}to{translate:calc(var(--fa) * .45) 0}}
+@keyframes flP{from{translate:0 0}to{translate:0 calc(var(--pd) * 1000px)}}
+#skyBody,#skyTrailC{--fa:4px;--fy:9.2s;--fx:13.6s;--fd:-3.1s;--pd:.2}
+#hdr .sky-scene::after{--fa:3px;--fy:11.4s;--fx:7.8s;--fd:-6.2s;--pd:.1}
+.sky-cap{--fa:2.4px;--fy:7.4s;--fx:10.2s;--fd:-1.7s;--pd:.05}
+#hdr .hd-he{--fa:2.2px;--fy:8.6s;--fx:12.8s;--fd:-4.4s;--pd:.03}
+#hdr .hd-div{--fa:1.6px;--fy:6.9s;--fx:9.3s;--fd:-2.6s;--pd:.015}
+#hdr .hd-en{--fa:1.8px;--fy:10.1s;--fx:7.1s;--fd:-5.3s;--pd:0}
+#hdr .wk{--fa:2.2px;--fy:9.7s;--fx:11.9s;--fd:-7.4s;--pd:-.015}
+.ai-fab{--fa:2.4px;--fy:8.1s;--fx:12.3s;--fd:-2.2s;--pd:0}
+.dock{--fa:1.2px;--fy:10.6s;--fx:14.2s;--fd:-8.8s;--pd:0}
+#skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab,.dock{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate;animation-composition:replace,add}
+:is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:rv .75s cubic-bezier(.2,.8,.2,1) calc(var(--i,0)*70ms) backwards,flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate;animation-composition:replace,replace,add}
+@supports (animation-timeline:scroll()){
+ #skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab,.dock{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both;animation-timeline:auto,auto,scroll(root block);animation-range:normal,normal,0px 1000px;animation-composition:replace,add,add}
+ :is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:rv .75s cubic-bezier(.2,.8,.2,1) calc(var(--i,0)*70ms) backwards,flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both;animation-timeline:auto,auto,auto,scroll(root block);animation-range:normal,normal,normal,0px 1000px;animation-composition:replace,replace,add,add}}
+@media(prefers-reduced-motion:reduce){#skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab,.dock,#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk,:is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:none!important}}
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
 </style>
 </head><body>
@@ -1766,32 +1785,26 @@ const GLS={ang:-2.25,L:[-.47,-.6,.65],t:0,ok:false};
    scroll (own speed and direction) plus a slow orbit of its own, and its glare band on its own phase. */
 const GLSEED=new WeakMap();let GLSI=0;
 function glSeed(e){let k=GLSEED.get(e);if(!k){const n=++GLSI,r=q=>((Math.sin(n*12.9898+q*78.233)*43758.5453)%1+1)%1;
- k={p:r(1)*6.283,f:.7+r(2)*.55,a:.75+r(3)*.5,dir:r(4)>.5?1:-1,spd:24+r(5)*22,ph:r(6)*360,q:r(7)*6.283};GLSEED.set(e,k)}return k}
+ k={dir:r(4)>.5?1:-1,ph:(r(6)-.5)*160};GLSEED.set(e,k)}return k}
 const GL_SEL='#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc';
 /* float size (px) and scroll depth (how much a piece lags behind when you scroll: the moon is "far", the week panel "near") */
-const GL_FLOAT={skyBody:[5,.2],skyScene:[3.2,.1],'sky-cap':[3,.05],'hd-he':[2.6,.03],'hd-div':[2,.015],'hd-en':[2.2,0],wk:[2.6,-.015],dock:[1.5,0],hint:[2.6,0],'ai-fab':[3,0]};
+/* The glint: a small bright spot on each glass chip's rim that slides a little as you swipe (each chip its own way), still when idle.
+   Floating and scroll depth are pure CSS (compositor), so no per-frame script work. */
 const glSet=(s,k,v)=>{if(s.getPropertyValue(k)!==v)s.setProperty(k,v)};
-function glassShine(){const H=innerHeight,W=innerWidth,lx=W/2+GLS.L[0]*H*1.6,ly=H/2+GLS.L[1]*H*1.6,t=GLS.t||0,sy=GLS.sc!=null?GLS.sc:(scrollY||0),mv=!GLS.still;
- const la=Math.atan2(lx-W/2,-(ly-H/2))*57.2958,dep=Math.min(sy,H*1.2);
- for(const e of document.querySelectorAll(GL_SEL+',#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#skyBody,#skyScene')){const r=e.getBoundingClientRect();if(r.bottom<-60||r.top>H+60||!r.width)continue;
-  const k=glSeed(e),s=e.style,key=e.id&&GL_FLOAT[e.id]?e.id:Object.keys(GL_FLOAT).find(c=>e.classList.contains(c)),fp=key?GL_FLOAT[key]:[1.8,0];
-  if(mv||fp[1]){const amp=fp[0]*k.a,w=t*k.f*1.35,x=mv?Math.sin(w*.53+k.q)*amp*.45:0,y=(mv?Math.sin(w*.82+k.p)*amp:0)+dep*fp[1],v=x.toFixed(2)+'px '+y.toFixed(2)+'px';
-   if(e.id==='skyScene'){glSet(s,'--dmx',x.toFixed(2)+'px');glSet(s,'--dmy',y.toFixed(2)+'px')}
-   else if(s.translate!==v){s.translate=v;if(e.id==='skyBody'){const c=document.getElementById('skyTrailC');if(c)c.style.translate=v}}}
-  if(!e.matches(GL_SEL))continue;
-  const cx=r.left+r.width/2,cy=r.top+r.height/2,dx=lx-cx,dy=ly-cy,d=Math.hypot(dx,dy)||1,nx=dx/d,ny=dy/d;
-  /* the travelling glint: scroll spins it around the edge, and it also wanders on its own, speeding up and slowing down */
-  const gg=la+k.ph+sy*1.5*k.dir+(mv?(t*k.spd+38*Math.sin(t*.6*k.f+k.q))*k.dir:0);
-  glSet(s,'--ga',(Math.atan2(dx,-dy)*57.2958).toFixed(0)+'deg');glSet(s,'--gg',(((gg%360)+360)%360).toFixed(1)+'deg');
+function glassShine(){const H=innerHeight,W=innerWidth,lx=W/2+GLS.L[0]*H*1.6,ly=H/2+GLS.L[1]*H*1.6,sy=GLS.sc||0;
+ const la=Math.atan2(lx-W/2,-(ly-H/2))*57.2958;
+ for(const e of document.querySelectorAll(GL_SEL)){const r=e.getBoundingClientRect();if(r.bottom<0||r.top>H||!r.width)continue;
+  const k=glSeed(e),s=e.style,cx=r.left+r.width/2,cy=r.top+r.height/2,dx=lx-cx,dy=ly-cy;
+  glSet(s,'--ga',(Math.atan2(dx,-dy)*57.2958).toFixed(0)+'deg');
+  if(e.matches('.panel,.hyc'))continue;
+  const gg=la+k.ph+sy*.16*k.dir;glSet(s,'--gg',(((gg%360)+360)%360).toFixed(1)+'deg');
   {const g=(gg+15)/57.2958,ux=Math.sin(g),uy=-Math.cos(g),hw=r.width/2,hh=r.height/2,m=Math.min(hw/Math.abs(ux||1e-6),hh/Math.abs(uy||1e-6));
-   glSet(s,'--hx',(hw+ux*m).toFixed(0)+'px');glSet(s,'--hy',(hh+uy*m).toFixed(0)+'px')}
-  glSet(s,'--gx',(50+nx*46).toFixed(0)+'%');glSet(s,'--gy',(50+ny*60).toFixed(0)+'%');
-  glSet(s,'--gs',(50+62*Math.sin(GLS.ang*1.6+cy/H*2.4+k.q+(mv?t*.12*k.f:0)+sy*.006*k.dir)).toFixed(0)+'%')}}
+   glSet(s,'--hx',(hw+ux*m).toFixed(0)+'px');glSet(s,'--hy',(hh+uy*m).toFixed(0)+'px')}}}
 (function(){const host=document.getElementById('skyWaves');if(!host)return;
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;GLS.still=reduce;
  const cv=document.createElement('canvas');cv.id='skyGL';let gl=null;
  try{gl=cv.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:false,depth:false,stencil:false,powerPreference:'low-power',desynchronized:true})}catch(e){}
- const fb=()=>{skyRibbonsSvg(host);GLS.still=true;const f=()=>requestAnimationFrame(glassShine);addEventListener('scroll',f,{passive:true});addEventListener('resize',f);f()};
+ const fb=()=>{skyRibbonsSvg(host);GLS.still=true;const f=()=>{GLS.sc=scrollY||0;requestAnimationFrame(glassShine)};addEventListener('scroll',f,{passive:true});addEventListener('resize',f);f()};
  if(!gl){fb();return}
  const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
  const FS=`precision highp float;
@@ -1837,23 +1850,22 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
  gl.uniform4fv(U.uA,fa(0));gl.uniform4fv(U.uB,fa(1));gl.uniform4fv(U.uC,fa(2));
  gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
  const hex=v=>{v=(v||'').trim();const m=/^#?([0-9a-f]{6})$/i.exec(v);if(!m)return[1,1,1];const n=parseInt(m[1],16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]};
- let colT=-1e9,W=0,Hh=0,sc=0,scT=0,last=0,raf=0,t0=performance.now();
- let Q=.5;const size=()=>{const d=Math.min(devicePixelRatio||1,2)*Q,w=Math.round(host.clientWidth*d),h=Math.round(host.clientHeight*d);if(w&&h&&(w!==W||h!==Hh)){W=cv.width=w;Hh=cv.height=h;gl.viewport(0,0,w,h)}};
+ /* Drawn only when something changes (scroll, size, colours): no idle animation, so nothing runs while you just look. */
+ let colT=-1e9,W=0,Hh=0,sc=-1,raf=0,Q=.5,dirty=true;const T0=7.0;
+ const size=()=>{const d=Math.min(devicePixelRatio||1,2)*Q,w=Math.round(host.clientWidth*d),h=Math.round(host.clientHeight*d);if(w&&h&&(w!==W||h!==Hh)){W=cv.width=w;Hh=cv.height=h;gl.viewport(0,0,w,h);dirty=true}};
  const colors=()=>{const cs=getComputedStyle(document.documentElement);gl.uniform3fv(U.uF,hex(cs.getPropertyValue('--rbf')));gl.uniform3fv(U.uE,hex(cs.getPropertyValue('--rbe')));gl.uniform1f(U.uO,document.documentElement.dataset.night==='1'?1:.8)};
- const draw=now=>{size();if(!W)return;GLS.drawn=1;if(now-colT>2000||colT<0){colT=now;colors()}
-  sc+=(scT-sc)*(reduce?1:.14);GLS.sc=sc;const t=reduce?0:(now-t0)/1000;GLS.t=t;
-  GLS.ang=-2.25+sc/innerHeight*.85+(reduce?0:.18*Math.sin(t*.07));const ca=Math.cos(GLS.ang),sa=Math.sin(GLS.ang);GLS.L=[ca*.76,sa*.76,.65];
-  gl.uniform2f(U.uR,W,Hh);gl.uniform1f(U.uT,t);gl.uniform1f(U.uS,sc/host.clientWidth);gl.uniform3fv(U.uL,GLS.L);
-  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);glassShine()};
- let gap=0,slow=0,prev=0;
- const loop=now=>{raf=0;if(document.hidden){prev=0;return}if(document.getElementById('intro')){setTimeout(kick,300);return}
-  const busy=Math.abs(scT-sc)>.5;if(now-last>=(busy?15:32)){if(prev&&!reduce){const g=now-prev;gap=gap?gap*.9+g*.1:g;if(gap>(busy?34:60)){if(++slow>45&&Q>.3){Q=Math.max(.3,Q*.8);slow=0}}else slow=Math.max(0,slow-1)}prev=now;last=now;draw(now)}
-  if(!reduce||!GLS.drawn||Math.abs(scT-sc)>.5)raf=requestAnimationFrame(loop)};
+ const draw=()=>{size();if(!W)return false;if(colT<0){colT=1;colors()}
+  const y=scrollY||document.documentElement.scrollTop||0;if(y===sc&&!dirty)return true;sc=y;dirty=false;GLS.sc=y;GLS.t=0;
+  GLS.ang=-2.25+y/innerHeight*.5;const ca=Math.cos(GLS.ang),sa=Math.sin(GLS.ang);GLS.L=[ca*.76,sa*.76,.65];
+  gl.uniform2f(U.uR,W,Hh);gl.uniform1f(U.uT,T0);gl.uniform1f(U.uS,y/host.clientWidth);gl.uniform3fv(U.uL,GLS.L);
+  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);glassShine();return true};
+ const loop=()=>{raf=0;if(document.hidden)return;if(document.getElementById('intro')){setTimeout(kick,300);return}if(!draw())raf=requestAnimationFrame(loop)};
  const kick=()=>{if(!raf)raf=requestAnimationFrame(loop)};
- addEventListener('scroll',()=>{scT=scrollY||document.documentElement.scrollTop||0;kick()},{passive:true});
- addEventListener('resize',()=>{colT=-1;kick()},{passive:true});document.addEventListener('visibilitychange',()=>{colT=-1;kick()});
- new MutationObserver(()=>{colT=-1;kick()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-night','data-theme']});
- GLS.kick=()=>{colT=-1;kick()};kick()})();
+ const scrollKick=kick;
+ addEventListener('scroll',scrollKick,{passive:true});
+ addEventListener('resize',()=>{colT=-1;dirty=true;kick()},{passive:true});document.addEventListener('visibilitychange',()=>{colT=-1;dirty=true;kick()});
+ new MutationObserver(()=>{colT=-1;dirty=true;kick()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-night','data-theme']});
+ GLS.kick=()=>{dirty=true;kick()};kick()})();
 if(SKY.on){const st0=skyCompute(Date.now());SKY.last=st0;SKY.shift=st0.shift;t0=new Date(st0.ymd[0],st0.ymd[1]-1,st0.ymd[2]+st0.shift,12);sel=t0;V=hm1(t0);skyApply(st0)}else skyOff();
 setInterval(skyTick,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)skyTick()});addEventListener('focus',skyTick);
