@@ -10,11 +10,11 @@ This repository is a hosted web app: a Chabad/Jewish calendar that is installed 
 | File | What it is |
 |---|---|
 | `index.html` | The whole app in one file (HTML + CSS + JS, about 380 KB). Edit it directly. |
-| `sw.js` | Service worker: shows push notifications, focuses the app on tap. No caching. |
+| `sw.js` | Service worker (registered for every user on load): shows push notifications, focuses the app on tap, and fetches `index.html` fresh on every open (falls back to the phone's saved copy offline). No other caching. |
 | `manifest.webmanifest`, `icon-*.png`, `apple-touch-icon.png` | Install metadata and icons (a plain aleph in a serif font). |
 | `server/worker.js` | Cloudflare Worker source. **Not served from here**: changes must be pasted into the Cloudflare dashboard by the owner (Workers & Pages, then cdate-push, then Edit code, then Deploy). Needs KV binding `KV` and cron `* * * * *`. |
 
-Do not add files named `index (1).html` or similar: only `index.html` is served. GitHub Pages caches for about 10 minutes after a push.
+Do not add files named `index (1).html` or similar: only `index.html` is served. GitHub Pages tells browsers to cache for about 10 minutes, but the service worker bypasses that, so an update shows on the next app open once Pages has published (1–2 minutes). If the app was left open in the background, a "Tap to update" button appears when it returns after 2+ minutes.
 
 ## Inside index.html (main pieces, by function name)
 - **Calendar core:** `hd()` Hebrew date, `t0` today (rolls over at sunset), `sel` selected day, `LC` location `{n,la,lo,tz}`, `setLoc(n,la,lo,tz)`, `zAt()` zmanim, `render()`, `panel()`, `upd()`. Study tracking lives in `DN` (key `YYYY-MM-DD` → `{chumash,tehillim,tanya,rambam3|rambam1,hy}`); `tog(k)` toggles one.
