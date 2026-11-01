@@ -1365,6 +1365,12 @@ async function rdBuild(k,d){const parts=await rdRefs(k,d);if(!parts.length)throw
    html+=rdHead('רמב״ם · '+(k==='rambam3'?'שלושה פרקים':'פרק אחד'),nm||'רמב״ם','');
    for(const x of F){const c=x.p[0],n=x.p[x.p.length-1];if(c!==lastC)html+=rdChip('פרק '+heN(c));lastC=c;html+=`<p class="rdv rdvj">${rdNum(n)}${rdClean(x.t)}</p>`}}}
  return `<div class="rdin">${html}</div>`}
+/* Reading place per shiur and day: where you were (p) and how far you ever got (m), as fractions of the text. A shiur is checked off
+   on leaving only once you have reached the end (m≈1); otherwise the place is kept and the reader reopens there. */
+const rdPosAll=()=>{try{return JSON.parse(localStorage.getItem(AK('cc_rd_pos'))||'{}')}catch(e){return{}}};
+const rdPosGet=(dk,k)=>rdPosAll()[dk+'|'+k]||null;
+function rdPosSet(dk,k,v){const A=rdPosAll(),id=dk+'|'+k;if(v)A[id]={...v,t:Date.now()};else delete A[id];
+ const ks=Object.keys(A).sort((x,y)=>A[y].t-A[x].t);ks.slice(40).forEach(x=>delete A[x]);try{localStorage.setItem(AK('cc_rd_pos'),JSON.stringify(A))}catch(e){}}
 let RDS=null;const rdFS=()=>{try{return +localStorage.getItem('cc_rd_fs')||20.5}catch(e){return 20.5}};
 function rdOpen(k){const d=new Date(sel),dk=dkey(),st=RDS={k,d,dk,ok:false};
  let b=$('#rdr');if(!b){b=document.createElement('div');b.id='rdr';b.className='rdr';b.innerHTML='<div class="rdb"><button type="button" class="rdx" aria-label="Back">←</button><div class="rdt"><b></b><small></small></div><button type="button" class="rdfs" aria-label="Text size">Aa</button><div class="rdpc" aria-live="off">0%</div><div class="rdp"><i></i></div></div><div class="rdw"><div class="rdm" dir="rtl" lang="he"></div><div class="rdsb" aria-hidden="true"><div class="rdth"><span></span></div></div></div>';document.body.appendChild(b);b.querySelector('.rdx').onclick=()=>history.back();rdScrollUI(b);b.querySelector('.rdfs').onclick=()=>{const S=[18,20.5,23,26],i=(S.indexOf(rdFS())+1)%S.length;try{localStorage.setItem('cc_rd_fs',S[i])}catch(e){}H.sel();b.querySelector('.rdm').style.setProperty('--rdfs',S[i]+'px');b._rdUpd&&b._rdUpd()}}
@@ -1373,7 +1379,7 @@ function rdOpen(k){const d=new Date(sel),dk=dkey(),st=RDS={k,d,dk,ok:false};
  const m=b.querySelector('.rdm');m.scrollTop=0;m.innerHTML=LOAD;b._rdUpd&&b._rdUpd();
  requestAnimationFrame(()=>b.classList.add('on'));document.body.classList.add('rdo');H.tap();
  history.pushState({rdr:1},'');
- rdBuild(k,d).then(html=>{if(RDS!==st)return;st.ok=true;requestAnimationFrame(()=>b._rdUpd&&b._rdUpd());m.innerHTML=html+`<p class="rdf" dir="ltr">Text from Sefaria · <a href="https://www.chabad.org/dailystudy/default.asp?tdate=${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}" target="_blank" rel="noopener">Open on Chabad.org ↗</a></p>`})
+ rdBuild(k,d).then(html=>{if(RDS!==st)return;const sv=rdPosGet(dk,k);st.maxF=sv?sv.m||0:0;requestAnimationFrame(()=>{if(RDS!==st)return;if(sv&&sv.p>.003&&sv.p<.995){const mx=m.scrollHeight-m.clientHeight;if(mx>0)m.scrollTop=sv.p*mx}st.ok=true;b._rdUpd&&b._rdUpd()});m.innerHTML=html+`<p class="rdf" dir="ltr">Text from Sefaria · <a href="https://www.chabad.org/dailystudy/default.asp?tdate=${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}" target="_blank" rel="noopener">Open on Chabad.org ↗</a></p>`})
   .catch(err=>{if(RDS!==st)return;m.innerHTML=`<p class="rdl" dir="ltr">Could not load the text. Check your connection (in China, Sefaria may need your VPN), then try again.</p><p class="rdl" dir="ltr" style="font-size:12px">(${String(err&&err.message||err).replace(/[<>&]/g,'')})</p><p class="rdl" dir="ltr"><button type="button" class="rdr2">Try again</button></p>`;m.querySelector('.rdr2').onclick=()=>{history.back();setTimeout(()=>rdOpen(k),350)}})}
 /* Reading progress: % in the header + a thin line under it, and a side scroll bar that appears while scrolling,
    can be dragged (it widens and shows the %), or tapped to jump. Light haptic tick every 10% while dragging. */
@@ -1382,6 +1388,7 @@ function rdScrollUI(b){const m=b.querySelector('.rdm'),sb=b.querySelector('.rdsb
  const geo=()=>{const max=Math.max(0,m.scrollHeight-m.clientHeight),tH=sb.clientHeight,thH=max?Math.max(44,Math.min(tH,tH*m.clientHeight/m.scrollHeight)):tH;return{max,tH,thH}};
  const upd=()=>{raf=0;const g=geo(),f=g.max?Math.min(1,Math.max(0,m.scrollTop/g.max)):(m.scrollHeight?1:0),n=Math.round(f*100);
   th.style.height=g.thH+'px';th.style.transform=`translateY(${((g.tH-g.thH)*f).toFixed(1)}px)`;bar.style.transform=`scaleX(${f.toFixed(4)})`;
+  const R=RDS;if(R&&R.ok){if(f>(R.maxF||0))R.maxF=f;R.posF=f;clearTimeout(R.svT);R.svT=setTimeout(()=>{if(R.ok)rdPosSet(R.dk,R.k,{p:R.posF,m:R.maxF})},400)}
   const t=n>=100&&g.max?'✓ 100%':n+'%';if(pc.textContent!==t)pc.textContent=t;lab.textContent=n+'%';sb.classList.toggle('none',!g.max);
   if(drag){const ten=Math.floor(n/10);if(ten!==lastTen){if(lastTen>=0)H.tap();lastTen=ten}}};
  const kick=()=>{if(!raf)raf=requestAnimationFrame(upd)};b._rdUpd=kick;
@@ -1396,8 +1403,8 @@ function rdScrollUI(b){const m=b.querySelector('.rdm'),sb=b.querySelector('.rdsb
  const end=()=>{if(!drag)return;drag=null;sb.classList.remove('drag');show()};
  sb.addEventListener('pointerup',end);sb.addEventListener('pointercancel',end)}
 function rdClose(){const st=RDS,b=$('#rdr');RDS=null;if(b)b.classList.remove('on');document.body.classList.remove('rdo');
- // leaving after reading checks it off (only when the text actually loaded)
- if(st&&st.ok){const D=(DN[st.dk]??={});if(!D[st.k]){if(st.k==='rambam3'||st.k==='rambam1')delete D[st.k==='rambam3'?'rambam1':'rambam3'];D[st.k]=1;SVD();upd();H.ok();if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}}}
+ // leaving checks it off only when the text loaded and was read to the end; otherwise the reading place is kept
+ if(st&&st.ok){clearTimeout(st.svT);const fin=(st.maxF||0)>=.995;if(!fin){rdPosSet(st.dk,st.k,{p:st.posF||0,m:st.maxF||0});return}rdPosSet(st.dk,st.k,null);const D=(DN[st.dk]??={});if(!D[st.k]){if(st.k==='rambam3'||st.k==='rambam1')delete D[st.k==='rambam3'?'rambam1':'rambam3'];D[st.k]=1;SVD();upd();H.ok();if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}}}
 addEventListener('popstate',()=>{if(RDS)rdClose()});
 document.addEventListener('click',e=>{const r=e.target.closest('.ck');if(r&&!e.target.closest('a')){if(RD_KEYS.includes(r.dataset.k)&&!e.target.closest('.bx'))return rdOpen(r.dataset.k);return tog(r.dataset.k)}if(e.target.closest('#hyb'))tog('hy')});
 function study(h){const u='https://www.chabad.org/dailystudy/default.asp?tdate='+encodeURIComponent(`${sel.getMonth()+1}/${sel.getDate()}/${sel.getFullYear()}`),
