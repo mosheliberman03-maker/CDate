@@ -1,0 +1,141 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Push server code</title>
+<style>body{font:17px/1.5 system-ui,sans-serif;margin:0;padding:18px;background:#f3f4fa;color:#161a2e}h1{font-size:22px}button{font:600 18px system-ui;padding:14px 18px;border:0;border-radius:14px;background:#161a2e;color:#fff;width:100%}#ok{color:#2a817d;font-weight:600;min-height:24px;margin:8px 0}textarea{width:100%;height:40vh;font:12px monospace;box-sizing:border-box}</style></head><body>
+<h1>Push server code (cdate-push)</h1>
+<button id="c">Copy the code</button><div id="ok"></div>
+<textarea id="t" readonly>// Chabad Calendar push server (Cloudflare Worker, free plan).
+// Needs: one KV namespace bound as &quot;KV&quot; and a cron trigger &quot;* * * * *&quot;.
+// The calendar app works out the reminder schedule and sends it here; this server just delivers each reminder on time.
+
+const enc = new TextEncoder();
+const b64u = (buf) =&gt; { const b = new Uint8Array(buf); let s = &#x27;&#x27;; for (const x of b) s += String.fromCharCode(x); return btoa(s).replace(/\+/g, &#x27;-&#x27;).replace(/\//g, &#x27;_&#x27;).replace(/=+$/, &#x27;&#x27;); };
+const unb64u = (s) =&gt; { s = s.replace(/-/g, &#x27;+&#x27;).replace(/_/g, &#x27;/&#x27;); while (s.length % 4) s += &#x27;=&#x27;; const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i &lt; b.length; i++) u[i] = b.charCodeAt(i); return u; };
+const cat = (...a) =&gt; { let n = 0; for (const x of a) n += x.length; const o = new Uint8Array(n); let p = 0; for (const x of a) { o.set(x, p); p += x.length; } return o; };
+
+const OK_HOSTS = [&#x27;fcm.googleapis.com&#x27;, &#x27;android.googleapis.com&#x27;, &#x27;web.push.apple.com&#x27;, &#x27;push.apple.com&#x27;, &#x27;updates.push.services.mozilla.com&#x27;, &#x27;push.services.mozilla.com&#x27;, &#x27;notify.windows.com&#x27;];
+const okEndpoint = (e) =&gt; { try { const u = new URL(e); return u.protocol === &#x27;https:&#x27; &amp;&amp; OK_HOSTS.some((h) =&gt; u.hostname === h || u.hostname.endsWith(&#x27;.&#x27; + h)); } catch (x) { return false; } };
+
+/* ---- Web Push payload encryption (RFC 8291, aes128gcm) ---- */
+export async function encryptPayload(sub, payload, opt = {}) {
+  const ua = unb64u(sub.keys.p256dh), auth = unb64u(sub.keys.auth);
+  const asKp = opt.asKeyPair || await crypto.subtle.generateKey({ name: &#x27;ECDH&#x27;, namedCurve: &#x27;P-256&#x27; }, true, [&#x27;deriveBits&#x27;]);
+  const asPub = new Uint8Array(await crypto.subtle.exportKey(&#x27;raw&#x27;, asKp.publicKey));
+  const uaKey = await crypto.subtle.importKey(&#x27;raw&#x27;, ua, { name: &#x27;ECDH&#x27;, namedCurve: &#x27;P-256&#x27; }, false, []);
+  const ecdh = new Uint8Array(await crypto.subtle.deriveBits({ name: &#x27;ECDH&#x27;, public: uaKey }, asKp.privateKey, 256));
+  const hk = async (salt, ikm, info, len) =&gt; crypto.subtle.deriveBits({ name: &#x27;HKDF&#x27;, hash: &#x27;SHA-256&#x27;, salt, info }, await crypto.subtle.importKey(&#x27;raw&#x27;, ikm, &#x27;HKDF&#x27;, false, [&#x27;deriveBits&#x27;]), len * 8);
+  const ikm = new Uint8Array(await hk(auth, ecdh, cat(enc.encode(&#x27;WebPush: info\0&#x27;), ua, asPub), 32));
+  const salt = opt.salt || crypto.getRandomValues(new Uint8Array(16));
+  const cek = await hk(salt, ikm, enc.encode(&#x27;Content-Encoding: aes128gcm\0&#x27;), 16);
+  const nonce = await hk(salt, ikm, enc.encode(&#x27;Content-Encoding: nonce\0&#x27;), 12);
+  const key = await crypto.subtle.importKey(&#x27;raw&#x27;, cek, &#x27;AES-GCM&#x27;, false, [&#x27;encrypt&#x27;]);
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: &#x27;AES-GCM&#x27;, iv: nonce }, key, cat(enc.encode(payload), new Uint8Array([2]))));
+  return cat(salt, new Uint8Array([0, 0, 16, 0]), new Uint8Array([asPub.length]), asPub, ct);
+}
+
+/* ---- VAPID (identifies this server to the push service) ---- */
+async function getVapid(env) {
+  let v = await env.KV.get(&#x27;vapid&#x27;, &#x27;json&#x27;);
+  if (v) return v;
+  const kp = await crypto.subtle.generateKey({ name: &#x27;ECDSA&#x27;, namedCurve: &#x27;P-256&#x27; }, true, [&#x27;sign&#x27;]);
+  v = { pub: b64u(await crypto.subtle.exportKey(&#x27;raw&#x27;, kp.publicKey)), jwk: await crypto.subtle.exportKey(&#x27;jwk&#x27;, kp.privateKey) };
+  await env.KV.put(&#x27;vapid&#x27;, JSON.stringify(v));
+  return v;
+}
+export async function makeJwt(v, aud, sub) {
+  const h = b64u(enc.encode(JSON.stringify({ typ: &#x27;JWT&#x27;, alg: &#x27;ES256&#x27; })));
+  const c = b64u(enc.encode(JSON.stringify({ aud, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub })));
+  const key = await crypto.subtle.importKey(&#x27;jwk&#x27;, v.jwk, { name: &#x27;ECDSA&#x27;, namedCurve: &#x27;P-256&#x27; }, false, [&#x27;sign&#x27;]);
+  const sig = await crypto.subtle.sign({ name: &#x27;ECDSA&#x27;, hash: &#x27;SHA-256&#x27; }, key, enc.encode(h + &#x27;.&#x27; + c));
+  return h + &#x27;.&#x27; + c + &#x27;.&#x27; + b64u(sig);
+}
+async function sendPush(env, rec, msg) {
+  const v = await getVapid(env), aud = new URL(rec.sub.endpoint).origin;
+  const body = await encryptPayload(rec.sub, JSON.stringify(msg));
+  const jwt = await makeJwt(v, aud, rec.origin || &#x27;https://example.com&#x27;);
+  const r = await fetch(rec.sub.endpoint, { method: &#x27;POST&#x27;, headers: { Authorization: &#x27;vapid t=&#x27; + jwt + &#x27;, k=&#x27; + v.pub, &#x27;Content-Encoding&#x27;: &#x27;aes128gcm&#x27;, &#x27;Content-Type&#x27;: &#x27;application/octet-stream&#x27;, TTL: &#x27;1800&#x27;, Urgency: &#x27;high&#x27; }, body });
+  return r.status;
+}
+
+/* ---- storage ---- */
+const sha = async (s) =&gt; [...new Uint8Array(await crypto.subtle.digest(&#x27;SHA-256&#x27;, enc.encode(s)))].slice(0, 16).map((x) =&gt; x.toString(16).padStart(2, &#x27;0&#x27;)).join(&#x27;&#x27;);
+const keyFor = async (endpoint) =&gt; &#x27;s:&#x27; + await sha(endpoint);
+/* index of who has something due soon, so the every-minute check needs one read, not a listing (KV free plan allows ~1000 listings a day) */
+const getIdx = async (env) =&gt; (await env.KV.get(&#x27;idx&#x27;, &#x27;json&#x27;)) || {};
+const setIdx = async (env, idx) =&gt; env.KV.put(&#x27;idx&#x27;, JSON.stringify(idx));
+const nextAt = (items) =&gt; items.reduce((m, i) =&gt; Math.min(m, i.at), Infinity);
+const clip = (s, n) =&gt; String(s == null ? &#x27;&#x27; : s).slice(0, n);
+
+const CORS = { &#x27;Access-Control-Allow-Origin&#x27;: &#x27;*&#x27;, &#x27;Access-Control-Allow-Methods&#x27;: &#x27;GET,POST,OPTIONS&#x27;, &#x27;Access-Control-Allow-Headers&#x27;: &#x27;content-type&#x27;, &#x27;Access-Control-Max-Age&#x27;: &#x27;86400&#x27; };
+const json = (o, status = 200) =&gt; new Response(JSON.stringify(o), { status, headers: { ...CORS, &#x27;content-type&#x27;: &#x27;application/json&#x27; } });
+
+async function handle(req, env) {
+  const url = new URL(req.url), p = url.pathname;
+  if (req.method === &#x27;OPTIONS&#x27;) return new Response(null, { status: 204, headers: CORS });
+  if (req.method === &#x27;GET&#x27; &amp;&amp; p === &#x27;/&#x27;) return new Response(&#x27;Chabad Calendar push server is running.&#x27;, { headers: { ...CORS, &#x27;content-type&#x27;: &#x27;text/plain&#x27; } });
+  if (req.method === &#x27;GET&#x27; &amp;&amp; p === &#x27;/vapid&#x27;) return json({ pub: (await getVapid(env)).pub });
+  // Sefaria relay for the app&#x27;s Hebrew shiur reader: some phones can&#x27;t read Sefaria&#x27;s replies directly.
+  // Only Sefaria&#x27;s daily-schedule and text addresses are allowed; answers are cached for a day.
+  if (req.method === &#x27;GET&#x27; &amp;&amp; p.startsWith(&#x27;/sefaria/&#x27;)) {
+    const rest = p.slice(&#x27;/sefaria/&#x27;.length);
+    if (!/^(calendars$|v3\/texts\/|v2\/raw\/index\/)/.test(rest)) return json({ error: &#x27;not allowed&#x27; }, 404);
+    try {
+      const r = await fetch(&#x27;https://www.sefaria.org/api/&#x27; + rest + url.search, { headers: { &#x27;User-Agent&#x27;: &#x27;CDate calendar (Sefaria relay)&#x27; }, cf: { cacheTtl: 86400, cacheEverything: true } });
+      return new Response(r.body, { status: r.status, headers: { ...CORS, &#x27;content-type&#x27;: &#x27;application/json; charset=utf-8&#x27;, &#x27;cache-control&#x27;: &#x27;public, max-age=3600&#x27; } });
+    } catch (e) { return json({ error: &#x27;sefaria unreachable&#x27; }, 502); }
+  }
+  if (req.method !== &#x27;POST&#x27;) return json({ error: &#x27;not found&#x27; }, 404);
+  let b; try { b = await req.json(); } catch (e) { return json({ error: &#x27;bad json&#x27; }, 400); }
+  const sub = b &amp;&amp; b.sub;
+  if (!sub || !sub.endpoint || !sub.keys || !sub.keys.p256dh || !sub.keys.auth || !okEndpoint(sub.endpoint)) return json({ error: &#x27;bad subscription&#x27; }, 400);
+  const clean = { endpoint: sub.endpoint, keys: { p256dh: String(sub.keys.p256dh), auth: String(sub.keys.auth) } };
+  const k = await keyFor(clean.endpoint);
+  if (p === &#x27;/sync&#x27;) {
+    const items = (Array.isArray(b.items) ? b.items : []).slice(0, 80).map((i) =&gt; ({ id: clip(i.id, 80), at: Number(i.at), title: clip(i.title, 120), body: clip(i.body, 600), tag: clip(i.tag, 120) })).filter((i) =&gt; i.id &amp;&amp; isFinite(i.at) &amp;&amp; i.title);
+    const idx = await getIdx(env);
+    if (!items.length) { await env.KV.delete(k); delete idx[k]; await setIdx(env, idx); return json({ ok: true, n: 0 }); }
+    await env.KV.put(k, JSON.stringify({ sub: clean, origin: url.origin, items }), { expirationTtl: 60 * 86400 });
+    idx[k] = nextAt(items); await setIdx(env, idx);
+    return json({ ok: true, n: items.length });
+  }
+  if (p === &#x27;/unsub&#x27;) { await env.KV.delete(k); const idx = await getIdx(env); delete idx[k]; await setIdx(env, idx); return json({ ok: true }); }
+  if (p === &#x27;/test&#x27;) {
+    const st = await sendPush({ ...env, KV: env.KV }, { sub: clean, origin: url.origin }, { title: clip(b.title, 120) || &#x27;Reminders are on&#x27;, body: clip(b.body, 600) || &#x27;This is how they will look.&#x27;, tag: &#x27;test&#x27; });
+    return json({ ok: st &gt;= 200 &amp;&amp; st &lt; 300, status: st });
+  }
+  return json({ error: &#x27;not found&#x27; }, 404);
+}
+
+/* ---- every minute: send what is due ---- */
+async function rebuildIdx(env) { /* every 10 minutes, repair the index from the stored subscriptions */
+  const idx = {}; let cursor;
+  do { const l = await env.KV.list({ prefix: &#x27;s:&#x27;, cursor }); cursor = l.list_complete ? undefined : l.cursor;
+    for (const k of l.keys) { const rec = await env.KV.get(k.name, &#x27;json&#x27;); if (rec &amp;&amp; rec.items &amp;&amp; rec.items.length) idx[k.name] = nextAt(rec.items); } } while (cursor);
+  return idx;
+}
+export async function run(env, now = Date.now()) {
+  let idx = Math.floor(now / 6e4) % 10 === 0 ? await rebuildIdx(env) : await getIdx(env), sent = 0, changed = false;
+  for (const name of Object.keys(idx)) {
+    if (idx[name] &gt; now) continue;
+    const rec = await env.KV.get(name, &#x27;json&#x27;);
+    if (!rec || !rec.items) { delete idx[name]; changed = true; continue; }
+    const due = rec.items.filter((i) =&gt; i.at &lt;= now &amp;&amp; i.at &gt; now - 15 * 6e4), keep = rec.items.filter((i) =&gt; i.at &gt; now);
+    /* one push per reminder (tag) per minute: the latest one already lists everything before it */
+    const latest = new Map(); for (const i of due) { const o = latest.get(i.tag || i.id); if (!o || i.at &gt;= o.at) latest.set(i.tag || i.id, i); }
+    let dead = false;
+    for (const i of latest.values()) {
+      try { const st = await sendPush(env, rec, { title: i.title, body: i.body, tag: i.tag }); sent++; if (st === 404 || st === 410) { dead = true; break; } } catch (e) { /* try again next minute */ }
+    }
+    if (dead || !keep.length) { await env.KV.delete(name); delete idx[name]; }
+    else { await env.KV.put(name, JSON.stringify({ ...rec, items: keep }), { expirationTtl: 60 * 86400 }); idx[name] = nextAt(keep); }
+    changed = true;
+  }
+  if (changed || Math.floor(now / 6e4) % 10 === 0) await setIdx(env, idx);
+  return sent;
+}
+
+export default {
+  async fetch(req, env) { try { return await handle(req, env); } catch (e) { return json({ error: String(e &amp;&amp; e.message || e) }, 500); } },
+  async scheduled(ev, env, ctx) { ctx.waitUntil(run(env)); },
+};
+</textarea>
+<script>document.getElementById('c').onclick=async()=>{const t=document.getElementById('t');let ok=false;try{await navigator.clipboard.writeText(t.value);ok=true}catch(e){t.select();ok=document.execCommand('copy')}document.getElementById('ok').textContent=ok?'Copied ✓ ('+t.value.length+' characters)':'Could not copy. Long-press in the box, Select all, Copy.'}</script>
+</body></html>

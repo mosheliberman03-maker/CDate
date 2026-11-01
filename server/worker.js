@@ -68,6 +68,16 @@ async function handle(req, env) {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
   if (req.method === 'GET' && p === '/') return new Response('Chabad Calendar push server is running.', { headers: { ...CORS, 'content-type': 'text/plain' } });
   if (req.method === 'GET' && p === '/vapid') return json({ pub: (await getVapid(env)).pub });
+  // Sefaria relay for the app's Hebrew shiur reader: some phones can't read Sefaria's replies directly.
+  // Only Sefaria's daily-schedule and text addresses are allowed; answers are cached for a day.
+  if (req.method === 'GET' && p.startsWith('/sefaria/')) {
+    const rest = p.slice('/sefaria/'.length);
+    if (!/^(calendars$|v3\/texts\/|v2\/raw\/index\/)/.test(rest)) return json({ error: 'not allowed' }, 404);
+    try {
+      const r = await fetch('https://www.sefaria.org/api/' + rest + url.search, { headers: { 'User-Agent': 'CDate calendar (Sefaria relay)' }, cf: { cacheTtl: 86400, cacheEverything: true } });
+      return new Response(r.body, { status: r.status, headers: { ...CORS, 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
+    } catch (e) { return json({ error: 'sefaria unreachable' }, 502); }
+  }
   if (req.method !== 'POST') return json({ error: 'not found' }, 404);
   let b; try { b = await req.json(); } catch (e) { return json({ error: 'bad json' }, 400); }
   const sub = b && b.sub;

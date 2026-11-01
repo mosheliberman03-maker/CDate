@@ -1138,7 +1138,11 @@ const RD_KEYS=['chumash','tehillim','tanya','rambam3','rambam1'];
 const RD_TITLE={chumash:'חומש עם פירוש רש״י',tehillim:'תהלים',tanya:'תניא',rambam3:'רמב״ם · שלושה פרקים',rambam1:'רמב״ם · פרק אחד'};
 const SEF='https://www.sefaria.org/api/';
 const RDC=new Map();
-const rdJ=url=>{if(!RDC.has(url))RDC.set(url,fetch(url).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).catch(e=>{RDC.delete(url);throw e}));return RDC.get(url)};
+// Sefaria directly first; if the phone can't read Sefaria's reply ("Failed to fetch"), go through the push server's relay.
+let RDP=(()=>{try{return localStorage.getItem('cc_rd_relay')==='1'}catch(e){return false}})();
+const rdGo=u=>fetch(u).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()});
+const rdRelay=u=>pushSrv().replace(/\/+$/,'')+'/sefaria/'+u.slice(SEF.length);
+const rdJ=url=>{if(!RDC.has(url))RDC.set(url,(RDP?rdGo(rdRelay(url)).catch(()=>rdGo(url)):rdGo(url).catch(e=>rdGo(rdRelay(url)).then(j=>{RDP=true;try{localStorage.setItem('cc_rd_relay','1')}catch(x){}return j}).catch(e2=>{throw new Error(e.message+' / relay: '+e2.message)}))).catch(e=>{RDC.delete(url);throw e}));return RDC.get(url)};
 const rdCal=d=>rdJ(`${SEF}calendars?year=${d.getFullYear()}&month=${d.getMonth()+1}&day=${d.getDate()}&diaspora=${LC.tz==='Asia/Jerusalem'?0:1}`);
 const rdUrl=ref=>ref.replace(/ (?=[\d:]+(?:-[\d:]+)?$)/,'.').replace(/ /g,'_').replace(/:/g,'.');
 const rdText=url=>rdJ(`${SEF}v3/texts/${encodeURI(url)}?version=hebrew&return_format=strip_only_footnotes`);

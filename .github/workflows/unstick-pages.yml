@@ -1,7 +1,9 @@
-name: Unstick Pages publishing (one-off)
+name: Unstick Pages publishing
+# Run this when "pages build and deployment" fails with "due to in progress deployment".
 on: workflow_dispatch
 permissions:
   pages: write
+  deployments: read
   contents: read
 jobs:
   fix:
@@ -12,8 +14,9 @@ jobs:
           R: ${{ github.repository }}
         run: |
           api(){ curl -sS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "$@"; }
-          for s in fa7d4871b0891d2631c0ce5699cbbe837d35c610; do
-            echo "== status $s"; api "https://api.github.com/repos/$R/pages/deployments/$s"
-            echo "== cancel $s"; api -X POST "https://api.github.com/repos/$R/pages/deployments/$s/cancel" -w "\nHTTP %{http_code}\n"
+          api "https://api.github.com/repos/$R/deployments?environment=github-pages&per_page=6" > d.json
+          for sha in $(python3 -c "import json;print(' '.join(dict.fromkeys(x['sha'] for x in json.load(open('d.json')))))"); do
+            echo "== cancel $sha"; api -X POST "https://api.github.com/repos/$R/pages/deployments/$sha/cancel" -o /dev/null -w "HTTP %{http_code}\n"
           done
-          echo "== request a fresh build"; api -X POST "https://api.github.com/repos/$R/pages/builds" -w "\nHTTP %{http_code}\n"
+          sleep 5
+          echo "== request a fresh build"; api -X POST "https://api.github.com/repos/$R/pages/builds" -o /dev/null -w "HTTP %{http_code}\n"
