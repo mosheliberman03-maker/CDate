@@ -2669,6 +2669,9 @@ const AI_ANCHOR_RE=/\b\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|\bat\s+\d{1,2
 const AI_SPLIT_FILLER=new Set('at on in every each the a an from to until till by for of and or next this coming week weekly month monthly year yearly day days am pm noon midnight tonight today tomorrow morning afternoon evening night hour hours minute minutes min mins also then plus again same time'.split(' '));
 function aiHasTitle(s){return aiNoPunct(s).some(w=>w.length>=3&&!/^\d/.test(w)&&!AI_SPLIT_FILLER.has(w)&&aiDow(w)<0&&!/^(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/.test(w)&&!aiHebKey(w))}
 function aiHasAnchor(s){return AI_ANCHOR_RE.test(s)}
+const AI_SUBJ_CUT=new RegExp('(?:every|each|on|at|@|with|daily|nightly|weekly|monthly|yearly|before|after|from|starting|beginning|tonight|tomorrow|today|this|next|until|till|for\\s+\\d|in\\s+the|around|'+AI_DAY_RE+'s?|\\d)\\b');
+// "Schedule a chavrusa every Monday with JJ" -> "Schedule a chavrusa": the words before the first when/who/where
+function aiSubject(t){const m=new RegExp('\\b'+AI_SUBJ_CUT.source,'i').exec(t);const s=(m?t.slice(0,m.index):t).replace(/[\s,;.]+$/,'').trim();return aiHasTitle(s)?s:''}
 function aiSplitRequests(raw){
  const text=String(raw||'').replace(/\r/g,'').replace(/[‘’`´]/g,"'").trim();if(!text)return[];
  // 1. lines (with bullets or numbers), semicolons, "1) … 2) …", Hebrew "וגם"
@@ -2681,15 +2684,19 @@ function aiSplitRequests(raw){
    else out.push(piece)}return out});
  // 3. inside one sentence: "and also …", ", and add …", or two parts that each name something and give it a day or time
  const vRe=new RegExp('^'+AI_SPLIT_VERB,'i');
- parts=parts.flatMap(l=>{const out=[];let cur='';const bits=l.split(/(\s*,\s*(?:and\s+)?(?:then\s+)?|\s+and\s+(?:then\s+)?|\s+&\s+|\s+plus\s+)/i);
+ parts=parts.flatMap(l=>{const out=[];let cur='';const bits=l.split(/(\s*,\s*(?:and\s+)?(?:then\s+)?|\s+and\s+(?:then\s+)?|\s+&\s+|\s+plus\s+|\s+(?=also\b))/i);
    cur=bits[0];
    for(let i=1;i<bits.length;i+=2){const sep=bits[i],rest=bits.slice(i+1).join(''),next=bits[i+1]||'';
-    const also=/^also\b/i.test(next.trim())&&/\band\b|,/i.test(sep);
+    const also=/^also\b/i.test(next.trim())&&(/\band\b|,/i.test(sep)||(aiHasAnchor(cur)&&aiHasAnchor(rest)));
     const verb=vRe.test(next.trim());
     const pair=aiHasTitle(cur)&&aiHasAnchor(cur)&&aiHasTitle(rest)&&aiHasAnchor(rest)&&aiHasTitle(next)&&!/^(?:with|at|on|in|for|from|to|until|every|each)\b/i.test(next.trim());
-    if(cur.trim()&&aiHasTitle(cur)&&(also||verb||pair)){out.push(cur);cur=next.replace(/^\s*also[,]?\s+/i,'')}
+    if(cur.trim()&&aiHasTitle(cur)&&(also||verb||pair)){out.push(cur);cur=also?next:next.replace(/^\s*also[,]?\s+/i,'')}
     else cur+=sep+next}
    out.push(cur);return out});
+ // 4. a part that starts straight with a when/who ("also every night at 8 with Adam") repeats what the part before it was about
+ parts=parts.map(t=>t.trim());
+ for(let i=1;i<parts.length;i++){const body=parts[i].replace(/^(?:and\s+|then\s+|plus\s+)*(?:also\s+)?/i,'').replace(/^[,\s]+/,'');
+  if(new RegExp('^'+AI_SUBJ_CUT.source,'i').test(body)){const subj=aiSubject(parts[i-1]);if(subj)parts[i]=subj+' '+body}}
  return parts.map(s=>s.replace(/^\s*(?:and|also|then|plus)\b[,]?\s*/i,'').replace(/[\s,.;!]+$/,'').trim()).filter(s=>s&&!/^(?:hi|hello|hey|thanks|thank you|please|ok|okay|that's all|that is all)$/i.test(s))}
 
 async function aiInterpretOne(raw){let data=null;
