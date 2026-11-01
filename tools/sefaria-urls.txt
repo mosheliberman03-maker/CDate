@@ -1,0 +1,6 @@
+https://www.sefaria.org/api/calendars?year=2026&month=11&day=2&diaspora=1
+https://www.sefaria.org/api/calendars?year=2026&month=11&day=5&diaspora=1
+https://www.sefaria.org/api/calendars?year=2026&month=11&day=7&diaspora=1
+https://www.sefaria.org/api/calendars?year=2026&month=11&day=10&diaspora=1
+https://www.sefaria.org/api/calendars?year=2027&month=7&day=13&diaspora=1
+https://www.sefaria.org/api/v2/raw/index/Numbers
