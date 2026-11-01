@@ -1537,8 +1537,10 @@ function skyPalette(alt,morning){
  return{top:skyHex(top),bot:skyHex(bot),mid:skyHex(mid),dark,contrast:Math.max(worst(SKY_INK_L),worst(SKY_INK_D)),stars:Math.max(0,Math.min(1,(-alt-3)/9))}}
 
 /* everything the home screen needs to know about "now" */
-/* the arch the sun and moon travel (percent of the scene): steep near the horizon so the body clears the time pill */
-function skyArcY(f){const v=Math.sin(Math.PI*f);return 90-40*Math.sign(v)*Math.pow(Math.abs(v),.4)}
+/* the arch the sun and moon travel (percent of the scene): a smooth half-ellipse whose ends lie beyond the screen edges,
+   so they rise in and set out along the curve; high enough over the middle to clear the time pill */
+function skyArcX(f){return 50-58*Math.cos(Math.PI*f)}
+function skyArcY(f){return 102-52*Math.sin(Math.PI*f)}
 function skyCompute(now){
  const[y,m,d]=skyLocalYMD(now),T=skySunTimes(y,m,d),sr=T.sr,ss=T.ss,sp=skySunPos(now),alt=sp.alt+.833,have=sr!=null&&ss!=null;
  const up=have?(now>=sr&&now<ss):alt>0,morning=have?now<(sr+ss)/2:true,mp=skyMoonPos(now);
@@ -1549,7 +1551,7 @@ function skyCompute(now){
   if(ps.isUp&&ps.rise&&ps.set){kind='moon';frac=Math.max(0,Math.min(1,(now-ps.rise)/(ps.set-ps.rise)));cap='Moon sets '+tf(ps.set);label='The moon is up and sets at '+tf(ps.set)}
   else if(ps.isUp){kind='moon';frac=.5;cap='Moon is up';label='The moon is up'}
   else{kind='below';frac=0;const nxt=ps.rise?(skyLocalYMD(ps.rise).join()!==[y,m,d].join()?' (tomorrow)':''):'';cap=ps.rise?'Moonrise '+tf(ps.rise)+nxt:'Moon is down';if(have&&now<sr){cap='Sunrise '+tf(sr);}label=cap}}
- st.kind=kind;st.frac=frac;st.cap=cap;st.label=label;{const f=kind==='below'?.03:frac;st.x=8+f*84;st.y=skyArcY(f)}st.pal=skyPalette(alt,morning);return st}
+ st.kind=kind;st.frac=frac;st.cap=cap;st.label=label;{const f=kind==='below'?.22:frac;st.x=skyArcX(f);st.y=skyArcY(f)}st.pal=skyPalette(alt,morning);return st}
 
 /* drawing */
 /* ===== Procedural sun & moon artwork (rendered once to canvas, then shown as images) ===== */
@@ -1640,7 +1642,7 @@ const skyHash=n=>{let k=Math.imul(n|0,374761393)^0x5bd1e995;k=Math.imul(k^(k>>>1
 const skyN1=x=>{const i=Math.floor(x),f=x-i,u=f*f*(3-2*f);return skyHash(i)*(1-u)+skyHash(i+1)*u};
 const SKT={key:'',off:null},SK_PAD=26;
 const skyDpr=()=>Math.min(2,window.devicePixelRatio||1);
-const skyPath=(f,W,H)=>[SK_PAD+(8+f*84)/100*W,SK_PAD+skyArcY(f)/100*H];
+const skyPath=(f,W,H)=>[SK_PAD+skyArcX(f)/100*W,SK_PAD+skyArcY(f)/100*H];
 /* the finished streak, drawn once and then only revealed as the body moves along it */
 /* The moon's trail: a faint stream of light and fine dust leaving the moon toward the lower left, densest and brightest
    near the moon and dissolving away from it. Drawn once per size into an offscreen canvas; animation only fades it in. */
@@ -1720,7 +1722,7 @@ function skyRun(plan,done){
    b.className='sky-body '+(sun?'sun-b':'moon-b')+' anim';b.style.left='0';b.style.top='0';b.style.willChange='transform,opacity';
    const im=b.querySelector('img');if(im)im.style.visibility='hidden';
    cv=b.querySelector('canvas.skycv');if(!cv){cv=document.createElement('canvas');cv.width=cv.height=ART_N;cv.className='skyimg skycv';cv.style.cssText='position:absolute;left:0;top:0';b.appendChild(cv)}cg=cv.getContext('2d')}
-  const fr=Math.min(1,frac),x=(8+fr*84)/100*W,y=skyArcY(frac)/100*H+dy;
+  const fr=Math.min(1,frac),x=skyArcX(frac)/100*W,y=skyArcY(frac)/100*H+dy;
   const key=sun?'s'+artSunKey(alt):'m'+(MOON_PX?'p':'');if(key!==lastKey){lastKey=key;const src=sun?artSunCanvasKey(artSunKey(alt)):artMoonCanvas(Math.min(.999,Math.max(0,st.phase)));if(cv.width!==src.width){cv.width=cv.height=src.width}cg.clearRect(0,0,cv.width,cv.height);cg.drawImage(src,0,0)}
   b.style.transform=`translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;b.style.opacity=Math.max(0,op).toFixed(3);
   if((fc++)%4===0||u>=1)skyApply({pal,anim:1});
