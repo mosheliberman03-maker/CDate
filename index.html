@@ -523,6 +523,16 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .dock #mo::after{content:'';position:absolute;left:-6px;top:14px;bottom:14px;width:1px;background:color-mix(in srgb,var(--gl-tx) 22%,transparent)}
 .dock #mn{font-size:22px;letter-spacing:1px;padding:0 18px;color:color-mix(in srgb,var(--gl-tx) 82%,transparent)}
 .nxc{background:var(--gl-bg);border-color:var(--gl-bd)}
+/* living light: the silk canvas, and glass whose rim glint and glare follow the same light as you scroll */
+#skyGL{position:absolute;inset:0;width:100%;height:100%;display:block}
+#hdr .wk,.hyc{position:relative}
+:is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc)::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;padding:1.2px;z-index:2;
+ background:conic-gradient(from var(--ga,-40deg),rgba(255,255,255,var(--gi)) 0deg,rgba(255,255,255,calc(var(--gi)*.35)) 32deg,rgba(255,255,255,0) 85deg,rgba(255,255,255,0) 150deg,rgba(255,255,255,calc(var(--gi)*.22)) 180deg,rgba(255,255,255,0) 212deg,rgba(255,255,255,0) 275deg,rgba(255,255,255,calc(var(--gi)*.35)) 328deg,rgba(255,255,255,var(--gi)) 360deg);
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+:is(#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc)::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
+ background:radial-gradient(80% 110% at var(--gx,30%) var(--gy,-10%),rgba(255,255,255,calc(var(--gi)*.16)),rgba(255,255,255,0) 62%),
+ linear-gradient(112deg,rgba(255,255,255,0) calc(var(--gs,40%) - 16%),rgba(255,255,255,calc(var(--gi)*.09)) var(--gs,40%),rgba(255,255,255,0) calc(var(--gs,40%) + 16%))}
+:root{--gi:.55}:root[data-night="1"]{--gi:.62}
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
 </style>
 </head><body>
@@ -888,7 +898,7 @@ function zmn(){const dt=sel,y=dt.getFullYear(),mo=dt.getMonth()+1,d=dt.getDate()
  {const hh=hd(dt);if(hh.k=='N'&&hh.d==14)R.push(['Stop eating chametz (end of 4th hour)',mn+4*mg],['Burn chametz by (end of 5th hour)',mn+5*mg])}
  ZR=R;$('#zm').innerHTML=`<h2 class="rv">Zmanim</h2><div class="mut rv" style="--i:1">${LC.n}</div>`+R.map((r,i)=>`<div class="dr rv" style="--i:${Math.min(i+2,10)}"><b>${r[0]}</b><span>${tf(r[1])}</span></div>`).join('')+'<small class="rv" style="--i:12">Calculated estimates (alos 16.1°, tzeis 8.5°, candles 18 min before sunset). Confirm with your local luach for halachic use.</small>'}
 const TH=['1–9','10–17','18–22','23–28','29–34','35–38','39–43','44–48','49–54','55–59','60–65','66–68','69–71','72–76','77–78','79–82','83–87','88–89','90–96','97–103','104–105','106–107','108–112','113–118','119:1–96','119:97–176','120–134','135–139','140–144','145–150'];
-function render(dir){
+function render(dir){if(typeof GLS!=='undefined'&&GLS.kick)requestAnimationFrame(GLS.kick);
  const f=V,L=hlen(f),a=ad(f,-f.getDay()),n=Math.ceil((f.getDay()+L)/7)*7,td=+t0;
  const h0=hd(f),e1=ad(f,L-1);$('#t').textContent=h0.n[0]+' '+h0.y;if(dir&&!RM)$('#t').animate([{opacity:0,transform:`translateX(${dir*18}px)`},{opacity:1,transform:'none'}],{duration:380,easing:'cubic-bezier(.2,.8,.2,1)'});
  {const A=f.toLocaleDateString('en',{month:'short'}),B=e1.toLocaleDateString('en',{month:'short'}),y1=f.getFullYear(),y2=e1.getFullYear();$('#s').innerHTML=`${A==B&&y1==y2?A:A+(y1==y2?'':' '+y1)+' – '+B} ${y2} · <b lang="he">${h0.n[1]} ה׳${G(h0.y%1000)}</b>`}
@@ -1734,7 +1744,7 @@ function skyTick(){
  el.style.boxShadow=a.join(',')})();
 /* Signature glass ribbons: broad, soft, translucent bands with one finely lit edge, layered for depth.
    Each band is many offset strokes fading away from the lit edge, softened with a blur; built once, they only drift on scroll. */
-(function(){const host=document.getElementById('skyWaves');if(!host)return;
+function skyRibbonsSvg(host){
  const R=[{c:[-80,380,0,240,140,40,380,-60],d:[60,70],s:4,o:.9},{c:[-80,140,90,30,300,10,480,210],d:[0,46],s:3,o:.5},{c:[480,300,400,330,330,400,280,520],d:[-50,20],s:7,o:.42},
   {c:[-80,500,30,500,110,560,170,660],d:[40,-10],s:8,o:.34},{c:[-80,760,100,720,260,640,480,580],d:[0,80],s:10,o:.85},{c:[480,660,330,690,170,790,-80,880],d:[0,70],s:12,o:.7}];
  const pt=(a,i)=>a[i].toFixed(1)+' '+a[i+1].toFixed(1),K=12;
@@ -1747,7 +1757,80 @@ function skyTick(){
    `<filter id="rb${n}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${(w*1.3).toFixed(1)}"/></filter><filter id="rg${n}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>`+
    `<g fill="none" stroke-linecap="round" filter="url(#rb${n})">${band}</g>`+
    `<path d="${e}" fill="none" stroke="url(#re${n})" stroke-width="4" opacity="${(.32*r.o).toFixed(2)}" filter="url(#rg${n})"/>`+
-   `<path d="${e}" fill="none" stroke="url(#re${n})" stroke-width=".9" opacity="${(.6*r.o).toFixed(2)}"/></svg>`}).join('')})();
+   `<path d="${e}" fill="none" stroke="url(#re${n})" stroke-width=".9" opacity="${(.6*r.o).toFixed(2)}"/></svg>`}).join('')}
+/* Living silk: the background ribbons are painted on the graphics chip (WebGL). Each ribbon is a twisting strip of
+   translucent silk with a curved cross-section, lit by one light; the light swings as you scroll (and drifts slowly),
+   so the sheen slides along the ribbons, and the glass pieces' rims and glare follow the same light (glassShine). */
+const GLS={ang:-2.25,L:[-.47,-.6,.65],t:0,ok:false};
+function glassShine(){const H=innerHeight,W=innerWidth,lx=W/2+GLS.L[0]*H*1.6,ly=H/2+GLS.L[1]*H*1.6;
+ for(const e of document.querySelectorAll('#hdr .wk,.sky-cap,.dock,.hint,.ai-fab,.panel,.hyc')){const r=e.getBoundingClientRect();if(r.bottom<-40||r.top>H+40||!r.width)continue;
+  const cx=r.left+r.width/2,cy=r.top+r.height/2,dx=lx-cx,dy=ly-cy,d=Math.hypot(dx,dy)||1,nx=dx/d,ny=dy/d,s=e.style;
+  s.setProperty('--ga',(Math.atan2(dx,-dy)*57.2958).toFixed(1)+'deg');s.setProperty('--gx',(50+nx*46).toFixed(1)+'%');s.setProperty('--gy',(50+ny*60).toFixed(1)+'%');
+  s.setProperty('--gs',(50+62*Math.sin(GLS.ang*1.6+cy/H*2.4)).toFixed(1)+'%')}}
+(function(){const host=document.getElementById('skyWaves');if(!host)return;
+ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const cv=document.createElement('canvas');cv.id='skyGL';let gl=null;
+ try{gl=cv.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:false,powerPreference:'low-power'})}catch(e){}
+ if(!gl){skyRibbonsSvg(host);return}
+ const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+ const FS=`precision highp float;
+uniform vec2 uR;uniform float uT,uS;uniform vec3 uF,uE,uL;uniform float uO;uniform vec4 uA[6],uB[6],uC[6];
+void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px=1./uR.x;
+ vec3 acc=vec3(0.);float aa=0.;vec3 Hv=normalize(uL+vec3(0.,0.,1.));
+ for(int i=0;i<6;i++){vec4 A=uA[i],B=uB[i],C=uC[i];float x=p.x,t=uT*C.w;
+  float a1=A.z*x+A.w+t,a2=B.y*x+1.7*A.w-.6*t;
+  float c=A.x-uS*C.y+A.y*sin(a1)+B.x*sin(a2),dc=A.y*A.z*cos(a1)+B.x*B.y*cos(a2);
+  float th=B.w*x+C.x+.35*t,ct=cos(th),st=sin(th);
+  float w=B.z*1.5*(.14+.86*abs(ct)),d=(p.y-c)/sqrt(1.+dc*dc),u=d/w;
+  float epx=(1.-abs(u))*w/px;
+  if(epx<-90.)continue;
+  vec3 T=normalize(vec3(1.,dc,0.)),N2=normalize(vec3(-dc,1.,0.)),Bv=ct*N2+st*vec3(0.,0.,1.);
+  vec3 n=normalize(cross(T,Bv));if(n.z<0.)n=-n;float uc=clamp(u,-1.,1.);n=normalize(n-Bv*uc*.7);
+  float nh=max(dot(n,Hv),0.),sp=pow(nh,60.),sp2=pow(nh,9.),dif=.3+.7*max(dot(n,uL),0.);
+  float ins=smoothstep(-.5,1.6,epx),rim=exp(-abs(epx)/1.15);
+  float top=u<0.?1.:.42,fade=.55+.45*sin(x*2.1+A.w*1.3+t*.5);
+  float fib=.55*pow(.5+.5*sin(u*41.+x*2.3),7.)+.45*pow(.5+.5*sin(u*15.-x*1.6+A.w),4.);
+  float lit=mix(1.,.3,clamp((u+1.)*.5,0.,1.));
+  float body=ins*(.085+.13*fib*dif*lit+.26*sp2*lit+.8*sp)*(.55+.45*dif);
+  float edge=rim*top*(.45+1.3*sp2+.6*sp);
+  float halo=(1.-ins)*exp(epx/(w/px*.35+6.))*.05*top;
+  float al=(body+edge+halo)*C.z*fade;
+  vec3 col=mix(uF,uE,clamp(sp2*.9+edge*.8,0.,1.))+vec3(sp*.7);
+  acc+=col*al;aa+=al;}
+ aa=clamp(aa,0.,1.);gl_FragColor=vec4(min(acc,vec3(1.))*uO,aa*uO);}`;
+ const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o};
+ let pr;try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw 0}
+ catch(e){skyRibbonsSvg(host);return}
+ host.appendChild(cv);GLS.ok=true;gl.useProgram(pr);
+ const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+ const al=gl.getAttribLocation(pr,'a');gl.enableVertexAttribArray(al);gl.vertexAttribPointer(al,2,gl.FLOAT,false,0,0);
+ const U={};for(const k of['uR','uT','uS','uF','uE','uL','uO','uA','uB','uC'])U[k]=gl.getUniformLocation(pr,k);
+ /* per ribbon: A=(height, sway, sway freq, phase)  B=(2nd sway, 2nd freq, half width, twist freq)  C=(twist phase, parallax, strength, drift speed) */
+ const R=[[.62,.42,2.5,1.25, .06,5.2,.085,3.1, .4,.32,.95,.05],
+  [.18,.10,3.3,2.6, .04,6.,.05,4.2, 2.1,.22,.55,.04],
+  [1.30,.16,3.0,4.1, .05,5.5,.075,2.6, 1.3,.42,.55,.06],
+  [1.66,.20,2.4,.35, .07,4.4,.11,2.2, 2.6,.55,.9,.05],
+  [2.02,.16,2.9,5.2, .05,6.3,.08,3.4, .9,.68,.75,.045],
+  [2.32,.22,2.1,2.0, .06,4.8,.12,2.0, 3.4,.8,.8,.04]];
+ const fa=j=>new Float32Array(R.flatMap(r=>r.slice(j*4,j*4+4)));
+ gl.uniform4fv(U.uA,fa(0));gl.uniform4fv(U.uB,fa(1));gl.uniform4fv(U.uC,fa(2));
+ gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
+ const hex=v=>{v=(v||'').trim();const m=/^#?([0-9a-f]{6})$/i.exec(v);if(!m)return[1,1,1];const n=parseInt(m[1],16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]};
+ let colT=-1e9,W=0,Hh=0,sc=0,scT=0,last=0,raf=0,t0=performance.now();
+ const size=()=>{const d=Math.min(devicePixelRatio||1,1.75),w=Math.round(host.clientWidth*d),h=Math.round(host.clientHeight*d);if(w&&h&&(w!==W||h!==Hh)){W=cv.width=w;Hh=cv.height=h;gl.viewport(0,0,w,h)}};
+ const colors=()=>{const cs=getComputedStyle(document.documentElement);gl.uniform3fv(U.uF,hex(cs.getPropertyValue('--rbf')));gl.uniform3fv(U.uE,hex(cs.getPropertyValue('--rbe')));gl.uniform1f(U.uO,document.documentElement.dataset.night==='1'?1:.8)};
+ const draw=now=>{size();if(!W)return;GLS.drawn=1;if(now-colT>2000||colT<0){colT=now;colors()}
+  sc+=(scT-sc)*(reduce?1:.09);const t=reduce?0:(now-t0)/1000;GLS.t=t;
+  GLS.ang=-2.25+sc/innerHeight*.85+(reduce?0:.18*Math.sin(t*.07));const ca=Math.cos(GLS.ang),sa=Math.sin(GLS.ang);GLS.L=[ca*.76,sa*.76,.65];
+  gl.uniform2f(U.uR,W,Hh);gl.uniform1f(U.uT,t);gl.uniform1f(U.uS,sc/host.clientWidth);gl.uniform3fv(U.uL,GLS.L);
+  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);glassShine()};
+ const loop=now=>{raf=0;if(document.hidden)return;if(document.getElementById('intro')){setTimeout(kick,300);return}if(now-last>=40){last=now;draw(now)}
+  if(!reduce||!GLS.drawn||Math.abs(scT-sc)>.5)raf=requestAnimationFrame(loop)};
+ const kick=()=>{if(!raf)raf=requestAnimationFrame(loop)};
+ addEventListener('scroll',()=>{scT=scrollY||document.documentElement.scrollTop||0;kick()},{passive:true});
+ addEventListener('resize',()=>{colT=-1;kick()},{passive:true});document.addEventListener('visibilitychange',()=>{colT=-1;kick()});
+ new MutationObserver(()=>{colT=-1;kick()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-night','data-theme']});
+ GLS.kick=()=>{colT=-1;kick()};kick()})();
 if(SKY.on){const st0=skyCompute(Date.now());SKY.last=st0;SKY.shift=st0.shift;t0=new Date(st0.ymd[0],st0.ymd[1]-1,st0.ymd[2]+st0.shift,12);sel=t0;V=hm1(t0);skyApply(st0)}else skyOff();
 setInterval(skyTick,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)skyTick()});addEventListener('focus',skyTick);
