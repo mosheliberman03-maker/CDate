@@ -558,11 +558,11 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
  #skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both;animation-timeline:auto,auto,scroll(root block);animation-range:normal,normal,0px 1000px;animation-composition:replace,add,add}
  :is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:rv .75s cubic-bezier(.2,.8,.2,1) calc(var(--i,0)*70ms) backwards,flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both;animation-timeline:auto,auto,auto,scroll(root block);animation-range:normal,normal,normal,0px 1000px;animation-composition:replace,replace,add,add}}
 .cc-away :is(#skyBody,#skyTrailC,.sky-cap,#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk),.cc-away #hdr .sky-scene::after{animation-play-state:paused!important}
-/* the semicircle rolls away as you scroll down: its left end runs along the curve and is swallowed at the right end while it turns */
+/* the semicircle swivels away as you scroll down: the whole arc turns clockwise around its own (invisible) centre, then fades out on the way down */
 @property --dw{syntax:'<angle>';inherits:false;initial-value:100deg}
-@keyframes dmW{from{--dw:100deg;rotate:0deg}to{--dw:252deg;rotate:16deg}}
+@keyframes dmW{0%{rotate:0deg;opacity:1}55%{opacity:1}100%{rotate:78deg;opacity:0}}
 @supports (animation-timeline:scroll()){
- #hdr .sky-scene::after{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both,dmW 1s linear both;animation-timeline:auto,auto,scroll(root block),scroll(root block);animation-range:normal,normal,0px 1000px,0px 300px;animation-composition:replace,add,add,replace}}
+ #hdr .sky-scene::after{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both,dmW 1s linear both;animation-timeline:auto,auto,scroll(root block),scroll(root block);animation-range:normal,normal,0px 1000px,0px 340px;animation-composition:replace,add,add,replace}}
 @media(prefers-reduced-motion:reduce){#skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab,.dock,#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk,:is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:none!important}}
 /* event labels at the bottom: one tidy row that scrolls sideways, never stacked over the week panel */
 .foot .chips2{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;justify-content:safe center;padding:3px 12px;margin:0 -12px;
