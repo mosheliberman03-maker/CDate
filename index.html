@@ -1124,8 +1124,18 @@ function study(h){const u='https://www.chabad.org/dailystudy/default.asp?tdate='
  $('#hy').innerHTML=`<div class="hyc rv"><h2>Hayom Yom</h2><div class="heb" lang="he" dir="rtl">${G(h.d)} ${h.n[1]}</div><p class="mut">The Rebbe’s daily collection of Chassidic teachings, one entry for each day of the year.</p><div class="hyr"><a class="btn" href="${u}" target="_blank" rel="noopener">Read ${h.d} ${h.n[0]} ↗</a><button class="btn gh" id="hyb"></button></div></div>`}
 const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');if(e.target.dataset.sectionStart==='1'&&!document.getElementById('intro'))H.rev();io.unobserve(e.target)}})},{threshold:.08,rootMargin:'0px 0px -5% 0px'});
 function reveal(c){const x=c.querySelectorAll('.rv');x.forEach((n,i)=>{n.classList.remove('in');io.unobserve(n);n.dataset.sectionStart=i===0?'1':'0'});requestAnimationFrame(()=>requestAnimationFrame(()=>x.forEach(n=>io.observe(n))))}
-function rail(){const h0=hd(sel),a=[];
- const scan=(lim,same)=>{for(let i=1;i<=lim&&a.length<14;i++){const dt=ad(sel,i),x=info(dt);if(same&&x.h.k!=h0.k)break;const v=x.ev.filter(e=>on[e.k]);if(v.length)a.push({dt,h:x.h,v})}};
+/* Daily routines (your own plans that repeat 5+ days a week, e.g. a nightly chavrusa) are left out of "Coming up".
+   Plans with the same name and person count together, so "every day except Wednesday" + "Wednesdays at 8:30" is one routine. */
+function dailyIds(){const g={},out=new Set();
+ for(const c of my){let days=null;
+  if(c.r==='custom'&&c.interval===1&&!(Array.isArray(c.dates)&&c.dates.length))days=[0,1,2,3,4,5,6];
+  else if(c.r==='every2')days=[0,1,2,3,4,5,6];
+  else if(c.r==='weekly')days=Array.isArray(c.dows)&&c.dows.length?c.dows:[c.dow];
+  if(!days)continue;const k=String(c.t||'').trim().toLowerCase()+'|'+String(c.person||'').trim().toLowerCase();
+  (g[k]=g[k]||{ids:[],d:new Set()}).ids.push(c.id);days.forEach(d=>g[k].d.add(d))}
+ for(const k in g)if(g[k].d.size>=5)g[k].ids.forEach(i=>out.add(i));return out}
+function rail(){const h0=hd(sel),a=[],DI=dailyIds();
+ const scan=(lim,same)=>{for(let i=1;i<=lim&&a.length<14;i++){const dt=ad(sel,i),x=info(dt);if(same&&x.h.k!=h0.k)break;const v=x.ev.filter(e=>on[e.k]&&!(e.k==='my'&&DI.has(e.id)));if(v.length)a.push({dt,h:x.h,v})}};
  scan(31,true);if(!a.length)scan(30,false);
  const r=$('#rail');$('#top').classList.toggle('norail',!a.length);
  r.innerHTML=a.length?'<div class="rl"><div class="rh rv">Coming up</div>'+a.map((x,i)=>{const p=x.v[0];return `<button class="rt mc k-${p.k}" style="--i:${Math.min(i,8)}" data-t="${+x.dt}" title="${x.v.map(e=>e.t).join(', ')}" aria-label="${x.dt.toDateString()}: ${x.v.map(e=>e.t).join(', ')}"><span class="mk2">${x.v.slice(0,3).map(e=>`<i class="m k-${e.k}"></i>`).join('')}</span><small>${x.dt.toLocaleDateString('en',{weekday:'short'})}</small><b>${x.dt.getDate()}</b><span lang="he">${G(x.h.d)}</span></button>`}).join('')+'</div>':'';
