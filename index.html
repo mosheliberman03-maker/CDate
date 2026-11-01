@@ -1161,7 +1161,7 @@ async function rdRefs(k,d){const cal=await rdCal(d),it=(cal.calendar_items||[]);
    if(ns.length>1)refs=ns.map(n=>n.refs[wd]).filter(Boolean)}catch(e){}}
   return refs.map(r=>({url:rdUrl(r),kind:'ch'}))}
  return[]}
-const rdSplit=r=>{const m=/^(.*) (\d+):(\d+)$/.exec(r||'');return m?{n:m[1],c:+m[2],s:+m[3]}:null};
+const rdSplit=r=>{const m=/^(.*?) (\d+):(\d+)(?:-[\d:]+)?$/.exec(String(r||'').trim());return m?{n:m[1],c:+m[2],s:+m[3]}:null};
 const rdNextRef=j=>typeof j.next==='string'?j.next:j.next&&(j.next.ref||j.next.url)||null;
 async function rdTanya(part){const A=rdSplit(part.from),B=rdSplit(part.to);if(!A)throw new Error('tanya');const out=[];let he='';
  const take=(j,keep)=>{he=he||j.heRef;for(const x of rdFlat(j))if(keep(x))out.push(x)};
@@ -1189,7 +1189,7 @@ function rdOpen(k){const d=new Date(sel),dk=dkey(),st=RDS={k,d,dk,ok:false};
  requestAnimationFrame(()=>b.classList.add('on'));document.body.classList.add('rdo');H.tap();
  history.pushState({rdr:1},'');
  rdBuild(k,d).then(html=>{if(RDS!==st)return;st.ok=true;m.innerHTML=html+`<p class="rdf" dir="ltr">Text from Sefaria · <a href="https://www.chabad.org/dailystudy/default.asp?tdate=${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}" target="_blank" rel="noopener">Open on Chabad.org ↗</a></p>`})
-  .catch(()=>{if(RDS!==st)return;m.innerHTML=`<p class="rdl" dir="ltr">Could not load the text. Check your connection (in China, Sefaria may need your VPN), then try again.</p><p class="rdl" dir="ltr"><button type="button" class="rdr2">Try again</button></p>`;m.querySelector('.rdr2').onclick=()=>{history.back();setTimeout(()=>rdOpen(k),350)}})}
+  .catch(err=>{if(RDS!==st)return;m.innerHTML=`<p class="rdl" dir="ltr">Could not load the text. Check your connection (in China, Sefaria may need your VPN), then try again.</p><p class="rdl" dir="ltr" style="font-size:12px">(${String(err&&err.message||err).replace(/[<>&]/g,'')})</p><p class="rdl" dir="ltr"><button type="button" class="rdr2">Try again</button></p>`;m.querySelector('.rdr2').onclick=()=>{history.back();setTimeout(()=>rdOpen(k),350)}})}
 function rdClose(){const st=RDS,b=$('#rdr');RDS=null;if(b)b.classList.remove('on');document.body.classList.remove('rdo');
  // leaving after reading checks it off (only when the text actually loaded)
  if(st&&st.ok){const D=(DN[st.dk]??={});if(!D[st.k]){if(st.k==='rambam3'||st.k==='rambam1')delete D[st.k==='rambam3'?'rambam1':'rambam3'];D[st.k]=1;SVD();upd();H.ok();if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}}}
