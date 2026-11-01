@@ -1,6 +1,6 @@
 // Chabad Calendar service worker: shows reminders pushed from the server, and makes the app open its newest version.
 // Opening the app always asks GitHub Pages for a fresh copy (instead of a copy the phone saved for up to 10 minutes).
-// With no internet it falls back to the copy the phone already has. Nothing else is cached here.
+// With no internet it falls back to the copy the phone already has. Fonts, the moon picture and icons are kept too (see below).
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
 self.addEventListener('push', (e) => {
@@ -23,6 +23,7 @@ self.addEventListener('notificationclick', (e) => {
 // copy from GitHub in the background. If it changed, tell the open app so it can offer "Tap to update".
 // First open (nothing saved yet) or no saved copy: wait for the network. Offline with nothing saved: normal browser behaviour.
 const APP_CACHE = 'cdate-app-v1';
+const STATIC_CACHE = 'cdate-static-v1';
 const sig = (res) => res.headers.get('etag') || res.headers.get('last-modified') || '';
 self.addEventListener('fetch', (e) => {
   const r = e.request;
@@ -32,6 +33,17 @@ self.addEventListener('fetch', (e) => {
   const scope = new URL(self.registration.scope);
   const isApp = r.mode === 'navigate' || u.pathname === scope.pathname || u.pathname === scope.pathname + 'index.html';
   const isHy = u.pathname === scope.pathname + 'hayomyom-en.json'; // the English Hayom Yom text: same treatment, so it works offline
+  // Fonts, the moon picture and icons rarely change: answer from the phone at once (and offline), refresh quietly in the background.
+  if (/\/(fonts|assets)\/|\/icon-\d+\.png$/.test(u.pathname) && u.pathname.startsWith(scope.pathname)) {
+    e.respondWith((async () => {
+      const cache = await caches.open(STATIC_CACHE);
+      const saved = await cache.match(r.url, { ignoreSearch: true });
+      const net = fetch(r).then((res) => { if (res.ok) cache.put(r.url, res.clone()); return res; });
+      if (saved) { e.waitUntil(net.catch(() => {})); return saved; }
+      return net;
+    })());
+    return;
+  }
   if (!isHy && (!isApp || (u.pathname !== scope.pathname && u.pathname !== scope.pathname + 'index.html'))) return;
   const key = isHy ? scope.href + 'hayomyom-en.json' : scope.href; // one saved copy each, whatever ?query the link had
   e.respondWith((async () => {
