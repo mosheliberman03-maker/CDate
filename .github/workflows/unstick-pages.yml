@@ -1,0 +1,19 @@
+name: Unstick Pages publishing (one-off)
+on: workflow_dispatch
+permissions:
+  pages: write
+  contents: read
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          R: ${{ github.repository }}
+        run: |
+          api(){ curl -sS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "$@"; }
+          for s in fa7d4871b0891d2631c0ce5699cbbe837d35c610; do
+            echo "== status $s"; api "https://api.github.com/repos/$R/pages/deployments/$s"
+            echo "== cancel $s"; api -X POST "https://api.github.com/repos/$R/pages/deployments/$s/cancel" -w "\nHTTP %{http_code}\n"
+          done
+          echo "== request a fresh build"; api -X POST "https://api.github.com/repos/$R/pages/builds" -w "\nHTTP %{http_code}\n"
