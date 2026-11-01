@@ -18,6 +18,7 @@ Do not add files named `index (1).html` or similar: only `index.html` is served.
 
 ## Inside index.html (main pieces, by function name)
 - **Calendar core:** `hd()` Hebrew date, `t0` today (rolls over at sunset), `sel` selected day, `LC` location `{n,la,lo,tz}`, `setLoc(n,la,lo,tz)`, `zAt()` zmanim, `render()`, `panel()`, `upd()`. Study tracking lives in `DN` (key `YYYY-MM-DD` → `{chumash,tehillim,tanya,rambam3|rambam1,hy}`); `tog(k)` toggles one.
+- **Repeating plans only on today:** the user's own daily / every-other-day / weekly plans (`routine(e)`) are shown only on today. Display code uses `infoD(dt)` (filtered); `info(dt)` keeps everything for reminders and for cancelling. Use `infoD` for anything new that displays days.
 - **Per-profile storage:** `AK(key)`, `ST(key,default)`. Local profiles and a login gate exist (`cc_local_profiles_v1`).
 - **Opening logo animation:** the `#intro` overlay script (about 10.7 s). Note: a `<style id="android-blank-screen-fix">` tag sits *inside* the main CSS as text, so its `#intro{display:none}` rule is dead. Leave it: "fixing" it would remove the intro the owner likes.
 - **Live sky:** `SKY`, `skyCompute()`, `skyPalette()`, `skyApply()`, `skyTick()` (every 30 s). Sun and moon artwork is procedural: `artSunCanvasKey()` (fields precomputed once in `artSunFieldRows()`), `artMoonCanvas()`, plus `artSunUrl()` / `artMoonUrl()` for `<img>` use.
