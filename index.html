@@ -3432,7 +3432,16 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
  <label style="margin-top:14px">Features (test account only)</label><div id="ttFlags" style="display:grid;gap:8px;margin:6px 0 4px"></div><div class="rw" style="flex-wrap:wrap;gap:8px;margin-top:10px"><button class="btn" type="button" id="ttPlay">Play sun/moon opening</button><button class="btn gh" type="button" id="ttIntro">Play logo intro</button><button class="btn gh" type="button" id="ttReset">Reset test account</button></div>`;
  if(help)help.parentNode.insertBefore(box,help);
  const $d=box.querySelector('#ttD'),$t=box.querySelector('#ttT'),$v=box.querySelector('#ttV');
- window.fill_=function(){const n=new Date();$d.value=ds(n);$t.value=n.getHours()*60+n.getMinutes();$v.textContent=n.toLocaleTimeString('en',{hour:'numeric',minute:'2-digit'})};
+ /* Always-visible reminder that the test account runs on a simulated clock, not the phone's time (prevents the
+    "sunrise looks wrong" confusion). Tap it to jump to real now. */
+ let tBadge=document.getElementById('ccTestBadge');if(!tBadge){tBadge=document.createElement('button');tBadge.id='ccTestBadge';tBadge.type='button';
+  tBadge.style.cssText='position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 6px);transform:translateX(-50%);z-index:100005;border:0;cursor:pointer;'+
+   'font:600 11px/1 Figtree,system-ui,sans-serif;letter-spacing:.02em;color:#fff;padding:5px 11px;border-radius:999px;background:rgba(140,148,239,.92);box-shadow:0 4px 14px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)';
+  tBadge.title='Test clock (not your phone). Tap for real time.';
+  tBadge.addEventListener('click',()=>{const q=box.querySelector('[data-q="now"]');if(q)q.click()});document.body.appendChild(tBadge)}
+ function ccTestBadge(){const n=new Date();tBadge.textContent='🧪 TEST CLOCK · '+n.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})+' · '+n.toLocaleTimeString('en',{hour:'numeric',minute:'2-digit'})}
+ setInterval(ccTestBadge,20000);
+ window.fill_=function(){const n=new Date();$d.value=ds(n);$t.value=n.getHours()*60+n.getMinutes();$v.textContent=n.toLocaleTimeString('en',{hour:'numeric',minute:'2-digit'});ccTestBadge()};
  let raf=0;const fromUI=jump=>{const[y,m,d]=$d.value.split('-').map(Number);if(!y)return;const mins=+$t.value;setClock(new RD(y,m-1,d,Math.floor(mins/60),mins%60));if(!raf)raf=requestAnimationFrame(()=>{raf=0;applyClock(jump)})};
  $t.addEventListener('input',()=>{fromUI(false);H.sel()});$d.addEventListener('change',()=>fromUI(true));
  box.addEventListener('click',e=>{const q=e.target.closest('[data-q]');if(!q)return;H.tap();const k=q.dataset.q,n=new Date(),T=skySunTimes(n.getFullYear(),n.getMonth()+1,n.getDate());
