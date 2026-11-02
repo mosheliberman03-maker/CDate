@@ -567,12 +567,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 /* water letters: when the glass layer is running, the real text stays for layout and screen readers but is drawn by #dlCv */
 :root.cc-wl #hdr .hd-big,:root.cc-wl #hdr .hd-big>span{background:none;-webkit-text-fill-color:transparent;filter:none}
 .dl-cv{position:absolute;pointer-events:none;display:block}
-/* mounted on the wall: it stays put while the page scrolls over it, then rises a little and fades (sc / dateWall). The rest of the header fades on its own layer. */
-#hdr .hd-he{opacity:var(--dateFade,1);transform:translateY(var(--dateY,0px));position:relative;z-index:0;pointer-events:none}
-#hdr h1.hd-he.rv.in{animation:rv .75s cubic-bezier(.2,.8,.2,1) calc(var(--i,0)*70ms) backwards}
-#hdr .sky-scene,#hdr .sky-cap2,#hdr .hd-div,#hdr .hd-en,#hdr .wk{opacity:var(--hdrFade,1)}
-#hdr .sky-cap2,#hdr .hd-div,#hdr .hd-en{position:relative;z-index:1}
-#hdr .wk{z-index:2}
+#hdr .hd-he{position:relative;pointer-events:none}
 
 
 .hd-div{display:flex;align-items:center;justify-content:center;gap:12px;width:min(84vw,340px);margin:clamp(8px,1.6vh,14px) auto 0}
@@ -1741,21 +1736,13 @@ function sc(){tk=0;const y=scrollY,vh=innerHeight||700,cl=v=>Math.min(1,Math.max
  cbar.classList.toggle('on',y>120);if(cbar.getAttribute('aria-hidden')!==String(y<=120))cbar.setAttribute('aria-hidden',y<=120);document.documentElement.classList.toggle('cc-away',y>vh*.9);
  const pd=cl(y/(vh*.42)),pf=cl((y-vh*.03)/(vh*.4)),ph=cl(y/(vh*.1));
  foot.classList.toggle('gone',pf>=1);hint.classList.toggle('gone',ph>=1);
- if(!RM){const hs=1-.09*pd,hy=-pd*34;hdr.style.transform=`translateY(${hy}px) scale(${hs})`;hdr.style.setProperty('--hdrFade',String(Math.max(0,1-2.6*pd)).slice(0,5));dateWall(y,vh,hs,hy);
+ if(!RM){hdr.style.transform=`translateY(${-pd*34}px) scale(${1-.09*pd})`;hdr.style.opacity=Math.max(0,1-1.1*pd);
   foot.style.opacity=1-pf;
   hint.style.opacity=1-ph;$('#gh').style.transform=`translateY(${y*.16}px)`}
  else{foot.style.opacity=pf>=1?0:1;hint.style.opacity=ph>=1?0:1}
  if(y<=4&&FP_PEND){footPlace();setTimeout(footPlace,450)}
  if(!RM)mz(y,vh)}
-/* the big date is fixed to the wall: it holds still while the page scrolls over it, then rises slowly and fades.
-   #hdr itself moves and shrinks on scroll, so the date's own offset cancels that out (sizes measured once per layout). */
 var DW=null;
-function dateMeasure(){const h1=hdr.querySelector('.hd-he');if(!h1){DW=null;return}const o=(getComputedStyle(hdr).transformOrigin||'0 0').split(' ').map(parseFloat);DW={el:h1,oT:h1.offsetParent===hdr?h1.offsetTop:h1.offsetTop-hdr.offsetTop,O:o[1]||0}}
-function dateWall(y,vh,s,ty){if(document.documentElement.classList.contains('tt-off-datewall')){hdr.style.setProperty('--dateY','0px');hdr.style.setProperty('--dateFade',hdr.style.getPropertyValue('--hdrFade')||'1');return}
- if(!DW||!DW.el.isConnected)dateMeasure();if(!DW)return;
- const y1=vh*.62,f=Math.min(1,Math.max(0,(y-y1)/(vh*.5)));if(f>=1&&DW.done)return;DW.done=f>=1;
- const rise=Math.max(0,y-y1)*.32,dy=(DW.oT-rise+y-ty-DW.O-(DW.oT-DW.O)*s)/s;
- hdr.style.setProperty('--dateY',dy.toFixed(1)+'px');hdr.style.setProperty('--dateFade',(1-f).toFixed(3))}
 addEventListener('scroll',()=>{tk||(tk=requestAnimationFrame(sc))},{passive:true});
 $('#hint').onclick=()=>{H.tap();scrollTo({top:Math.max(0,$('#top').getBoundingClientRect().top+scrollY-72),behavior:RM?'auto':'smooth'})};addEventListener('resize',sc);
 
@@ -2195,33 +2182,40 @@ vec4 silk(vec2 p,float px){
  const R=document.documentElement,cv=document.createElement('canvas');cv.id='dlCv';cv.className='dl-cv';cv.setAttribute('aria-hidden','true');
  const gl=cv.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:false,depth:false,stencil:false});if(!gl)return;
  const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
- const FS=`precision highp float;uniform vec2 uCR,uCO,uCS,uV,uTl;uniform sampler2D uM;uniform vec3 uTop,uBot,uRim;uniform float uDk,uWo,uNk;`+GLS.SILK+`
+ const FS=`precision highp float;uniform vec2 uCR,uCO,uCS,uV,uTl;uniform sampler2D uM;uniform vec3 uTop,uBot,uRim,uSun;uniform float uDk,uWo,uNk,uRef,uPx;`+GLS.SILK+`
 void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=texture2D(uM,cuv);float a=m.r;
  if(a<.004){gl_FragColor=vec4(0.);return;}
  vec2 e=vec2(1.5/uCR.x,1.5/uCR.y);float h=m.g;
  float hx=texture2D(uM,cuv+vec2(e.x,0.)).g-texture2D(uM,cuv-vec2(e.x,0.)).g,hy=texture2D(uM,cuv+vec2(0.,e.y)).g-texture2D(uM,cuv-vec2(0.,e.y)).g;
  vec3 n=normalize(vec3(-hx*uNk,-hy*uNk,1.));
- vec2 vp=uCO+cuv*uCS,ct=uCO+uCS*.5;
- vec2 q=ct+(vp-ct)*.8+n.xy*24.+uTl*vec2(16.,9.)*(.35+.65*h);
+ vec2 vp=uCO+cuv*uCS;
+ float ed=clamp(1.-n.z,0.,1.),nl=length(n.xy);vec2 nd=nl>1e-4?n.xy/nl:vec2(0.);
+ /* clear water: the flat middle of a stroke shows the sky almost as is; toward the edges the view bends hard (and the water sways with tilt) */
+ vec2 q=vp+n.xy*uRef+uTl*vec2(13.,8.)*(.25+.75*h);
  vec3 sky=mix(uTop,uBot,clamp(q.y/uV.y,0.,1.));
  vec4 sk=silk(vec2(q.x/uV.x,q.y/uV.x),1./(uV.x*.8))*uWo;
  vec3 bg=sky*(1.-sk.a)+sk.rgb;
- float fr=pow(1.-n.z,1.25);
- vec3 L=normalize(vec3(-.35+uTl.x*.5,-.55+uTl.y*.35,.75));
- float sp=pow(max(dot(reflect(-L,n),vec3(0.,0.,1.)),0.),34.);
- vec2 c2=cuv-.5;float lv=dot(c2,vec2(sin(uTl.x*.4),cos(uTl.x*.4)));
- vec3 body=mix(bg*.84+vec3(.0,.03,.09),bg*1.18+.05,uDk);
- vec3 col=mix(body,uRim,clamp(fr*(.8-.12*uDk),0.,1.))+vec3(sp*.9)+vec3(.9,.96,1.)*smoothstep(.06,-.3,lv)*.045*uDk;
+ vec2 Lto=normalize(vec2(-.55+uTl.x*.7,-.85+uTl.y*.35));
+ float lit=max(dot(nd,Lto),0.),far=max(dot(nd,-Lto),0.);
+ float band=smoothstep(.1,.42,ed)*(1.-smoothstep(.62,.92,ed));
+ float rim=smoothstep(.72,.97,ed);
+ float caus=pow(far,1.4)*smoothstep(.04,.35,ed)*(1.-smoothstep(.7,.95,ed)),streak=pow(far,6.)*smoothstep(.3,.55,ed)*(1.-smoothstep(.6,.8,ed));
+ float spec=pow(lit,5.)*smoothstep(.25,.75,ed);
+ vec2 gp=floor(cuv*uCR/(3.*uPx)+uTl*7.);float hs=fract(sin(dot(gp,vec2(12.9898,78.233)))*43758.5453);
+ float glint=step(.972,hs)*smoothstep(.15,.6,ed)*(lit+far*.8);
+ vec3 col=mix(bg,bg*vec3(.86,.96,1.08)+vec3(.02,.05,.08),.6)*(1.-band*(.1+.34*(1.-uDk)))-vec3(.07,.04,0.)*(1.-uDk)*smoothstep(0.,.5,h);
+ col+=uSun*((.16+.3*h)*(.08+.92*uDk)+caus*(.3+.35*uDk)+streak*.8+spec*.8+glint*1.2);
+ col=mix(col,uRim,rim*(.82-.12*uDk));
  gl_FragColor=vec4(col*a,a);}`;
  const sh=(t,src)=>{const o=gl.createShader(t);gl.shaderSource(o,src);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o};
  let pr;try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw 0}catch(e){return}
  gl.useProgram(pr);const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
  const al=gl.getAttribLocation(pr,'a');gl.enableVertexAttribArray(al);gl.vertexAttribPointer(al,2,gl.FLOAT,false,0,0);
- const U={};for(const k of['uCR','uCO','uCS','uV','uTl','uM','uTop','uBot','uRim','uDk','uWo','uNk','uT','uS','uF','uE','uL','uO','uK','uA','uB','uC'])U[k]=gl.getUniformLocation(pr,k);
+ const U={};for(const k of['uCR','uCO','uCS','uV','uTl','uM','uTop','uBot','uRim','uSun','uRef','uPx','uDk','uWo','uNk','uT','uS','uF','uE','uL','uO','uK','uA','uB','uC'])U[k]=gl.getUniformLocation(pr,k);
  gl.uniform4fv(U.uA,GLS.R[0]);gl.uniform4fv(U.uB,GLS.R[1]);gl.uniform4fv(U.uC,GLS.R[2]);gl.uniform1f(U.uS,0);gl.uniform1i(U.uM,0);
  const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);for(const[k,v]of[[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,v);
  const hx=c=>{const m=/#?([0-9a-f]{6})/i.exec(c||'');if(!m)return[0,0,0];const n=parseInt(m[1],16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]};
- const PAD=16;let W=0,H=0,ok=false,key='',tl=[0,0],tv=[0,0],tg=[0,0],traf=0;
+ const PAD=16;let dlFs=60,W=0,H=0,ok=false,key='',tl=[0,0],tv=[0,0],tg=[0,0],traf=0;
  const off=()=>R.classList.contains('tt-off-waterdate')||RM;
  /* the letter shapes: drawn from the real text (same font, size and place), plus a softened copy that gives each stroke a rounded, water-filled surface */
  function layout(){const h1=document.querySelector('#hdr .hd-he'),big=h1&&h1.querySelector('.hd-big');
@@ -2235,11 +2229,11 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
    const tx=x.offsetLeft+x.offsetWidth/2+PAD,ty=x.offsetTop+PAD+(x.offsetHeight-(asc+ds))/2+asc;a.lineWidth=fs*.07;a.strokeText(t,tx,ty);a.fillText(t,tx,ty)}
   const b=B.getContext('2d');b.filter='blur('+(fs*dpr*.07).toFixed(1)+'px)';b.drawImage(A,0,0);
   const da=a.getImageData(0,0,W,H).data,db=b.getImageData(0,0,W,H).data,o=new Uint8Array(W*H*4);for(let i=3;i<da.length;i+=4){o[i-3]=da[i];o[i-2]=Math.min(255,db[i]*1.6);o[i]=255}
-  gl.bindTexture(gl.TEXTURE_2D,tex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,W,H,0,gl.RGBA,gl.UNSIGNED_BYTE,o);gl.uniform1f(U.uNk,fs*dpr*.09);ok=true;if(!R.classList.contains('cc-wl'))R.classList.add('cc-wl');draw()}
+  gl.bindTexture(gl.TEXTURE_2D,tex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,W,H,0,gl.RGBA,gl.UNSIGNED_BYTE,o);gl.uniform1f(U.uNk,fs*dpr*.09);dlFs=fs;ok=true;if(!R.classList.contains('cc-wl'))R.classList.add('cc-wl');draw()}
  function draw(){if(!ok||!cv.isConnected||R.classList.contains('cc-away'))return;const r=cv.getBoundingClientRect();if(!r.width||r.bottom<0||r.top>innerHeight)return;
   const st=SKY.last,pal=st&&st.pal,dk=R.dataset.theme==='dark',night=R.dataset.night==='1';
   gl.uniform2f(U.uCR,W,H);gl.uniform2f(U.uCO,r.left,r.top);gl.uniform2f(U.uCS,r.width,r.height);gl.uniform2f(U.uV,innerWidth,innerHeight);gl.uniform2f(U.uTl,tl[0],tl[1]);
-  gl.uniform3fv(U.uTop,hx(night?'#0a1230':pal&&pal.top));gl.uniform3fv(U.uBot,hx(night?'#18225a':pal&&pal.bot));gl.uniform3fv(U.uRim,dk?[1,1,1]:[.11,.17,.42]);gl.uniform1f(U.uDk,dk?1:0);gl.uniform1f(U.uWo,GLS.WO||1);
+  gl.uniform3fv(U.uTop,hx(night?'#0a1230':pal&&pal.top));gl.uniform3fv(U.uBot,hx(night?'#18225a':pal&&pal.bot));gl.uniform3fv(U.uRim,dk?[1,1,1]:[.1,.15,.38]);gl.uniform3fv(U.uSun,night?[.86,.9,1]:R.dataset.sky==='dusk'?[1,.86,.76]:[1,.95,.82]);gl.uniform1f(U.uRef,dlFs*.9);gl.uniform1f(U.uPx,W/(r.width||1));gl.uniform1f(U.uDk,dk?1:0);gl.uniform1f(U.uWo,GLS.WO||1);
   gl.uniform1f(U.uT,GLS.T||7);gl.uniform3fv(U.uF,GLS.F||[1,1,1]);gl.uniform3fv(U.uE,GLS.E||[1,1,1]);gl.uniform3fv(U.uL,GLS.L||[0,0,1]);gl.uniform1f(U.uO,GLS.O||1);gl.uniform1f(U.uK,GLS.K||0);
   gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3)}
  /* gravity: the water leans a little toward the low side and sloshes back on a soft spring */
@@ -2641,8 +2635,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=9;
+const CC_VER=10;
 const CC_LOG=[
+ {v:10,new:['The water letters are now clear and full: you see the sky through them, light glows and glints inside, and the edges bend the view like a water bottle.','The date scrolls with the rest of the top of the screen again.']},
  {v:9,new:['The big date is now made of water: each letter bends the sky behind it like a full water bottle, and tilting the phone makes the water inside sway a little.','A little more silk in the sky, in every theme.']},
  {v:8,new:['A calmer, glassier big date that stays put while the page scrolls over it, then rises a little and fades.','Evening (and daytime) skies are softer and glassier, like the night sky.','Shiurim and your stats now use the app’s own colors.','To-do lists: fasting, Aneinu, Selichos, Tehillim on Shabbos Mevarchim and lighting the menorah are now reminders, not checkboxes; Al HaNissim, Chanukah gelt and farbrengens are plain notes; Birkas HaChodesh is gone.','Your chavrusas and shiurim no longer have a check box.','Birthday: the aliyah moves to the Monday, Thursday or Shabbos just before (with a reminder the day before), and saying a maamar of the Rebbe replaces the dvar Torah.','The Rebbeim’s yahrzeits show only the customs really kept on each one.','Fixed the event chips sometimes covering the week row.']},
  {v:7,new:['Beta: Chabad Calendar now runs in the Android app. The app asks once for location (for zmanim) and microphone (to speak to the planner), and new users get the tour on a sample day with real events.']},
@@ -3830,7 +3825,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['datewall','Big date stays put while the page scrolls over it'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id]of FLAGS)document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
