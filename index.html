@@ -558,19 +558,19 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .capi{flex:none;width:19px;height:19px;display:block}
 /* the dates */
 #hdr .hd-he{margin:clamp(20px,3.6vh,36px) 0 0;display:block;text-align:center}
-#hdr .hd-big{font:500 clamp(52px,15.6vw,70px)/1.1 'FRL App','Frank Ruhl Libre','Noto Serif Hebrew App',Georgia,serif;letter-spacing:0;color:var(--dtc);
- /* a thick solid block standing out of the back wall: a stepped extrusion toward the lower right, then its soft shadow on the wall */
- text-shadow:0.0105em 0.0105em 0 #5a6196,0.021em 0.021em 0 #575d91,0.0315em 0.0315em 0 #535a8d,0.042em 0.042em 0 #505688,0.0525em 0.0525em 0 #4c5383,0.063em 0.063em 0 #494f7e,0.0735em 0.0735em 0 #464c7a,0.084em 0.084em 0 #424875,0.0945em 0.0945em 0 #3f4570,0.105em 0.105em 0 #3b416b,0.1155em 0.1155em 0 #383e67,0.126em 0.126em 0 #353a62,0.1365em 0.1365em 0 #31375d,0.147em 0.147em 0 #2e3358,0.1575em 0.1575em 0 #2a3054,0.168em 0.168em 0 #272c4f,.19em .26em .03em rgba(40,60,120,.22),.24em .38em .34em rgba(40,60,120,.3)}
-:root[data-night="1"] #hdr .hd-big{text-shadow:0.0105em 0.0105em 0 #bcb6a3,0.021em 0.021em 0 #b1ac9b,0.0315em 0.0315em 0 #a7a294,0.042em 0.042em 0 #9c988c,0.0525em 0.0525em 0 #918e85,0.063em 0.063em 0 #87847d,0.0735em 0.0735em 0 #7c7a75,0.084em 0.084em 0 #71706e,0.0945em 0.0945em 0 #676566,0.105em 0.105em 0 #5c5b5f,0.1155em 0.1155em 0 #515157,0.126em 0.126em 0 #47474f,0.1365em 0.1365em 0 #3c3d48,0.147em 0.147em 0 #313340,0.1575em 0.1575em 0 #272939,0.168em 0.168em 0 #1c1f31,.19em .26em .03em rgba(2,3,12,.5),.24em .38em .34em rgba(1,2,9,.55)}
+#hdr .hd-big{font:400 clamp(52px,15.6vw,70px)/1.1 'FRL App','Frank Ruhl Libre','Noto Serif Hebrew App',Georgia,serif;letter-spacing:.01em;color:var(--dtc);
+ /* quiet, glassy lettering: a soft tint down the letters, a faint glow and a far, diffused shadow, so it sits in the sky without hard edges */
+ background:linear-gradient(180deg,var(--dtc) 32%,color-mix(in srgb,var(--dtc) 70%,#8fa6ee) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+ filter:drop-shadow(0 12px 26px rgba(30,54,120,.24))}
+:root[data-night="1"] #hdr .hd-big{background:linear-gradient(180deg,#F6EEE2 30%,#cbc8ec 100%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 22px rgba(190,200,255,.18)) drop-shadow(0 16px 30px rgba(1,2,14,.5))}
+#hdr.sky-side .hd-big>span{background:inherit;-webkit-background-clip:text;background-clip:text}
 /* mounted on the wall: it stays put while the page scrolls over it, then rises a little and fades (sc / dateWall). The rest of the header fades on its own layer. */
 #hdr .hd-he{opacity:var(--dateFade,1);transform:translateY(var(--dateY,0px));position:relative;z-index:0;pointer-events:none}
 #hdr h1.hd-he.rv.in{animation:rv .75s cubic-bezier(.2,.8,.2,1) calc(var(--i,0)*70ms) backwards}
 #hdr .sky-scene,#hdr .sky-cap2,#hdr .hd-div,#hdr .hd-en,#hdr .wk{opacity:var(--hdrFade,1)}
 #hdr .sky-cap2,#hdr .hd-div,#hdr .hd-en{position:relative;z-index:1}
 #hdr .wk{z-index:2}
-/* Test tools switch "block3d": back to a flat date with a soft shadow */
-:root.tt-off-block3d #hdr .hd-big{text-shadow:0 13px 28px rgba(30,54,120,.28)}
-:root[data-night="1"].tt-off-block3d #hdr .hd-big{text-shadow:0 15px 32px rgba(1,2,14,.55)}
+
 
 .hd-div{display:flex;align-items:center;justify-content:center;gap:12px;width:min(84vw,340px);margin:clamp(8px,1.6vh,14px) auto 0}
 .hd-div i{flex:1;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--dtc) 46%,transparent))}
@@ -1748,7 +1748,7 @@ function sc(){tk=0;const y=scrollY,vh=innerHeight||700,cl=v=>Math.min(1,Math.max
    #hdr itself moves and shrinks on scroll, so the date's own offset cancels that out (sizes measured once per layout). */
 var DW=null;
 function dateMeasure(){const h1=hdr.querySelector('.hd-he');if(!h1){DW=null;return}const o=(getComputedStyle(hdr).transformOrigin||'0 0').split(' ').map(parseFloat);DW={el:h1,oT:h1.offsetParent===hdr?h1.offsetTop:h1.offsetTop-hdr.offsetTop,O:o[1]||0}}
-function dateWall(y,vh,s,ty){if(document.documentElement.classList.contains('tt-off-block3d')){hdr.style.setProperty('--dateY','0px');hdr.style.setProperty('--dateFade',hdr.style.getPropertyValue('--hdrFade')||'1');return}
+function dateWall(y,vh,s,ty){if(document.documentElement.classList.contains('tt-off-datewall')){hdr.style.setProperty('--dateY','0px');hdr.style.setProperty('--dateFade',hdr.style.getPropertyValue('--hdrFade')||'1');return}
  if(!DW||!DW.el.isConnected)dateMeasure();if(!DW)return;
  const y1=vh*.62,f=Math.min(1,Math.max(0,(y-y1)/(vh*.5)));if(f>=1&&DW.done)return;DW.done=f>=1;
  const rise=Math.max(0,y-y1)*.32,dy=(DW.oT-rise+y-ty-DW.O-(DW.oT-DW.O)*s)/s;
@@ -2575,7 +2575,7 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
 const CC_VER=8;
 const CC_LOG=[
- {v:8,new:['The big date is now a thick block set into the sky “wall”: it stays put while the page scrolls over it, then rises a little and fades.','Evening (and daytime) skies are softer and glassier, like the night sky.','Shiurim and your stats now use the app’s own colors.','To-do lists: fasting, Aneinu, Selichos, Tehillim on Shabbos Mevarchim and lighting the menorah are now reminders, not checkboxes; Al HaNissim, Chanukah gelt and farbrengens are plain notes; Birkas HaChodesh is gone.','Your chavrusas and shiurim no longer have a check box.','Birthday: the aliyah moves to the Monday, Thursday or Shabbos just before (with a reminder the day before), and saying a maamar of the Rebbe replaces the dvar Torah.','The Rebbeim’s yahrzeits show only the customs really kept on each one.','Fixed the event chips sometimes covering the week row.']},
+ {v:8,new:['A calmer, glassier big date that stays put while the page scrolls over it, then rises a little and fades.','Evening (and daytime) skies are softer and glassier, like the night sky.','Shiurim and your stats now use the app’s own colors.','To-do lists: fasting, Aneinu, Selichos, Tehillim on Shabbos Mevarchim and lighting the menorah are now reminders, not checkboxes; Al HaNissim, Chanukah gelt and farbrengens are plain notes; Birkas HaChodesh is gone.','Your chavrusas and shiurim no longer have a check box.','Birthday: the aliyah moves to the Monday, Thursday or Shabbos just before (with a reminder the day before), and saying a maamar of the Rebbe replaces the dvar Torah.','The Rebbeim’s yahrzeits show only the customs really kept on each one.','Fixed the event chips sometimes covering the week row.']},
  {v:7,new:['Beta: Chabad Calendar now runs in the Android app. The app asks once for location (for zmanim) and microphone (to speak to the planner), and new users get the tour on a sample day with real events.']},
  {v:6,new:['The big Hebrew date now has a soft shadow so it floats above the sky, with a very slight buoyant drift so it feels suspended rather than flat.']},
  {v:5,new:['Fixed reminders like “set a reminder for an hour before” — it now sets the reminder correctly instead of mangling the title.','Fixed the event chips sometimes overlapping the week row on the home screen.','A few more silky waves in the daytime sky.']},
@@ -3761,7 +3761,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['block3d','Big date as a thick block on the wall'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['datewall','Big date stays put while the page scrolls over it'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id]of FLAGS)document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
