@@ -353,6 +353,7 @@ body.om .foot,body.om .hint{opacity:0!important}
 #sky{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}#skyGrad{position:absolute;inset:0}#stars{position:absolute;left:0;top:0;width:1px;height:1px;border-radius:50%;opacity:0;transition:opacity 2s}
 .sky-scene{position:relative;flex:0 0 100%;height:140px;margin-bottom:8px}.sky-arc{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.sky-trailc{position:absolute;left:-26px;top:-26px;pointer-events:none}.sky-body.anim{transition:none!important}
 .sky-body{position:absolute;width:112px;height:112px;margin:-56px 0 0 -56px;transition:left 1.2s ease,top 1.2s ease,opacity .6s}.skyimg{display:block;width:100%;height:100%;pointer-events:none;user-select:none}.moon .skyimg{width:96px;height:96px;margin:-18px 0}.sky-body.below .skyimg{filter:brightness(.5) saturate(.8)}
+:root:not([data-night="1"]) .sky-body.below{opacity:.45}
 .sky-cap{position:absolute;left:0;right:0;bottom:-6px;text-align:center;font-size:12px;letter-spacing:.02em;color:color-mix(in srgb,var(--ink) 72%,transparent)}
 .c2[data-go]{cursor:pointer}.c2[data-go]:focus-visible{outline:2px solid var(--ct);outline-offset:2px}
 @keyframes cflash{0%,100%{box-shadow:0 0 0 0 transparent}25%,65%{box-shadow:0 0 0 3px color-mix(in srgb,var(--ct) 70%,transparent),0 0 24px color-mix(in srgb,var(--ct) 45%,transparent)}}.flash{animation:cflash 2.4s ease;border-radius:14px}
@@ -620,10 +621,10 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #skyGL{position:absolute;inset:0;width:100%;height:100%;display:block}
 #hdr .wk,.hyc{position:relative}
 :is(#hdr .wk,.sky-cap,.sky-cap2,.dock,.hint,.ai-fab)::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;padding:1.6px;z-index:2;
- background:conic-gradient(from var(--gg,120deg),rgba(190,230,255,0) 0deg,rgba(190,230,255,.22) 8deg,rgba(225,242,255,.75) 18deg,rgba(225,242,255,.75) 22deg,rgba(190,230,255,.22) 32deg,rgba(190,230,255,0) 42deg,rgba(190,230,255,0) 360deg);
+ background:conic-gradient(from var(--gg,120deg),rgba(var(--glc,190,230,255),0) 0deg,rgba(var(--glc,190,230,255),.22) 8deg,rgba(var(--glc2,225,242,255),.75) 18deg,rgba(var(--glc2,225,242,255),.75) 22deg,rgba(var(--glc,190,230,255),.22) 32deg,rgba(var(--glc,190,230,255),0) 42deg,rgba(var(--glc,190,230,255),0) 360deg);
  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 :is(#hdr .wk,.sky-cap,.sky-cap2,.dock,.hint,.ai-fab)::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
- background:radial-gradient(70px 46px at var(--hx,-99px) var(--hy,-99px),rgba(175,225,255,calc(var(--gi)*.32)),rgba(150,200,255,calc(var(--gi)*.1)) 55%,rgba(150,200,255,0) 100%)}
+ background:radial-gradient(70px 46px at var(--hx,-99px) var(--hy,-99px),rgba(var(--glc,175,225,255),calc(var(--gi)*.32)),rgba(var(--glc,150,200,255),calc(var(--gi)*.1)) 55%,rgba(var(--glc,150,200,255),0) 100%)}
 :root{--gi:.55}:root[data-night="1"]{--gi:.62}
 /* each piece floats on its own clock and sits at its own depth when you scroll; pure CSS so the browser runs it off the main thread */
 @keyframes flY{from{translate:0 calc(var(--fa) * -1)}to{translate:0 var(--fa)}}
@@ -709,6 +710,9 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 :root[data-theme]:not(.tt-off-glassui) .sts .sring.shero .pg{filter:drop-shadow(0 0 9px color-mix(in srgb,var(--sg) 38%,transparent))}
 :root[data-theme]:not(.tt-off-glassui) .rdr{background:var(--bg)}
 :root[data-theme]:not(.tt-off-glassui) .rdx{background:var(--gx-gh);border-color:var(--gx-bd)}
+:root[data-theme]:not(.tt-off-glassui) :is(.panel,.hyc,#p .ev,#rail .rt.mc,.sheet,.ai-card,.dmc,.stsp,#hdr .wk,.dock,.ai-fab,.sky-cap,.sky-cap2,.hint,.cb){box-shadow:var(--gx-sh,0 0 0 transparent),var(--lrim,0 0 0 transparent)}
+#lightCast{position:fixed;inset:0;pointer-events:none;z-index:45;background:var(--lcast,transparent);opacity:var(--lcasto,0);mix-blend-mode:soft-light;transition:opacity 2s,background-color 2s}
+:root.tt-off-reallight #lightCast{display:none}
 :root[data-theme]:not(.tt-off-glassui) .btn:not(.gh){background:var(--gx-pri);color:var(--gx-prit);border-color:transparent;border-radius:14px}
 :root[data-theme]:not(.tt-off-glassui) .btn.gh{background:var(--gx-gh);border:1px solid var(--gx-bd);border-radius:14px}
 :root[data-theme]:not(.tt-off-glassui) #g .day{background:color-mix(in srgb,var(--ink) 3%,transparent);border-color:color-mix(in srgb,var(--ink) 10%,transparent)}
@@ -741,7 +745,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
 </style>
 </head><body>
-<div id="sky" hidden><div id="skyGrad"></div><div id="skyNight"></div><div id="stars"></div><div id="skyWaves" aria-hidden="true"></div></div>
+<div id="lightCast" aria-hidden="true"></div><div id="sky" hidden><div id="skyGrad"></div><div id="skyNight"></div><div id="stars"></div><div id="skyWaves" aria-hidden="true"></div></div>
 <div class="cc-gate" id="webOnly" role="alertdialog" aria-modal="true" aria-labelledby="webOnlyT"><div class="gc"><img src="icon-192.png" alt=""><h1 id="webOnlyT">Please use the app</h1><p class="gb">BETA</p><p>Chabad Calendar now runs in its Android app. Install it to continue: your reminders there ring as alarms, even with no internet or VPN.</p><div class="cc-andr-yes"><ol><li>Tap <b>Download the app</b>.</li><li>Open the downloaded file and allow installing.</li><li>Open the app and create your account there.</li></ol><a class="gbtn" id="webOnlyDl" href="https://github.com/mosheliberman03-maker/CDate/releases/download/apk-latest/ChabadCalendar.apk">Download the app</a><p class="gs" id="webOnlyS"></p></div><div class="cc-andr-no"><p>The app is for Android phones. Open this page on your Android phone to install it.</p></div></div></div>
 <div class="cc-gate" id="permGate" role="dialog" aria-modal="true" aria-labelledby="permGateT"><div class="gc"><img src="icon-192.png" alt=""><h1 id="permGateT">Two quick permissions</h1><p class="gb">BETA</p><p><b>Location</b> works out sunrise, sunset and candle-lighting for where you are. <b>Microphone</b> lets you speak to the planner instead of typing.</p><button class="gbtn" id="permAllow" type="button">Allow</button><button class="glink" id="permLater" type="button">Not now</button><p class="gs" id="permS"></p></div></div>
 <script>/* Beta: the website is closed (only the Android app works); the app asks for location + microphone once, before sign-in. */
@@ -2061,11 +2065,49 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)SKYA.hidden
 addEventListener('resize',()=>{skyRedrawTrail()});
 function skyApply(st){
  if(SKYA.run&&!st.anim)return;
- const p=st.pal,r=document.documentElement;if(st.anim){document.getElementById('sky').hidden=false;document.getElementById('skyGrad').style.background=`linear-gradient(180deg,${p.top} 0%,${p.bot} 100%)`;document.getElementById('stars').style.opacity=p.stars.toFixed(2);skyNightAmt(p);const n=performance.now();if(p.dark===SKYA.lastDark&&n-SKYA.rootT<1500)return;SKYA.rootT=n}SKYA.lastDark=p.dark;const nt=skyNightAmt(p),sv=(k,v)=>{if(r.style.getPropertyValue(k)!==v)r.style.setProperty(k,v)},sd=(k,v)=>{if(r.dataset[k]!==v)r.dataset[k]=v};
+ const p=st.pal,r=document.documentElement;if(st.anim){document.getElementById('sky').hidden=false;document.getElementById('skyGrad').style.background=skyBgCss(p);document.getElementById('stars').style.opacity=p.stars.toFixed(2);skyNightAmt(p);const n=performance.now();if(p.dark===SKYA.lastDark&&n-SKYA.rootT<1500)return;SKYA.rootT=n}SKYA.lastDark=p.dark;const nt=skyNightAmt(p),sv=(k,v)=>{if(r.style.getPropertyValue(k)!==v)r.style.setProperty(k,v)},sd=(k,v)=>{if(r.dataset[k]!==v)r.dataset[k]=v};
  {const th=p.dark?'dark':'light';if(r.dataset.theme!==th){r.dataset.theme=th;if(MOON_PX)document.querySelectorAll('img.mimg').forEach(i=>{i.src=artMoonUrl(+i.dataset.f)})}}sv('--bg',nt>.5?'#0b1330':p.mid);sv('--card',nt>.5?'#121a3d':`color-mix(in srgb,${p.dark?'#161a30':'#ffffff'} 90%,${p.mid})`);sd('night',nt>.5?'1':'0');sd('sky',nt>.5?'night':st.alt<9?'dusk':'day');
- const sky=document.getElementById('sky');if(sky.hidden)sky.hidden=false;const sg=document.getElementById('skyGrad'),bgv=`linear-gradient(180deg,${p.top} 0%,${p.bot} 100%)`;if(sg._bg!==bgv){sg._bg=bgv;sg.style.background=bgv}
+ skyLightCalc(st);
+ /* the silk picks up the warm light around sunrise and sunset */
+ {const g=SKL.g;if(g>.05&&nt<.5){const m=Math.min(.55,g*.9),base=p.dark?[1,.89,.85]:[.84,.89,1],c=base.map((v,i)=>v+(SKL.gc[i]-v)*m),hx='#'+c.map(v=>Math.round(v*255).toString(16).padStart(2,'0')).join('');if(r.style.getPropertyValue('--rbe')!==hx){r.style.setProperty('--rbe',hx);if(GLS.kick)GLS.kick()}}else if(r.style.getPropertyValue('--rbe')){r.style.removeProperty('--rbe');if(GLS.kick)GLS.kick()}}
+ skyLightUI(nt);
+ const sky=document.getElementById('sky');if(sky.hidden)sky.hidden=false;const sg=document.getElementById('skyGrad'),bgv=skyBgCss(p);if(sg._bg!==bgv){sg._bg=bgv;sg.style.background=bgv}
  {const so=document.getElementById('stars'),v=p.stars.toFixed(2);if(so.style.opacity!==v)so.style.opacity=v}
  const tc=document.querySelector('meta[name=theme-color]');if(tc&&(!st.anim||performance.now()-(SKYA.tcT||0)>250)){{const v=skyNightAmt(p)>.5?'#070D22':p.top;if(tc.content!==v)tc.content=v}SKYA.tcT=performance.now()}}
+/* ===== Real light =====
+   Sunlight's colour after its path through the air: the lower the sun, the more air it crosses (Kasten–Young air mass), and air
+   scatters blue far more than red (Rayleigh, ~1/λ⁴) plus a little haze (aerosols). So high sun = warm white, ~15° golden, ~5° orange,
+   at the horizon deep red-orange. Below the horizon (twilight) the light is the pink-violet glow scattered by the sky; at night, moonlight.
+   SKL is shared by the sky glow, the silk and the water letters. */
+const SKL={col:[1,.95,.85],I:1,g:0,gc:[1,.6,.4],bc:[1,.72,.76],side:0,src:'sun'};
+function skyLightCalc(st){if(!st||st.alt==null)return SKL;const a=st.alt,sm=(e0,e1,x)=>{const t=Math.max(0,Math.min(1,(x-e0)/(e1-e0)));return t*t*(3-2*t)},mix=(u,v,t)=>u.map((x,i)=>x+(v[i]-x)*t);
+ const sunCol=h=>{const zd=90-Math.max(h,2),m=1/(Math.cos(zd*Math.PI/180)+.50572*Math.pow(Math.max(.1,96.07995-zd),-1.6364)),T=[.114,.183,.34].map(t=>Math.exp(-t*m)),mx=Math.max(...T);return{c:T.map((v,i)=>v/mx*.8+[1,.82,.7][i]*.2),I:Math.min(1,mx*1.3)}};
+ let col,I;const tw=[mix([1,.52,.56],[.62,.56,.98],sm(-1,-8,a)),.55*(1-sm(-5,-12,a))];
+ if(a>1.5){const s0=sunCol(a);col=s0.c;I=s0.I}
+ else if(a>-12){const s0=sunCol(.5),t=sm(1.5,-3,a);col=mix(s0.c,tw[0],t);I=Math.max(.15,(s0.I*(1-t)+tw[1]*t))}
+ else{const ph=st.phase||0,ill=.5-.5*Math.cos(ph*6.283);col=[.8,.87,1];I=st.kind==='moon'?.35+.4*ill:.25}
+ if(a<=-12||(st.kind==='moon'&&a<-6)){const ph=st.phase||0,ill=.5-.5*Math.cos(ph*6.283),mI=st.kind==='moon'?.35+.4*ill:.22;col=mix(col,[.8,.87,1],sm(-6,-12,a)||1);I=Math.max(I*(1-sm(-6,-12,a)),mI)}
+ /* the glow around the sun: strongest from a few degrees above the horizon to early twilight */
+ const g=(sm(14,2,a)*(1-sm(-2,-11,a)))*.85;const gc=a>-1?sunCol(Math.max(a,.3)).c:mix(sunCol(.3).c,[1,.55,.62],sm(-1,-7,a));
+ Object.assign(SKL,{col,I,g,gc,bc:mix([1,.72,.78],[.86,.66,.9],sm(0,-6,a)),side:a>-12?(st.morning?-1:1):0,src:st.kind});return SKL}
+/* where the light comes from on screen: the sun or moon itself, or (sun below the horizon) the horizon on its side */
+function skyLightPos(){const b=document.getElementById('skyBody'),sc=document.getElementById('skyScene');
+ if(b&&(SKL.src==='sun'||SKL.src==='moon')){const r=b.getBoundingClientRect();if(r.width)return[r.left+r.width/2,r.top+r.height/2]}
+ const r=sc?sc.getBoundingClientRect():{bottom:innerHeight*.25};return[SKL.side<0?-innerWidth*.05:innerWidth*1.05,r.bottom]}
+const SKH=c=>'rgba('+c.map(v=>Math.round(Math.max(0,Math.min(1,v))*255)).join(',');
+/* everything else on screen: CSS variables from the same light (written every 30 s with the sky; off with Test tools "reallight") */
+function skyLightUI(nt){const r=document.documentElement,sv=(k,v)=>{if(r.style.getPropertyValue(k)!==v)r.style.setProperty(k,v)};
+ if(r.classList.contains('tt-off-reallight')){['--lcast','--lcasto','--lrim','--glc','--glc2'].forEach(k=>r.style.removeProperty(k));return}
+ const c=SKL.col,warm=Math.max(0,Math.min(1,SKL.g)),cast=nt>.5?.18:(.07+.36*warm)*(SKL.src==='below'&&warm<.05?.4:1),lp=skyLightPos();SKL.pos=lp;
+ let dx=lp[0]-innerWidth/2,dy=lp[1]-innerHeight/2;const dl=Math.hypot(dx,dy)||1;dx/=dl;dy/=dl;
+ const ra=(nt>.5?.2:.16+.34*warm).toFixed(3),h=v=>Math.round(Math.max(0,Math.min(1,v))*255);
+ sv('--lcast','rgb('+c.map(h).join(',')+')');sv('--lcasto',cast.toFixed(3));
+ sv('--lrim',`inset ${(-dx*7).toFixed(1)}px ${(-dy*7).toFixed(1)}px 16px -9px rgba(${c.map(h).join(',')},${ra})`);
+ const g1=c.map((v,i)=>h(v*(.45+.55*warm)+[.75,.9,1][i]*(1-(.45+.55*warm))*.85+.12));sv('--glc',g1.join(','));sv('--glc2',c.map((v,i)=>h(v*.5+.5)).join(','))}
+function skyBgCss(p){const g=SKL.g;let s=`linear-gradient(180deg,${p.top} 0%,${p.bot} 100%)`;if(g<.02||SKL.side===0)return s;
+ const [x,y]=skyLightPos(),R=Math.round(Math.max(innerWidth,innerHeight)*.6),ox=innerWidth-x;
+ return `radial-gradient(circle at ${x.toFixed(0)}px ${y.toFixed(0)}px,${SKH(SKL.gc)},${(.5*g).toFixed(3)}) 0px,${SKH(SKL.gc)},${(.17*g).toFixed(3)}) ${Math.round(R*.35)}px,transparent ${R}px),`+
+  `radial-gradient(120% 40% at ${ox.toFixed(0)}px ${(y+60).toFixed(0)}px,${SKH(SKL.bc)},${(.22*g).toFixed(3)}) 0%,transparent 70%),`+s}
 /* how much of the designed night sky to show: 0 by day, 1 once it is properly dark */
 function skyNightAmt(p){const n=Math.max(0,Math.min(1,(p.stars||0)*1.35)),e=document.getElementById('skyNight'),v=n.toFixed(3);if(e&&e.style.opacity!==v)e.style.opacity=v;return n}
 function skyOff(){const r=document.documentElement;r.removeAttribute('data-theme');r.style.removeProperty('--bg');r.style.removeProperty('--card');document.getElementById('sky').hidden=true;
@@ -2110,7 +2152,7 @@ const GL_SEL='#hdr .wk,.sky-cap,.sky-cap2,.dock,.hint,.ai-fab';
    Floating and scroll depth are pure CSS (compositor), so no per-frame script work. */
 const glSet=(s,k,v)=>{if(s.getPropertyValue(k)!==v)s.setProperty(k,v)};
 const GLSZ=new WeakMap();let GLSZt=0;
-function glassShine(){const H=innerHeight,W=innerWidth,lx=W/2+GLS.L[0]*H*1.6,ly=H/2+GLS.L[1]*H*1.6,sy=GLS.sc||0,now=performance.now();
+function glassShine(){const H=innerHeight,W=innerWidth,rl=typeof SKL!=='undefined'&&SKL.pos&&!document.documentElement.classList.contains('tt-off-reallight'),lx=rl?SKL.pos[0]:W/2+GLS.L[0]*H*1.6,ly=rl?SKL.pos[1]-(GLS.sc||0)*.0:H/2+GLS.L[1]*H*1.6,sy=GLS.sc||0,now=performance.now();
  const la=Math.atan2(lx-W/2,-(ly-H/2))*57.2958,fresh=GLS.szDirty||now-GLSZt>1500;if(fresh){GLSZt=now;GLS.szDirty=false}
  for(const e of document.querySelectorAll(GL_SEL)){let z=GLSZ.get(e);if(!z||fresh&&!GLS.scrolling){z=[e.offsetWidth,e.offsetHeight];GLSZ.set(e,z)}if(!z[0])continue;
   const k=glSeed(e),s=e.style,gg=la+k.ph+sy*.3*k.dir;glSet(s,'--gg',(((gg%360)+360)%360).toFixed(1)+'deg');
@@ -2199,8 +2241,10 @@ vec4 silk(vec2 p,float px){
  const NP=8,NG=14;   /* particles per bubble, letters with a bubble */
  const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
  /* texture: R = letter shape, G = softened depth (the water's curved surface), B = which letter, A = shape with a very small blur (for the thin outline) */
- const FS=`precision highp float;uniform vec2 uCR,uCO,uCS,uV,uLd;uniform sampler2D uM;uniform vec3 uTop,uBot,uRim,uSun;uniform float uDk,uWo,uNk,uRef,uPx,uSg,uSl,uTm;uniform vec4 uP[${NP*NG/2}];uniform vec2 uCn[${NG+1}];`+GLS.SILK+`
-vec3 sky(vec2 q,float soft){vec3 s=mix(uTop,uBot,clamp(q.y/uV.y,0.,1.));vec4 k=silk(vec2(q.x/uV.x,q.y/uV.x),soft/uV.x)*uWo;return s*(1.-k.a)+k.rgb;}
+ const FS=`precision highp float;uniform vec2 uCR,uCO,uCS,uV,uLd;uniform sampler2D uM;uniform vec3 uTop,uBot,uRim,uSun;uniform float uDk,uWo,uNk,uRef,uPx,uSg,uSl,uTm,uGa,uGr;uniform vec2 uGp,uBp;uniform vec3 uGc,uBc;uniform vec4 uP[${NP*NG/2}];uniform vec2 uCn[${NG+1}];`+GLS.SILK+`
+vec3 sky(vec2 q,float soft){vec3 s=mix(uTop,uBot,clamp(q.y/uV.y,0.,1.));
+ float gd=length(q-uGp),ga=uGa*(gd<uGr*.35?mix(.5,.17,gd/(uGr*.35)):mix(.17,0.,clamp((gd-uGr*.35)/(uGr*.65),0.,1.)));s=mix(s,uGc,ga);
+ vec2 bq=(q-uBp)/vec2(uV.x*1.2,uV.y*.4);s=mix(s,uBc,uGa*.22*clamp(1.-length(bq)/.7,0.,1.));vec4 k=silk(vec2(q.x/uV.x,q.y/uV.x),soft/uV.x)*uWo;return s*(1.-k.a)+k.rgb;}
 void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=texture2D(uM,cuv);float a=m.r;
  if(a<.004){gl_FragColor=vec4(0.);return;}
  vec2 e=vec2(2.2/uCR.x,2.2/uCR.y);float h=m.g;
@@ -2212,6 +2256,7 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  vec3 L=normalize(vec3(uLd,.75));float sp=pow(max(dot(reflect(-L,n),vec3(0.,0.,1.)),0.),26.)*smoothstep(.06,.3,1.-n.z);
  float far=max(dot(n.xy,-uLd),0.)/max(length(uLd),1e-3);
  col+=uSun*(sp*.6+far*far*.22*smoothstep(.12,.45,1.-n.z));
+ float lit2=max(dot(n.xy,uLd),0.)/max(length(uLd),1e-3);col+=uSun*lit2*smoothstep(.1,.5,1.-n.z)*.1*(1.-uDk*.3);
  /* the bubble: a few particles (moved by the script) blended into one soft blob, only where the water is deep enough, so it bends to the letter */
  int gi=int(floor(m.b*255.+.5));vec2 px=cuv*uCR;float f=0.;
  if(gi>0){for(int i=0;i<${NP*NG/2};i++){vec4 P=uP[i];float lg=floor(float(i*2)/${NP}.)+1.;if(int(lg)==gi){vec2 d1=px-P.xy,d2=px-P.zw;f+=exp(-dot(d1,d1)/uSg)+exp(-dot(d2,d2)/uSg);}}}
@@ -2227,7 +2272,7 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  let pr;try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw 0}catch(e){console.warn('water date',e);return}
  gl.useProgram(pr);const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
  const al=gl.getAttribLocation(pr,'a');gl.enableVertexAttribArray(al);gl.vertexAttribPointer(al,2,gl.FLOAT,false,0,0);
- const U={};for(const k of['uCR','uCO','uCS','uV','uLd','uM','uTop','uBot','uRim','uSun','uRef','uPx','uSg','uSl','uTm','uP','uCn','uDk','uWo','uNk','uT','uS','uF','uE','uL','uO','uK','uA','uB','uC'])U[k]=gl.getUniformLocation(pr,k);
+ const U={};for(const k of['uCR','uCO','uCS','uV','uLd','uM','uTop','uBot','uRim','uSun','uRef','uPx','uSg','uSl','uTm','uP','uCn','uGa','uGr','uGp','uBp','uGc','uBc','uDk','uWo','uNk','uT','uS','uF','uE','uL','uO','uK','uA','uB','uC'])U[k]=gl.getUniformLocation(pr,k);
  gl.uniform4fv(U.uA,GLS.R[0]);gl.uniform4fv(U.uB,GLS.R[1]);gl.uniform4fv(U.uC,GLS.R[2]);gl.uniform1f(U.uS,0);gl.uniform1i(U.uM,0);
  const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);for(const[k,v]of[[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,v);
  const hx=c=>{const m=/#?([0-9a-f]{6})/i.exec(c||'');if(!m)return[0,0,0];const n=parseInt(m[1],16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]};
@@ -2275,9 +2320,12 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
     if(Math.abs(nx-p.x)+Math.abs(ny-p.y)>.12)mv=true;p.x=nx;p.y=ny}}
   pack();return mv}
  function draw(){if(!ok||!cv.isConnected||R.classList.contains('cc-away'))return;const r=cv.getBoundingClientRect();if(!r.width||r.bottom<0||r.top>innerHeight)return;
-  const st=SKY.last,pal=st&&st.pal,dk=R.dataset.theme==='dark',night=R.dataset.night==='1',ld=[-.55+tl[0]*.9,-.8-tl[1]*.6];
+  const st=SKY.last,pal=st&&st.pal,dk=R.dataset.theme==='dark',night=R.dataset.night==='1',lp=typeof skyLightPos==='function'?skyLightPos():[0,0];
+  let lx=lp[0]-(r.left+r.width/2),ly=lp[1]-(r.top+r.height/2);const ln=Math.hypot(lx,ly)||1;lx=lx/ln*.95;ly=ly/ln*.95;const ld=[lx+tl[0]*.6,ly-tl[1]*.45];
+  const L=typeof SKL!=='undefined'?SKL:null,lc=L?L.col.map(v=>v*(.55+.45*L.I)*(night?.9:1.05)):[1,.95,.82];
+  if(L){gl.uniform1f(U.uGa,L.side&&!night?L.g:0);gl.uniform1f(U.uGr,Math.max(innerWidth,innerHeight)*.6);gl.uniform2f(U.uGp,lp[0],lp[1]);gl.uniform2f(U.uBp,innerWidth-lp[0],lp[1]+60);gl.uniform3fv(U.uGc,L.gc);gl.uniform3fv(U.uBc,L.bc)}else gl.uniform1f(U.uGa,0);
   gl.uniform2f(U.uCR,W,H);gl.uniform2f(U.uCO,r.left,r.top);gl.uniform2f(U.uCS,r.width,r.height);gl.uniform2f(U.uV,innerWidth,innerHeight);gl.uniform2f(U.uLd,ld[0],ld[1]);
-  gl.uniform3fv(U.uTop,hx(night?'#0a1230':pal&&pal.top));gl.uniform3fv(U.uBot,hx(night?'#18225a':pal&&pal.bot));gl.uniform3fv(U.uRim,dk?[.96,.97,1]:[.1,.15,.38]);gl.uniform3fv(U.uSun,night?[.86,.9,1]:R.dataset.sky==='dusk'?[1,.86,.76]:[1,.95,.82]);
+  gl.uniform3fv(U.uTop,hx(night?'#0a1230':pal&&pal.top));gl.uniform3fv(U.uBot,hx(night?'#18225a':pal&&pal.bot));gl.uniform3fv(U.uRim,dk?[.96,.97,1]:[.1,.15,.38]);gl.uniform3fv(U.uSun,lc);
   gl.uniform1f(U.uRef,dlFs*.55);gl.uniform1f(U.uPx,W/(r.width||1));gl.uniform1f(U.uDk,dk?1:0);gl.uniform1f(U.uWo,GLS.WO||1);gl.uniform1f(U.uSl,Math.min(1,Math.hypot(tv[0],tv[1])*.6));gl.uniform1f(U.uTm,performance.now()/1000%1000);
   gl.uniform1f(U.uT,GLS.T||7);gl.uniform3fv(U.uF,GLS.F||[1,1,1]);gl.uniform3fv(U.uE,GLS.E||[1,1,1]);gl.uniform3fv(U.uL,GLS.L||[0,0,1]);gl.uniform1f(U.uO,GLS.O||1);gl.uniform1f(U.uK,GLS.K||0);
   gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3)}
@@ -2685,8 +2733,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=23;
+const CC_VER=24;
 const CC_LOG=[
+ {v:24,new:['Real light: sunrise and sunset now glow warm across the whole screen (sky, cards, buttons and the water letters), in the true colour of the sunlight for that hour, with a soft edge of light on the side facing the sun or moon.']},
  {v:23,new:['Small updates now show up as this little banner instead of a big popup. Tap it to see what changed, or swipe it away.']},
  {v:22,new:['Fixed a dark “moon shadow” on the sky arch; the moon now sits solidly in front of it.']},
  {v:21,new:['The moon is always drawn in front of the glowing sky arch.']},
@@ -3903,7 +3952,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['reallight','Real light (sunrise/sunset colours on everything)'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id,,opt]of FLAGS){if(opt)document.documentElement.classList.toggle('tt-on-'+id,f[id]===true);else document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)}};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{const opt=(FLAGS.find(x=>x[0]===c.dataset.f)||[])[2];c.checked=opt?fl()[c.dataset.f]===true:fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
