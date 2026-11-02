@@ -2463,8 +2463,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=6;
+const CC_VER=7;
 const CC_LOG=[
+ {v:7,new:['When you ask for a reminder about something you already have on the calendar — like “set a reminder for my cello lesson an hour before” — it now finds that lesson and adds the reminder to it, using its real time, instead of making a new blank one.']},
  {v:6,new:['The big Hebrew date now has a soft shadow so it floats above the sky, with a very slight buoyant drift so it feels suspended rather than flat.']},
  {v:5,new:['Fixed reminders like “set a reminder for an hour before” — it now sets the reminder correctly instead of mangling the title.','Fixed the event chips sometimes overlapping the week row on the home screen.','A few more silky waves in the daytime sky.']},
  {v:4,new:['Birthday & yahrzeit customs are now a checklist you can tick off — and your ticks stay saved.','Confetti now pops only on YOUR birthday, and every time you open that day.','The planner now understands Hebrew dates spelled out in words, like “chof aleph sivan” (21 Sivan).','The daytime sky waves are a little more visible.','The app and browser icon is now the aleph logo.']},
@@ -3400,7 +3401,12 @@ function aiRemParse(text){let t=String(text||''),rem=[],found=false,mm;
   t=t.replace(/\b(a|an|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|half|\d+(?:\.\d+)?)\s*(?:and\s+a\s+half\s+)?(hours?|hrs?|minutes?|mins?|days?|weeks?)\s+(?:before|ahead\s+of)\s+(it(?:\s+(?:happens?|starts?|begins?|occurs?))?|the\s+(?:event|time|lesson|appointment|appt|session|meeting|shiur|class|chavrusa|seder)|hand|that)\b/gi,
    (m,num,unit)=>{let n=DW[String(num).toLowerCase()];if(n===undefined)n=parseFloat(num);if(isNaN(n))return m;
     const u=unit.toLowerCase(),min=/^h/.test(u)?n*60:/^m/.test(u)?n:/^d/.test(u)?n*1440:n*10080;
-    rem.push({type:'rel',min:Math.round(min)});found=true;return ' '});}
+    rem.push({type:'rel',min:Math.round(min)});found=true;return ' '});
+  // bare "<hours/minutes> before/early/ahead/in advance" at the end (no object) -> relative reminder;
+  // also swallow an immediately-preceding "remind me / set a reminder" so it leaves no dangling trigger
+  t=t.replace(/(?:(?:\b(?:and|also|then|plus)\s+)?(?:please\s+)?(?:remind\s+me|set(?:\s+up)?\s+(?:a|an)\s+(?:push\s+)?reminder(?:\s+for)?|give\s+me\s+(?:a|an)\s+reminder|send\s+(?:a|an)\s+reminder)\s+)?\b(a|an|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|half|\d+(?:\.\d+)?)\s*(?:and\s+a\s+half\s+)?(hours?|hrs?|minutes?|mins?)\s+(?:before|ahead|early|in\s+advance|prior)(?=\s*(?:$|[,.;!]))/gi,
+   (m,num,unit)=>{let n=DW[String(num).toLowerCase()];if(n===undefined)n=parseFloat(num);if(isNaN(n))return m;
+    const u=unit.toLowerCase(),min=/^h/.test(u)?n*60:n;rem.push({type:'rel',min:Math.round(min)});found=true;return ' '});}
  const re=new RegExp(AI_REM_TRIG.source,'gi'),cuts=[];
  while(mm=re.exec(t)){let pos=mm.index+mm[0].length,specs=[],end=pos;
   for(;;){const rest=t.slice(end),sep=(/^(?:\s*(?:,|and|&|also|plus|as\s+well\s+as|or)\s*|\s+)?/i.exec(rest)||[''])[0],r2=rest.slice(sep.length);
@@ -3522,16 +3528,47 @@ function aiReasonEvent(reason,ex,mainNotes){
  if(!hasDay){if(!ex||!ex.days.length)return '';ev+=' every '+ex.days.map(d=>AI_DAY_LABEL[d]).join(' and ')}
  if(!hasTime){const t=(/Time:\s*(\d{1,2}:\d{2}\s*[AP]M)/.exec(mainNotes||'')||[])[1];if(t)ev+=' at '+t;else if(ex&&ex.night)ev+=' night'}
  return ev}
+const AI_GEN_TOK=new Set(['lesson','lessons','meeting','appointment','appt','session','class','event','call','learning','shiur','seder','time','reminder','my','our','the','a','an','with','and','for','to','of','on','at','in','today','tomorrow','tonight','this','that','it','me']);
+const aiTok=x=>(String(x||'').toLowerCase().match(/[a-z’']{2,}/g)||[]);
+function aiFindMyEvent(title,person){const pt=aiTok(title+' '+(person||'')),key=pt.filter(w=>!AI_GEN_TOK.has(w)&&w.length>=3);
+ if(!key.length)return null;let best=null,bs=0;
+ for(const e of my){const et=new Set(aiTok((e.t||'')+' '+(e.x||'')+' '+(e.person||'')));
+  let score=0,distinct=false;for(const w of key)if(et.has(w)){score+=3;distinct=true}for(const w of pt)if(et.has(w)&&AI_GEN_TOK.has(w))score+=.5;
+  if(distinct&&score>bs){bs=score;best=e}}
+ return bs>=3?best:null}
+function aiNextOccur(ev){const r=ev.r||'once';
+ try{if(r==='greg'){const d=new Date(ev.dt+'T12:00:00'),nd=aiNextGreg(d.getMonth(),d.getDate(),t0);if(nd)return nd}
+  if(r==='heb'){const nd=aiNextHebrew(ev.hk,ev.hd,t0);if(nd)return nd}
+  if(r!=='once'){for(let i=0;i<=400;i++){const dt=ad(t0,i);if(info(dt).ev.some(e=>e.id===ev.id))return dt}}}catch(e){}
+ return new Date((ev.dt||ds(t0))+'T12:00:00')}
 async function aiInterpretSeg(src0){const R=aiRemParse(src0),src=R.found?R.text:src0;const e=aiExceptParse(src);const p=await aiInterpretOne(e.ex||e.reason||R.found?e.base:src);
  const out=aiApplyException(p,e.ex,e.reason);
  const rs=e.reason&&!p.unsupported&&!p.needsClarification?aiReasonEvent(e.reason,e.ex,p.notes):'';
  let rem=R.rem;if(!rem.length&&/^(?:please\s+)?(?:remind\s+me|(?:set|add|make|create)\s+(?:a|an|me\s+a)\s+reminder|reminder)\s+(?:to|about|of|for)\b/i.test(src0.trim()))rem=[{type:'rel',min:0,auto:true}];
  if(rem.length)out.forEach(q=>{if(!q.unsupported&&!q.needsClarification)aiRemAttach(q,rem)});
+ {const remCmd=/^\s*(?:please\s+)?(?:set(?:\s+up)?\s+(?:a|an)\s+(?:push\s+)?(?:reminder|notification|alert)|add\s+(?:a|an)\s+(?:reminder|notification|alert)|give\s+me\s+(?:a|an)\s+(?:reminder|notification|alert)|remind\s+me)\b/i.test(src0.trim());
+  const schedSig=/\b(?:schedule|every|each|daily|weekly|monthly|at\s+\d{1,2}(?::\d\d)?\s*(?:am|pm)?|:\d\d|\b\d{1,2}\s*(?:am|pm)\b|o['’]?clock)\b/i.test(src0);
+  if(R.found&&remCmd&&!schedSig&&out.length===1&&!out[0].needsClarification&&!out[0].unsupported&&out[0].rem&&out[0].rem.length&&!(typeof document!=='undefined'&&document.documentElement.classList.contains('tt-off-remmatch'))){
+   const p=out[0],ev=aiFindMyEvent(p.title,p.participant);
+   if(ev){const nd=aiNextOccur(ev);p.attachTo=ev.id;p.title=ev.t;p.participant=ev.person||undefined;p.kind='event';
+    p.date=ds(nd);p.hd=hd(nd).d;p.recurrence=ev.r||'once';
+    if(ev.tm){p.tm=ev.tm;p.time=aiHM(ev.tm)}else{p.tm=undefined}
+    p.summaryDate='For your “'+ev.t+'” · '+aiFmtDate(nd)+(ev.tm?' at '+aiHM(ev.tm):'');
+    p.summary='Reminder added to your existing '+((ev.r&&ev.r!=='once')?'schedule':'event');
+    p.notes='🔔 Reminder: '+p.rem.map(r=>aiRemLabel(r,ev.tm)).join(', ')+(ev.tm?'':' · (no set time, so it comes that morning)');
+    p.needsClarification=false;p.clarify='';p.warnings=[]}}}
  if(rs){try{const q=await aiInterpretOne(rs);if(q&&!q.unsupported&&q.title){q.fromReason=true;q.reasonSrc=rs;out.push(q)}}catch(x){}}
  return out}
 let aiSeq=0;
 // Save one approved plan to the calendar. `source` is the request text it came from (remembered on this device).
-function aiCommit(p,source){const dv=new Date((p.date||ds(sel))+'T12:00:00');if(!p.title||isNaN(+dv))return null;
+function aiCommit(p,source){
+ if(p.attachTo){const ev=my.find(x=>x.id===p.attachTo);if(!ev)return null;
+  const add=(p.rem||[]).map(r=>{const c={...r};delete c.auto;return c});ev.rem=[...(ev.rem||[]),...add];
+  const seen=new Set();ev.rem=ev.rem.filter(r=>{const k=JSON.stringify(r);if(seen.has(k))return false;seen.add(k);return true});
+  const tm=p.tm||aiClock(p.time);if(!ev.tm&&tm)ev.tm=tm;
+  SV();lg();if(typeof notifSyncSoon==='function')notifSyncSoon();
+  return{o:ev,dv:new Date((p.date||ev.dt||ds(t0))+'T12:00:00'),attached:true}}
+ const dv=new Date((p.date||ds(sel))+'T12:00:00');if(!p.title||isNaN(+dv))return null;
  const h=hd(dv),o={id:'ai'+Date.now()+(aiSeq++?'_'+aiSeq:''),t:p.title,x:p.notes||'',person:p.participant||'',kind:p.kind||'event',dt:ds(dv),r:p.recurrence||'once',hk:h.k,hd:p.hd||h.d,interval:p.interval};
  if(Array.isArray(p.rem)&&p.rem.length){o.rem=p.rem.map(r=>{const c={...r};delete c.auto;return c});const tm=p.tm||aiClock(p.time);if(tm)o.tm=tm}
  if(o.r==='weekly'){o.dow=Number.isInteger(p.dow)?p.dow:dv.getDay();if(Array.isArray(p.dows)&&p.dows.length)o.dows=p.dows.filter(Number.isInteger)}
@@ -3648,7 +3685,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll'],['remmatch','Attach “remind me” requests to a matching event']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id]of FLAGS)document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
