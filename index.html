@@ -352,7 +352,7 @@ body.om .foot,body.om .hint{opacity:0!important}
 <style id="android-blank-screen-fix">#intro{display:none!important;pointer-events:none!important}
 #sky{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}#skyGrad{position:absolute;inset:0}#stars{position:absolute;left:0;top:0;width:1px;height:1px;border-radius:50%;opacity:0;transition:opacity 2s}
 .sky-scene{position:relative;flex:0 0 100%;height:140px;margin-bottom:8px}.sky-arc{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.sky-trailc{position:absolute;left:-26px;top:-26px;pointer-events:none}.sky-body.anim{transition:none!important}
-.sky-body{position:absolute;width:112px;height:112px;margin:-56px 0 0 -56px;transition:left 1.2s ease,top 1.2s ease,opacity .6s}.skyimg{display:block;width:100%;height:100%;pointer-events:none;user-select:none}.moon .skyimg{width:96px;height:96px;margin:-18px 0}.sky-body.below{opacity:.4}
+.sky-body{position:absolute;width:112px;height:112px;margin:-56px 0 0 -56px;transition:left 1.2s ease,top 1.2s ease,opacity .6s}.skyimg{display:block;width:100%;height:100%;pointer-events:none;user-select:none}.moon .skyimg{width:96px;height:96px;margin:-18px 0}.sky-body.below .skyimg{filter:brightness(.5) saturate(.8)}
 .sky-cap{position:absolute;left:0;right:0;bottom:-6px;text-align:center;font-size:12px;letter-spacing:.02em;color:color-mix(in srgb,var(--ink) 72%,transparent)}
 .c2[data-go]{cursor:pointer}.c2[data-go]:focus-visible{outline:2px solid var(--ct);outline-offset:2px}
 @keyframes cflash{0%,100%{box-shadow:0 0 0 0 transparent}25%,65%{box-shadow:0 0 0 3px color-mix(in srgb,var(--ct) 70%,transparent),0 0 24px color-mix(in srgb,var(--ct) 45%,transparent)}}.flash{animation:cflash 2.4s ease;border-radius:14px}
@@ -541,11 +541,11 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
    atmosphere where the sun/moon is (--lx/--ly follow the body on the dome). It rolls/turns as you scroll (dmW). */
 #hdr .sky-scene::after{content:'';position:absolute;--dd:min(90vw,400px);left:calc(50% - var(--dd) / 2);top:calc(100% - 62px);width:var(--dd);height:var(--dd);box-sizing:border-box;border-radius:50%;z-index:-1;pointer-events:none;
  background:radial-gradient(46% 30% at var(--lx,50%) var(--ly,3%),color-mix(in srgb,var(--lc,#cfe0ff) calc(58% * var(--li,.5)),transparent) 0%,color-mix(in srgb,var(--lc,#cfe0ff) calc(20% * var(--li,.5)),transparent) 42%,transparent 72%),radial-gradient(closest-side,transparent 87%,color-mix(in srgb,var(--rbe) 32%,transparent) 94.5%,color-mix(in srgb,var(--rbe) 8%,transparent) 98%,transparent 100%),radial-gradient(60% 26% at var(--lx,50%) var(--ly,1%),color-mix(in srgb,var(--rbe) 13%,transparent) 0%,transparent 70%),radial-gradient(120% 82% at 50% 100%,color-mix(in srgb,var(--rbf) 6%,transparent) 0%,transparent 58%);
- -webkit-mask-image:conic-gradient(from 270deg,transparent 0deg,#000 30deg,#000 calc(var(--dl,180deg) - 30deg),transparent var(--dl,180deg)),radial-gradient(circle at var(--mhx,-50%) var(--mhy,-50%),transparent var(--mhr,0px),#000 calc(var(--mhr,0px) + 3px));mask-image:conic-gradient(from 270deg,transparent 0deg,#000 30deg,#000 calc(var(--dl,180deg) - 30deg),transparent var(--dl,180deg)),radial-gradient(circle at var(--mhx,-50%) var(--mhy,-50%),transparent var(--mhr,0px),#000 calc(var(--mhr,0px) + 3px));-webkit-mask-composite:source-in;mask-composite:intersect}
+ -webkit-mask-image:conic-gradient(from 270deg,transparent 0deg,#000 30deg,#000 calc(var(--dl,180deg) - 30deg),transparent var(--dl,180deg));mask-image:conic-gradient(from 270deg,transparent 0deg,#000 30deg,#000 calc(var(--dl,180deg) - 30deg),transparent var(--dl,180deg))}
 /* a wider, softer halo of lit atmosphere around the dome, for airiness; breathes, and fades as you scroll */
 #hdr .sky-scene::before{content:'';position:absolute;--dd:min(90vw,400px);left:calc(50% - var(--dd) / 2);top:calc(100% - 62px);width:var(--dd);height:var(--dd);border-radius:50%;z-index:-1;pointer-events:none;mix-blend-mode:screen;transform-origin:50% 50%;
  background:radial-gradient(56% 46% at var(--lx,50%) var(--ly,6%),color-mix(in srgb,var(--lc,#cfe0ff) calc(42% * var(--li,.5)),transparent) 0%,transparent 64%);
- -webkit-mask-image:radial-gradient(circle at var(--mhx,-50%) var(--mhy,-50%),transparent var(--mhr,0px),#000 calc(var(--mhr,0px) + 3px));mask-image:radial-gradient(circle at var(--mhx,-50%) var(--mhy,-50%),transparent var(--mhr,0px),#000 calc(var(--mhr,0px) + 3px));
+
  animation:domeBreath 7.5s ease-in-out infinite}
 @keyframes domeBreath{0%,100%{scale:1}50%{scale:1.045}}
 @keyframes domeTurn{to{opacity:0}}
@@ -1969,11 +1969,6 @@ function skyDomeAim(st){const sc=document.getElementById('skyScene');if(!sc)retu
   Xp=50+Math.sin(an)*50;Yp=50-Math.cos(an)*50;
   const low=Math.max(0,Math.min(1,(st.y-6)/52));
   li=st.kind==='below'?.55:(.55+.4*low);lc=st.kind==='sun'?'#ffdca6':'#cfe0ff'}
- /* the moon always sits on top of the arch: cut a moon-sized hole in the arch's glow where the moon is */
- const bd=document.getElementById('skyBody'),isM=bd&&bd.classList.contains('moon-b');
- if(st&&isM){const Hs=sc.offsetHeight||140,img=bd.querySelector('.skyimg'),mr=((img&&img.offsetWidth)||100)/2;
-  set('--mhx',((st.x/100*W-(cx-R))/(2*R)*100).toFixed(1)+'%');set('--mhy',((st.y/100*Hs-(Hs-62))/(2*R)*100).toFixed(1)+'%');set('--mhr',(mr-2).toFixed(0)+'px')}
- else set('--mhr','0px');
  set('--lx',Xp.toFixed(1)+'%');set('--ly',Yp.toFixed(1)+'%');set('--li',li.toFixed(2));set('--lc',lc);set('--dma','0deg')}
 /* When the sun/moon is far to one side (or below the horizon) the middle of the sky is empty: the date moves up and grows into it.
    Applied as a state, not animated. */
@@ -2680,8 +2675,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=21;
+const CC_VER=22;
 const CC_LOG=[
+ {v:22,new:['Fixed a dark “moon shadow” on the sky arch; the moon now sits solidly in front of it.']},
  {v:21,new:['The moon is always drawn in front of the glowing sky arch.']},
  {v:20,new:['The glowing sky arch now always lights up on the side facing the sun or the moon.']},
  {v:19,new:['Softer bubble edges in the water letters.']},
