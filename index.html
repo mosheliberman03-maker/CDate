@@ -486,7 +486,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 @font-face{font-family:'FRL App';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/frank-ruhl-libre-hebrew-500-normal.woff2) format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
 @font-face{font-family:'FRL App';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/frank-ruhl-libre-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'FRL App';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/frank-ruhl-libre-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-:root{--dtc:var(--ink);--gl-bg:color-mix(in srgb,var(--card) 50%,transparent);--gl-bd:color-mix(in srgb,var(--ink) 13%,transparent);--gl-tx:var(--ink);--rbf:#ffffff;--rbe:#ffffff;--waveo:.55;--navy:#0a1131}
+:root{--dtc:var(--ink);--gl-bg:color-mix(in srgb,var(--card) 50%,transparent);--gl-bd:color-mix(in srgb,var(--ink) 13%,transparent);--gl-tx:var(--ink);--rbf:#9fb6ea;--rbe:#d6e4ff;--waveo:.55;--navy:#0a1131}
 :root[data-night="1"]{--ink:#ECEAF6;--mut:#A6AACB;--line:rgba(168,178,255,.16);--dtc:#F0E4D4;--gl-bg:linear-gradient(180deg,rgba(58,70,150,.30),rgba(28,40,96,.28) 62%,rgba(60,108,180,.22));--gl-bd:rgba(168,178,255,.21);--gl-tx:#E8E6F4;--rbf:#7f86f2;--rbe:#a9e2ff;--waveo:1}
 /* the sky */
 #skyNight{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease;background:
@@ -645,6 +645,13 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 :root[data-theme="light"]:not(.tt-off-glassui) #g .day.day[class*="w-"]{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 9%,rgba(255,255,255,.62)),rgba(255,255,255,.45))!important;border-color:color-mix(in srgb,var(--c) 45%,rgba(255,255,255,.7))}
 :root[data-theme="dark"]:not(.tt-off-glassui) #g .day.day[class*="w-"]{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 9%,rgba(46,56,128,.35)),rgba(22,30,80,.3))!important;border-color:color-mix(in srgb,var(--c) 42%,transparent)}
 /* birthday & yahrzeit touches */
+.occ-list{margin:8px 0}
+.occ-item{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;background:none;border:0;color:var(--ink);font:inherit;font-size:13.5px;line-height:1.5;padding:8px 2px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.occ-item+.occ-item{border-top:1px solid color-mix(in srgb,var(--gx-bd,var(--line)) 55%,transparent)}
+.occ-box{flex:none;width:20px;height:20px;border-radius:7px;border:1.5px solid color-mix(in srgb,var(--mut) 55%,transparent);display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;margin-top:1px;transition:background .18s,border-color .18s}
+.occ-item.on .occ-box{background:var(--my);border-color:var(--my)}
+.occ-item.on>span:last-child{opacity:.55;text-decoration:line-through}
+
 .occ-mingm{margin-top:12px;padding-top:12px;border-top:1px solid var(--gx-bd,var(--line))}
 .occ-mingm>b{font-size:14px;display:block;margin-bottom:2px}
 .occ-mingm ul{margin:6px 0;padding-left:20px;font-size:13.5px;line-height:1.6;color:var(--mut)}
@@ -1547,8 +1554,11 @@ function occOwnBday(e){if(!e||e.k!=='my'||occKind(e)!=='bday')return false;
  if(/\b(?:his|her|their|son|daughter|wife|husband|father|mother|friend|brother|sister|zaidy|bubby|tatty|mommy|kid|child|boy|girl)\b/i.test(t))return false;
  return /\bmy\b/i.test(t+' '+x)||/^\s*birthday\s*$/i.test(t); // "my birthday" / just "Birthday"
 }
-function occMingm(k){const L=k==='bday'?BDAY_MINHAGIM:YZ_MINHAGIM;
- return `<div class="occ-mingm"><b>${k==='bday'?'🎂 Birthday customs':'Customs for the yahrzeit'}</b><ul>${L.map(x=>'<li>'+x+'</li>').join('')}</ul><small>Chabad minhagim — check with your Rav for anything specific.</small></div>`}
+function occMingm(k,eid){const L=k==='bday'?BDAY_MINHAGIM:YZ_MINHAGIM,D=taskDone(),dt=ds(sel);
+ return `<div class="occ-mingm"><b>${k==='bday'?'🎂 Birthday customs':'Customs for the yahrzeit'}</b><div class="occ-list">`+
+  L.map((x,i)=>{const id='occ:'+eid+':'+i,done=!!D[id+'@'+dt];
+   return `<button type="button" class="occ-item${done?' on':''}" data-task="${id}" data-date="${dt}" aria-pressed="${done?'true':'false'}"><span class="occ-box">${done?'✓':''}</span><span>${x}</span></button>`}).join('')+
+  `</div><small>Chabad minhagim — check with your Rav for anything specific.</small></div>`}
 function evCard(e,i){const ok=occKind(e);
  return `<div class="ev mc k-${e.k}${ok?' occ occ-'+ok:''}" style="--i:${i+3}">`+
   (ok==='yz'?'<span class="yzc" aria-hidden="true"><b></b><u></u></span>':'')+
@@ -1557,7 +1567,7 @@ function evCard(e,i){const ok=occKind(e);
   (editing?`<button class="ed" data-e="${e.id}">Edit</button>`:'')+
   `<h3 style="${e.isTask&&e.done?'text-decoration:line-through;opacity:.65':''}">${ok==='bday'?'🎂 ':''}${e.t}${e.h?` <span class="heb" lang="he">${e.h}</span>`:''}</h3>`+
   (lt(e)?`<p class="sm" role="button" tabindex="0" data-i="${i}">${e.x} <span class="mr">More ›</span></p>`:`<p>${e.x}</p>`)+
-  (ok?occMingm(ok):'')+
+  (ok?occMingm(ok,e.id):'')+
   `</div>`}
 let ccPanelDay='';
 function ccConfetti(){if(RM||document.documentElement.classList.contains('tt-off-occ'))return;
@@ -2040,7 +2050,7 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
  /* Drawn only when something changes (scroll, size, colours): no idle animation, so nothing runs while you just look. */
  let colT=-1e9,W=0,Hh=0,sc=-1,raf=0,Q=.4,dirty=true,lastD=0,lastG=0,gT=0;const T0=7.0;
  const size=()=>{const d=Math.min(devicePixelRatio||1,2)*Q,w=Math.round(host.clientWidth*d),h=Math.round(host.clientHeight*d);if(w&&h&&(w!==W||h!==Hh)){W=cv.width=w;Hh=cv.height=h;gl.viewport(0,0,w,h);dirty=true}};
- const colors=()=>{const cs=getComputedStyle(document.documentElement);gl.uniform3fv(U.uF,hex(cs.getPropertyValue('--rbf')));gl.uniform3fv(U.uE,hex(cs.getPropertyValue('--rbe')));const nightW=document.documentElement.dataset.night==='1';gl.uniform1f(U.uO,nightW?1:.8);
+ const colors=()=>{const cs=getComputedStyle(document.documentElement);gl.uniform3fv(U.uF,hex(cs.getPropertyValue('--rbf')));gl.uniform3fv(U.uE,hex(cs.getPropertyValue('--rbe')));const nightW=document.documentElement.dataset.night==='1';gl.uniform1f(U.uO,nightW?1:1.0);
   /* night waves are kept soft and quiet so they stay in the background (owner); Test tools switch "swave" turns that off */
   gl.uniform1f(U.uK,nightW&&!document.documentElement.classList.contains('tt-off-swave')?1:0)};
  const draw=()=>{size();if(!W)return false;if(colT<0){colT=1;colors()}
