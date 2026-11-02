@@ -2184,37 +2184,42 @@ vec4 silk(vec2 p,float px){
  const R=document.documentElement,cv=document.createElement('canvas');cv.id='dlCv';cv.className='dl-cv';cv.setAttribute('aria-hidden','true');
  const gl=cv.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:false,depth:false,stencil:false});if(!gl)return;
  const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
- const FS=`precision highp float;uniform vec2 uCR,uCO,uCS,uV,uTl;uniform sampler2D uM;uniform vec3 uTop,uBot,uRim,uSun;uniform float uDk,uWo,uNk,uRef,uPx,uBub;`+GLS.SILK+`
-float Hq(vec2 c){float h0=texture2D(uM,c).g;return texture2D(uM,c+vec2(uTl.x,-uTl.y)*uBub/uCS*smoothstep(.06,.75,h0)).g;}
+ const FS=`precision highp float;uniform vec2 uCR,uCO,uCS,uV,uTl;uniform sampler2D uM;uniform vec3 uTop,uBot,uRim,uSun;uniform float uDk,uWo,uNk,uRef,uPx,uBub,uSl,uTm;`+GLS.SILK+`
 void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=texture2D(uM,cuv);float a=m.r;
  if(a<.004){gl_FragColor=vec4(0.);return;}
- vec2 e=vec2(2.6/uCR.x,2.6/uCR.y);float h=Hq(cuv);
- float hx=Hq(cuv+vec2(e.x,0.))-Hq(cuv-vec2(e.x,0.)),hy=Hq(cuv+vec2(0.,e.y))-Hq(cuv-vec2(0.,e.y));
+ vec2 e=vec2(2.2/uCR.x,2.2/uCR.y);float h=m.g;
+ float hx=texture2D(uM,cuv+vec2(e.x,0.)).g-texture2D(uM,cuv-vec2(e.x,0.)).g,hy=texture2D(uM,cuv+vec2(0.,e.y)).g-texture2D(uM,cuv-vec2(0.,e.y)).g;
  vec3 n=normalize(vec3(-hx*uNk,-hy*uNk,1.));
  vec2 vp=uCO+cuv*uCS;
  float ed=clamp(1.-n.z,0.,1.),nl=length(n.xy);vec2 nd=nl>1e-4?n.xy/nl:vec2(0.);
  /* clear water: the flat middle of a stroke shows the sky almost as is; toward the edges the view bends hard (and the water sways with tilt) */
- vec2 q=vp+n.xy*uRef+uTl*vec2(13.,8.)*(.25+.75*h);
+ vec2 q=vp+n.xy*uRef;
  vec3 sky=mix(uTop,uBot,clamp(q.y/uV.y,0.,1.));
  vec4 sk=silk(vec2(q.x/uV.x,q.y/uV.x),1./(uV.x*.8))*uWo;
  vec3 bg=sky*(1.-sk.a)+sk.rgb;
- vec2 Lto=normalize(vec2(-.55+uTl.x*.25,-.85+uTl.y*.12));
+ vec2 Lto=normalize(vec2(-.55,-.85));
  float lit=max(dot(nd,Lto),0.),far=max(dot(nd,-Lto),0.);
  float band=smoothstep(.1,.42,ed)*(1.-smoothstep(.62,.92,ed));
  float rim=smoothstep(.72,.97,ed);
  float caus=pow(far,1.4)*smoothstep(.04,.35,ed)*(1.-smoothstep(.7,.95,ed)),streak=pow(far,6.)*smoothstep(.3,.55,ed)*(1.-smoothstep(.6,.8,ed));
  float spec=pow(lit,5.)*smoothstep(.25,.75,ed);
- vec2 gq=cuv*uCR/(5.*uPx)+uTl*3.,gp=floor(gq);float hs=fract(sin(dot(gp,vec2(12.9898,78.233)))*43758.5453);
+ vec2 gq=cuv*uCR/(5.*uPx),gp=floor(gq);float hs=fract(sin(dot(gp,vec2(12.9898,78.233)))*43758.5453);
  float glint=step(.972,hs)*smoothstep(.36,.05,length(fract(gq)-.5))*smoothstep(.15,.6,ed)*(lit+far*.8);
  vec3 col=mix(bg,bg*vec3(.86,.96,1.08)+vec3(.02,.05,.08),.6)*(1.-band*(.1+.34*(1.-uDk)))-vec3(.07,.04,0.)*(1.-uDk)*smoothstep(0.,.5,h);
- col+=uSun*((.16+.3*h)*(.08+.92*uDk)+caus*(.3+.35*uDk)+streak*.8+spec*.8+glint*1.2);
+ col+=uSun*(.03+.33*uDk*smoothstep(0.,.12,a)+caus*(.3+.35*uDk)+streak*.8+spec*.8+glint*1.2);
+ float tm=length(uTl);vec2 lp=vec2(m.a,m.b)-.5,ud=tm>1e-3?vec2(-uTl.x,uTl.y)/tm:vec2(0.,-1.),ac=vec2(ud.y,-ud.x);
+ float sd=dot(lp,ud),lv=.5-.3*smoothstep(.05,.9,tm)-ed*.06+uSl*.035*sin(dot(lp,ac)*17.+uTm*8.);
+ float air=smoothstep(lv-.02,lv+.02,sd)*smoothstep(.06,.35,tm)*step(.001,m.a+m.b);
+ float men=exp(-abs(sd-lv)/.018)*smoothstep(.06,.35,tm)*step(.001,m.a+m.b);
+ vec3 airc=bg*(1.02+.06*uDk)+uSun*(spec*.7+.04*uDk);
+ col=mix(col,airc,air*.85)+uSun*men*(.35+.25*uDk);
  col=mix(col,uRim,rim*(.82-.12*uDk));
  gl_FragColor=vec4(col*a,a);}`;
  const sh=(t,src)=>{const o=gl.createShader(t);gl.shaderSource(o,src);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o};
  let pr;try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw 0}catch(e){return}
  gl.useProgram(pr);const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
  const al=gl.getAttribLocation(pr,'a');gl.enableVertexAttribArray(al);gl.vertexAttribPointer(al,2,gl.FLOAT,false,0,0);
- const U={};for(const k of['uCR','uCO','uCS','uV','uTl','uM','uTop','uBot','uRim','uSun','uRef','uPx','uBub','uDk','uWo','uNk','uT','uS','uF','uE','uL','uO','uK','uA','uB','uC'])U[k]=gl.getUniformLocation(pr,k);
+ const U={};for(const k of['uCR','uCO','uCS','uV','uTl','uM','uTop','uBot','uRim','uSun','uRef','uPx','uBub','uSl','uTm','uDk','uWo','uNk','uT','uS','uF','uE','uL','uO','uK','uA','uB','uC'])U[k]=gl.getUniformLocation(pr,k);
  gl.uniform4fv(U.uA,GLS.R[0]);gl.uniform4fv(U.uB,GLS.R[1]);gl.uniform4fv(U.uC,GLS.R[2]);gl.uniform1f(U.uS,0);gl.uniform1i(U.uM,0);
  const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);for(const[k,v]of[[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,v);
  const hx=c=>{const m=/#?([0-9a-f]{6})/i.exec(c||'');if(!m)return[0,0,0];const n=parseInt(m[1],16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]};
@@ -2228,14 +2233,19 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
   const k=[w,h,dpr,h1.className,document.getElementById('hdr').className,sp.map(x=>x.textContent+x.offsetLeft+','+x.offsetTop).join('|')].join(';');if(k===key&&ok)return;key=k;
   W=Math.round(w*dpr);H=Math.round(h*dpr);cv.width=W;cv.height=H;Object.assign(cv.style,{left:-PAD+'px',top:-PAD+'px',width:w+'px',height:h+'px'});gl.viewport(0,0,W,H);
   const mk=()=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c},A=mk(),B=mk(),a=A.getContext('2d');a.scale(dpr,dpr);a.fillStyle='#fff';a.textAlign='center';a.textBaseline='alphabetic';a.strokeStyle='#fff';a.lineJoin='round';a.lineCap='round';
-  let fs=60;for(const x of sp){const cs=getComputedStyle(x);fs=parseFloat(cs.fontSize)||fs;a.font=cs.fontStyle+' '+cs.fontWeight+' '+cs.fontSize+' '+cs.fontFamily;const t=x.textContent,mt=a.measureText(t),asc=mt.fontBoundingBoxAscent||fs*.8,ds=mt.fontBoundingBoxDescent||fs*.25;
-   const tx=x.offsetLeft+x.offsetWidth/2+PAD,ty=x.offsetTop+PAD+(x.offsetHeight-(asc+ds))/2+asc;a.lineWidth=fs*.07;a.strokeText(t,tx,ty);a.fillText(t,tx,ty)}
+  let fs=60;const G=[];for(const x of sp){const cs=getComputedStyle(x);fs=parseFloat(cs.fontSize)||fs;a.font=cs.fontStyle+' '+cs.fontWeight+' '+cs.fontSize+' '+cs.fontFamily;const t=x.textContent,mt=a.measureText(t),asc=mt.fontBoundingBoxAscent||fs*.8,ds=mt.fontBoundingBoxDescent||fs*.25;
+   const ty=x.offsetTop+PAD+(x.offsetHeight-(asc+ds))/2+asc;let xr=x.offsetLeft+x.offsetWidth/2+PAD+mt.width/2;a.lineWidth=fs*.07;a.textAlign='right';
+   for(const ch of t){if(!ch.trim()){xr-=a.measureText(ch).width;continue}const cm=a.measureText(ch),lw=fs*.05;a.strokeText(ch,xr,ty);a.fillText(ch,xr,ty);
+    G.push({ch,font:a.font,x:xr,y:ty,lw:a.lineWidth,b:[xr-(cm.actualBoundingBoxLeft||cm.width)-lw,ty-(cm.actualBoundingBoxAscent||fs*.7)-lw,xr+(cm.actualBoundingBoxRight||0)+lw,ty+(cm.actualBoundingBoxDescent||0)+lw]});xr-=cm.width}}
   const b=B.getContext('2d');b.filter='blur('+(fs*dpr*.07).toFixed(1)+'px)';b.drawImage(A,0,0);
-  const da=a.getImageData(0,0,W,H).data,db=b.getImageData(0,0,W,H).data,o=new Uint8Array(W*H*4);for(let i=3;i<da.length;i+=4){o[i-3]=da[i];o[i-2]=Math.min(255,db[i]*1.6);o[i]=255}
+  const da=a.getImageData(0,0,W,H).data,db=b.getImageData(0,0,W,H).data,o=new Uint8Array(W*H*4);for(let i=3;i<da.length;i+=4){o[i-3]=da[i];o[i-2]=Math.min(255,db[i]*1.6);o[i-1]=0;o[i]=0}
+  const C=mk(),c=C.getContext('2d');for(const g of G){c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,W,H);c.scale(dpr,dpr);c.font=g.font;c.textAlign='right';c.textBaseline='alphabetic';c.fillStyle=c.strokeStyle='#fff';c.lineJoin='round';c.lineWidth=g.lw;c.strokeText(g.ch,g.x,g.y);c.fillText(g.ch,g.x,g.y);
+   const x0=Math.max(0,Math.floor(g.b[0]*dpr)),y0=Math.max(0,Math.floor(g.b[1]*dpr)),x1=Math.min(W,Math.ceil(g.b[2]*dpr)),y1=Math.min(H,Math.ceil(g.b[3]*dpr)),bw=Math.max(1,x1-x0),bh=Math.max(1,y1-y0);if(x1<=x0||y1<=y0)continue;
+   const d=c.getImageData(x0,y0,bw,bh).data;for(let yy=0;yy<bh;yy++)for(let xx=0;xx<bw;xx++){if(d[(yy*bw+xx)*4+3]<60)continue;const k=((y0+yy)*W+x0+xx)*4;o[k+2]=1+Math.round(yy/bh*253);o[k+3]=1+Math.round(xx/bw*253)}}
   gl.bindTexture(gl.TEXTURE_2D,tex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,W,H,0,gl.RGBA,gl.UNSIGNED_BYTE,o);gl.uniform1f(U.uNk,fs*dpr*.09);dlFs=fs;ok=true;if(!R.classList.contains('cc-wl'))R.classList.add('cc-wl');draw()}
  function draw(){if(!ok||!cv.isConnected||R.classList.contains('cc-away'))return;const r=cv.getBoundingClientRect();if(!r.width||r.bottom<0||r.top>innerHeight)return;
   const st=SKY.last,pal=st&&st.pal,dk=R.dataset.theme==='dark',night=R.dataset.night==='1';
-  gl.uniform2f(U.uCR,W,H);gl.uniform2f(U.uCO,r.left,r.top);gl.uniform2f(U.uCS,r.width,r.height);gl.uniform2f(U.uV,innerWidth,innerHeight);gl.uniform2f(U.uTl,tl[0],tl[1]);
+  gl.uniform2f(U.uCR,W,H);gl.uniform2f(U.uCO,r.left,r.top);gl.uniform2f(U.uCS,r.width,r.height);gl.uniform2f(U.uV,innerWidth,innerHeight);gl.uniform2f(U.uTl,tl[0],tl[1]);gl.uniform1f(U.uSl,Math.min(1,Math.hypot(tv[0],tv[1])*.6));gl.uniform1f(U.uTm,performance.now()/1000%1000);
   gl.uniform3fv(U.uTop,hx(night?'#0a1230':pal&&pal.top));gl.uniform3fv(U.uBot,hx(night?'#18225a':pal&&pal.bot));gl.uniform3fv(U.uRim,dk?[1,1,1]:[.1,.15,.38]);gl.uniform3fv(U.uSun,night?[.86,.9,1]:R.dataset.sky==='dusk'?[1,.86,.76]:[1,.95,.82]);gl.uniform1f(U.uRef,dlFs*.9);gl.uniform1f(U.uBub,dlFs*.11);gl.uniform1f(U.uPx,W/(r.width||1));gl.uniform1f(U.uDk,dk?1:0);gl.uniform1f(U.uWo,GLS.WO||1);
   gl.uniform1f(U.uT,GLS.T||7);gl.uniform3fv(U.uF,GLS.F||[1,1,1]);gl.uniform3fv(U.uE,GLS.E||[1,1,1]);gl.uniform3fv(U.uL,GLS.L||[0,0,1]);gl.uniform1f(U.uO,GLS.O||1);gl.uniform1f(U.uK,GLS.K||0);
   gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3)}
@@ -2640,8 +2650,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=14;
+const CC_VER=15;
 const CC_LOG=[
+ {v:15,new:['New bubble in the water letters: each letter is like a little level vial facing you. Tilt the phone and the air gathers on the higher side, stopping at the letter’s own walls.']},
  {v:14,new:['The water inside the date letters now flows like liquid when you tilt: it bends and gathers against the letter’s own edges instead of sliding.']},
  {v:13,new:['iPhone and iPad users can use the calendar right here on the website, no app needed.']},
  {v:12,new:['The light inside the water letters now drifts like the bubble in a water bottle when you tilt the phone: tilt right and it moves left, tilt down and it moves up.']},
