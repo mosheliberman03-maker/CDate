@@ -379,6 +379,16 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
 
 .gi{flex:none;border:1px solid color-mix(in srgb,var(--c,var(--ys)) 45%,var(--line));background:color-mix(in srgb,var(--c,var(--ys)) 10%,transparent);color:var(--ink);font:600 12px Figtree,system-ui;border-radius:99px;padding:6px 11px;cursor:pointer;white-space:nowrap}.gi:active{transform:scale(.96)}
 .ck .gi{margin-left:6px}
+ #newsBar{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 8px);width:min(calc(100% - 24px),420px);transform:translate(-50%,-140%);opacity:0;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s;z-index:60;touch-action:pan-y;
+ background:var(--gx-sheet,var(--card));color:var(--ink);border:1px solid var(--gx-bd,var(--line));border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.22);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);overflow:hidden}
+#newsBar.on{transform:translate(-50%,0);opacity:1}
+#newsBar .nb-h{display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;background:none;border:0;color:inherit;font:600 14px Figtree,system-ui,sans-serif;text-align:left;cursor:pointer}
+#newsBar .nb-t{flex:1;min-width:0}#newsBar .nb-t small{font-weight:500;color:var(--mut)}
+#newsBar .nb-h i{font-style:normal;color:var(--mut);font-size:18px;transition:transform .25s}#newsBar.open .nb-h i{transform:rotate(90deg)}
+#newsBar .nb-b{display:none;padding:0 16px 14px}#newsBar.open .nb-b{display:block}
+#newsBar ul{margin:0 0 10px;padding-left:18px;font-size:13.5px;line-height:1.6;color:var(--ink)}
+#newsBar .nb-x{border:1px solid var(--gx-bd,var(--line));background:var(--gx-gh,transparent);color:inherit;border-radius:12px;padding:8px 14px;font:600 13px Figtree,system-ui,sans-serif;cursor:pointer}
+@media(prefers-reduced-motion:reduce){#newsBar{transition:opacity .2s}}
 .tdn{display:flex;align-items:center;gap:13px;padding:12px 2px;border-top:1px solid var(--line)}
 .ph+.tdn,.gt+.tdn{border-top:0}
 .tdn .ic{flex:none;width:26px;height:26px;display:grid;place-items:center;color:var(--mut)}
@@ -2675,31 +2685,31 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=22;
+const CC_VER=23;
 const CC_LOG=[
+ {v:23,new:['Small updates now show up as this little banner instead of a big popup. Tap it to see what changed, or swipe it away.']},
  {v:22,new:['Fixed a dark “moon shadow” on the sky arch; the moon now sits solidly in front of it.']},
  {v:21,new:['The moon is always drawn in front of the glowing sky arch.']},
  {v:20,new:['The glowing sky arch now always lights up on the side facing the sun or the moon.']},
  {v:19,new:['Softer bubble edges in the water letters.']},
  {v:18,new:['The bubbles in the water letters now prefer the middle of each letter: they rest in its thickest part, away from the walls, and drift back there when you level the phone.']},
  {v:17,new:['Much bigger bubbles in the water letters: each one fills a good part of its stroke, keeps its own rim just inside the letter’s wall, and flows along the letter as you tilt.']},
- {v:16,new:['Each water letter now has a small clear air bubble, like in a water bottle. Tilt the phone and it rolls to the higher side, following the letter’s shape and flattening against its walls.']},
  {v:16,new:['The date letters are now clear water inside a thin outline, with a small clear air bubble in each letter. Tilt the phone and the bubble flows to the higher side and flattens against the letter’s walls; the light shifts as you tilt.']},
  {v:15,new:['New bubble in the water letters: each letter is like a little level vial facing you. Tilt the phone and the air gathers on the higher side, stopping at the letter’s own walls.']},
  {v:14,new:['The water inside the date letters now flows like liquid when you tilt: it bends and gathers against the letter’s own edges instead of sliding.']},
- {v:13,new:['iPhone and iPad users can use the calendar right here on the website, no app needed.']},
+ {v:13,big:1,new:['iPhone and iPad users can use the calendar right here on the website, no app needed.']},
  {v:12,new:['The light inside the water letters now drifts like the bubble in a water bottle when you tilt the phone: tilt right and it moves left, tilt down and it moves up.']},
  {v:11,new:['The water letters are now evenly full, with no darker stripe down the middle.']},
  {v:10,new:['The water letters are now clear and full: you see the sky through them, light glows and glints inside, and the edges bend the view like a water bottle.','The date scrolls with the rest of the top of the screen again.']},
  {v:9,new:['The big date is now made of water: each letter bends the sky behind it like a full water bottle, and tilting the phone makes the water inside sway a little.','A little more silk in the sky, in every theme.']},
- {v:8,new:['A calmer, glassier big date that stays put while the page scrolls over it, then rises a little and fades.','Evening (and daytime) skies are softer and glassier, like the night sky.','Shiurim and your stats now use the app’s own colors.','To-do lists: fasting, Aneinu, Selichos, Tehillim on Shabbos Mevarchim and lighting the menorah are now reminders, not checkboxes; Al HaNissim, Chanukah gelt and farbrengens are plain notes; Birkas HaChodesh is gone.','Your chavrusas and shiurim no longer have a check box.','Birthday: the aliyah moves to the Monday, Thursday or Shabbos just before (with a reminder the day before), and saying a maamar of the Rebbe replaces the dvar Torah.','The Rebbeim’s yahrzeits show only the customs really kept on each one.','Fixed the event chips sometimes covering the week row.']},
- {v:7,new:['Beta: Chabad Calendar now runs in the Android app. The app asks once for location (for zmanim) and microphone (to speak to the planner), and new users get the tour on a sample day with real events.']},
+ {v:8,big:1,new:['A calmer, glassier big date that stays put while the page scrolls over it, then rises a little and fades.','Evening (and daytime) skies are softer and glassier, like the night sky.','Shiurim and your stats now use the app’s own colors.','To-do lists: fasting, Aneinu, Selichos, Tehillim on Shabbos Mevarchim and lighting the menorah are now reminders, not checkboxes; Al HaNissim, Chanukah gelt and farbrengens are plain notes; Birkas HaChodesh is gone.','Your chavrusas and shiurim no longer have a check box.','Birthday: the aliyah moves to the Monday, Thursday or Shabbos just before (with a reminder the day before), and saying a maamar of the Rebbe replaces the dvar Torah.','The Rebbeim’s yahrzeits show only the customs really kept on each one.','Fixed the event chips sometimes covering the week row.']},
+ {v:7,big:1,new:['Beta: Chabad Calendar now runs in the Android app. The app asks once for location (for zmanim) and microphone (to speak to the planner), and new users get the tour on a sample day with real events.']},
  {v:6,new:['The big Hebrew date now has a soft shadow so it floats above the sky, with a very slight buoyant drift so it feels suspended rather than flat.']},
- {v:5,new:['Fixed reminders like “set a reminder for an hour before” — it now sets the reminder correctly instead of mangling the title.','Fixed the event chips sometimes overlapping the week row on the home screen.','A few more silky waves in the daytime sky.']},
- {v:4,new:['Birthday & yahrzeit customs are now a checklist you can tick off — and your ticks stay saved.','Confetti now pops only on YOUR birthday, and every time you open that day.','The planner now understands Hebrew dates spelled out in words, like “chof aleph sivan” (21 Sivan).','The daytime sky waves are a little more visible.','The app and browser icon is now the aleph logo.']},
- {v:3,new:['Add your birthdays and yahrzeits — just tell the planner (“Zaidy’s yahrzeit 3 Tishrei”, “my birthday 15 Nissan”). A birthday pops confetti when you open that day; a yahrzeit shows a lit candle. Both now show the Chabad customs for the day.']},
+ {v:5,big:1,new:['Fixed reminders like “set a reminder for an hour before” — it now sets the reminder correctly instead of mangling the title.','Fixed the event chips sometimes overlapping the week row on the home screen.','A few more silky waves in the daytime sky.']},
+ {v:4,big:1,new:['Birthday & yahrzeit customs are now a checklist you can tick off — and your ticks stay saved.','Confetti now pops only on YOUR birthday, and every time you open that day.','The planner now understands Hebrew dates spelled out in words, like “chof aleph sivan” (21 Sivan).','The daytime sky waves are a little more visible.','The app and browser icon is now the aleph logo.']},
+ {v:3,big:1,new:['Add your birthdays and yahrzeits — just tell the planner (“Zaidy’s yahrzeit 3 Tishrei”, “my birthday 15 Nissan”). A birthday pops confetti when you open that day; a yahrzeit shows a lit candle. Both now show the Chabad customs for the day.']},
  {v:1,new:['The night and day screens were restyled as one matching glass look.','The semicircle under the sun and moon is now a soft glow of lit atmosphere — no more hard shape.']},
- {v:2,feature:'The phone app',tour:'app',new:['New: a phone app that rings your reminders as real alarms — even with no internet or VPN. A home-screen widget is coming next.','Get it from ⋯ → App.']}
+ {v:2,big:1,feature:'The phone app',tour:'app',new:['New: a phone app that rings your reminders as real alarms — even with no internet or VPN. A home-screen widget is coming next.','Get it from ⋯ → App.']}
 ];
 function ccNewsPopup(items,tourWhich){
  let o=document.getElementById('newsBox');if(o)o.remove();
@@ -2720,8 +2730,23 @@ function ccWhatsNew(sv){let seen=0;try{seen=+localStorage.getItem(sv)||0}catch(e
  try{localStorage.setItem(sv,String(CC_VER))}catch(e){}
  if(!fresh.length)return;
  const picked=seen===0?fresh.slice(-1):fresh;      /* first time tracking: show the latest only, not a backlog */
- const items=[];let tour=null;for(const e of picked){(e.new||[]).forEach(i=>items.push(i));if(e.tour)tour=e.tour}
- if(!items.length&&!tour)return;setTimeout(()=>ccNewsPopup(items,tour),500);}
+ const big=[],small=[];let tour=null;for(const e of picked){(e.new||[]).forEach(i=>(e.big||e.tour?big:small).push(i));if(e.tour)tour=e.tour}
+ if(big.length||tour)setTimeout(()=>ccNewsPopup([...big,...small],tour),500);
+ else if(small.length)setTimeout(()=>ccNewsBar(small),900);}
+/* small updates: a slim banner at the very top. Tap to open the list, swipe it away (left, right or up), or close it. */
+function ccNewsBar(items){let o=document.getElementById('newsBar');if(o)o.remove();
+ const esc=t=>String(t).replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
+ o=document.createElement('div');o.id='newsBar';o.setAttribute('role','status');
+ o.innerHTML='<button class="nb-h" type="button" aria-expanded="false"><span class="nb-s">✨</span><span class="nb-t">What’s new <small>· '+(items.length==1?'1 small update':items.length+' small updates')+'</small></span><i aria-hidden="true">›</i></button><div class="nb-b"><ul>'+items.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul><button class="nb-x" type="button">Got it</button></div>';
+ document.body.appendChild(o);requestAnimationFrame(()=>o.classList.add('on'));
+ const bye=(dx,dy)=>{o.style.transition='transform .28s ease,opacity .28s';o.style.transform=`translate(${dx}px,${dy}px)`;o.style.opacity='0';setTimeout(()=>o.remove(),300)};
+ const h=o.querySelector('.nb-h');h.addEventListener('click',()=>{if(o._sw)return;const on=!o.classList.contains('open');o.classList.toggle('open',on);h.setAttribute('aria-expanded',on);try{H.tap()}catch(e){}});
+ o.querySelector('.nb-x').addEventListener('click',()=>bye(0,-80));
+ let x0=0,y0=0,dx=0,dy=0,drag=false;
+ o.addEventListener('pointerdown',e=>{x0=e.clientX;y0=e.clientY;dx=dy=0;drag=true;o._sw=false;o.style.transition='none'});
+ o.addEventListener('pointermove',e=>{if(!drag)return;dx=e.clientX-x0;dy=Math.min(0,e.clientY-y0);if(!o._sw&&(Math.abs(dx)>8||dy<-8)){o._sw=true;try{o.setPointerCapture(e.pointerId)}catch(_){}}if(o._sw){o.style.transform=`translate(${dx}px,${dy}px)`;o.style.opacity=String(1-Math.min(.8,Math.max(Math.abs(dx)/260,-dy/120)))}});
+ const up=()=>{if(!drag)return;drag=false;if(Math.abs(dx)>70)bye(dx>0?innerWidth:-innerWidth,0);else if(dy<-40)bye(0,-120);else{o.style.transition='transform .25s ease,opacity .25s';o.style.transform='';o.style.opacity=''}setTimeout(()=>{o._sw=false},0)};
+ o.addEventListener('pointerup',up);o.addEventListener('pointercancel',up)}
 // First-run guided tour (see ccTourStart). Also hooks up profile name / log out.
 (function(){const u=localStorage.getItem('cc_local_active_profile_v1');if(!u)return;const name=document.getElementById('profileName');if(name)name.textContent=u;const gate=document.getElementById('accountGate');if(gate)gate.style.display='none';const key='cc_local_tour_done_'+u,sv='cc_seen_ver_'+u;function waitForIntro(){if(document.getElementById('intro')){setTimeout(waitForIntro,180);return}if(!localStorage.getItem(key)){if(!ccIsApp()&&!ccIOS())return;try{localStorage.setItem(sv,String(CC_VER))}catch(e){}const demoDay=findDemoDay();if(demoDay&&+demoDay!==+t0){window.tourDemoDay=demoDay;sel=demoDay;upd()}setTimeout(()=>ccTourStart(key),1200)}else ccWhatsNew(sv)}waitForIntro();
 const rp=document.getElementById('tourReplay');if(rp)rp.addEventListener('click',()=>{op(false);setTimeout(()=>ccTourStart(key,true),450)});
