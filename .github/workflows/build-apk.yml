@@ -40,6 +40,11 @@ jobs:
       - name: Generate the Android project
         run: npx cap add android
 
+      - name: Generate the app icon (the web-app aleph logo)
+        run: |
+          npm i -D @capacitor/assets@3
+          npx capacitor-assets generate --android --iconBackgroundColor '#0a0b10' --iconBackgroundColorDark '#0a0b10' --splashBackgroundColor '#0a0b10' --splashBackgroundColorDark '#0a0b10'
+
       - name: Add permissions for exact alarms
         run: node patch-android.js
 
