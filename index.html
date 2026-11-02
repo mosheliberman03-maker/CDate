@@ -2494,7 +2494,7 @@ function ccWhatsNew(sv){let seen=0;try{seen=+localStorage.getItem(sv)||0}catch(e
  const items=[];let tour=null;for(const e of picked){(e.new||[]).forEach(i=>items.push(i));if(e.tour)tour=e.tour}
  if(!items.length&&!tour)return;setTimeout(()=>ccNewsPopup(items,tour),500);}
 // First-run guided tour (see ccTourStart). Also hooks up profile name / log out.
-(function(){const u=localStorage.getItem('cc_local_active_profile_v1');if(!u)return;const name=document.getElementById('profileName');if(name)name.textContent=u;const gate=document.getElementById('accountGate');if(gate)gate.style.display='none';const key='cc_local_tour_done_'+u,sv='cc_seen_ver_'+u;function waitForIntro(){if(document.getElementById('intro')){setTimeout(waitForIntro,180);return}if(!localStorage.getItem(key)){try{localStorage.setItem(sv,String(CC_VER))}catch(e){}setTimeout(()=>ccTourStart(key),700)}else ccWhatsNew(sv)}waitForIntro();
+(function(){const u=localStorage.getItem('cc_local_active_profile_v1');if(!u)return;const name=document.getElementById('profileName');if(name)name.textContent=u;const gate=document.getElementById('accountGate');if(gate)gate.style.display='none';const key='cc_local_tour_done_'+u,sv='cc_seen_ver_'+u;function waitForIntro(){if(document.getElementById('intro')){setTimeout(waitForIntro,180);return}if(!localStorage.getItem(key)){try{localStorage.setItem(sv,String(CC_VER))}catch(e){}if(window.CC_NATIVE){const demoDay=findDemoDay();if(demoDay){window.tourDemoDay=demoDay;sel=demoDay;upd()}setTimeout(()=>ccTourStart(key),1200)}else{setTimeout(()=>ccTourStart(key),700)}}else ccWhatsNew(sv)}waitForIntro();
 const rp=document.getElementById('tourReplay');if(rp)rp.addEventListener('click',()=>{op(false);setTimeout(()=>ccTourStart(key,true),450)});
 
 /* ===== The native app, controlled only through the web app =====
@@ -2517,6 +2517,7 @@ function appShow(){let o=document.getElementById('appBox');
  }
  requestAnimationFrame(()=>o.classList.add('on'));H.tap&&H.tap()}
 function CC_LOGGED(){const g=document.getElementById('accountGate');return !g||getComputedStyle(g).display==='none'}
+function findDemoDay(){try{for(let i=0;i<40;i++){const d=ad(t0,i),inf=info(d);if(inf.ev&&inf.ev.length>=2)return d}}catch(e){}return t0}
 function appSync(){const el=document.getElementById('appSec'),h=document.getElementById('appH');if(!el)return;
  if(CC_NATIVE){el.innerHTML='<p class="mut" style="font-size:14px;margin:4px 0 0">✓ You’re using the app. Your reminders here ring as alarms on this phone, even offline.</p>';return}
  if(ccAndroid){el.innerHTML='<button class="btn" type="button" id="appGet">Download the app</button><p class="mut" style="font-size:13px;margin:8px 0 0">Adds offline alarms (no VPN needed) and a home-screen widget. You still control everything from here.</p>';
