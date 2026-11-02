@@ -314,7 +314,8 @@ body.om .foot,body.om .hint{opacity:0!important}
 @keyframes cflash{0%,100%{box-shadow:0 0 0 0 transparent}25%,65%{box-shadow:0 0 0 3px color-mix(in srgb,var(--ct) 70%,transparent),0 0 24px color-mix(in srgb,var(--ct) 45%,transparent)}}.flash{animation:cflash 2.4s ease;border-radius:14px}
 @media (prefers-reduced-motion:reduce){.sky-body{transition:none}}
 
-#tg{position:fixed;inset:0;z-index:100002;touch-action:none;opacity:0;transition:opacity .45s ease}#tg.in{opacity:1}#tg.out{opacity:0;pointer-events:none}
+#tg{position:fixed;inset:0;z-index:100002;touch-action:none;opacity:0;transition:opacity .45s ease}
+#tg.pass{pointer-events:none}#tg.pass .tg-card{pointer-events:auto}#tg.in{opacity:1}#tg.out{opacity:0;pointer-events:none}
 .tg-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:block}
 .tg-card{position:absolute;left:0;right:0;margin:0 auto;top:0;width:min(calc(100% - 28px),392px);box-sizing:border-box;padding:16px 18px 18px;border-radius:22px;background:var(--gx-sheet,var(--card,#fff));color:var(--ink,#222);box-shadow:0 18px 60px rgba(0,0,0,.42);border:1px solid var(--gx-bd,var(--line,#0001));-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);will-change:transform;transition:opacity .17s ease}
 .tg-card.swap{opacity:0}.tg-card.center{text-align:center}.tg-card.center .tg-top{justify-content:center}
@@ -2443,21 +2444,18 @@ function ccTourStart(key,replay,which){
  const toShiur=()=>{const sd=q('#sd');if(sd)scrollSmooth(Math.max(0,sd.getBoundingClientRect().top+scrollY-110))};
  const SETS={
   onboard:[
-   {t:'Welcome',p:'Your Chabad calendar. The big Hebrew date sits under a living sky — the real sun and moon rise and set, and the day turns over at sunset.',els:()=>[q('#hdr .hd-he')||q('#hdr')],pad:8,enter:async()=>{scrollTo(0,0)}},
-   {t:'Change the day',p:'Swipe left or right anywhere, or tap a day on the week strip. Today’s circle glows; a teal dot marks a day with something special.',els:()=>[q('#hdr .wk')],pad:8,
-    enter:async t=>{scrollTo(0,0);await sleep(700,t);await pressEl(q('#hdr .wk .wd:nth-child(6)'),t)}},
-   {t:'Special days & your plans',p:'Holidays, candle-lighting, fasts and your own events show as chips. Tap one to jump straight to its details.',els:()=>[q('#ch')],pad:8,skip:()=>!q('#ch .c2'),
-    enter:async t=>{await sleep(300,t);await pressEl(q('#ch .c2'),t)}},
-   {t:'Scroll for the day',p:'Scroll down for Hayom Yom, today’s learning (Chitas & Rambam), your tasks, and the zmanim for where you are.',els:()=>[q('#hint')],pad:8,round:true,
-    enter:async t=>{await sleep(400,t);toShiur();await sleep(900,t)},leave:()=>scrollTo(0,0)},
-   {t:'Read a shiur',p:'Tap a learning row to read it in Hebrew. Scroll to the end and leave — it checks off by itself. Or tap the circle to check it without opening.',els:()=>[firstShiur()||q('#sd')],pad:8,skip:()=>!firstShiur(),
-    enter:async t=>{toShiur();await sleep(600,t)},leave:()=>scrollTo(0,0)},
-   {t:'Just ask',p:'Tap + and say it in your own words — “chavrusa with Adam every night at 8, remind me 2 hours before.” It works out the day, time and reminders; you confirm before anything saves.',els:()=>[aiEl('aiInput'),aiEl('aiPlan')],pad:10,top:true,
+   {t:'Welcome',p:'Your Chabad calendar — Hebrew dates under a living sky, today’s learning and holidays, and a planner you just talk to. Swipe, or tap the week strip, to move between days. Let’s set it up.',els:()=>[q('#hdr')],pad:6,enter:async()=>{scrollTo(0,0)}},
+   {t:'Set your location',p:'Zmanim, candle-lighting and sunset are all worked out for where you are. Tap “Detect my location,” or type your city — then Next.',els:()=>[q('#locNow'),q('#ul'),q('#cs'),q('#csb')],pad:12,interactive:true,
+    enter:async t=>{op(true);await sleep(480,t);const l=q('#ul');l&&l.scrollIntoView({block:'center',behavior:reduce?'auto':'smooth'})},leave:()=>op(false)},
+   {t:'Everything for today',p:'Scroll down for holidays and your plans, Hayom Yom, today’s learning (Chitas & Rambam), and the zmanim for your location.',els:()=>[q('#hint')],pad:8,round:true,
+    enter:async t=>{await sleep(400,t);const sd=q('#sd');if(sd)scrollSmooth(Math.max(0,sd.getBoundingClientRect().top+scrollY-110));await sleep(900,t)},leave:()=>scrollTo(0,0)},
+   {t:'Learn in one tap',p:'Tap a learning row to read it in Hebrew. Reach the end and leave — it checks off by itself. Or tap the circle to check it without opening.',els:()=>[firstShiur()||q('#sd')],pad:8,skip:()=>!firstShiur(),
+    enter:async t=>{const sd=q('#sd');if(sd)scrollSmooth(Math.max(0,sd.getBoundingClientRect().top+scrollY-110));await sleep(600,t)},leave:()=>scrollTo(0,0)},
+   {t:'Just ask',p:'Tap + and say it in plain words — “chavrusa with Adam every night at 8, remind me 2 hours before.” It sets the day, time and reminders; you confirm before anything saves.',els:()=>[aiEl('aiInput'),aiEl('aiPlan')],pad:10,top:true,
     enter:async t=>{const b=aiEl('aiBackdrop');b.classList.add('on');b.setAttribute('aria-hidden','false');await sleep(800,t);await typeInto(aiEl('aiInput'),'Chavrusa with Adam every night at 8pm, remind me 2 hours before',t);await sleep(500,t);const go=aiEl('aiPlan');await pressEl(go,t);go.click();await sleep(2400,t)},
     leave:()=>{try{const no=aiEl('aiNo');if(no&&aiEl('aiPreview').offsetParent)no.click()}catch(e){}aiEl('aiInput').value='';aiSetStatus('');aiClose()}},
-   {t:'Reminders that reach you',p:'In ⋯ → Reminders, turn on notifications. Install the phone app (⋯ → App) and they ring even with no internet or VPN.',els:()=>[q('.dock #mn')],pad:8,enter:async()=>{scrollSmooth(0)}},
-   {t:'Everything else is in ⋯',p:'Month view, your location, what shows on the calendar, and Help all live under ⋯.',els:()=>[q('.dock')],pad:6,enter:async()=>{scrollSmooth(0)}},
-   {t:'You’re all set',p:'Replay this tour any time from ⋯ → Help.',els:()=>null,last:true,enter:async()=>{scrollTo({top:0,behavior:'auto'})}}
+   {t:'Never miss it',p:'Turn on reminders in ⋯ → Reminders. Install the phone app (⋯ → App) and they ring even with no internet or VPN.',els:()=>[q('.dock #mn')],pad:8,enter:async()=>{scrollSmooth(0)}},
+   {t:'You’re all set',p:'Change your location, turn on reminders, or replay this tour anytime in ⋯ → Help.',els:()=>null,last:true,enter:async()=>{scrollTo({top:0,behavior:'auto'})}}
   ],
   app:[
    {t:'The phone app',p:'A small app that adds alarms which ring even without a VPN — and soon a home-screen widget. Everything is still controlled right here in the calendar.',els:()=>[q('.dock #mn')],pad:8,enter:async()=>{scrollTo(0,0)}},
@@ -2492,7 +2490,7 @@ function ccTourStart(key,replay,which){
    if(n>=steps.length||n<0){return finish()}
    let s=steps[n];while(s&&s.skip&&s.skip()){n++;s=steps[n]}if(!s)return finish();
    card.classList.add('swap');await new Promise(r=>setTimeout(r,reduce?0:170));if(t!==run)return;
-   idx=n;const L=live(),pos=L.indexOf(s)+1;
+   idx=n;document.getElementById('tg').classList.toggle('pass',!!s.interactive);const L=live(),pos=L.indexOf(s)+1;
    q('#tgN').textContent=pos+' of '+L.length;cardH=0;q('#tgBar').style.width=(pos/L.length*100)+'%';q('#tgT').textContent=s.t;q('#tgP').textContent=s.p;
    const nx=q('#tgNext');nx.textContent=s.last?'Start using the calendar':'Next';q('#tgSkip').hidden=!!s.last;
    card.classList.toggle('center',!!s.last);void card.offsetWidth;cardH=card.offsetHeight;card.classList.remove('swap');busy=false;
