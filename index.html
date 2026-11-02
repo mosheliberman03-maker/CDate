@@ -1035,7 +1035,7 @@ function footPlace(){const f=document.getElementById('foot'),w=document.querySel
  let wb=w.getBoundingClientRect().bottom;const fh=f.offsetHeight||42,lim=H-166;let over=wb+14+fh-lim;
  if(over>0&&sc){const cur=sc.offsetHeight,nh=Math.max(document.getElementById('hdr').classList.contains('sky-side')?64:150,cur-over);if(nh<cur){sc.style.height=nh+'px';wb=w.getBoundingClientRect().bottom;over=wb+14+fh-lim}}
  f.style.top=Math.round(wb+14)+'px';f.style.bottom='auto';if(typeof skyRedrawTrail==='function')skyRedrawTrail();if(SKY.last&&!SKYA.run)skyDomeAim(SKY.last)}
-addEventListener('resize',()=>requestAnimationFrame(footPlace));if(document.fonts)document.fonts.ready.then(()=>footPlace());
+addEventListener('resize',()=>requestAnimationFrame(footPlace));if(document.fonts)document.fonts.ready.then(()=>footPlace());[500,1200,2600].forEach(ms=>setTimeout(footPlace,ms));
 function render(dir){requestAnimationFrame(()=>requestAnimationFrame(footPlace));if(typeof ccBridgeSoon==='function')ccBridgeSoon();if(typeof GLS!=='undefined'&&GLS.kick)requestAnimationFrame(GLS.kick);
  const f=V,L=hlen(f),a=ad(f,-f.getDay()),n=Math.ceil((f.getDay()+L)/7)*7,td=+t0;
  const h0=hd(f),e1=ad(f,L-1);$('#t').textContent=h0.n[0]+' '+h0.y;if(dir&&!RM)$('#t').animate([{opacity:0,transform:`translateX(${dir*18}px)`},{opacity:1,transform:'none'}],{duration:380,easing:'cubic-bezier(.2,.8,.2,1)'});
@@ -1899,7 +1899,7 @@ function skyRun(plan,done){
   if(b){const st=skyCompute(Date.now());if(cv&&cv.parentNode)cv.remove();const im=b.querySelector('img');if(im)im.style.visibility='';
    b.className='sky-body '+(st.kind==='sun'?'sun-b':'moon-b')+(st.kind==='below'?' below':'')+' anim';b.style.transform='';b.style.willChange='';b.style.opacity='';b.style.left=st.x.toFixed(1)+'%';b.style.top=st.y.toFixed(1)+'%';void b.offsetWidth;if(st.kind==='below')b.style.opacity='0';requestAnimationFrame(()=>{b.classList.remove('anim');if(st.kind==='below')requestAnimationFrame(()=>{b.style.opacity=''})})}
   const tc=document.getElementById('skyTrailC');if(tc)tc.style.opacity='';
-  const st=skyCompute(Date.now());SKY.last=st;if(SKY.on){skyApply(st);skyUpdateScene(st);const b2=document.getElementById('skyBody');if(b2&&st.kind==='below')b2.style.opacity='0'}if(done)done()};
+  const st=skyCompute(Date.now());SKY.last=st;if(SKY.on){skyApply(st);skyUpdateScene(st);const b2=document.getElementById('skyBody');if(b2&&st.kind==='below')b2.style.opacity='0'}if(typeof footPlace==='function')requestAnimationFrame(footPlace);if(done)done()};
  const step=ts=>{const b=document.getElementById('skyBody');if(!b||!SKY.on){stop();return}
   const u=Math.min(1,Math.max(0,(ts-t0)/plan.dur)),st=plan.st;let frac,op=1,pal=st.pal,sun=false,dy=0,alt=0;
   if(plan.mode==='up'){const e=ease3(u),tm=plan.sr+(plan.now-plan.sr)*e;alt=skySunPos(tm).alt+.833;frac=st.frac*e;sun=true;pal=skyPalette(alt,tm<(plan.sr+plan.ss)/2);op=skySm(0,.14,u);dy=24*(1-skySm(0,.5,u))}
@@ -2005,10 +2005,10 @@ function glassShine(){const H=innerHeight,W=innerWidth,lx=W/2+GLS.L[0]*H*1.6,ly=
  if(!gl){fb();return}
  const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
  const FS=`precision highp float;
-uniform vec2 uR;uniform float uT,uS;uniform vec3 uF,uE,uL;uniform float uO,uK;uniform vec4 uA[6],uB[6],uC[6];
+uniform vec2 uR;uniform float uT,uS;uniform vec3 uF,uE,uL;uniform float uO,uK;uniform vec4 uA[9],uB[9],uC[9];
 void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px=1./uR.x;
  vec3 acc=vec3(0.);float aa=0.;vec3 Hv=normalize(uL+vec3(0.,0.,1.));
- for(int i=0;i<6;i++){vec4 A=uA[i],B=uB[i],C=uC[i];float x=p.x,t=uT*C.w;
+ for(int i=0;i<9;i++){vec4 A=uA[i],B=uB[i],C=uC[i];float x=p.x,t=uT*C.w;
   float a1=A.z*x+A.w+t,a2=B.y*x+1.7*A.w-.6*t;
   float c=A.x-uS*C.y+A.y*sin(a1)+B.x*sin(a2),dc=A.y*A.z*cos(a1)+B.x*B.y*cos(a2);
   float th=B.w*x+C.x+.35*t,ct=cos(th),st=sin(th);
@@ -2042,7 +2042,10 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
   [1.30,.16,3.0,4.1, .05,5.5,.075,2.6, 1.3,.42,.55,.06],
   [1.66,.20,2.4,.35, .07,4.4,.11,2.2, 2.6,.55,.9,.05],
   [2.02,.16,2.9,5.2, .05,6.3,.08,3.4, .9,.68,.75,.045],
-  [2.32,.22,2.1,2.0, .06,4.8,.12,2.0, 3.4,.8,.8,.04]];
+  [2.32,.22,2.1,2.0, .06,4.8,.12,2.0, 3.4,.8,.8,.04],
+  [.9,.30,2.7,3.3, .05,5.8,.07,2.8, 1.8,.38,.6,.055],
+  [1.48,.18,3.2,.9, .06,4.9,.09,3.0, .5,.5,.62,.048],
+  [1.9,.24,2.3,4.7, .05,5.1,.1,2.4, 2.9,.72,.68,.042]];
  const fa=j=>new Float32Array(R.flatMap(r=>r.slice(j*4,j*4+4)));
  gl.uniform4fv(U.uA,fa(0));gl.uniform4fv(U.uB,fa(1));gl.uniform4fv(U.uC,fa(2));
  gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
@@ -2454,8 +2457,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=4;
+const CC_VER=5;
 const CC_LOG=[
+ {v:5,new:['Fixed reminders like “set a reminder for an hour before” — it now sets the reminder correctly instead of mangling the title.','Fixed the event chips sometimes overlapping the week row on the home screen.','A few more silky waves in the daytime sky.']},
  {v:4,new:['Birthday & yahrzeit customs are now a checklist you can tick off — and your ticks stay saved.','Confetti now pops only on YOUR birthday, and every time you open that day.','The planner now understands Hebrew dates spelled out in words, like “chof aleph sivan” (21 Sivan).','The daytime sky waves are a little more visible.','The app and browser icon is now the aleph logo.']},
  {v:3,new:['Add your birthdays and yahrzeits — just tell the planner (“Zaidy’s yahrzeit 3 Tishrei”, “my birthday 15 Nissan”). A birthday pops confetti when you open that day; a yahrzeit shows a lit candle. Both now show the Chabad customs for the day.']},
  {v:1,new:['The night and day screens were restyled as one matching glass look.','The semicircle under the sun and moon is now a soft glow of lit atmosphere — no more hard shape.']},
@@ -2771,7 +2775,7 @@ function aiParseDate(str,today){
  if(m=/\b(?:on\s+)?the\s+(\d{1,2})(?:st|nd|rd|th)\b(?!\s+(?:chapters?|perek|perakim|pages?|day|time|daf|mishna|siman|seif|sicha|maamar|letter|one))/i.exec(str)){const dn=+m[1];if(dn>=1&&dn<=31){let d=null;for(let i=0;i<62&&!d;i++){const x=ad(today,i);if(x.getDate()===dn)d=x}return{info:{kind:'dom',date:d},rest:cut(m)}}}
  return null}
 
-function aiLocalInterpret(raw){
+function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|myself|ourselves)\b/gi,' ').replace(/\s+/g,' ').trim();
  const today=ad(new Date(),0), base=new Date(sel), prefs=aiPrefs();
  const original=String(raw||'').replace(/[‘’`´]/g,"'").replace(/[“”]/g,'"').replace(/[–—]/g,'-').replace(/\s+/g,' ').trim();
  const warn=[], notes=[];
@@ -3371,7 +3375,7 @@ function aiHasAnchor(s){return AI_ANCHOR_RE.test(s)}
    aiRemParse() finds reminder requests in a request, removes them from the text (so they don't become part of the plan),
    and returns a list of reminder rules. They are saved on the plan (o.rem) and sent as push notifications by notifPlan(). */
 const AI_REM_NUM={a:1,an:1,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,fifteen:15,twenty:20,thirty:30,forty:40,'forty five':45,'forty-five':45,fifty:50,sixty:60,ninety:90,couple:2,'couple of':2,few:3};
-const AI_REM_TRIG=/(?:\b(?:and|also|then|please|pls)\s+|,\s*)*\b(?:remind\s+me(?:\s+(?:about|of)\s+(?:it|this|that))?|let\s+me\s+know|notify\s+me|alert\s+me|ping\s+me|buzz\s+me|text\s+me|warn\s+me|give\s+me\s+(?:a\s+|an\s+)?(?:reminder|heads[\s-]?up|notification|ping|alert)|send\s+(?:me\s+)?(?:a\s+|an\s+)?(?:push\s+)?(?:reminder|notification|alert|push)|(?:with\s+)?(?:a\s+|an\s+)?(?:push\s+)?(?:reminder|notification|alert)s?)\b/gi;
+const AI_REM_TRIG=/(?:\b(?:and|also|then|please|pls)\s+|,\s*)*\b(?:set(?:\s+up)?\s+(?:a\s+|an\s+)?(?:push\s+)?(?:reminder|notification|alert)s?|remind\s+me(?:\s+(?:about|of)\s+(?:it|this|that))?|let\s+me\s+know|notify\s+me|alert\s+me|ping\s+me|buzz\s+me|text\s+me|warn\s+me|give\s+me\s+(?:a\s+|an\s+)?(?:reminder|heads[\s-]?up|notification|ping|alert)|send\s+(?:me\s+)?(?:a\s+|an\s+)?(?:push\s+)?(?:reminder|notification|alert|push)|(?:with\s+)?(?:a\s+|an\s+)?(?:push\s+)?(?:reminder|notification|alert)s?)\b/gi;
 function aiRemSpec(s){let m;const at=(h,mn,ap)=>{let H=+h,M=+(mn||0);ap=aiNormAp(ap);if(H<1||H>12&&ap||H>23||M>59)return null;if(ap==='PM'&&H<12)H+=12;if(ap==='AM'&&H===12)H=0;if(!ap&&H>=1&&H<=6)H+=12;return[H,M]};
  if(m=/^(?:about\s+|around\s+|like\s+)?(\d+(?:\.\d+)?|an?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty[\s-]five|forty|fifty|sixty|ninety|couple(?:\s+of)?|few|half\s+an?)\s*(?:(and\s+a\s+half)\s+)?(minutes?|mins?|hours?|hrs?|days?|weeks?)(?:\s+(and\s+a\s+half))?\s+(?:before(?:hand)?|ahead(?:\s+of\s+time)?|earlier|prior|in\s+advance|early)(?:\s+(?:it\s+starts|that|the\s+event|the\s+time|of\s+time|it))?/i.exec(s)){
   const w=m[1].toLowerCase().replace(/\s+/g,' ');let n=/^half/.test(w)?.5:/^\d/.test(w)?+w:AI_REM_NUM[w]||1;if(m[2]||m[4])n+=.5;
@@ -3383,10 +3387,17 @@ function aiRemSpec(s){let m;const at=(h,mn,ap)=>{let H=+h,M=+(mn||0);ap=aiNormAp
  if(m=/^at\s+(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)?(?![\w:])(?:\s+(?:on\s+)?((?:the\s+)?(?:day|night|evening)\s+before|the\s+previous\s+(?:day|night|evening)|that\s+(?:day|morning|evening|night)|on\s+the\s+day|the\s+same\s+day))?/i.exec(s)){
   const t=at(m[1],m[2],m[3]);if(!t)return null;return{len:m[0].length,r:{type:'at',h:t[0],m:t[1],day:m[4]&&/before|previous/i.test(m[4])?-1:0}}}
  return null}
-function aiRemParse(text){let t=String(text||''),rem=[],found=false,mm;const re=new RegExp(AI_REM_TRIG.source,'gi'),cuts=[];
+function aiRemParse(text){let t=String(text||''),rem=[],found=false,mm;
+ // "<duration> before it happens / before it starts / before the lesson / before hand" -> a relative reminder (not a duration)
+ {const DW={a:1,an:1,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,twelve:12,fifteen:15,twenty:20,thirty:30,half:.5};
+  t=t.replace(/\b(a|an|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|half|\d+(?:\.\d+)?)\s*(?:and\s+a\s+half\s+)?(hours?|hrs?|minutes?|mins?|days?|weeks?)\s+(?:before|ahead\s+of)\s+(it(?:\s+(?:happens?|starts?|begins?|occurs?))?|the\s+(?:event|time|lesson|appointment|appt|session|meeting|shiur|class|chavrusa|seder)|hand|that)\b/gi,
+   (m,num,unit)=>{let n=DW[String(num).toLowerCase()];if(n===undefined)n=parseFloat(num);if(isNaN(n))return m;
+    const u=unit.toLowerCase(),min=/^h/.test(u)?n*60:/^m/.test(u)?n:/^d/.test(u)?n*1440:n*10080;
+    rem.push({type:'rel',min:Math.round(min)});found=true;return ' '});}
+ const re=new RegExp(AI_REM_TRIG.source,'gi'),cuts=[];
  while(mm=re.exec(t)){let pos=mm.index+mm[0].length,specs=[],end=pos;
   for(;;){const rest=t.slice(end),sep=(/^(?:\s*(?:,|and|&|also|plus|as\s+well\s+as|or)\s*|\s+)?/i.exec(rest)||[''])[0],r2=rest.slice(sep.length);
-   const lead=(/^(?:me\s+|it\s+|for\s+it\s+|about\s+it\s+)/i.exec(r2)||[''])[0],d=aiRemSpec(r2),sp=d||aiRemSpec(r2.slice(lead.length));
+   const lead=(/^(?:me\s+|it\s+|for\s+it\s+|about\s+it\s+|for\s+)/i.exec(r2)||[''])[0],d=aiRemSpec(r2),sp=d||aiRemSpec(r2.slice(lead.length));
    if(!sp)break;specs.push(sp.r);end+=sep.length+(d?0:lead.length)+sp.len}
   const verb=!/reminder|notification|alert|push|heads/i.test(mm[0])||/^\s*(?:give|send)/i.test(mm[0].replace(/^[\s,]*(?:and|also|then|please|pls)\s+/i,''));
   if(!specs.length&&verb&&/^\s*(?:$|[,.;!]|too\b|as\s+well\b)/i.test(t.slice(pos))&&!/\b(?:to|about|of)\s*$/i.test(mm[0])){specs.push({type:'rel',min:0});end=pos}
