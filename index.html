@@ -2454,8 +2454,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=3;
+const CC_VER=4;
 const CC_LOG=[
+ {v:4,new:['Birthday & yahrzeit customs are now a checklist you can tick off — and your ticks stay saved.','Confetti now pops only on YOUR birthday, and every time you open that day.','The planner now understands Hebrew dates spelled out in words, like “chof aleph sivan” (21 Sivan).','The daytime sky waves are a little more visible.','The app and browser icon is now the aleph logo.']},
  {v:3,new:['Add your birthdays and yahrzeits — just tell the planner (“Zaidy’s yahrzeit 3 Tishrei”, “my birthday 15 Nissan”). A birthday pops confetti when you open that day; a yahrzeit shows a lit candle. Both now show the Chabad customs for the day.']},
  {v:1,new:['The night and day screens were restyled as one matching glass look.','The semicircle under the sun and moon is now a soft glow of lit atmosphere — no more hard shape.']},
  {v:2,feature:'The phone app',tour:'app',new:['New: a phone app that rings your reminders as real alarms — even with no internet or VPN. A home-screen widget is coming next.','Get it from ⋯ → App.']}
