@@ -508,11 +508,11 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 @font-face{font-family:'FRL App';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/frank-ruhl-libre-hebrew-500-normal.woff2) format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
 @font-face{font-family:'FRL App';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/frank-ruhl-libre-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'FRL App';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/frank-ruhl-libre-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-:root{--dtc:var(--ink);--gl-bg:color-mix(in srgb,var(--card) 50%,transparent);--gl-bd:color-mix(in srgb,var(--ink) 13%,transparent);--gl-tx:var(--ink);--rbf:#9fb6ea;--rbe:#d6e4ff;--waveo:.55;--navy:#0a1131}
+:root{--dtc:var(--ink);--gl-bg:color-mix(in srgb,var(--card) 50%,transparent);--gl-bd:color-mix(in srgb,var(--ink) 13%,transparent);--gl-tx:var(--ink);--rbf:#9fb6ea;--rbe:#d6e4ff;--waveo:.72;--wo:1.22;--navy:#0a1131}
 :root{--wk:.45}
 :root[data-sky="dusk"]:not(.tt-off-duskglass){--rbf:#a993ea;--rbe:#ffd6c6;--wk:.8}
 :root.tt-off-duskglass{--wk:0}
-:root[data-night="1"]{--wk:1}
+:root[data-night="1"]{--wk:1;--wo:1.28}
 :root[data-night="1"]{--ink:#ECEAF6;--mut:#A6AACB;--line:rgba(168,178,255,.16);--dtc:#F0E4D4;--gl-bg:linear-gradient(180deg,rgba(58,70,150,.30),rgba(28,40,96,.28) 62%,rgba(60,108,180,.22));--gl-bd:rgba(168,178,255,.21);--gl-tx:#E8E6F4;--rbf:#7f86f2;--rbe:#a9e2ff;--waveo:1}
 /* the sky */
 #skyNight{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease;background:
@@ -564,6 +564,9 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
  filter:drop-shadow(0 12px 26px rgba(30,54,120,.24))}
 :root[data-night="1"] #hdr .hd-big{background:linear-gradient(180deg,#F6EEE2 30%,#cbc8ec 100%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 22px rgba(190,200,255,.18)) drop-shadow(0 16px 30px rgba(1,2,14,.5))}
 #hdr.sky-side .hd-big>span{background:inherit;-webkit-background-clip:text;background-clip:text}
+/* water letters: when the glass layer is running, the real text stays for layout and screen readers but is drawn by #dlCv */
+:root.cc-wl #hdr .hd-big,:root.cc-wl #hdr .hd-big>span{background:none;-webkit-text-fill-color:transparent;filter:none}
+.dl-cv{position:absolute;pointer-events:none;display:block}
 /* mounted on the wall: it stays put while the page scrolls over it, then rises a little and fades (sc / dateWall). The rest of the header fades on its own layer. */
 #hdr .hd-he{opacity:var(--dateFade,1);transform:translateY(var(--dateY,0px));position:relative;z-index:0;pointer-events:none}
 #hdr h1.hd-he.rv.in{animation:rv .75s cubic-bezier(.2,.8,.2,1) calc(var(--i,0)*70ms) backwards}
@@ -1120,7 +1123,7 @@ function footPlace(){const f=document.getElementById('foot'),w=document.querySel
  const sc=document.querySelector('#hdr .sky-scene,#hdr .moon'),H=innerHeight;if(sc)sc.style.height='';f.style.top='';f.style.bottom='';
  let wb=w.getBoundingClientRect().bottom;const fh=f.offsetHeight||42,lim=H-166;let over=wb+14+fh-lim;
  if(over>0&&sc){const cur=sc.offsetHeight,nh=Math.max(document.getElementById('hdr').classList.contains('sky-side')?64:150,cur-over);if(nh<cur){sc.style.height=nh+'px';wb=w.getBoundingClientRect().bottom;over=wb+14+fh-lim}}
- f.style.top=Math.round(wb+14)+'px';f.style.bottom='auto';if(typeof skyRedrawTrail==='function')skyRedrawTrail();if(SKY.last&&!SKYA.run)skyDomeAim(SKY.last)}
+ f.style.top=Math.round(wb+14)+'px';f.style.bottom='auto';if(window.dlLayout)dlLayout();if(typeof skyRedrawTrail==='function')skyRedrawTrail();if(SKY.last&&!SKYA.run)skyDomeAim(SKY.last)}
 addEventListener('resize',()=>requestAnimationFrame(footPlace));
 /* any change in the header's size (caption text, sky-side, fonts, a new day) re-pins the chips under the week row */
 {let fpR=0;const fpK=()=>{if(!fpR)fpR=requestAnimationFrame(()=>{fpR=0;footPlace()})};if(window.ResizeObserver){const ro=new ResizeObserver(fpK),h=document.getElementById('hdr');if(h){ro.observe(h);new MutationObserver(()=>{const w=h.querySelector('.wk');if(w)ro.observe(w)}).observe(h,{childList:true})}}}if(document.fonts)document.fonts.ready.then(()=>footPlace());[500,1200,2600].forEach(ms=>setTimeout(footPlace,ms));
@@ -2066,7 +2069,7 @@ function skyNightAmt(p){const n=Math.max(0,Math.min(1,(p.stars||0)*1.35)),e=docu
 function skyOff(){const r=document.documentElement;r.removeAttribute('data-theme');r.style.removeProperty('--bg');r.style.removeProperty('--card');document.getElementById('sky').hidden=true;
  const tc=document.querySelector('meta[name=theme-color]');if(tc)tc.content='#0a0b10'}
 function skyTick(){
- if(!SKY.on||SKYA.run)return;const st=skyCompute(Date.now());SKY.last=st;skyApply(st);
+ if(!SKY.on||SKYA.run)return;const st=skyCompute(Date.now());SKY.last=st;skyApply(st);if(GLS.lens)GLS.lens();
  const nt=new Date(st.ymd[0],st.ymd[1]-1,st.ymd[2]+st.shift,12);
  if(+nt!==+t0){const wasToday=+sel===+t0;SKY.shift=st.shift;t0=nt;if(wasToday){sel=t0;V=hm1(t0)}render(0);if(wasToday)panel(0)}
  else{SKY.shift=st.shift;skyUpdateScene(st)}
@@ -2118,9 +2121,8 @@ function glassShine(){const H=innerHeight,W=innerWidth,lx=W/2+GLS.L[0]*H*1.6,ly=
  const fb=()=>{skyRibbonsSvg(host);GLS.still=true;const f=()=>{GLS.sc=scrollY||0;requestAnimationFrame(glassShine)};addEventListener('scroll',f,{passive:true});addEventListener('resize',f);f()};
  if(!gl){fb();return}
  const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
- const FS=`precision highp float;
-uniform vec2 uR;uniform float uT,uS;uniform vec3 uF,uE,uL;uniform float uO,uK;uniform vec4 uA[9],uB[9],uC[9];
-void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px=1./uR.x;
+ const SILK=`uniform float uT,uS;uniform vec3 uF,uE,uL;uniform float uO,uK;uniform vec4 uA[9],uB[9],uC[9];
+vec4 silk(vec2 p,float px){
  vec3 acc=vec3(0.);float aa=0.;vec3 Hv=normalize(uL+vec3(0.,0.,1.));
  for(int i=0;i<9;i++){vec4 A=uA[i],B=uB[i],C=uC[i];float x=p.x,t=uT*C.w;
   float a1=A.z*x+A.w+t,a2=B.y*x+1.7*A.w-.6*t;
@@ -2142,7 +2144,9 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
   float al=(body+edge+halo)*C.z*fade*(1.-.3*uK);
   vec3 irid=mix(uF,uE,.5+.5*sin(u*2.4+x*3.1+A.w+t*.3)),col=mix(irid,mix(uE,vec3(1.),.35),clamp(sp2*.7+edge*.5,0.,1.))+vec3(sp*.28*(1.-uK));
   acc+=col*al;aa+=al;}
- aa=clamp(aa,0.,1.);gl_FragColor=vec4(min(acc,vec3(1.))*uO,aa*uO);}`;
+ aa=clamp(aa,0.,1.);return vec4(min(acc,vec3(1.))*uO,min(aa*uO,1.));}`;
+ GLS.SILK=SILK;
+ const FS=`precision highp float;uniform vec2 uR;`+SILK+`void main(){gl_FragColor=silk(vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x),1./uR.x);}`;
  const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o};
  let pr;try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw 0}
  catch(e){fb();return}
@@ -2160,21 +2164,21 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
   [.9,.30,2.7,3.3, .05,5.8,.07,2.8, 1.8,.38,.6,.055],
   [1.48,.18,3.2,.9, .06,4.9,.09,3.0, .5,.5,.62,.048],
   [1.9,.24,2.3,4.7, .05,5.1,.1,2.4, 2.9,.72,.68,.042]];
- const fa=j=>new Float32Array(R.flatMap(r=>r.slice(j*4,j*4+4)));
+ const fa=j=>new Float32Array(R.flatMap(r=>r.slice(j*4,j*4+4)));GLS.R=[fa(0),fa(1),fa(2)];
  gl.uniform4fv(U.uA,fa(0));gl.uniform4fv(U.uB,fa(1));gl.uniform4fv(U.uC,fa(2));
  gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
  const hex=v=>{v=(v||'').trim();const m=/^#?([0-9a-f]{6})$/i.exec(v);if(!m)return[1,1,1];const n=parseInt(m[1],16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]};
  /* Drawn only when something changes (scroll, size, colours): no idle animation, so nothing runs while you just look. */
  let colT=-1e9,W=0,Hh=0,sc=-1,raf=0,Q=.4,dirty=true,lastD=0,lastG=0,gT=0;const T0=7.0;
  const size=()=>{const d=Math.min(devicePixelRatio||1,2)*Q,w=Math.round(host.clientWidth*d),h=Math.round(host.clientHeight*d);if(w&&h&&(w!==W||h!==Hh)){W=cv.width=w;Hh=cv.height=h;gl.viewport(0,0,w,h);dirty=true}};
- const colors=()=>{const cs=getComputedStyle(document.documentElement);gl.uniform3fv(U.uF,hex(cs.getPropertyValue('--rbf')));gl.uniform3fv(U.uE,hex(cs.getPropertyValue('--rbe')));const nightW=document.documentElement.dataset.night==='1';gl.uniform1f(U.uO,nightW?1:1.0);
+ const colors=()=>{const cs=getComputedStyle(document.documentElement);GLS.F=hex(cs.getPropertyValue('--rbf'));GLS.E=hex(cs.getPropertyValue('--rbe'));gl.uniform3fv(U.uF,GLS.F);gl.uniform3fv(U.uE,GLS.E);const nightW=document.documentElement.dataset.night==='1';GLS.O=parseFloat(cs.getPropertyValue('--wo'))||1;GLS.WO=parseFloat(cs.getPropertyValue('--waveo'))||1;gl.uniform1f(U.uO,GLS.O);
   /* night waves are kept soft and quiet so they stay in the background (owner); Test tools switch "swave" turns that off */
-  const rc=document.documentElement.classList;gl.uniform1f(U.uK,nightW?(rc.contains('tt-off-swave')?0:1):(parseFloat(cs.getPropertyValue('--wk'))||0))};
+  const rc=document.documentElement.classList;GLS.K=nightW?(rc.contains('tt-off-swave')?0:1):(parseFloat(cs.getPropertyValue('--wk'))||0);gl.uniform1f(U.uK,GLS.K)};
  const draw=()=>{size();if(!W)return false;if(colT<0){colT=1;colors()}
   const y=scrollY||document.documentElement.scrollTop||0;if(y===sc&&!dirty)return true;sc=y;dirty=false;GLS.sc=y;GLS.t=0;
   GLS.ang=-2.25+y/innerHeight*.5;const ca=Math.cos(GLS.ang),sa=Math.sin(GLS.ang);GLS.L=[ca*.76,sa*.76,.65];
-  gl.uniform2f(U.uR,W,Hh);gl.uniform1f(U.uT,T0+y*.06);gl.uniform1f(U.uS,0.);gl.uniform3fv(U.uL,GLS.L);
-  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);const n=performance.now();if(n-lastG>30){lastG=n;glassShine()}else if(!gT)gT=setTimeout(()=>{gT=0;lastG=performance.now();glassShine()},34);return true};
+  GLS.T=T0+y*.06;gl.uniform2f(U.uR,W,Hh);gl.uniform1f(U.uT,GLS.T);gl.uniform1f(U.uS,0.);gl.uniform3fv(U.uL,GLS.L);
+  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);if(GLS.lens)GLS.lens();const n=performance.now();if(n-lastG>30){lastG=n;glassShine()}else if(!gT)gT=setTimeout(()=>{gT=0;lastG=performance.now();glassShine()},34);return true};
  const loop=now=>{raf=0;if(document.hidden)return;if(document.getElementById('intro')){setTimeout(kick,300);return}
   if(now-lastD<15){raf=requestAnimationFrame(loop);return}lastD=now;if(!draw())raf=requestAnimationFrame(loop)};
  const kick=()=>{if(!raf)raf=requestAnimationFrame(loop)};
@@ -2183,6 +2187,70 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
  addEventListener('resize',()=>{colT=-1;dirty=true;kick()},{passive:true});document.addEventListener('visibilitychange',()=>{colT=-1;dirty=true;kick()});
  new MutationObserver(()=>{colT=-1;dirty=true;kick()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-night','data-theme','data-sky','class']});
  GLS.kick=()=>{GLS.szDirty=true;dirty=true;colT=-1;kick()};kick()})();
+/* ===== The date as water: each letter is a little water lens over the sky (like a full water bottle bending the light).
+   A second, small WebGL layer redraws the same silk (GLS.SILK) bent and slightly magnified through the letters, with
+   light catching the edges. Tilting the phone makes the water inside sway a little on a soft spring; the letters stay put.
+   Drawn only when the background redraws, the layout changes, or the phone is tilted. Test tools switch "waterdate". */
+(function(){if(!GLS.ok||!GLS.SILK)return;
+ const R=document.documentElement,cv=document.createElement('canvas');cv.id='dlCv';cv.className='dl-cv';cv.setAttribute('aria-hidden','true');
+ const gl=cv.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:false,depth:false,stencil:false});if(!gl)return;
+ const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+ const FS=`precision highp float;uniform vec2 uCR,uCO,uCS,uV,uTl;uniform sampler2D uM;uniform vec3 uTop,uBot,uRim;uniform float uDk,uWo,uNk;`+GLS.SILK+`
+void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=texture2D(uM,cuv);float a=m.r;
+ if(a<.004){gl_FragColor=vec4(0.);return;}
+ vec2 e=vec2(1.5/uCR.x,1.5/uCR.y);float h=m.g;
+ float hx=texture2D(uM,cuv+vec2(e.x,0.)).g-texture2D(uM,cuv-vec2(e.x,0.)).g,hy=texture2D(uM,cuv+vec2(0.,e.y)).g-texture2D(uM,cuv-vec2(0.,e.y)).g;
+ vec3 n=normalize(vec3(-hx*uNk,-hy*uNk,1.));
+ vec2 vp=uCO+cuv*uCS,ct=uCO+uCS*.5;
+ vec2 q=ct+(vp-ct)*.8+n.xy*24.+uTl*vec2(16.,9.)*(.35+.65*h);
+ vec3 sky=mix(uTop,uBot,clamp(q.y/uV.y,0.,1.));
+ vec4 sk=silk(vec2(q.x/uV.x,q.y/uV.x),1./(uV.x*.8))*uWo;
+ vec3 bg=sky*(1.-sk.a)+sk.rgb;
+ float fr=pow(1.-n.z,1.25);
+ vec3 L=normalize(vec3(-.35+uTl.x*.5,-.55+uTl.y*.35,.75));
+ float sp=pow(max(dot(reflect(-L,n),vec3(0.,0.,1.)),0.),34.);
+ vec2 c2=cuv-.5;float lv=dot(c2,vec2(sin(uTl.x*.4),cos(uTl.x*.4)));
+ vec3 body=mix(bg*.84+vec3(.0,.03,.09),bg*1.18+.05,uDk);
+ vec3 col=mix(body,uRim,clamp(fr*(.8-.12*uDk),0.,1.))+vec3(sp*.9)+vec3(.9,.96,1.)*smoothstep(.06,-.3,lv)*.045*uDk;
+ gl_FragColor=vec4(col*a,a);}`;
+ const sh=(t,src)=>{const o=gl.createShader(t);gl.shaderSource(o,src);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o};
+ let pr;try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw 0}catch(e){return}
+ gl.useProgram(pr);const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+ const al=gl.getAttribLocation(pr,'a');gl.enableVertexAttribArray(al);gl.vertexAttribPointer(al,2,gl.FLOAT,false,0,0);
+ const U={};for(const k of['uCR','uCO','uCS','uV','uTl','uM','uTop','uBot','uRim','uDk','uWo','uNk','uT','uS','uF','uE','uL','uO','uK','uA','uB','uC'])U[k]=gl.getUniformLocation(pr,k);
+ gl.uniform4fv(U.uA,GLS.R[0]);gl.uniform4fv(U.uB,GLS.R[1]);gl.uniform4fv(U.uC,GLS.R[2]);gl.uniform1f(U.uS,0);gl.uniform1i(U.uM,0);
+ const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);for(const[k,v]of[[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,v);
+ const hx=c=>{const m=/#?([0-9a-f]{6})/i.exec(c||'');if(!m)return[0,0,0];const n=parseInt(m[1],16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]};
+ const PAD=16;let W=0,H=0,ok=false,key='',tl=[0,0],tv=[0,0],tg=[0,0],traf=0;
+ const off=()=>R.classList.contains('tt-off-waterdate')||RM;
+ /* the letter shapes: drawn from the real text (same font, size and place), plus a softened copy that gives each stroke a rounded, water-filled surface */
+ function layout(){const h1=document.querySelector('#hdr .hd-he'),big=h1&&h1.querySelector('.hd-big');
+  if(off()||!h1||!big){if(R.classList.contains('cc-wl'))R.classList.remove('cc-wl');ok=false;if(cv.parentNode)cv.remove();return}
+  if(cv.parentNode!==h1)h1.appendChild(cv);
+  const sp=[...big.querySelectorAll('.hd-d,.hd-m')],dpr=Math.min(devicePixelRatio||1,2.5),w=h1.offsetWidth+PAD*2,h=h1.offsetHeight+PAD*2;if(!w||!h||!sp.length)return;
+  const k=[w,h,dpr,h1.className,document.getElementById('hdr').className,sp.map(x=>x.textContent+x.offsetLeft+','+x.offsetTop).join('|')].join(';');if(k===key&&ok)return;key=k;
+  W=Math.round(w*dpr);H=Math.round(h*dpr);cv.width=W;cv.height=H;Object.assign(cv.style,{left:-PAD+'px',top:-PAD+'px',width:w+'px',height:h+'px'});gl.viewport(0,0,W,H);
+  const mk=()=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c},A=mk(),B=mk(),a=A.getContext('2d');a.scale(dpr,dpr);a.fillStyle='#fff';a.textAlign='center';a.textBaseline='alphabetic';a.strokeStyle='#fff';a.lineJoin='round';a.lineCap='round';
+  let fs=60;for(const x of sp){const cs=getComputedStyle(x);fs=parseFloat(cs.fontSize)||fs;a.font=cs.fontStyle+' '+cs.fontWeight+' '+cs.fontSize+' '+cs.fontFamily;const t=x.textContent,mt=a.measureText(t),asc=mt.fontBoundingBoxAscent||fs*.8,ds=mt.fontBoundingBoxDescent||fs*.25;
+   const tx=x.offsetLeft+x.offsetWidth/2+PAD,ty=x.offsetTop+PAD+(x.offsetHeight-(asc+ds))/2+asc;a.lineWidth=fs*.07;a.strokeText(t,tx,ty);a.fillText(t,tx,ty)}
+  const b=B.getContext('2d');b.filter='blur('+(fs*dpr*.07).toFixed(1)+'px)';b.drawImage(A,0,0);
+  const da=a.getImageData(0,0,W,H).data,db=b.getImageData(0,0,W,H).data,o=new Uint8Array(W*H*4);for(let i=3;i<da.length;i+=4){o[i-3]=da[i];o[i-2]=Math.min(255,db[i]*1.6);o[i]=255}
+  gl.bindTexture(gl.TEXTURE_2D,tex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,W,H,0,gl.RGBA,gl.UNSIGNED_BYTE,o);gl.uniform1f(U.uNk,fs*dpr*.09);ok=true;if(!R.classList.contains('cc-wl'))R.classList.add('cc-wl');draw()}
+ function draw(){if(!ok||!cv.isConnected||R.classList.contains('cc-away'))return;const r=cv.getBoundingClientRect();if(!r.width||r.bottom<0||r.top>innerHeight)return;
+  const st=SKY.last,pal=st&&st.pal,dk=R.dataset.theme==='dark',night=R.dataset.night==='1';
+  gl.uniform2f(U.uCR,W,H);gl.uniform2f(U.uCO,r.left,r.top);gl.uniform2f(U.uCS,r.width,r.height);gl.uniform2f(U.uV,innerWidth,innerHeight);gl.uniform2f(U.uTl,tl[0],tl[1]);
+  gl.uniform3fv(U.uTop,hx(night?'#0a1230':pal&&pal.top));gl.uniform3fv(U.uBot,hx(night?'#18225a':pal&&pal.bot));gl.uniform3fv(U.uRim,dk?[1,1,1]:[.11,.17,.42]);gl.uniform1f(U.uDk,dk?1:0);gl.uniform1f(U.uWo,GLS.WO||1);
+  gl.uniform1f(U.uT,GLS.T||7);gl.uniform3fv(U.uF,GLS.F||[1,1,1]);gl.uniform3fv(U.uE,GLS.E||[1,1,1]);gl.uniform3fv(U.uL,GLS.L||[0,0,1]);gl.uniform1f(U.uO,GLS.O||1);gl.uniform1f(U.uK,GLS.K||0);
+  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3)}
+ /* gravity: the water leans a little toward the low side and sloshes back on a soft spring */
+ let tlast=0;const step=now=>{traf=0;const dt=Math.min(.05,(now-(tlast||now))/1000)||.016;tlast=now;let moving=false;
+  for(let i=0;i<2;i++){const f=(tg[i]-tl[i])*26-tv[i]*4.2;tv[i]+=f*dt;tl[i]+=tv[i]*dt;if(Math.abs(tg[i]-tl[i])>.002||Math.abs(tv[i])>.002)moving=true}
+  draw();if(moving)traf=requestAnimationFrame(step);else tlast=0};
+ addEventListener('deviceorientation',e=>{if(e.gamma==null||!ok)return;const gx=Math.max(-1,Math.min(1,e.gamma/35)),gy=Math.max(-1,Math.min(1,((e.beta||45)-45)/45));
+  if(Math.abs(gx-tg[0])+Math.abs(gy-tg[1])<.01)return;tg=[gx,gy];if(!traf)traf=requestAnimationFrame(step)},{passive:true});
+ GLS.lens=draw;window.dlLayout=layout;
+ new MutationObserver(()=>{layout();draw()}).observe(R,{attributes:true,attributeFilter:['class','data-theme','data-night']});
+ layout()})();
 if(SKY.on){const st0=skyCompute(Date.now());SKY.last=st0;SKY.shift=st0.shift;t0=new Date(st0.ymd[0],st0.ymd[1]-1,st0.ymd[2]+st0.shift,12);sel=t0;V=hm1(t0);skyApply(st0)}else skyOff();
 setInterval(skyTick,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)skyTick()});addEventListener('focus',skyTick);
@@ -2573,8 +2641,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=8;
+const CC_VER=9;
 const CC_LOG=[
+ {v:9,new:['The big date is now made of water: each letter bends the sky behind it like a full water bottle, and tilting the phone makes the water inside sway a little.','A little more silk in the sky, in every theme.']},
  {v:8,new:['A calmer, glassier big date that stays put while the page scrolls over it, then rises a little and fades.','Evening (and daytime) skies are softer and glassier, like the night sky.','Shiurim and your stats now use the app’s own colors.','To-do lists: fasting, Aneinu, Selichos, Tehillim on Shabbos Mevarchim and lighting the menorah are now reminders, not checkboxes; Al HaNissim, Chanukah gelt and farbrengens are plain notes; Birkas HaChodesh is gone.','Your chavrusas and shiurim no longer have a check box.','Birthday: the aliyah moves to the Monday, Thursday or Shabbos just before (with a reminder the day before), and saying a maamar of the Rebbe replaces the dvar Torah.','The Rebbeim’s yahrzeits show only the customs really kept on each one.','Fixed the event chips sometimes covering the week row.']},
  {v:7,new:['Beta: Chabad Calendar now runs in the Android app. The app asks once for location (for zmanim) and microphone (to speak to the planner), and new users get the tour on a sample day with real events.']},
  {v:6,new:['The big Hebrew date now has a soft shadow so it floats above the sky, with a very slight buoyant drift so it feels suspended rather than flat.']},
@@ -3761,7 +3830,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['datewall','Big date stays put while the page scrolls over it'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['datewall','Big date stays put while the page scrolls over it'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id]of FLAGS)document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
