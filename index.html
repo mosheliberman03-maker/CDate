@@ -379,6 +379,14 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
 
 .gi{flex:none;border:1px solid color-mix(in srgb,var(--c,var(--ys)) 45%,var(--line));background:color-mix(in srgb,var(--c,var(--ys)) 10%,transparent);color:var(--ink);font:600 12px Figtree,system-ui;border-radius:99px;padding:6px 11px;cursor:pointer;white-space:nowrap}.gi:active{transform:scale(.96)}
 .ck .gi{margin-left:6px}
+.tdn{display:flex;align-items:center;gap:13px;padding:12px 2px;border-top:1px solid var(--line)}
+.ph+.tdn,.gt+.tdn{border-top:0}
+.tdn .ic{flex:none;width:26px;height:26px;display:grid;place-items:center;color:var(--mut)}
+.tdn.rem .ic{color:color-mix(in srgb,var(--ct) 70%,var(--ink))}
+.tdn .ic i{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.7}
+.tdn .tx{flex:1;min-width:0}.tdn .tx b{font-weight:500}
+.tdn small{display:block;color:var(--mut);font-size:12px;letter-spacing:.02em}
+.tdn .gi{margin-left:6px}
 .dmc .gw{background:color-mix(in srgb,var(--c) 10%,transparent);border-radius:12px;padding:10px 12px;margin:10px 0 12px;font-size:14px;line-height:1.5}.dmc .gw b{display:block;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--c);margin-bottom:2px}
 .dmc .gl{margin:0 0 10px;padding-left:20px;font-size:14px;line-height:1.5}.dmc .gl li{margin:0 0 6px}.dmc .gn{font-size:12px;color:var(--mut);margin:6px 0 0}
 /* v13: streak + reminders */
@@ -501,6 +509,10 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 @font-face{font-family:'FRL App';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/frank-ruhl-libre-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'FRL App';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/frank-ruhl-libre-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 :root{--dtc:var(--ink);--gl-bg:color-mix(in srgb,var(--card) 50%,transparent);--gl-bd:color-mix(in srgb,var(--ink) 13%,transparent);--gl-tx:var(--ink);--rbf:#9fb6ea;--rbe:#d6e4ff;--waveo:.55;--navy:#0a1131}
+:root{--wk:.45}
+:root[data-sky="dusk"]:not(.tt-off-duskglass){--rbf:#a993ea;--rbe:#ffd6c6;--wk:.8}
+:root.tt-off-duskglass{--wk:0}
+:root[data-night="1"]{--wk:1}
 :root[data-night="1"]{--ink:#ECEAF6;--mut:#A6AACB;--line:rgba(168,178,255,.16);--dtc:#F0E4D4;--gl-bg:linear-gradient(180deg,rgba(58,70,150,.30),rgba(28,40,96,.28) 62%,rgba(60,108,180,.22));--gl-bd:rgba(168,178,255,.21);--gl-tx:#E8E6F4;--rbf:#7f86f2;--rbe:#a9e2ff;--waveo:1}
 /* the sky */
 #skyNight{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease;background:
@@ -546,13 +558,20 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .capi{flex:none;width:19px;height:19px;display:block}
 /* the dates */
 #hdr .hd-he{margin:clamp(20px,3.6vh,36px) 0 0;display:block;text-align:center}
-#hdr .hd-big{font:500 clamp(52px,15.6vw,70px)/1.1 'FRL App','Frank Ruhl Libre','Noto Serif Hebrew App',Georgia,serif;letter-spacing:0;color:var(--dtc);text-shadow:0 13px 28px rgba(30,54,120,.28)}
-:root[data-night="1"] #hdr .hd-big{text-shadow:0 15px 32px rgba(1,2,14,.55)}
-/* very slight buoyancy so the date feels suspended, not static (barely noticeable on first glance) */
-@keyframes buoy{0%,100%{translate:0 .6px;rotate:-.5deg}50%{translate:0 -4.6px;rotate:.55deg}}
-#hdr .hd-big{animation:buoy 6.4s ease-in-out infinite;transform-origin:50% 60%}
-.cc-away #hdr .hd-big{animation-play-state:paused}
-@media(prefers-reduced-motion:reduce){#hdr .hd-big{animation:none}}
+#hdr .hd-big{font:500 clamp(52px,15.6vw,70px)/1.1 'FRL App','Frank Ruhl Libre','Noto Serif Hebrew App',Georgia,serif;letter-spacing:0;color:var(--dtc);
+ /* a thick solid block standing out of the back wall: a stepped extrusion toward the lower right, then its soft shadow on the wall */
+ text-shadow:0.0105em 0.0105em 0 #5a6196,0.021em 0.021em 0 #575d91,0.0315em 0.0315em 0 #535a8d,0.042em 0.042em 0 #505688,0.0525em 0.0525em 0 #4c5383,0.063em 0.063em 0 #494f7e,0.0735em 0.0735em 0 #464c7a,0.084em 0.084em 0 #424875,0.0945em 0.0945em 0 #3f4570,0.105em 0.105em 0 #3b416b,0.1155em 0.1155em 0 #383e67,0.126em 0.126em 0 #353a62,0.1365em 0.1365em 0 #31375d,0.147em 0.147em 0 #2e3358,0.1575em 0.1575em 0 #2a3054,0.168em 0.168em 0 #272c4f,.19em .26em .03em rgba(40,60,120,.22),.24em .38em .34em rgba(40,60,120,.3)}
+:root[data-night="1"] #hdr .hd-big{text-shadow:0.0105em 0.0105em 0 #bcb6a3,0.021em 0.021em 0 #b1ac9b,0.0315em 0.0315em 0 #a7a294,0.042em 0.042em 0 #9c988c,0.0525em 0.0525em 0 #918e85,0.063em 0.063em 0 #87847d,0.0735em 0.0735em 0 #7c7a75,0.084em 0.084em 0 #71706e,0.0945em 0.0945em 0 #676566,0.105em 0.105em 0 #5c5b5f,0.1155em 0.1155em 0 #515157,0.126em 0.126em 0 #47474f,0.1365em 0.1365em 0 #3c3d48,0.147em 0.147em 0 #313340,0.1575em 0.1575em 0 #272939,0.168em 0.168em 0 #1c1f31,.19em .26em .03em rgba(2,3,12,.5),.24em .38em .34em rgba(1,2,9,.55)}
+/* mounted on the wall: it stays put while the page scrolls over it, then rises a little and fades (sc / dateWall). The rest of the header fades on its own layer. */
+#hdr .hd-he{opacity:var(--dateFade,1);transform:translateY(var(--dateY,0px));position:relative;z-index:0;pointer-events:none}
+#hdr h1.hd-he.rv.in{animation:rv .75s cubic-bezier(.2,.8,.2,1) calc(var(--i,0)*70ms) backwards}
+#hdr .sky-scene,#hdr .sky-cap2,#hdr .hd-div,#hdr .hd-en,#hdr .wk{opacity:var(--hdrFade,1)}
+#hdr .sky-cap2,#hdr .hd-div,#hdr .hd-en{position:relative;z-index:1}
+#hdr .wk{z-index:2}
+/* Test tools switch "block3d": back to a flat date with a soft shadow */
+:root.tt-off-block3d #hdr .hd-big{text-shadow:0 13px 28px rgba(30,54,120,.28)}
+:root[data-night="1"].tt-off-block3d #hdr .hd-big{text-shadow:0 15px 32px rgba(1,2,14,.55)}
+
 .hd-div{display:flex;align-items:center;justify-content:center;gap:12px;width:min(84vw,340px);margin:clamp(8px,1.6vh,14px) auto 0}
 .hd-div i{flex:1;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--dtc) 46%,transparent))}
 .hd-div i:last-child{background:linear-gradient(270deg,transparent,color-mix(in srgb,var(--dtc) 46%,transparent))}
@@ -658,6 +677,29 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 :root[data-theme]:not(.tt-off-glassui) :is(.sheet,.ai-card,.dmc,.stsp){background:var(--gx-sheet);border:1px solid var(--gx-bd);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
 :root[data-theme]:not(.tt-off-glassui) .dmc{border-top:2px solid color-mix(in srgb,var(--c) 70%,transparent)}
 :root[data-theme]:not(.tt-off-glassui) :is(.sheet,.ai-card,.dmc,#rdr) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea){background:var(--gx-in);border:1px solid var(--gx-inb);border-radius:14px;color:var(--ink)}
+/* Shiurim + their statistics in the app's own colours (navy / ivory glass with a soft periwinkle accent), not health-app green */
+:root[data-theme="light"]:not(.tt-off-glassui){--acc:#4655c8;--acc2:#a9b8f2}
+:root[data-theme="dark"]:not(.tt-off-glassui){--acc:#aab6ff;--acc2:#F0E4D4}
+:root[data-theme]:not(.tt-off-glassui) .ck.on .bx{background:var(--gx-pri);border-color:var(--gx-pri)}
+:root[data-theme]:not(.tt-off-glassui) .bx svg{stroke:var(--gx-prit)}
+:root[data-theme]:not(.tt-off-glassui) .ring .rb{stroke:color-mix(in srgb,var(--ink) 13%,transparent)}
+:root[data-theme]:not(.tt-off-glassui) .ring .rf{stroke:var(--acc)}
+:root[data-theme]:not(.tt-off-glassui) .ring.full .rf{stroke:var(--gx-pri)}
+:root[data-theme]:not(.tt-off-glassui) .sts{--sg:var(--acc);--sg2:var(--acc2)}
+:root[data-theme]:not(.tt-off-glassui) .qdot.f i{background:var(--acc);border-color:var(--acc)}
+:root[data-theme]:not(.tt-off-glassui) .qdot.p i{background:linear-gradient(90deg,var(--acc) 50%,transparent 50%);border-color:var(--acc)}
+:root[data-theme]:not(.tt-off-glassui) .qdot.now i{outline-color:color-mix(in srgb,var(--acc) 40%,transparent)}
+:root[data-theme]:not(.tt-off-glassui) .sts :is(.srh,.tiles div,.scard){background:var(--gx-bg);border:1px solid var(--gx-bd);box-shadow:var(--gx-sh)}
+:root[data-theme]:not(.tt-off-glassui) .sts .stt{background:var(--gx-in);border:1px solid var(--gx-inb)}
+:root[data-theme]:not(.tt-off-glassui) .sts .sti{background:var(--gx-pri);box-shadow:none}
+:root[data-theme]:not(.tt-off-glassui) .sts .stt button[aria-selected=true]{color:var(--gx-prit)}
+:root[data-theme]:not(.tt-off-glassui) .sts :is(.stl .x,.stn .nv){background:var(--gx-gh);border:1px solid var(--gx-bd)}
+:root[data-theme]:not(.tt-off-glassui) .sts :is(.smc.l4,.sgrid .shd.now b){color:var(--gx-prit)}
+:root[data-theme]:not(.tt-off-glassui) .sts .sgrid .shd.now b{background:var(--gx-pri)}
+:root[data-theme]:not(.tt-off-glassui) .sts .smc{border-color:var(--gx-bd)}
+:root[data-theme]:not(.tt-off-glassui) .sts .sring.shero .pg{filter:drop-shadow(0 0 9px color-mix(in srgb,var(--sg) 38%,transparent))}
+:root[data-theme]:not(.tt-off-glassui) .rdr{background:var(--bg)}
+:root[data-theme]:not(.tt-off-glassui) .rdx{background:var(--gx-gh);border-color:var(--gx-bd)}
 :root[data-theme]:not(.tt-off-glassui) .btn:not(.gh){background:var(--gx-pri);color:var(--gx-prit);border-color:transparent;border-radius:14px}
 :root[data-theme]:not(.tt-off-glassui) .btn.gh{background:var(--gx-gh);border:1px solid var(--gx-bd);border-radius:14px}
 :root[data-theme]:not(.tt-off-glassui) #g .day{background:color-mix(in srgb,var(--ink) 3%,transparent);border-color:color-mix(in srgb,var(--ink) 10%,transparent)}
@@ -667,6 +709,10 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 /* birthday & yahrzeit touches */
 .occ-list{margin:8px 0}
 .occ-item{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;background:none;border:0;color:var(--ink);font:inherit;font-size:13.5px;line-height:1.5;padding:8px 2px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.occ-note{display:flex;gap:11px;align-items:flex-start;font-size:13.5px;line-height:1.5;padding:8px 2px;color:var(--ink)}
+.occ-note>svg{flex:none;margin-top:2px;color:color-mix(in srgb,var(--ct) 70%,var(--ink))}
+.occ-note>i{flex:none;width:6px;height:6px;border-radius:50%;background:var(--mut);margin:8px 7px 0}
+.occ-list>*+*{border-top:1px solid color-mix(in srgb,var(--gx-bd,var(--line)) 55%,transparent)}
 .occ-item+.occ-item{border-top:1px solid color-mix(in srgb,var(--gx-bd,var(--line)) 55%,transparent)}
 .occ-box{flex:none;width:20px;height:20px;border-radius:7px;border:1.5px solid color-mix(in srgb,var(--mut) 55%,transparent);display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;margin-top:1px;transition:background .18s,border-color .18s}
 .occ-item.on .occ-box{background:var(--my);border-color:var(--my)}
@@ -1040,8 +1086,9 @@ function infoBase(dt){const key=dt.getFullYear()*10000+dt.getMonth()*100+dt.getD
  const rc=h.d==1&&h.k!='Ti'?h.n[0]:h.d==30?hd(ad(dt,1)).n[0]:'';
  dynEv(dt,h,wd,ev);
  const r={h,rc,ev};if(IBC.size>3000)IBC.clear();IBC.set(key,r);return r}
+const PLAN_LEARN=/\b(?:chavrusa|chavrusas|kvius|seder|sedarim|shiur|shiurim|learn(?:ing)?|study(?:ing)?|class|lesson|farbrengen)\b/i;
 function info(dt){const b=infoBase(dt),h=b.h,rc=b.rc,ev=b.ev.slice(),wd=dt.getDay();
- const s=ds(dt),K=Object.keys(KN);for(const c of my)if(((c.from&&s<c.from)||(Array.isArray(c.skip)&&c.skip.some(r=>s>=r[0]&&s<=r[1])))?false:(c.r=='once'&&c.dt==s)||(c.r=='greg'&&c.dt.slice(5)==s.slice(5))||(c.r=='heb'&&c.hk==h.k&&c.hd==h.d)||(c.r=='weekly'&&(Array.isArray(c.dows)&&c.dows.length?c.dows.includes(dt.getDay()):dt.getDay()==c.dow))||(c.r=='every2'&&((Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)>=0)&&(Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)%2===0)))||(c.r=='hmonth'&&h.d==c.hd)||(c.r=='yomadpagra'&&Array.isArray(c.dates)&&c.dates.includes(h.k+'-'+h.d))||(c.r=='custom'&&((Array.isArray(c.dates)&&c.dates.includes(s))||(Number.isInteger(c.interval)&&c.interval>0&&Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)>=0&&Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)%c.interval===0))))ev.push({k:'my',t:c.t,h:'',x:c.x||'Your event.',id:c.id,isTask:c.kind==='task',done:!!taskDone()[c.id+'@'+s]});
+ const s=ds(dt),K=Object.keys(KN);for(const c of my)if(((c.from&&s<c.from)||(Array.isArray(c.skip)&&c.skip.some(r=>s>=r[0]&&s<=r[1])))?false:(c.r=='once'&&c.dt==s)||(c.r=='greg'&&c.dt.slice(5)==s.slice(5))||(c.r=='heb'&&c.hk==h.k&&c.hd==h.d)||(c.r=='weekly'&&(Array.isArray(c.dows)&&c.dows.length?c.dows.includes(dt.getDay()):dt.getDay()==c.dow))||(c.r=='every2'&&((Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)>=0)&&(Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)%2===0)))||(c.r=='hmonth'&&h.d==c.hd)||(c.r=='yomadpagra'&&Array.isArray(c.dates)&&c.dates.includes(h.k+'-'+h.d))||(c.r=='custom'&&((Array.isArray(c.dates)&&c.dates.includes(s))||(Number.isInteger(c.interval)&&c.interval>0&&Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)>=0&&Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)%c.interval===0))))ev.push({k:'my',t:c.t,h:'',x:c.x||'Your event.',id:c.id,isTask:c.kind==='task'&&!PLAN_LEARN.test(c.t+' '+(c.x||'')),done:!!taskDone()[c.id+'@'+s]});
  return{h,rc,ev:ev.map(e=>ov[e.id]?{...e,...ov[e.id]}:e).sort((a,b)=>K.indexOf(a.k)-K.indexOf(b.k))}}
 let t0=ad(new Date(),0);const hm1=dt=>ad(dt,1-hd(dt).d),hlen=f=>hd(ad(f,29)).d==30?30:29;let V=hm1(t0),sel=t0;const on={yt:1,ct:1,yb:1,ys:1,fs:1,my:1};
 const g=$('#g');
@@ -1067,12 +1114,16 @@ function zmn(){const dt=sel,y=dt.getFullYear(),mo=dt.getMonth()+1,d=dt.getDate()
 const TH=['1–9','10–17','18–22','23–28','29–34','35–38','39–43','44–48','49–54','55–59','60–65','66–68','69–71','72–76','77–78','79–82','83–87','88–89','90–96','97–103','104–105','106–107','108–112','113–118','119:1–96','119:97–176','120–134','135–139','140–144','145–150'];
 /* Keep the event chips in their own space: just under the week panel and above the + button. On short screens the sky
    area gives up height (never the chips) so nothing overlaps. */
-function footPlace(){const f=document.getElementById('foot'),w=document.querySelector('#hdr .wk');if(!f||!w||(scrollY||0)>4)return;
+/* re-pin later if asked while scrolled away (sc() calls it again back at the top) */
+var FP_PEND=false;
+function footPlace(){const f=document.getElementById('foot'),w=document.querySelector('#hdr .wk');if(!f||!w)return;if((scrollY||0)>4){FP_PEND=true;return}FP_PEND=false;DW=null;
  const sc=document.querySelector('#hdr .sky-scene,#hdr .moon'),H=innerHeight;if(sc)sc.style.height='';f.style.top='';f.style.bottom='';
  let wb=w.getBoundingClientRect().bottom;const fh=f.offsetHeight||42,lim=H-166;let over=wb+14+fh-lim;
  if(over>0&&sc){const cur=sc.offsetHeight,nh=Math.max(document.getElementById('hdr').classList.contains('sky-side')?64:150,cur-over);if(nh<cur){sc.style.height=nh+'px';wb=w.getBoundingClientRect().bottom;over=wb+14+fh-lim}}
  f.style.top=Math.round(wb+14)+'px';f.style.bottom='auto';if(typeof skyRedrawTrail==='function')skyRedrawTrail();if(SKY.last&&!SKYA.run)skyDomeAim(SKY.last)}
-addEventListener('resize',()=>requestAnimationFrame(footPlace));if(document.fonts)document.fonts.ready.then(()=>footPlace());[500,1200,2600].forEach(ms=>setTimeout(footPlace,ms));
+addEventListener('resize',()=>requestAnimationFrame(footPlace));
+/* any change in the header's size (caption text, sky-side, fonts, a new day) re-pins the chips under the week row */
+{let fpR=0;const fpK=()=>{if(!fpR)fpR=requestAnimationFrame(()=>{fpR=0;footPlace()})};if(window.ResizeObserver){const ro=new ResizeObserver(fpK),h=document.getElementById('hdr');if(h){ro.observe(h);new MutationObserver(()=>{const w=h.querySelector('.wk');if(w)ro.observe(w)}).observe(h,{childList:true})}}}if(document.fonts)document.fonts.ready.then(()=>footPlace());[500,1200,2600].forEach(ms=>setTimeout(footPlace,ms));
 function render(dir){requestAnimationFrame(()=>requestAnimationFrame(footPlace));if(typeof ccBridgeSoon==='function')ccBridgeSoon();if(typeof GLS!=='undefined'&&GLS.kick)requestAnimationFrame(GLS.kick);
  const f=V,L=hlen(f),a=ad(f,-f.getDay()),n=Math.ceil((f.getDay()+L)/7)*7,td=+t0;
  const h0=hd(f),e1=ad(f,L-1);$('#t').textContent=h0.n[0]+' '+h0.y;if(dir&&!RM)$('#t').animate([{opacity:0,transform:`translateX(${dir*18}px)`},{opacity:1,transform:'none'}],{duration:380,easing:'cubic-bezier(.2,.8,.2,1)'});
@@ -1370,6 +1421,9 @@ const FAST2=()=>[fastTimes(),'Add Aneinu in Shemoneh Esrei at Mincha','Say Selic
 const RESTRICT='Keep the five Yom Kippur restrictions until nightfall: no eating or drinking, washing, anointing, leather shoes or marital relations';
 const YB2=['Light a yahrzeit candle before sunset the evening before (it burns 24 hours)','Study some of their Torah teachings, or a Chassidic discourse (maamar)','Say Tehillim and give tzedakah in their merit','Make or join a farbrengen and take on a good resolution'];
 const CT2=['Make or join a farbrengen','Study Chassidus (a section of Tanya or a discourse)','Give tzedakah and take on a good resolution'];
+const YBR=['Study some of their teachings (a maamar or a sicha)','Give tzedakah in their merit','Make or join a farbrengen'];
+const YBW=['Give tzedakah in her merit','Study some Torah or Chassidus in her merit'];
+Object.assign(TK,{'Sh-10':()=>YB2,'Ta-3':()=>YB2,'Te-24':()=>YBR,'Ki-9':()=>YBR,'N-13':()=>YBR,'Ti-13':()=>YBR,'N-2':()=>YBR,'Sh-22':()=>[...YBW,'Women and girls: join or hold a gathering in her honor (custom)'],'Ti-6':()=>YBW,'A-7':()=>[],'Si-6':()=>[]});
 Object.assign(TK,{
 'Ti-1-2':(h,W)=>[W!=6&&'Hear the shofar','Dip an apple in honey and eat the simanim with their Yehi Ratzon prayers',h.d==1&&W!=6&&'Say Tashlich at a body of water',h.d==2&&W==0&&'Say Tashlich today because the first day was Shabbos'],
 'Ti-9':()=>['Say Selichos in the morning','Kaparos (early morning)','Get a haircut and immerse in the mikvah (custom)','Malkos (custom)','Ask forgiveness from people you may have wronged','Ask for, and give, lekach (honey cake)','Give tzedakah generously before Kol Nidrei','Eat the festive meals, and finish the last meal (seudah mafsekes) before sunset'+(zt('Shkiah')?' ('+zt('Shkiah')+')':''),'Say Mincha with Viduy before the last meal','Bless your children before the fast',clt('Light Yom Kippur candles and a 24-hour candle for Havdalah'),'Prepare a memorial candle for Yizkor and non-leather shoes for tomorrow'],
@@ -1395,7 +1449,7 @@ Object.assign(TK,{
 'fAv':()=>['Fast from sunset until nightfall (about 25 hours)'+(zt('Tzeis')?' (ends '+zt('Tzeis')+')':''),'Sit on the floor or a low stool until midday','Do not wear leather shoes, wash or apply lotion','Read Eichah at night and say Kinos in the morning','Wear tallis and tefillin at Mincha'],
 'eruv':()=>['Make Eruv Tavshilin today, before Yom Tov begins'+(cln()?' (candle lighting '+tf(cln()[1])+')':''),'Cook and prepare for Shabbos on Yom Tov Friday, early in the day'],
 'tal':()=>['Start saying “V’sein tal u’matar” at Maariv this evening'],'tal2':()=>['Say “V’sein tal u’matar” in the weekday Shemoneh Esrei'],
-'sp-mev':()=>['Say the entire Tehillim (Chabad custom)','Hear Birkas HaChodesh and the announcement of the molad'],
+'sp-mev':()=>['Say the entire Tehillim before Shacharis (Chabad custom)'],
 'sp-zach':()=>['Hear Parshas Zachor (a Torah mitzvah), men and women'],'sp-shek':()=>[],'sp-par':()=>[],'sp-hach':()=>[],'sp-hag':()=>[],'sp-shuv':()=>[],'sp-chaz':()=>[],'sp-nach':()=>[],'sp-chm':()=>[]
 });
 
@@ -1404,14 +1458,20 @@ function groups(){const{h,ev,rc}=infoD(sel),W=sel.getDay(),o=[];
  for(const e of ev){const f=tasksFor(e,h,W);if(f.length)o.push({t:e.t,k:e.k,id:e.id,items:f})}
  o.push(...dynGroups(h,W,ev,rc));
  if(W==5&&cln())o.push({t:'Erev Shabbos',k:'ys',id:'fri',items:[clt('Light Shabbos candles')]});
+ const ba=bdayAliyahFrom(sel);if(ba)o.push({t:'Your birthday is '+ba.when,k:'my',id:'bdal',items:['Ask for an aliyah today, the closest Torah reading before your birthday']});
  return o}
-function special(){const G2=groups(),el=$('#sp');el.hidden=!G2.length;if(!G2.length){el.innerHTML='';return}
- let i=0;el.innerHTML=`<div class="ph rv"><div><h2>To do today</h2><div class="mut" id="spn"></div></div></div>`+G2.map(g=>`<div class="gt rv k-${g.k}" style="--i:${Math.min(i++,6)}"><i class="m k-${g.k}"></i>${g.t}</div>`+g.items.map((t,j)=>row('t:'+g.id+':'+j,t,'','',Math.min(i++,8),guideFor(t),g.k)).join('')).join('')}
+/* to-do lines: 'chk' = checkbox, 'rem' = only a reminder (bell, no checkbox), 'note' = plain line, no checkbox */
+const TODO_DROP=/Birkas HaChodesh/i,TODO_REM=/entire Tehillim|^Fast from|five Yom Kippur restrictions|Aneinu|Selichos|Light the menorah|^Ask for an aliyah/i,TODO_NOTE=/Al HaNissim|Chanukah gelt|farbrengen/i;
+const todoMode=t=>TODO_REM.test(t)?'rem':TODO_NOTE.test(t)?'note':'chk';
+const BELL='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"/><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0"/></svg>';
+const noteRow=(t,mode,i,gi,gk)=>`<div class="tdn rv ${mode}" style="--i:${i}"><span class="ic" aria-hidden="true">${mode=='rem'?BELL:'<i></i>'}</span><div class="tx"><b>${t}</b>${mode=='rem'?'<small>Reminder</small>':''}</div>${gi>=0?`<button class="gi" type="button" data-g="${gi}" data-k="${gk||'ys'}" aria-label="How and when: ${t.replace(/"/g,'')}">How &amp; when ›</button>`:''}</div>`;
+function special(){const G2=groups().map(g=>({...g,items:g.items.map((t,j)=>[t,j]).filter(([t])=>!TODO_DROP.test(t))})).filter(g=>g.items.length),el=$('#sp');el.hidden=!G2.length;if(!G2.length){el.innerHTML='';return}
+ let i=0;el.innerHTML=`<div class="ph rv"><div><h2>To do today</h2><div class="mut" id="spn"></div></div></div>`+G2.map(g=>`<div class="gt rv k-${g.k}" style="--i:${Math.min(i++,6)}"><i class="m k-${g.k}"></i>${g.t}</div>`+g.items.map(([t,j])=>{const m=todoMode(t),gi=/farbrengen/i.test(t)?-1:guideFor(t);return m=='chk'?row('t:'+g.id+':'+j,t,'','',Math.min(i++,8),gi,g.k):noteRow(t,m,Math.min(i++,8),gi,g.k)}).join('')).join('')}
 function upd(){const sd=['chumash','tehillim','tanya'].filter(ck).length+(['rambam3','rambam1'].some(ck)?1:0),st=4,d=sd+(ck('hy')?1:0),t=5;
  document.querySelectorAll('.ring').forEach(r=>{const inStudy=!!r.closest('#sd'),a=inStudy?sd:d,b=inStudy?st:t;r.querySelector('.rf').style.strokeDashoffset=94.25*(1-a/b);r.querySelector('span').textContent=a+'/'+b;r.classList.toggle('full',a==b)});
  document.querySelectorAll('.ck').forEach(x=>{const o=ck(x.dataset.k);x.classList.toggle('on',o);x.querySelector('.bx').setAttribute('aria-checked',o)});
  const n=$('#sdn');if(n)n.textContent=sd==st?'All done. Hatzlacha!':sd+' of '+st+' shiurim completed';
- const sp=document.querySelectorAll('#sp .ck'),a=[...sp].filter(x=>x.classList.contains('on')).length,sn=$('#spn');if(sn)sn.textContent=a==sp.length&&sp.length?'All done. Hatzlacha!':a+' of '+sp.length+' done';
+ const sp=document.querySelectorAll('#sp .ck'),a=[...sp].filter(x=>x.classList.contains('on')).length,sn=$('#spn');if(sn)sn.textContent=!sp.length?'':a==sp.length?'All done. Hatzlacha!':a+' of '+sp.length+' done';
  stkRefresh();const hb=$('#hyb');if(hb){hb.classList.toggle('on',ck('hy'));hb.textContent=ck('hy')?'✓ Read':'Mark as read'}}
 function tog(k){const d=dkey();(DN[d]??={});if(DN[d][k])delete DN[d][k];else{if(k==='rambam3'||k==='rambam1')delete DN[d][k==='rambam3'?'rambam1':'rambam3'];DN[d][k]=1}if(!Object.keys(DN[d]).length)delete DN[d];SVD();upd();H.ok();if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}
 /* ===== Shiur reader: the day's Hebrew text from Sefaria (free texts, open API).
@@ -1579,11 +1639,16 @@ function chips(h,ev,rc){const a=[],w=sel.getDay();let evi=0;
    you open that day + its customs. Switch `occ` in Test tools turns it off. */
 function occKind(e){if(document.documentElement.classList.contains('tt-off-occ'))return null;
  const s=((e&&e.t)||'')+' '+((e&&e.x)||'')+' '+((e&&e.person)||'');
- if(/\b(yahr?z?eit|yohr?tzait|yartzeit|yorz?eit|yahrtzeit|hilula)\b|יארצייט|הילולא|אזכרה/i.test(s))return 'yz';
- if(/\bbirthdays?\b|\bb-?day\b|\bbday\b|געבוירן|יום הולדת|הולדת/i.test(s))return 'bday';
- return null}
-const BDAY_MINHAGIM=['Get an aliyah to the Torah on the Shabbos before (or on the day, when it is read).','Give extra tzedakah — before Shacharis and before Mincha.','Set aside time alone to daven, look back over the year, and make a good resolution.','From today, say the new chapter of Tehillim for your years (turning 13 → begin kapitel 14).','Add in Torah, avodah and good deeds; make a farbrengen and share a dvar Torah.'];
+ let k=null;if(/\b(yahr?z?eit|yohr?tzait|yartzeit|yorz?eit|yahrtzeit|hilula)\b|יארצייט|הילולא|אזכרה/i.test(s))k='yz';
+ else if(/\bbirthdays?\b|\bb-?day\b|\bbday\b|געבוירן|יום הולדת|הולדת/i.test(s))k='bday';
+ if(e&&e.k!=='my'&&['Sh-10','Ta-3'].includes(e.id))return 'yz';
+ if(k==='yz'&&e&&e.k!=='my')return null;
+ return k}
+const BDAY_MINHAGIM=['Give extra tzedakah — before Shacharis and before Mincha.','Set aside time alone to daven, look back over the year, and make a good resolution.','From today, say the new chapter of Tehillim for your years (turning 13 → begin kapitel 14).','Learn a maamar of the Rebbe, and say it over (by heart, if you can).',{n:'Add in Torah, avodah and good deeds, and make a farbrengen with friends.'}];
 const YZ_MINHAGIM=['Light a 24-hour candle at nightfall, as the day begins.','Get an aliyah, and lead the davening, on the yahrzeit and the Shabbos before.','Say Kaddish, or arrange for someone to.','Learn Mishnayos for the letters of the name, and give tzedakah l’ilui nishmas.','Visit the resting place if you can; make a good resolution in their memory.'];
+function bdayAliyahDay(b){for(let i=1;i<=7;i++){const d=ad(b,-i);if([1,4,6].includes(d.getDay()))return d}}
+/* is this day the aliyah day for one of the user's own birthdays in the coming week? */
+function bdayAliyahFrom(d){for(let k=1;k<=7;k++){const b=ad(d,k);if(info(b).ev.some(occOwnBday)&&+bdayAliyahDay(b)===+d)return{b,when:k==1?'tomorrow':'on '+b.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}}return null}
 function occOwnBday(e){if(!e||e.k!=='my'||occKind(e)!=='bday')return false;
  const t=String(e.t||''),x=String(e.x||'');
  if(e.person)return false;                                   // a named participant => someone else
@@ -1591,9 +1656,11 @@ function occOwnBday(e){if(!e||e.k!=='my'||occKind(e)!=='bday')return false;
  if(/\b(?:his|her|their|son|daughter|wife|husband|father|mother|friend|brother|sister|zaidy|bubby|tatty|mommy|kid|child|boy|girl)\b/i.test(t))return false;
  return /\bmy\b/i.test(t+' '+x)||/^\s*birthday\s*$/i.test(t); // "my birthday" / just "Birthday"
 }
-function occMingm(k,eid){const L=k==='bday'?BDAY_MINHAGIM:YZ_MINHAGIM,D=taskDone(),dt=ds(sel);
+function occMingm(k,eid){const L=k==='bday'?BDAY_MINHAGIM:YZ_MINHAGIM,D=taskDone(),dt=ds(sel),pre=k==='bday'?'occb:':'occ:';
+ const al=k==='bday'?bdayAliyahDay(sel):null;
  return `<div class="occ-mingm"><b>${k==='bday'?'🎂 Birthday customs':'Customs for the yahrzeit'}</b><div class="occ-list">`+
-  L.map((x,i)=>{const id='occ:'+eid+':'+i,done=!!D[id+'@'+dt];
+  (al?`<div class="occ-note">${BELL}<span>Aliyah: ask for one on <b>${al.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</b>, the closest Torah reading before your birthday. You'll get a reminder the day before.</span></div>`:'')+
+  L.map((x,i)=>{if(x&&x.n)return `<div class="occ-note"><i></i><span>${x.n}</span></div>`;const id=pre+eid+':'+i,done=!!D[id+'@'+dt];
    return `<button type="button" class="occ-item${done?' on':''}" data-task="${id}" data-date="${dt}" aria-pressed="${done?'true':'false'}"><span class="occ-box">${done?'✓':''}</span><span>${x}</span></button>`}).join('')+
   `</div><small>Chabad minhagim — check with your Rav for anything specific.</small></div>`}
 function evCard(e,i){const ok=occKind(e);
@@ -1604,7 +1671,7 @@ function evCard(e,i){const ok=occKind(e);
   (editing?`<button class="ed" data-e="${e.id}">Edit</button>`:'')+
   `<h3 style="${e.isTask&&e.done?'text-decoration:line-through;opacity:.65':''}">${ok==='bday'?'🎂 ':''}${e.t}${e.h?` <span class="heb" lang="he">${e.h}</span>`:''}</h3>`+
   (lt(e)?`<p class="sm" role="button" tabindex="0" data-i="${i}">${e.x} <span class="mr">More ›</span></p>`:`<p>${e.x}</p>`)+
-  (ok?occMingm(ok,e.id):'')+
+  (ok&&e.k==='my'&&(ok==='yz'||occOwnBday(e))?occMingm(ok,e.id):'')+
   `</div>`}
 let ccPanelDay='';
 function ccConfetti(){if(RM||document.documentElement.classList.contains('tt-off-occ'))return;
@@ -1671,11 +1738,21 @@ function sc(){tk=0;const y=scrollY,vh=innerHeight||700,cl=v=>Math.min(1,Math.max
  cbar.classList.toggle('on',y>120);if(cbar.getAttribute('aria-hidden')!==String(y<=120))cbar.setAttribute('aria-hidden',y<=120);document.documentElement.classList.toggle('cc-away',y>vh*.9);
  const pd=cl(y/(vh*.42)),pf=cl((y-vh*.03)/(vh*.4)),ph=cl(y/(vh*.1));
  foot.classList.toggle('gone',pf>=1);hint.classList.toggle('gone',ph>=1);
- if(!RM){hdr.style.transform=`translateY(${-pd*34}px) scale(${1-.09*pd})`;hdr.style.opacity=Math.max(0,1-1.1*pd);
+ if(!RM){const hs=1-.09*pd,hy=-pd*34;hdr.style.transform=`translateY(${hy}px) scale(${hs})`;hdr.style.setProperty('--hdrFade',String(Math.max(0,1-2.6*pd)).slice(0,5));dateWall(y,vh,hs,hy);
   foot.style.opacity=1-pf;
   hint.style.opacity=1-ph;$('#gh').style.transform=`translateY(${y*.16}px)`}
  else{foot.style.opacity=pf>=1?0:1;hint.style.opacity=ph>=1?0:1}
+ if(y<=4&&FP_PEND){footPlace();setTimeout(footPlace,450)}
  if(!RM)mz(y,vh)}
+/* the big date is fixed to the wall: it holds still while the page scrolls over it, then rises slowly and fades.
+   #hdr itself moves and shrinks on scroll, so the date's own offset cancels that out (sizes measured once per layout). */
+var DW=null;
+function dateMeasure(){const h1=hdr.querySelector('.hd-he');if(!h1){DW=null;return}const o=(getComputedStyle(hdr).transformOrigin||'0 0').split(' ').map(parseFloat);DW={el:h1,oT:h1.offsetParent===hdr?h1.offsetTop:h1.offsetTop-hdr.offsetTop,O:o[1]||0}}
+function dateWall(y,vh,s,ty){if(document.documentElement.classList.contains('tt-off-block3d')){hdr.style.setProperty('--dateY','0px');hdr.style.setProperty('--dateFade',hdr.style.getPropertyValue('--hdrFade')||'1');return}
+ if(!DW||!DW.el.isConnected)dateMeasure();if(!DW)return;
+ const y1=vh*.62,f=Math.min(1,Math.max(0,(y-y1)/(vh*.5)));if(f>=1&&DW.done)return;DW.done=f>=1;
+ const rise=Math.max(0,y-y1)*.32,dy=(DW.oT-rise+y-ty-DW.O-(DW.oT-DW.O)*s)/s;
+ hdr.style.setProperty('--dateY',dy.toFixed(1)+'px');hdr.style.setProperty('--dateFade',(1-f).toFixed(3))}
 addEventListener('scroll',()=>{tk||(tk=requestAnimationFrame(sc))},{passive:true});
 $('#hint').onclick=()=>{H.tap();scrollTo({top:Math.max(0,$('#top').getBoundingClientRect().top+scrollY-72),behavior:RM?'auto':'smooth'})};addEventListener('resize',sc);
 
@@ -1731,7 +1808,7 @@ function skyMoonPass(now){ // is the moon up, and when does it rise / set around
 
 /* palette: [sun altitude°, top, bottom]. Altitude 0 = sunrise/sunset. Evening is redder, morning pinker/peachier. */
 const SKY_M=[[-18,'#05070f','#0b0f22'],[-12,'#0c1235','#1c2250'],[-6,'#2b2a63','#8a4f86'],[-2,'#5a5aa6','#f08a78'],[.5,'#7f9bd8','#ffb07a'],[6,'#9fc3f0','#ffd9a6'],[18,'#a9d0f8','#e9f3ff'],[45,'#9fcdfb','#eef6ff']];
-const SKY_E=[[-18,'#05070f','#0b0f22'],[-12,'#151a45','#3a2a60'],[-6,'#2f2a6b','#a53a55'],[-2,'#5a3f94','#e0583f'],[.5,'#7480c4','#ff8f4f'],[6,'#9db8e6','#ffd08a'],[18,'#a9d0f8','#eaf2fb'],[45,'#9fcdfb','#eef6ff']];
+const SKY_E=[[-18,'#05070f','#0b0f22'],[-12,'#131944','#2d2a64'],[-6,'#262b6e','#6f4c8e'],[-2,'#3e4aa0','#b9789a'],[.5,'#6779c6','#e9a191'],[6,'#93b1e6','#f6cfae'],[18,'#a9d0f8','#eaf2fb'],[45,'#9fcdfb','#eef6ff']];
 const skyRGB=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),skyHex=c=>'#'+c.map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
 const skyLum=c=>{const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(c[0])+.7152*f(c[1])+.0722*f(c[2])};
 const skyCR=(a,b)=>{const x=skyLum(a),y=skyLum(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
@@ -1980,7 +2057,7 @@ addEventListener('resize',()=>{skyRedrawTrail()});
 function skyApply(st){
  if(SKYA.run&&!st.anim)return;
  const p=st.pal,r=document.documentElement;if(st.anim){document.getElementById('sky').hidden=false;document.getElementById('skyGrad').style.background=`linear-gradient(180deg,${p.top} 0%,${p.bot} 100%)`;document.getElementById('stars').style.opacity=p.stars.toFixed(2);skyNightAmt(p);const n=performance.now();if(p.dark===SKYA.lastDark&&n-SKYA.rootT<1500)return;SKYA.rootT=n}SKYA.lastDark=p.dark;const nt=skyNightAmt(p),sv=(k,v)=>{if(r.style.getPropertyValue(k)!==v)r.style.setProperty(k,v)},sd=(k,v)=>{if(r.dataset[k]!==v)r.dataset[k]=v};
- {const th=p.dark?'dark':'light';if(r.dataset.theme!==th){r.dataset.theme=th;if(MOON_PX)document.querySelectorAll('img.mimg').forEach(i=>{i.src=artMoonUrl(+i.dataset.f)})}}sv('--bg',nt>.5?'#0b1330':p.mid);sv('--card',nt>.5?'#121a3d':`color-mix(in srgb,${p.dark?'#161a30':'#ffffff'} 90%,${p.mid})`);sd('night',nt>.5?'1':'0');
+ {const th=p.dark?'dark':'light';if(r.dataset.theme!==th){r.dataset.theme=th;if(MOON_PX)document.querySelectorAll('img.mimg').forEach(i=>{i.src=artMoonUrl(+i.dataset.f)})}}sv('--bg',nt>.5?'#0b1330':p.mid);sv('--card',nt>.5?'#121a3d':`color-mix(in srgb,${p.dark?'#161a30':'#ffffff'} 90%,${p.mid})`);sd('night',nt>.5?'1':'0');sd('sky',nt>.5?'night':st.alt<9?'dusk':'day');
  const sky=document.getElementById('sky');if(sky.hidden)sky.hidden=false;const sg=document.getElementById('skyGrad'),bgv=`linear-gradient(180deg,${p.top} 0%,${p.bot} 100%)`;if(sg._bg!==bgv){sg._bg=bgv;sg.style.background=bgv}
  {const so=document.getElementById('stars'),v=p.stars.toFixed(2);if(so.style.opacity!==v)so.style.opacity=v}
  const tc=document.querySelector('meta[name=theme-color]');if(tc&&(!st.anim||performance.now()-(SKYA.tcT||0)>250)){{const v=skyNightAmt(p)>.5?'#070D22':p.top;if(tc.content!==v)tc.content=v}SKYA.tcT=performance.now()}}
@@ -2092,7 +2169,7 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
  const size=()=>{const d=Math.min(devicePixelRatio||1,2)*Q,w=Math.round(host.clientWidth*d),h=Math.round(host.clientHeight*d);if(w&&h&&(w!==W||h!==Hh)){W=cv.width=w;Hh=cv.height=h;gl.viewport(0,0,w,h);dirty=true}};
  const colors=()=>{const cs=getComputedStyle(document.documentElement);gl.uniform3fv(U.uF,hex(cs.getPropertyValue('--rbf')));gl.uniform3fv(U.uE,hex(cs.getPropertyValue('--rbe')));const nightW=document.documentElement.dataset.night==='1';gl.uniform1f(U.uO,nightW?1:1.0);
   /* night waves are kept soft and quiet so they stay in the background (owner); Test tools switch "swave" turns that off */
-  gl.uniform1f(U.uK,nightW&&!document.documentElement.classList.contains('tt-off-swave')?1:0)};
+  const rc=document.documentElement.classList;gl.uniform1f(U.uK,nightW?(rc.contains('tt-off-swave')?0:1):(parseFloat(cs.getPropertyValue('--wk'))||0))};
  const draw=()=>{size();if(!W)return false;if(colT<0){colT=1;colors()}
   const y=scrollY||document.documentElement.scrollTop||0;if(y===sc&&!dirty)return true;sc=y;dirty=false;GLS.sc=y;GLS.t=0;
   GLS.ang=-2.25+y/innerHeight*.5;const ca=Math.cos(GLS.ang),sa=Math.sin(GLS.ang);GLS.L=[ca*.76,sa*.76,.65];
@@ -2104,7 +2181,7 @@ void main(){vec2 p=vec2(gl_FragCoord.x/uR.x,(uR.y-gl_FragCoord.y)/uR.x);float px
  const scrollKick=kick;
  let scT0=0;addEventListener('scroll',()=>{GLS.scrolling=true;clearTimeout(scT0);scT0=setTimeout(()=>{GLS.scrolling=false},180);scrollKick()},{passive:true});
  addEventListener('resize',()=>{colT=-1;dirty=true;kick()},{passive:true});document.addEventListener('visibilitychange',()=>{colT=-1;dirty=true;kick()});
- new MutationObserver(()=>{colT=-1;dirty=true;kick()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-night','data-theme']});
+ new MutationObserver(()=>{colT=-1;dirty=true;kick()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-night','data-theme','data-sky','class']});
  GLS.kick=()=>{GLS.szDirty=true;dirty=true;colT=-1;kick()};kick()})();
 if(SKY.on){const st0=skyCompute(Date.now());SKY.last=st0;SKY.shift=st0.shift;t0=new Date(st0.ymd[0],st0.ymd[1]-1,st0.ymd[2]+st0.shift,12);sel=t0;V=hm1(t0);skyApply(st0)}else skyOff();
 setInterval(skyTick,30000);
@@ -2274,6 +2351,8 @@ function notifPlan(c,days=30,opt){
   if(c.cand&&strictYT(h)&&strictYT(h1)&&wd!=5){
    const e0=ev.find(e=>e.k=='yt'&&!/Chol Hamoed/.test(e.t)),nm=ytn(ev)||'Yom Tov',b=h.k=='Ti'&&h.d==22?'Simchas Torah night':h.k=='N'&&h.d==21?'Last night of Pesach':'Second night of '+nm;
    add(T(e0?e0.id:'yt',k,e0?e0.t:nm),'cand2:'+k,ts,'Light Yom Tov candles now · '+b+'. Use an existing flame.','cand')}
+  /* birthday aliyah: remind the morning before the Torah reading */
+  if(c.mine!==false){const ba=bdayAliyahFrom(n1);if(ba)add(T('bdal',k,'Birthday aliyah'),'bdal:'+k,wallMs(d,mh,mm),'Your birthday is '+ba.when+'. Ask the gabbai for an aliyah '+(n1.getDay()==6?'this Shabbos':'tomorrow, '+n1.toLocaleDateString('en-US',{weekday:'long'}))+'.','mine')}
   /* omer */
   const on_=omerIdx(h1);if(c.omer&&on_)add(T('omer',k,'Sefiras HaOmer'),'omer:'+k,ts,'Count tonight: day '+on_+' · '+omerTxt(on_),'omer');
   /* chanukah */
@@ -2494,8 +2573,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=7;
+const CC_VER=8;
 const CC_LOG=[
+ {v:8,new:['The big date is now a thick block set into the sky “wall”: it stays put while the page scrolls over it, then rises a little and fades.','Evening (and daytime) skies are softer and glassier, like the night sky.','Shiurim and your stats now use the app’s own colors.','To-do lists: fasting, Aneinu, Selichos, Tehillim on Shabbos Mevarchim and lighting the menorah are now reminders, not checkboxes; Al HaNissim, Chanukah gelt and farbrengens are plain notes; Birkas HaChodesh is gone.','Your chavrusas and shiurim no longer have a check box.','Birthday: the aliyah moves to the Monday, Thursday or Shabbos just before (with a reminder the day before), and saying a maamar of the Rebbe replaces the dvar Torah.','The Rebbeim’s yahrzeits show only the customs really kept on each one.','Fixed the event chips sometimes covering the week row.']},
  {v:7,new:['Beta: Chabad Calendar now runs in the Android app. The app asks once for location (for zmanim) and microphone (to speak to the planner), and new users get the tour on a sample day with real events.']},
  {v:6,new:['The big Hebrew date now has a soft shadow so it floats above the sky, with a very slight buoyant drift so it feels suspended rather than flat.']},
  {v:5,new:['Fixed reminders like “set a reminder for an hour before” — it now sets the reminder correctly instead of mangling the title.','Fixed the event chips sometimes overlapping the week row on the home screen.','A few more silky waves in the daytime sky.']},
@@ -3018,7 +3098,7 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
  if(timeTxt)nt.push('Time: '+timeTxt); if(durTxt)nt.push('Duration: '+durTxt); if(place)nt.push('Place: '+place); if(portion)nt.push('Portion: '+portion); if(rec.note)nt.push(rec.note);
  p.notes=[...nt,...notes].join(' · ');
  p.participant=person||undefined; p.title=title; p.category=category; p.time=timeTxt||undefined;
- p.kind=/\b(?:task|to-?do|remind\s+me|reminder)\b/i.test(q0)?'task':(category==='Learning'||category==='Reminder')?'task':'event';
+ p.kind=PLAN_LEARN.test(q0)||category==='Learning'?'event':/\b(?:task|to-?do)\b/i.test(q0)||category==='Reminder'?'task':'event';
  // ---- 11. Resolve recurrence + first date
  const anchor=dateInfo&&dateInfo.date&&!isNaN(+dateInfo.date)?dateInfo.date:null;
  let start=anchor||base, summary='';
@@ -3681,7 +3761,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['block3d','Big date as a thick block on the wall'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id]of FLAGS)document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
