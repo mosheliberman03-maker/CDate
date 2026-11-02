@@ -2185,10 +2185,11 @@ vec4 silk(vec2 p,float px){
  const gl=cv.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:false,depth:false,stencil:false});if(!gl)return;
  const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
  const FS=`precision highp float;uniform vec2 uCR,uCO,uCS,uV,uTl;uniform sampler2D uM;uniform vec3 uTop,uBot,uRim,uSun;uniform float uDk,uWo,uNk,uRef,uPx,uBub;`+GLS.SILK+`
+float Hq(vec2 c){float h0=texture2D(uM,c).g;return texture2D(uM,c+vec2(uTl.x,-uTl.y)*uBub/uCS*smoothstep(.06,.75,h0)).g;}
 void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=texture2D(uM,cuv);float a=m.r;
  if(a<.004){gl_FragColor=vec4(0.);return;}
- vec2 e=vec2(1.5/uCR.x,1.5/uCR.y),bu=cuv+vec2(uTl.x,-uTl.y)*uBub/uCS;float h=texture2D(uM,bu).g;
- float hx=texture2D(uM,bu+vec2(e.x,0.)).g-texture2D(uM,bu-vec2(e.x,0.)).g,hy=texture2D(uM,bu+vec2(0.,e.y)).g-texture2D(uM,bu-vec2(0.,e.y)).g;
+ vec2 e=vec2(2.6/uCR.x,2.6/uCR.y);float h=Hq(cuv);
+ float hx=Hq(cuv+vec2(e.x,0.))-Hq(cuv-vec2(e.x,0.)),hy=Hq(cuv+vec2(0.,e.y))-Hq(cuv-vec2(0.,e.y));
  vec3 n=normalize(vec3(-hx*uNk,-hy*uNk,1.));
  vec2 vp=uCO+cuv*uCS;
  float ed=clamp(1.-n.z,0.,1.),nl=length(n.xy);vec2 nd=nl>1e-4?n.xy/nl:vec2(0.);
@@ -2235,7 +2236,7 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  function draw(){if(!ok||!cv.isConnected||R.classList.contains('cc-away'))return;const r=cv.getBoundingClientRect();if(!r.width||r.bottom<0||r.top>innerHeight)return;
   const st=SKY.last,pal=st&&st.pal,dk=R.dataset.theme==='dark',night=R.dataset.night==='1';
   gl.uniform2f(U.uCR,W,H);gl.uniform2f(U.uCO,r.left,r.top);gl.uniform2f(U.uCS,r.width,r.height);gl.uniform2f(U.uV,innerWidth,innerHeight);gl.uniform2f(U.uTl,tl[0],tl[1]);
-  gl.uniform3fv(U.uTop,hx(night?'#0a1230':pal&&pal.top));gl.uniform3fv(U.uBot,hx(night?'#18225a':pal&&pal.bot));gl.uniform3fv(U.uRim,dk?[1,1,1]:[.1,.15,.38]);gl.uniform3fv(U.uSun,night?[.86,.9,1]:R.dataset.sky==='dusk'?[1,.86,.76]:[1,.95,.82]);gl.uniform1f(U.uRef,dlFs*.9);gl.uniform1f(U.uBub,dlFs*.075);gl.uniform1f(U.uPx,W/(r.width||1));gl.uniform1f(U.uDk,dk?1:0);gl.uniform1f(U.uWo,GLS.WO||1);
+  gl.uniform3fv(U.uTop,hx(night?'#0a1230':pal&&pal.top));gl.uniform3fv(U.uBot,hx(night?'#18225a':pal&&pal.bot));gl.uniform3fv(U.uRim,dk?[1,1,1]:[.1,.15,.38]);gl.uniform3fv(U.uSun,night?[.86,.9,1]:R.dataset.sky==='dusk'?[1,.86,.76]:[1,.95,.82]);gl.uniform1f(U.uRef,dlFs*.9);gl.uniform1f(U.uBub,dlFs*.11);gl.uniform1f(U.uPx,W/(r.width||1));gl.uniform1f(U.uDk,dk?1:0);gl.uniform1f(U.uWo,GLS.WO||1);
   gl.uniform1f(U.uT,GLS.T||7);gl.uniform3fv(U.uF,GLS.F||[1,1,1]);gl.uniform3fv(U.uE,GLS.E||[1,1,1]);gl.uniform3fv(U.uL,GLS.L||[0,0,1]);gl.uniform1f(U.uO,GLS.O||1);gl.uniform1f(U.uK,GLS.K||0);
   gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3)}
  /* gravity: the water leans a little toward the low side and sloshes back on a soft spring */
@@ -2639,8 +2640,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=13;
+const CC_VER=14;
 const CC_LOG=[
+ {v:14,new:['The water inside the date letters now flows like liquid when you tilt: it bends and gathers against the letter’s own edges instead of sliding.']},
  {v:13,new:['iPhone and iPad users can use the calendar right here on the website, no app needed.']},
  {v:12,new:['The light inside the water letters now drifts like the bubble in a water bottle when you tilt the phone: tilt right and it moves left, tilt down and it moves up.']},
  {v:11,new:['The water letters are now evenly full, with no darker stripe down the middle.']},
