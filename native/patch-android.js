@@ -30,3 +30,23 @@ try {
 } catch (e) {
   console.log('patch-android: skipped (' + e.message + ')');
 }
+
+/* Sign every build with the app's permanent key (native/cdate-debug.keystore). Without this each CI run
+   made a new random key and phones refused to install updates ("App not installed"). */
+const gradle = 'android/app/build.gradle';
+try {
+  let g = fs.readFileSync(gradle, 'utf8');
+  if (!g.includes('cdate-debug.keystore')) {
+    g += `
+android.signingConfigs.debug.storeFile = file("\${rootDir}/../cdate-debug.keystore")
+android.signingConfigs.debug.storePassword = "android"
+android.signingConfigs.debug.keyAlias = "androiddebugkey"
+android.signingConfigs.debug.keyPassword = "android"
+`;
+    fs.writeFileSync(gradle, g);
+    console.log('patch-android: permanent signing key set');
+  }
+} catch (e) {
+  console.log('patch-android: signing not set (' + e.message + ')');
+  process.exit(1);
+}

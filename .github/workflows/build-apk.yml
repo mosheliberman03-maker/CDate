@@ -51,11 +51,6 @@ jobs:
       - name: Sync web assets and plugins
         run: npx cap sync android
 
-      - name: Use the app's permanent signing key (so each new version installs over the old one)
-        run: |
-          mkdir -p ~/.android
-          cp cdate-debug.keystore ~/.android/debug.keystore
-
       - name: Build the debug APK
         run: |
           cd android
@@ -64,6 +59,13 @@ jobs:
 
       - name: Rename the APK
         run: cp android/app/build/outputs/apk/debug/app-debug.apk ChabadCalendar.apk
+
+      - name: Check the APK is signed with the permanent key (otherwise phones refuse the update)
+        run: |
+          WANT=$(keytool -list -v -keystore cdate-debug.keystore -storepass android -alias androiddebugkey | grep 'SHA256:' | awk '{print $2}')
+          GOT=$($ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)/apksigner verify --print-certs ChabadCalendar.apk | grep 'SHA-256 digest' | head -1 | awk '{print $NF}' | tr a-f A-F | sed 's/../&:/g;s/:$//')
+          echo "want $WANT"; echo "got  $GOT"
+          [ "$WANT" = "$GOT" ]
 
       - name: Upload the APK as a build artifact
         uses: actions/upload-artifact@v4
