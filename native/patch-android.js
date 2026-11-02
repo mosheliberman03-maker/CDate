@@ -10,7 +10,11 @@ try {
     'android.permission.USE_EXACT_ALARM',
     'android.permission.POST_NOTIFICATIONS',
     'android.permission.RECEIVE_BOOT_COMPLETED',
-    'android.permission.VIBRATE'
+    'android.permission.VIBRATE',
+    'android.permission.ACCESS_COARSE_LOCATION',
+    'android.permission.ACCESS_FINE_LOCATION',
+    'android.permission.RECORD_AUDIO',
+    'android.permission.MODIFY_AUDIO_SETTINGS'
   ];
   const add = perms
     .filter(p => !x.includes(p))
