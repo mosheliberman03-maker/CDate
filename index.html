@@ -977,7 +977,7 @@ function footPlace(){const f=document.getElementById('foot'),w=document.querySel
  if(over>0&&sc){const cur=sc.offsetHeight,nh=Math.max(document.getElementById('hdr').classList.contains('sky-side')?64:150,cur-over);if(nh<cur){sc.style.height=nh+'px';wb=w.getBoundingClientRect().bottom;over=wb+14+fh-lim}}
  f.style.top=Math.round(wb+14)+'px';f.style.bottom='auto';if(typeof skyRedrawTrail==='function')skyRedrawTrail();if(SKY.last&&!SKYA.run)skyDomeAim(SKY.last)}
 addEventListener('resize',()=>requestAnimationFrame(footPlace));if(document.fonts)document.fonts.ready.then(()=>footPlace());
-function render(dir){requestAnimationFrame(()=>requestAnimationFrame(footPlace));if(typeof GLS!=='undefined'&&GLS.kick)requestAnimationFrame(GLS.kick);
+function render(dir){requestAnimationFrame(()=>requestAnimationFrame(footPlace));if(typeof ccBridgeSoon==='function')ccBridgeSoon();if(typeof GLS!=='undefined'&&GLS.kick)requestAnimationFrame(GLS.kick);
  const f=V,L=hlen(f),a=ad(f,-f.getDay()),n=Math.ceil((f.getDay()+L)/7)*7,td=+t0;
  const h0=hd(f),e1=ad(f,L-1);$('#t').textContent=h0.n[0]+' '+h0.y;if(dir&&!RM)$('#t').animate([{opacity:0,transform:`translateX(${dir*18}px)`},{opacity:1,transform:'none'}],{duration:380,easing:'cubic-bezier(.2,.8,.2,1)'});
  {const A=f.toLocaleDateString('en',{month:'short'}),B=e1.toLocaleDateString('en',{month:'short'}),y1=f.getFullYear(),y2=e1.getFullYear();$('#s').innerHTML=`${A==B&&y1==y2?A:A+(y1==y2?'':' '+y1)+' – '+B} ${y2} · <b lang="he">${h0.n[1]} ה׳${G(h0.y%1000)}</b>`}
@@ -2262,7 +2262,7 @@ async function notifSync(){const c=nCfg(),pl=NP();
   else{WT.forEach(clearTimeout);WT=[]}
   if(!pl&&pushSrv()&&!PSUB)await pushCur();
   if(!c.on){NLAST=[];if(!pl&&pushActive())await pushSync(c);return}
-  const plan=notifPlan(c);NLAST=plan;
+  const plan=notifPlan(c);NLAST=plan;ccBridgeSoon(200);
   if(pl){if(!(await nPerm()))return;
    try{await pl.createChannel({id:'ccal',name:'Calendar reminders',description:'Candle lighting, Omer, fasts and special days',importance:3,visibility:1})}catch(e){}
    if(plan.length)await pl.schedule({notifications:plan.map(n=>({id:nid(n.id),title:n.th.title,body:n.text,group:n.th.key,smallIcon:'ic_stat',channelId:'ccal',schedule:{at:new Date(n.at),allowWhileIdle:true}}))})}
@@ -2270,6 +2270,23 @@ async function notifSync(){const c=nCfg(),pl=NP();
   else webSchedule(plan)
  }catch(e){}}
 let nT=0;function notifSyncSoon(ms){clearTimeout(nT);nT=setTimeout(notifSync,ms==null?1500:ms)}
+
+/* ===== Native wrapper bridge (Capacitor): export today's summary for the home-screen widget =====
+   Harmless in a normal browser (it only runs when wrapped in the native app). Alarms already go
+   through NP()/LocalNotifications in notifSync; this adds the widget's "today" digest. */
+function ccPrefs(){try{const C=window.Capacitor;if(!C||!(C.isNativePlatform&&C.isNativePlatform()))return null;
+  return (C.Plugins&&C.Plugins.Preferences)||(C.registerPlugin&&C.registerPlugin('Preferences'))||null}catch(e){return null}}
+async function ccBridge(){const P=ccPrefs();if(!P)return;try{
+  const h=hd(t0),x=infoD(t0),on_=on;
+  const specials=x.ev.filter(e=>e.k!=='my'&&on_[e.k]).map(e=>({t:e.t,he:e.h||'',k:e.k}));
+  const tasks=x.ev.filter(e=>e.k==='my').map(e=>{const m=my.find(z=>z.id===e.id)||{};return{t:e.t,tm:m.tm||''}});
+  const dig={v:1,at:Date.now(),he:G(h.d)+' '+h.n[1],heYr:G(h.y%1000),
+    en:t0.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric'}),
+    specials,tasks,url:location.origin+location.pathname};
+  await P.set({key:'cc_widget',value:JSON.stringify(dig)});
+}catch(e){}}
+let cbT=0;function ccBridgeSoon(ms){clearTimeout(cbT);cbT=setTimeout(ccBridge,ms==null?900:ms)}
+
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&nCfg().on)notifSyncSoon(2000)});
 setInterval(()=>{if(nCfg().on)notifSync()},6*36e5);
 {const pl=NP();if(pl){try{pl.addListener('localNotificationActionPerformed',()=>{try{pick(t0)}catch(e){}})}catch(e){}}}

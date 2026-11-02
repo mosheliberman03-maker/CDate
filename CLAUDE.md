@@ -54,7 +54,14 @@ Do not add files named `index (1).html` or similar: only `index.html` is served.
 ## Push server (server/worker.js)
 Endpoints: `GET /vapid` (public key, generated once into KV), `GET /sefaria/<api path>` (Sefaria relay for the shiur reader), `POST /sync`, `/unsub`, `/test`. The cron sends due items (15-minute grace window), uses an `idx` key so each minute costs one KV read, and rebuilds the index every 10 minutes (KV free plan allows about 1000 list calls a day). RFC 8291 encryption was verified against the RFC test vector.
 
+## Native Android wrapper (widget + offline alarms) — `native/`
+A thin Capacitor wrapper so the owner gets a home-screen widget and alarms that ring without Google push (unreliable in China). It is **not** a rewrite: `server.url` in `native/capacitor.config.json` points the WebView at the live GitHub Pages site, so the app always runs the current web app.
+- **Alarms already work through the web app:** `notifSync()` → `NP()` (Capacitor `LocalNotifications`) schedules OS-level notifications with `allowWhileIdle` when `window.Capacitor` is native. No push needed. Packaging it with `@capacitor/local-notifications` is what turns these on.
+- **Widget bridge (web side):** `ccBridge()`/`ccBridgeSoon()` in index.html write a `cc_widget` digest (Hebrew+English date, today's special days, today's tasks) via Capacitor `Preferences` when wrapped; a no-op in a normal browser. Called from `render()` and `notifSync()`. The native widget reads SharedPreferences store `CapacitorStorage` key `cc_widget`. (Widget UI itself = Milestone 2, not built yet.)
+- **Build:** `.github/workflows/build-apk.yml` builds a debug APK on GitHub (push to `native/**` or manual run) and publishes it to the `apk-latest` release so the owner downloads `ChabadCalendar.apk` from a stable link. `native/patch-android.js` adds exact-alarm/boot/notify permissions after `npx cap add android`. The owner can't build locally (phone-only); CI is the only APK source, and its logs are how to debug build failures.
+- appId `com.mosheliberman.cdate`. `native/android/` and `node_modules/` are gitignored (regenerated in CI).
+
 ## Open items / ideas
-- Home-screen **widget** (Hebrew/English date, today's special events, tasks today): not possible from a web app on Android. It needs a native app (an earlier Capacitor project exists outside this repo, untested).
+- Home-screen **widget**: being built via the native wrapper above (see that section). The widget UI itself is the remaining piece.
 - Android web push depends on Google's push service; in mainland China it can be unreliable without a VPN.
 - The owner asked for good haptics and a clean, uncrowded UI. Check visuals at phone width (about 412 px) in light and dark sky themes.

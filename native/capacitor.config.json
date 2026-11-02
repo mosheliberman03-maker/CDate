@@ -1,0 +1,13 @@
+{
+  "appId": "com.mosheliberman.cdate",
+  "appName": "Chabad Calendar",
+  "webDir": "www",
+  "server": {
+    "url": "https://mosheliberman03-maker.github.io/CDate/",
+    "cleartext": false,
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
