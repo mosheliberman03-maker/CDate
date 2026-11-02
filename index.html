@@ -2203,8 +2203,8 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  float spec=pow(lit,5.)*smoothstep(.25,.75,ed);
  vec2 gp=floor(cuv*uCR/(3.*uPx)+uTl*7.);float hs=fract(sin(dot(gp,vec2(12.9898,78.233)))*43758.5453);
  float glint=step(.972,hs)*smoothstep(.15,.6,ed)*(lit+far*.8);
- vec3 col=mix(bg,bg*vec3(.86,.96,1.08)+vec3(.02,.05,.08),.6)*(1.-band*(.1+.34*(1.-uDk)))-vec3(.07,.04,0.)*(1.-uDk)*smoothstep(0.,.5,h);
- col+=uSun*((.16+.3*h)*(.08+.92*uDk)+caus*(.3+.35*uDk)+streak*.8+spec*.8+glint*1.2);
+ vec3 col=mix(bg,bg*vec3(.86,.96,1.08)+vec3(.02,.05,.08),.6)*(1.-band*.44*(1.-uDk))-vec3(.07,.04,0.)*(1.-uDk)*smoothstep(0.,.5,h);
+ col+=uSun*(.03+.33*uDk*smoothstep(0.,.12,a)+caus*(.3-.08*uDk)+streak*.6+spec*.8+glint*1.2);
  col=mix(col,uRim,rim*(.82-.12*uDk));
  gl_FragColor=vec4(col*a,a);}`;
  const sh=(t,src)=>{const o=gl.createShader(t);gl.shaderSource(o,src);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o};
@@ -2635,8 +2635,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=10;
+const CC_VER=11;
 const CC_LOG=[
+ {v:11,new:['The water letters are now evenly full, with no darker stripe down the middle.']},
  {v:10,new:['The water letters are now clear and full: you see the sky through them, light glows and glints inside, and the edges bend the view like a water bottle.','The date scrolls with the rest of the top of the screen again.']},
  {v:9,new:['The big date is now made of water: each letter bends the sky behind it like a full water bottle, and tilting the phone makes the water inside sway a little.','A little more silk in the sky, in every theme.']},
  {v:8,new:['A calmer, glassier big date that stays put while the page scrolls over it, then rises a little and fades.','Evening (and daytime) skies are softer and glassier, like the night sky.','Shiurim and your stats now use the app’s own colors.','To-do lists: fasting, Aneinu, Selichos, Tehillim on Shabbos Mevarchim and lighting the menorah are now reminders, not checkboxes; Al HaNissim, Chanukah gelt and farbrengens are plain notes; Birkas HaChodesh is gone.','Your chavrusas and shiurim no longer have a check box.','Birthday: the aliyah moves to the Monday, Thursday or Shabbos just before (with a reminder the day before), and saying a maamar of the Rebbe replaces the dvar Torah.','The Rebbeim’s yahrzeits show only the customs really kept on each one.','Fixed the event chips sometimes covering the week row.']},
