@@ -532,13 +532,8 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .capi{flex:none;width:19px;height:19px;display:block}
 /* the dates */
 #hdr .hd-he{margin:clamp(20px,3.6vh,36px) 0 0;display:block;text-align:center}
-#hdr .hd-big{font:500 clamp(52px,15.6vw,70px)/1.1 'FRL App','Frank Ruhl Libre','Noto Serif Hebrew App',Georgia,serif;letter-spacing:0;color:var(--dtc);text-shadow:0 -1px 0 rgba(255,255,255,.55),0 1px 0 rgba(26,40,90,.28),0 2px 1px rgba(26,40,90,.22),0 4px 3px rgba(26,40,90,.16),0 11px 20px rgba(36,64,130,.18),0 26px 42px rgba(30,54,120,.26)}
-:root[data-night="1"] #hdr .hd-big{text-shadow:0 1px 0 rgba(120,106,80,.55),0 2px 0 rgba(84,74,56,.5),0 3px 1px rgba(52,46,36,.45),0 5px 10px rgba(4,6,30,.5),0 2px 24px rgba(240,228,212,.14),0 28px 46px rgba(1,2,14,.55)}
-#hdr .hd-d{display:inline-block;rotate:1.5deg}
-#hdr .hd-m{display:inline-block;rotate:-1.4deg}
-#hdr .hd-en{display:inline-block;rotate:-.8deg}
-#hdr .hd-div{rotate:.6deg}
-@media(prefers-reduced-motion:reduce){#hdr .hd-d,#hdr .hd-m,#hdr .hd-en,#hdr .hd-div{rotate:0deg}}
+#hdr .hd-big{font:500 clamp(52px,15.6vw,70px)/1.1 'FRL App','Frank Ruhl Libre','Noto Serif Hebrew App',Georgia,serif;letter-spacing:0;color:var(--dtc);text-shadow:0 13px 28px rgba(30,54,120,.28)}
+:root[data-night="1"] #hdr .hd-big{text-shadow:0 15px 32px rgba(1,2,14,.55)}
 /* very slight buoyancy so the date feels suspended, not static (barely noticeable on first glance) */
 @keyframes buoy{0%,100%{translate:0 .6px;rotate:-.5deg}50%{translate:0 -4.6px;rotate:.55deg}}
 #hdr .hd-big{animation:buoy 6.4s ease-in-out infinite;transform-origin:50% 60%}
@@ -2470,7 +2465,7 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
 const CC_VER=6;
 const CC_LOG=[
- {v:6,new:['The big Hebrew date now has real depth — carved/raised shadows, a soft shadow so it floats above the sky, a barely-there tilt, and a very slight buoyant drift so it feels suspended rather than flat.']},
+ {v:6,new:['The big Hebrew date now has a soft shadow so it floats above the sky, with a very slight buoyant drift so it feels suspended rather than flat.']},
  {v:5,new:['Fixed reminders like “set a reminder for an hour before” — it now sets the reminder correctly instead of mangling the title.','Fixed the event chips sometimes overlapping the week row on the home screen.','A few more silky waves in the daytime sky.']},
  {v:4,new:['Birthday & yahrzeit customs are now a checklist you can tick off — and your ticks stay saved.','Confetti now pops only on YOUR birthday, and every time you open that day.','The planner now understands Hebrew dates spelled out in words, like “chof aleph sivan” (21 Sivan).','The daytime sky waves are a little more visible.','The app and browser icon is now the aleph logo.']},
  {v:3,new:['Add your birthdays and yahrzeits — just tell the planner (“Zaidy’s yahrzeit 3 Tishrei”, “my birthday 15 Nissan”). A birthday pops confetti when you open that day; a yahrzeit shows a lit candle. Both now show the Chabad customs for the day.']},
