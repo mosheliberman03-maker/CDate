@@ -2202,11 +2202,11 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  /* the bubble: a few particles (moved by the script) blended into one soft blob, only where the water is deep enough, so it bends to the letter */
  int gi=int(floor(m.b*255.+.5));vec2 px=cuv*uCR;float f=0.;
  if(gi>0){for(int i=0;i<${NP*NG/2};i++){vec4 P=uP[i];float lg=floor(float(i*2)/${NP}.)+1.;if(int(lg)==gi){vec2 d1=px-P.xy,d2=px-P.zw;f+=exp(-dot(d1,d1)/uSg)+exp(-dot(d2,d2)/uSg);}}}
- float sd=min((f-2.2)*.5,(h-.9)*7.);float bub=smoothstep(-.03,.05,sd)*step(.5,a),ring=exp(-pow(sd/.06,2.))*smoothstep(.3,.7,a)*step(.5,f);
+ float sd=min((f-2.2)*.5,(h-.9)*7.);float bub=smoothstep(-.06,.1,sd)*step(.5,a),ring=exp(-pow(sd/.1,2.))*smoothstep(.3,.7,a)*smoothstep(.3,.8,f);
  vec2 cn=vec2(0.);for(int i=1;i<${NG+1};i++){if(i==gi)cn=uCn[i];}
  vec2 bd=normalize(px-cn+1e-4);float rl=max(dot(bd,normalize(uLd)),0.);
  col=mix(col,sky(vp+n.xy*uRef*.25,3.)*1.08+uSun*.03,bub);
- col+=uSun*min(ring*(.25+1.1*rl*rl),.55);col=mix(col,col*.72,ring*(1.-rl)*.6);
+ col+=uSun*min(ring*(.1+.5*rl*rl),.26);col=mix(col,col*.86,ring*(1.-rl)*.45);
  /* the letter itself: only a very thin outline */
  float ol=smoothstep(.04,.3,m.a)*(1.-smoothstep(.55,.95,m.a));col=mix(col,uRim,ol*(.85-.15*uDk));
  gl_FragColor=vec4(col*a,a);}`;
@@ -2672,8 +2672,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=18;
+const CC_VER=19;
 const CC_LOG=[
+ {v:19,new:['Softer bubble edges in the water letters.']},
  {v:18,new:['The bubbles in the water letters now prefer the middle of each letter: they rest in its thickest part, away from the walls, and drift back there when you level the phone.']},
  {v:17,new:['Much bigger bubbles in the water letters: each one fills a good part of its stroke, keeps its own rim just inside the letter’s wall, and flows along the letter as you tilt.']},
  {v:16,new:['Each water letter now has a small clear air bubble, like in a water bottle. Tilt the phone and it rolls to the higher side, following the letter’s shape and flattening against its walls.']},
