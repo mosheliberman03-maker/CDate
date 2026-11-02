@@ -2218,7 +2218,7 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  gl.uniform4fv(U.uA,GLS.R[0]);gl.uniform4fv(U.uB,GLS.R[1]);gl.uniform4fv(U.uC,GLS.R[2]);gl.uniform1f(U.uS,0);gl.uniform1i(U.uM,0);
  const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);for(const[k,v]of[[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,v);
  const hx=c=>{const m=/#?([0-9a-f]{6})/i.exec(c||'');if(!m)return[0,0,0];const n=parseInt(m[1],16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]};
- const PAD=16;let BA=90,BBL=[],DEP=null,GID=null,dlFs=60,dpr0=1,W=0,H=0,ok=false,key='',tl=[0,0],tv=[0,0],tg=[0,0],traf=0;
+ const PAD=16;let CEN=null,BBL=[],DEP=null,GID=null,dlFs=60,dpr0=1,W=0,H=0,ok=false,key='',tl=[0,0],tv=[0,0],tg=[0,0],traf=0;
  const PB=new Float32Array(NP*NG*2),CN=new Float32Array((NG+1)*2);
  const off=()=>R.classList.contains('tt-off-waterdate')||RM;
  /* the letter shapes: each character drawn from the real text (same font, size and place) */
@@ -2235,12 +2235,12 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
     G.push({ch,font:a.font,x:xr,y:ty,lw:a.lineWidth,b:[xr-(cm.actualBoundingBoxLeft||cm.width)-lw,ty-(cm.actualBoundingBoxAscent||fs*.7)-lw,xr+(cm.actualBoundingBoxRight||0)+lw,ty+(cm.actualBoundingBoxDescent||0)+lw]});xr-=cm.width}}
   const blur=(r)=>{const c=mk(),x=c.getContext('2d');x.filter='blur('+r.toFixed(2)+'px)';x.drawImage(A,0,0);return x.getImageData(0,0,W,H).data};
   const da=a.getImageData(0,0,W,H).data,db=blur(fs*dpr*.07),ds=blur(Math.max(.6,dpr*.55)),o=new Uint8Array(W*H*4);DEP=new Uint8Array(W*H);GID=new Uint8Array(W*H);
-  for(let i=0,p=0;i<da.length;i+=4,p++){o[i]=da[i+3];const dv=Math.min(255,db[i+3]*1.6);o[i+1]=dv;DEP[p]=dv;o[i+2]=0;o[i+3]=ds[i+3]}
+  const dc=blur(fs*dpr*.11);CEN=new Uint8Array(W*H);for(let i=0,p=0;i<da.length;i+=4,p++){o[i]=da[i+3];const dv=Math.min(255,db[i+3]*1.6);o[i+1]=dv;DEP[p]=dv;CEN[p]=dc[i+3];o[i+2]=0;o[i+3]=ds[i+3]}
   /* which letter each pixel belongs to, and where its bubble rests (the deepest point of that letter) */
   const C=mk(),c=C.getContext('2d');let gid=0;BBL=[];for(const g of G){gid++;if(gid>NG)break;c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,W,H);c.scale(dpr,dpr);c.font=g.font;c.textAlign='right';c.textBaseline='alphabetic';c.fillStyle=c.strokeStyle='#fff';c.lineJoin='round';c.lineWidth=g.lw;c.strokeText(g.ch,g.x,g.y);c.fillText(g.ch,g.x,g.y);
    const x0=Math.max(0,Math.floor(g.b[0]*dpr)),y0=Math.max(0,Math.floor(g.b[1]*dpr)),x1=Math.min(W,Math.ceil(g.b[2]*dpr)),y1=Math.min(H,Math.ceil(g.b[3]*dpr)),bw=x1-x0,bh=y1-y0;if(bw<=0||bh<=0)continue;
    const d=c.getImageData(x0,y0,bw,bh).data;let bv=-1,sx=0,sy=0,sn=0;for(let yy=0;yy<bh;yy++)for(let xx=0;xx<bw;xx++){if(d[(yy*bw+xx)*4+3]<60)continue;const pi=(y0+yy)*W+x0+xx;o[pi*4+2]=gid;GID[pi]=gid;if(DEP[pi]>bv)bv=DEP[pi];sx+=x0+xx;sy+=y0+yy;sn++}
-   if(bv<40||!sn)continue;let bx=0,by=0,bd=1e18;sx/=sn;sy/=sn;for(let yy=0;yy<bh;yy+=2)for(let xx=0;xx<bw;xx+=2){const pi=(y0+yy)*W+x0+xx;if(GID[pi]!==gid||DEP[pi]<bv*.8)continue;const dd=(x0+xx-sx)**2+(y0+yy-sy)**2;if(dd<bd){bd=dd;bx=x0+xx;by=y0+yy}}const r0=fs*dpr*.12,P=[];for(let q=0;q<NP;q++){const an=q/NP*6.283;P.push({x:bx+Math.cos(an)*r0,y:by+Math.sin(an)*r0*.7,vx:0,vy:0})}
+   if(bv<40||!sn)continue;let bx=0,by=0,bd=-1;sx/=sn;sy/=sn;for(let yy=0;yy<bh;yy+=2)for(let xx=0;xx<bw;xx+=2){const pi=(y0+yy)*W+x0+xx;if(GID[pi]!==gid||DEP[pi]<bv*.8)continue;const v=CEN[pi]-Math.hypot(x0+xx-sx,y0+yy-sy)*.05;if(v>bd){bd=v;bx=x0+xx;by=y0+yy}}const r0=fs*dpr*.12,P=[];for(let q=0;q<NP;q++){const an=q/NP*6.283;P.push({x:bx+Math.cos(an)*r0,y:by+Math.sin(an)*r0*.7,vx:0,vy:0})}
    BBL[gid]={rx:bx,ry:by,mx:bv,P,r0}}
   gl.bindTexture(gl.TEXTURE_2D,tex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,W,H,0,gl.RGBA,gl.UNSIGNED_BYTE,o);gl.uniform1f(U.uNk,fs*dpr*.09);dlFs=fs;ok=true;
   const sg=fs*dpr*.15;gl.uniform1f(U.uSg,sg*sg);pack();if(!R.classList.contains('cc-wl'))R.classList.add('cc-wl');draw();kick()}
@@ -2249,10 +2249,11 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  /* the bubble's physics: buoyancy toward the higher side, a soft pull back to its resting place, surface tension keeping it one blob,
     and the letter's walls (it may only sit where the water is deep enough; at a wall it slides along it and squeezes into the shape) */
  const dep=(x,y,g)=>{const xi=x|0,yi=y|0;if(xi<1||yi<1||xi>=W-1||yi>=H-1)return 0;const pi=yi*W+xi;return GID[pi]===g?DEP[pi]:0};
- function sim(dt){let mv=false;const S=dlFs*dpr0,top=R.classList.contains('tt-on-bubtop'),fx=-tl[0]*S*9,fy=top?-S*9*Math.max(0,Math.min(1,Math.sin(BA*Math.PI/180))):-tl[1]*S*9,ka=top?1.5:7;
+ function sim(dt){let mv=false;const S=dlFs*dpr0,fx=-tl[0]*S*7,fy=-tl[1]*S*7,ka=5;
   for(let g=1;g<=NG;g++){const b=BBL[g];if(!b)continue;let cx=0,cy=0;for(const p of b.P){cx+=p.x;cy+=p.y}cx/=NP;cy/=NP;
    const lim=b.mx*.3;
-   for(const p of b.P){let ax=fx+(b.rx-cx)*ka+(cx-p.x)*40,ay=fy+(b.ry-cy)*ka+(cy-p.y)*40;
+   for(const p of b.P){const xi=p.x|0,yi=p.y|0,ok2=xi>3&&yi>3&&xi<W-4&&yi<H-4,cg=ok2?[(CEN[yi*W+xi+3]-CEN[yi*W+xi-3])/6,(CEN[(yi+3)*W+xi]-CEN[(yi-3)*W+xi])/6]:[0,0];
+    let ax=fx+(b.rx-cx)*ka+(cx-p.x)*40+cg[0]*S*3.2,ay=fy+(b.ry-cy)*ka+(cy-p.y)*40+cg[1]*S*3.2;
     for(const o of b.P){if(o===p)continue;const dx=p.x-o.x,dy=p.y-o.y,dd=Math.hypot(dx,dy)||1e-3,mn=b.r0*1.05;if(dd<mn){ax+=dx/dd*(mn-dd)*240;ay+=dy/dd*(mn-dd)*240}}
     p.vx=(p.vx+ax*dt)*Math.exp(-5.5*dt);p.vy=(p.vy+ay*dt)*Math.exp(-5.5*dt);let nx=p.x+p.vx*dt,ny=p.y+p.vy*dt;
     /* walls: if the new spot is too shallow, step back up the depth slope */
@@ -2274,7 +2275,7 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  /* the bubble settles: once nothing new happens it stops drawing within a few seconds (no endless jitter against a wall) */
  let kT=0;const kick=()=>{kT=performance.now();if(!traf)traf=requestAnimationFrame(step)};
  /* gamma: tilt right -> bubble goes left. beta (from how the phone is normally held): top tipped down/forward -> bubble goes down */
- let bB=null;addEventListener('deviceorientation',e=>{if(e.gamma==null||!ok)return;const be=e.beta==null?45:e.beta;bB=bB==null?be:bB+(be-bB)*.025;const bo=BA;BA=Math.abs(be);if(Math.abs(bo-BA)>1)kick();const gx=Math.max(-1,Math.min(1,e.gamma/30)),gy=Math.max(-1,Math.min(1,(be-bB)/25));
+ let bB=null;addEventListener('deviceorientation',e=>{if(e.gamma==null||!ok)return;const be=e.beta==null?45:e.beta;bB=bB==null?be:bB+(be-bB)*.025;const gx=Math.max(-1,Math.min(1,e.gamma/30)),gy=Math.max(-1,Math.min(1,(be-bB)/25));
   if(Math.abs(gx-tg[0])+Math.abs(gy-tg[1])<.01)return;tg=[gx,gy];kick()},{passive:true});
  /* iPhone: Safari needs a tap before a website may read the tilt sensor; ask once, on the first tap */
  if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function'){const ask=()=>{removeEventListener('touchend',ask,true);removeEventListener('click',ask,true);try{DeviceOrientationEvent.requestPermission().catch(()=>{})}catch(e){}};addEventListener('touchend',ask,true);addEventListener('click',ask,true)}
@@ -2671,8 +2672,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=17;
+const CC_VER=18;
 const CC_LOG=[
+ {v:18,new:['The bubbles in the water letters now prefer the middle of each letter: they rest in its thickest part, away from the walls, and drift back there when you level the phone.']},
  {v:17,new:['Much bigger bubbles in the water letters: each one fills a good part of its stroke, keeps its own rim just inside the letter’s wall, and flows along the letter as you tilt.']},
  {v:16,new:['Each water letter now has a small clear air bubble, like in a water bottle. Tilt the phone and it rolls to the higher side, following the letter’s shape and flattening against its walls.']},
  {v:16,new:['The date letters are now clear water inside a thin outline, with a small clear air bubble in each letter. Tilt the phone and the bubble flows to the higher side and flattens against the letter’s walls; the light shifts as you tilt.']},
@@ -3869,7 +3871,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['bubtop','Trying out: the bubble rises to the top of the phone (not the screen face)',1],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id,,opt]of FLAGS){if(opt)document.documentElement.classList.toggle('tt-on-'+id,f[id]===true);else document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)}};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{const opt=(FLAGS.find(x=>x[0]===c.dataset.f)||[])[2];c.checked=opt?fl()[c.dataset.f]===true:fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
