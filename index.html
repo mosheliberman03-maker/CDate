@@ -532,13 +532,19 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .capi{flex:none;width:19px;height:19px;display:block}
 /* the dates */
 #hdr .hd-he{margin:clamp(20px,3.6vh,36px) 0 0;display:block;text-align:center}
-#hdr .hd-big{font:500 clamp(52px,15.6vw,70px)/1.1 'FRL App','Frank Ruhl Libre','Noto Serif Hebrew App',Georgia,serif;letter-spacing:0;color:var(--dtc);text-shadow:0 13px 28px rgba(30,54,120,.28)}
-:root[data-night="1"] #hdr .hd-big{text-shadow:0 15px 32px rgba(1,2,14,.55)}
-/* very slight buoyancy so the date feels suspended, not static (barely noticeable on first glance) */
-@keyframes buoy{0%,100%{translate:0 .6px;rotate:-.5deg}50%{translate:0 -4.6px;rotate:.55deg}}
-#hdr .hd-big{animation:buoy 6.4s ease-in-out infinite;transform-origin:50% 60%}
-.cc-away #hdr .hd-big{animation-play-state:paused}
-@media(prefers-reduced-motion:reduce){#hdr .hd-big{animation:none}}
+#hdr .hd-big{font:500 clamp(52px,15.6vw,70px)/1.1 'FRL App','Frank Ruhl Libre','Noto Serif Hebrew App',Georgia,serif;letter-spacing:0;color:var(--dtc);
+ /* solid 3D blocks that stick out of the wall behind: a deep extrusion toward the light's lower-right, then a soft contact shadow where the blocks meet the wall */
+ text-shadow:1px 1px 0 #555c92,2px 2px 0 #52598e,3px 3px 0 #4f568a,4px 4px 0 #4d5386,5px 5px 0 #4a5082,6px 6px 0 #474e7e,7px 7px 0 #444b7a,8px 8px 0 #424876,9px 9px 0 #3f4572,10px 10px 0 #3c426d,11px 11px 0 #393f69,12px 12px 0 #373c65,13px 13px 0 #343961,14px 14px 0 #31375d,15px 15px 0 #2e3459,16px 16px 0 #2c3155,17px 17px 0 #292e51,18px 18px 0 #262b4d,20px 24px 2px rgba(40,60,120,.26),24px 34px 26px rgba(40,60,120,.3)}
+:root[data-night="1"] #hdr .hd-big{text-shadow:1px 1px 0 #bdb7a4,2px 2px 0 #b3ae9d,3px 3px 0 #aaa596,4px 4px 0 #a09c90,5px 5px 0 #979389,6px 6px 0 #8d8a82,7px 7px 0 #84817b,8px 8px 0 #7a7874,9px 9px 0 #716f6d,10px 10px 0 #676667,11px 11px 0 #5e5d60,12px 12px 0 #545459,13px 13px 0 #4b4b52,14px 14px 0 #41424b,15px 15px 0 #383944,16px 16px 0 #2e303e,17px 17px 0 #252737,18px 18px 0 #1b1e30,20px 24px 2px rgba(2,3,12,.5),24px 34px 26px rgba(1,2,9,.55)}
+/* The date is mounted on the back "wall": it keeps its place (slow parallax) while the week panel, chips and cards slide up and over it, and it fades only once they start covering it. Opacity is driven per-layer (not on #hdr as a whole) so the date can stay solid after the rest has faded. */
+#hdr .hd-he{opacity:var(--dateFade,1);transform:translateY(var(--dateY,0px));transform-origin:50% 50%;position:relative;z-index:0;pointer-events:none;will-change:transform,opacity}
+#hdr .sky-scene,#hdr .sky-cap2,#hdr .hd-div,#hdr .hd-en,#hdr .wk{opacity:var(--hdrFade,1)}
+#hdr .sky-cap2,#hdr .hd-div,#hdr .hd-en{position:relative;z-index:1}
+#hdr .wk{z-index:2}
+/* Test tools: turn the 3D blocks + wall behaviour off (back to a flat date that fades with the header) */
+:root.tt-off-block3d #hdr .hd-big{text-shadow:0 13px 28px rgba(30,54,120,.28)}
+:root[data-night="1"].tt-off-block3d #hdr .hd-big{text-shadow:0 15px 32px rgba(1,2,14,.55)}
+:root.tt-off-block3d #hdr .hd-he{opacity:var(--hdrFade,1);transform:none;z-index:auto}
 .hd-div{display:flex;align-items:center;justify-content:center;gap:12px;width:min(84vw,340px);margin:clamp(8px,1.6vh,14px) auto 0}
 .hd-div i{flex:1;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--dtc) 46%,transparent))}
 .hd-div i:last-child{background:linear-gradient(270deg,transparent,color-mix(in srgb,var(--dtc) 46%,transparent))}
@@ -673,6 +679,8 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 </style>
 </head><body>
 <div id="sky" hidden><div id="skyGrad"></div><div id="skyNight"></div><div id="stars"></div><div id="skyWaves" aria-hidden="true"></div></div>
+<div class="account-shade" id="permGate" role="dialog" aria-modal="true" style="display:none"><div class="account-card"><h1>Welcome to Chabad Calendar</h1><p>To use the app, we need to access your location and microphone for calendar features.</p><div id="permStatus" style="margin:16px 0;font-size:14px;color:#888"></div><div class="account-buttons"><button id="permRequest" class="ai-yes" type="button">Grant Permissions</button><button id="permSkip" class="alt" type="button">Later</button></div></div></div>
+<div class="account-shade" id="betaGate" role="dialog" aria-modal="true" style="display:none;background:rgba(10,11,16,.94);pointer-events:all" onclick="event.stopPropagation()"><div class="account-card" style="max-width:340px;pointer-events:auto"><div style="text-align:center;margin-bottom:20px"><h1 style="margin:0 0 4px;font-size:28px">Thank you for beta testing!</h1></div><p style="color:#aaa;font-size:14px;margin:12px 0">The Chabad Calendar works best as an app. It gives you smooth offline performance, home-screen widget, and alarms that actually ring without internet.</p><div style="margin:24px 0"><button id="betaDownload" class="ai-yes" type="button" style="width:100%;padding:14px 16px;font-size:16px">Install the App</button></div><p style="color:#888;font-size:13px;text-align:center;line-height:1.5;margin-top:20px">The web version here is for development testing only. Please use the app for daily use.</p></div></div>
 <div class="account-shade" id="accountGate" role="dialog" aria-modal="true" aria-labelledby="accountTitle"><form class="account-card" id="accountForm"><h1 id="accountTitle">Your Chabad Calendar</h1><p id="accountSub">Sign in or create a private profile for this device.</p><label for="accountUser">Username</label><input id="accountUser" autocomplete="username" minlength="3" maxlength="32" required placeholder="Choose a username"><label for="accountPass">Password</label><input id="accountPass" type="password" autocomplete="current-password" minlength="4" required placeholder="At least 4 characters"><div class="account-buttons"><button id="accountSubmit" type="submit">Log in</button><button id="accountMode" class="alt" type="button">Create account</button></div><div class="account-error" id="accountError" role="status"></div><p class="account-note">Your profile and schedule stay in this browser on this device. This is not a cloud account: another person or device has separate data, and your schedule will not sync between devices. This simple offline lock is not suitable for sensitive information.</p></form></div>
 <div id="intro"><svg id="in-logo" viewBox="95 85 770 675" role="img" aria-label="Logo">
   <defs><linearGradient id="in-fade" gradientUnits="userSpaceOnUse" x1="556" y1="536" x2="548" y2="590"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient></defs>
@@ -1640,7 +1648,10 @@ function sc(){tk=0;const y=scrollY,vh=innerHeight||700,cl=v=>Math.min(1,Math.max
  cbar.classList.toggle('on',y>120);if(cbar.getAttribute('aria-hidden')!==String(y<=120))cbar.setAttribute('aria-hidden',y<=120);document.documentElement.classList.toggle('cc-away',y>vh*.9);
  const pd=cl(y/(vh*.42)),pf=cl((y-vh*.03)/(vh*.4)),ph=cl(y/(vh*.1));
  foot.classList.toggle('gone',pf>=1);hint.classList.toggle('gone',ph>=1);
- if(!RM){hdr.style.transform=`translateY(${-pd*34}px) scale(${1-.09*pd})`;hdr.style.opacity=Math.max(0,1-1.1*pd);
+ if(!RM){hdr.style.transform=`translateY(${-pd*34}px) scale(${1-.09*pd})`;
+  hdr.style.setProperty('--hdrFade',String(Math.max(0,1-1.1*pd)));
+  // the date stays on the wall (slow parallax) and only fades once the foreground has risen to cover it
+  const dpf=cl((y-vh*.2)/(vh*.28));hdr.style.setProperty('--dateFade',String(1-dpf));hdr.style.setProperty('--dateY',Math.min(y*.5,vh*.55).toFixed(1)+'px');
   foot.style.opacity=1-pf;
   hint.style.opacity=1-ph;$('#gh').style.transform=`translateY(${y*.16}px)`}
  else{foot.style.opacity=pf>=1?0:1;hint.style.opacity=ph>=1?0:1}
@@ -2494,8 +2505,10 @@ function ccWhatsNew(sv){let seen=0;try{seen=+localStorage.getItem(sv)||0}catch(e
  const picked=seen===0?fresh.slice(-1):fresh;      /* first time tracking: show the latest only, not a backlog */
  const items=[];let tour=null;for(const e of picked){(e.new||[]).forEach(i=>items.push(i));if(e.tour)tour=e.tour}
  if(!items.length&&!tour)return;setTimeout(()=>ccNewsPopup(items,tour),500);}
+/* For native app first-run tour: find a real day (next ~40 days) with good calendar features to demo */
+function findDemoDay(){try{for(let i=0;i<40;i++){const d=ad(t0,i),inf=info(d);if(inf.ev&&inf.ev.length>=2)return d}}catch(e){}return t0}
 // First-run guided tour (see ccTourStart). Also hooks up profile name / log out.
-(function(){const u=localStorage.getItem('cc_local_active_profile_v1');if(!u)return;const name=document.getElementById('profileName');if(name)name.textContent=u;const gate=document.getElementById('accountGate');if(gate)gate.style.display='none';const key='cc_local_tour_done_'+u,sv='cc_seen_ver_'+u;function waitForIntro(){if(document.getElementById('intro')){setTimeout(waitForIntro,180);return}if(!localStorage.getItem(key)){try{localStorage.setItem(sv,String(CC_VER))}catch(e){}setTimeout(()=>ccTourStart(key),700)}else ccWhatsNew(sv)}waitForIntro();
+(function(){const u=localStorage.getItem('cc_local_active_profile_v1');if(!u)return;const name=document.getElementById('profileName');if(name)name.textContent=u;const gate=document.getElementById('accountGate');if(gate)gate.style.display='none';const key='cc_local_tour_done_'+u,sv='cc_seen_ver_'+u;function waitForIntro(){if(document.getElementById('intro')){setTimeout(waitForIntro,180);return}if(!localStorage.getItem(key)){try{localStorage.setItem(sv,String(CC_VER))}catch(e){}if(CC_NATIVE){const demoDay=findDemoDay();if(demoDay){window.tourDemoDay=demoDay;sel=demoDay;upd()}setTimeout(()=>ccTourStart(key),1200)}else{setTimeout(()=>ccTourStart(key),700)}}else ccWhatsNew(sv)}waitForIntro();
 const rp=document.getElementById('tourReplay');if(rp)rp.addEventListener('click',()=>{op(false);setTimeout(()=>ccTourStart(key,true),450)});
 
 /* ===== The native app, controlled only through the web app =====
@@ -2518,6 +2531,19 @@ function appShow(){let o=document.getElementById('appBox');
  }
  requestAnimationFrame(()=>o.classList.add('on'));H.tap&&H.tap()}
 function CC_LOGGED(){const g=document.getElementById('accountGate');return !g||getComputedStyle(g).display==='none'}
+/* Request location and microphone permissions in the native app before login (one-time) */
+let permissionsRequested=false;
+async function requestAppPermissions(){if(!CC_NATIVE||CC_LOGGED()||permissionsRequested)return;
+ permissionsRequested=true;try{const C=window.Capacitor;
+  if(!C)return;const {Geolocation}=await import('@capacitor/geolocation');
+  const permGate=$('permGate'),permStatus=$('permStatus'),permRequest=$('permRequest'),permSkip=$('permSkip');
+  if(!permGate)return;permGate.style.display='flex';
+  permRequest.onclick=async()=>{try{permStatus.innerHTML='<b>Requesting permissions…</b>';
+   const r1=await Geolocation.requestPermissions();
+   const loc=r1.location!=='denied'?'✓ Location' :'✗ Location';permStatus.innerHTML=loc+' · Trying microphone…';
+   // Microphone permission is handled by browser on Android; just continue
+   permStatus.innerHTML=loc+' · Ready!';setTimeout(()=>{permGate.style.display='none';permissionsRequested=false},600)}catch(e){permStatus.innerHTML='Permission request failed: '+e.message}};
+  permSkip.onclick=()=>{permGate.style.display='none'}}}catch(e){}}
 function appSync(){const el=document.getElementById('appSec'),h=document.getElementById('appH');if(!el)return;
  if(CC_NATIVE){el.innerHTML='<p class="mut" style="font-size:14px;margin:4px 0 0">✓ You’re using the app. Your reminders here ring as alarms on this phone, even offline.</p>';return}
  if(ccAndroid){el.innerHTML='<button class="btn" type="button" id="appGet">Download the app</button><p class="mut" style="font-size:13px;margin:8px 0 0">Adds offline alarms (no VPN needed) and a home-screen widget. You still control everything from here.</p>';
@@ -2526,6 +2552,8 @@ function appSync(){const el=document.getElementById('appSec'),h=document.getElem
 /* offer the app the first time each profile signs in (Android browser only) */
 function appFirstRun(){try{if(CC_NATIVE||!ccAndroid||!CC_LOGGED())return;if(localStorage.getItem(AK('cc_app_seen')))return;
  localStorage.setItem(AK('cc_app_seen'),'1');setTimeout(appShow,1400)}catch(e){}}
+if(!CC_NATIVE&&ccAndroid){setTimeout(()=>{const bg=$('betaGate');if(bg){bg.style.display='flex';const btn=$('betaDownload');if(btn)btn.onclick=()=>{window.location.href=APK_URL}}},500)}
+if(CC_NATIVE&&!CC_LOGGED())setTimeout(requestAppPermissions,300);
 appSync();appFirstRun();
 
 const lo=document.createElement('div');lo.id='loBox';lo.setAttribute('aria-hidden','true');lo.innerHTML='<div class="lo-card" role="alertdialog" aria-modal="true" aria-labelledby="loT"><h2 id="loT">Log out?</h2><p>Your schedule stays saved on this device. Log back in with your password to see it again.</p><div class="lo-b"><button type="button" id="loNo">Stay signed in</button><button type="button" id="loYes">Log out</button></div></div>';document.body.appendChild(lo);
@@ -2607,7 +2635,7 @@ function ccTourStart(key,replay,which){
   }catch(e){if(e!=='x')console.error(e)}finally{if(t===run)busy=false}}
  function finish(){if(!alive)return;alive=false;run++;try{const o=steps[idx];o&&o.leave&&o.leave()}catch(e){}
   try{localStorage.setItem(key,'1')}catch(e){}
-  root.classList.add('out');cancelAnimationFrame(raf);setTimeout(()=>{document.documentElement.classList.remove('tour-on');root.remove();scrollTo({top:0,behavior:reduce?'auto':'smooth'})},reduce?0:380)}
+  root.classList.add('out');cancelAnimationFrame(raf);setTimeout(()=>{document.documentElement.classList.remove('tour-on');root.remove();if(CC_NATIVE&&window.tourDemoDay&&sel!==t0){sel=t0;upd()}scrollTo({top:0,behavior:reduce?'auto':'smooth'})},reduce?0:380)}
  q('#tgNext').addEventListener('click',()=>{H.tap();if(steps[idx].last)finish();else{run++;busy=false;go(idx+1)}});
  q('#tgSkip').addEventListener('click',()=>{H.tap();finish()});
  addEventListener('keydown',function k(e){if(!alive){removeEventListener('keydown',k);return}if(e.key==='Escape')finish();else if(e.key==='ArrowRight'||e.key==='Enter'){e.preventDefault();q('#tgNext').click()}},true);
@@ -3685,7 +3713,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll'],['remmatch','Attach “remind me” requests to a matching event']];
+ const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll'],['remmatch','Attach “remind me” requests to a matching event'],['block3d','3D block date mounted on the wall']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id]of FLAGS)document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
