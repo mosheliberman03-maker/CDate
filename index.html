@@ -2608,6 +2608,11 @@ const AI_HMONTHS=[
  ['iyar|iyyar|iyor','I','Iyar'],['sivan|sivon','Si','Sivan'],['tammuz|tamuz|tamus|tammus','Ta','Tammuz'],
  ['menachem\\s*-?\\s*av|av','Av','Av'],['elul','E','Elul']];
 const AI_HMONTH_RE='(?:'+AI_HMONTHS.map(m=>m[0]).join('|')+')';
+// Hebrew day numbers spelled out (gematria words): "chof aleph" = 21, "yud" = 10, "tes vav" = 15 ...
+const AI_HLET={aleph:1,alef:1,beis:2,bais:2,beit:2,bet:2,beth:2,gimmel:3,gimel:3,daled:4,dalet:4,daleth:4,hei:5,hey:5,heh:5,vov:6,vav:6,vuv:6,zayin:7,zoyin:7,ches:8,chet:8,cheis:8,het:8,tes:9,tet:9,teis:9,yud:10,yod:10,yid:10,chof:20,chaf:20,kaf:20,kof:20,lamed:30};
+const AI_HLET_RE='(?:'+Object.keys(AI_HLET).sort((a,b)=>b.length-a.length).join('|')+')';
+const AI_HDAY_RE='(?:'+AI_HLET_RE+'(?:[\\s-]+'+AI_HLET_RE+')?)';
+function aiHDayVal(t){let n=0;for(const w of String(t).toLowerCase().split(/[\s-]+/))n+=AI_HLET[w]||0;return n}
 const AI_HMONTH_HE=[['תשרי','Ti','Tishrei'],['חשון|מרחשון','Ch','Cheshvan'],['כסלו','Ki','Kislev'],['טבת','Te','Teves'],['שבט','Sh','Shevat'],['אדר\\s*א[׳\']?','AI','Adar I'],['אדר\\s*ב[׳\']?','A','Adar'],['אדר','A','Adar'],['ניסן','N','Nissan'],['אייר','I','Iyar'],['סיון|סיוון','Si','Sivan'],['תמוז','Ta','Tammuz'],['אב','Av','Av'],['אלול','E','Elul']];
 // Well-known Chabad / Jewish dates people name instead of giving a number: [regex, label, monthKey, day]
 const AI_NAMED=[
@@ -2714,6 +2719,11 @@ function aiParseDate(str,today){
  if(m=new RegExp('\\b(?:the\\s+)?(\\d{1,2})(?:st|nd|rd|th)?\\s+(?:day\\s+)?(?:of\\s+)?('+AI_HMONTH_RE+')\\b','i').exec(str)){const mk=aiHebKey(m[2]),dn=+m[1];
   if(mk&&dn>=1&&dn<=30){const r=stripDow(m);return{info:{kind:'heb',hk:mk[0],hdn:dn,label:dn+' '+mk[1],date:aiNextHebrew(mk[0],dn,today),weekday:r.wd},rest:r.rest}}}
  if(m=new RegExp('\\b('+AI_HMONTH_RE+')\\s+(?:the\\s+)?(\\d{1,2})(?:st|nd|rd|th)?\\b(?!\\s*(?:chapters?|pages?|minutes?|hours?|days?|am\\b|pm\\b|:))','i').exec(str)){const mk=aiHebKey(m[1]),dn=+m[2];
+  if(mk&&dn>=1&&dn<=30){const r=stripDow(m);return{info:{kind:'heb',hk:mk[0],hdn:dn,label:dn+' '+mk[1],date:aiNextHebrew(mk[0],dn,today),weekday:r.wd},rest:r.rest}}}
+ // 4b. Hebrew month with a gematria-WORD day ("chof aleph sivan", "sivan chof aleph")
+ if(m=new RegExp('\\b('+AI_HDAY_RE+')\\s+(?:of\\s+)?('+AI_HMONTH_RE+')\\b','i').exec(str)){const mk=aiHebKey(m[2]),dn=aiHDayVal(m[1]);
+  if(mk&&dn>=1&&dn<=30){const r=stripDow(m);return{info:{kind:'heb',hk:mk[0],hdn:dn,label:dn+' '+mk[1],date:aiNextHebrew(mk[0],dn,today),weekday:r.wd},rest:r.rest}}}
+ if(m=new RegExp('\\b('+AI_HMONTH_RE+')\\s+(?:the\\s+)?('+AI_HDAY_RE+')\\b','i').exec(str)){const mk=aiHebKey(m[1]),dn=aiHDayVal(m[2]);
   if(mk&&dn>=1&&dn<=30){const r=stripDow(m);return{info:{kind:'heb',hk:mk[0],hdn:dn,label:dn+' '+mk[1],date:aiNextHebrew(mk[0],dn,today),weekday:r.wd},rest:r.rest}}}
  // 5. Gregorian month name
  {const mon=s=>{s=s.toLowerCase().replace(/\./g,'');const i=AI_MONTHS_EN.indexOf(s);return i>=0?i:AI_MONTH_ABBR[s]};
