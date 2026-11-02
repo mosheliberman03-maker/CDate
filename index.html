@@ -2183,7 +2183,7 @@ vec4 silk(vec2 p,float px){
 (function(){if(!GLS.ok||!GLS.SILK)return;
  const R=document.documentElement,cv=document.createElement('canvas');cv.id='dlCv';cv.className='dl-cv';cv.setAttribute('aria-hidden','true');
  const gl=cv.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:false,depth:false,stencil:false});if(!gl)return;
- const NP=6,NG=14;   /* particles per bubble, letters with a bubble */
+ const NP=8,NG=14;   /* particles per bubble, letters with a bubble */
  const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
  /* texture: R = letter shape, G = softened depth (the water's curved surface), B = which letter, A = shape with a very small blur (for the thin outline) */
  const FS=`precision highp float;uniform vec2 uCR,uCO,uCS,uV,uLd;uniform sampler2D uM;uniform vec3 uTop,uBot,uRim,uSun;uniform float uDk,uWo,uNk,uRef,uPx,uSg,uSl,uTm;uniform vec4 uP[${NP*NG/2}];uniform vec2 uCn[${NG+1}];`+GLS.SILK+`
@@ -2202,7 +2202,7 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  /* the bubble: a few particles (moved by the script) blended into one soft blob, only where the water is deep enough, so it bends to the letter */
  int gi=int(floor(m.b*255.+.5));vec2 px=cuv*uCR;float f=0.;
  if(gi>0){for(int i=0;i<${NP*NG/2};i++){vec4 P=uP[i];float lg=floor(float(i*2)/${NP}.)+1.;if(int(lg)==gi){vec2 d1=px-P.xy,d2=px-P.zw;f+=exp(-dot(d1,d1)/uSg)+exp(-dot(d2,d2)/uSg);}}}
- float inw=smoothstep(.5,.92,a);float bub=smoothstep(1.35,1.6,f)*inw,ring=exp(-pow((f-1.47)/.2,2.))*inw;
+ float sd=min((f-2.2)*.5,(h-.9)*7.);float bub=smoothstep(-.03,.05,sd)*step(.5,a),ring=exp(-pow(sd/.06,2.))*smoothstep(.3,.7,a)*step(.5,f);
  vec2 cn=vec2(0.);for(int i=1;i<${NG+1};i++){if(i==gi)cn=uCn[i];}
  vec2 bd=normalize(px-cn+1e-4);float rl=max(dot(bd,normalize(uLd)),0.);
  col=mix(col,sky(vp+n.xy*uRef*.25,3.)*1.08+uSun*.03,bub);
@@ -2240,10 +2240,10 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
   const C=mk(),c=C.getContext('2d');let gid=0;BBL=[];for(const g of G){gid++;if(gid>NG)break;c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,W,H);c.scale(dpr,dpr);c.font=g.font;c.textAlign='right';c.textBaseline='alphabetic';c.fillStyle=c.strokeStyle='#fff';c.lineJoin='round';c.lineWidth=g.lw;c.strokeText(g.ch,g.x,g.y);c.fillText(g.ch,g.x,g.y);
    const x0=Math.max(0,Math.floor(g.b[0]*dpr)),y0=Math.max(0,Math.floor(g.b[1]*dpr)),x1=Math.min(W,Math.ceil(g.b[2]*dpr)),y1=Math.min(H,Math.ceil(g.b[3]*dpr)),bw=x1-x0,bh=y1-y0;if(bw<=0||bh<=0)continue;
    const d=c.getImageData(x0,y0,bw,bh).data;let bv=-1,sx=0,sy=0,sn=0;for(let yy=0;yy<bh;yy++)for(let xx=0;xx<bw;xx++){if(d[(yy*bw+xx)*4+3]<60)continue;const pi=(y0+yy)*W+x0+xx;o[pi*4+2]=gid;GID[pi]=gid;if(DEP[pi]>bv)bv=DEP[pi];sx+=x0+xx;sy+=y0+yy;sn++}
-   if(bv<40||!sn)continue;let bx=0,by=0,bd=1e18;sx/=sn;sy/=sn;for(let yy=0;yy<bh;yy+=2)for(let xx=0;xx<bw;xx+=2){const pi=(y0+yy)*W+x0+xx;if(GID[pi]!==gid||DEP[pi]<bv*.8)continue;const dd=(x0+xx-sx)**2+(y0+yy-sy)**2;if(dd<bd){bd=dd;bx=x0+xx;by=y0+yy}}const r0=fs*dpr*.045,P=[];for(let q=0;q<NP;q++){const an=q/NP*6.283;P.push({x:bx+Math.cos(an)*r0,y:by+Math.sin(an)*r0*.7,vx:0,vy:0})}
+   if(bv<40||!sn)continue;let bx=0,by=0,bd=1e18;sx/=sn;sy/=sn;for(let yy=0;yy<bh;yy+=2)for(let xx=0;xx<bw;xx+=2){const pi=(y0+yy)*W+x0+xx;if(GID[pi]!==gid||DEP[pi]<bv*.8)continue;const dd=(x0+xx-sx)**2+(y0+yy-sy)**2;if(dd<bd){bd=dd;bx=x0+xx;by=y0+yy}}const r0=fs*dpr*.12,P=[];for(let q=0;q<NP;q++){const an=q/NP*6.283;P.push({x:bx+Math.cos(an)*r0,y:by+Math.sin(an)*r0*.7,vx:0,vy:0})}
    BBL[gid]={rx:bx,ry:by,mx:bv,P,r0}}
   gl.bindTexture(gl.TEXTURE_2D,tex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,W,H,0,gl.RGBA,gl.UNSIGNED_BYTE,o);gl.uniform1f(U.uNk,fs*dpr*.09);dlFs=fs;ok=true;
-  const sg=fs*dpr*.046;gl.uniform1f(U.uSg,sg*sg);pack();if(!R.classList.contains('cc-wl'))R.classList.add('cc-wl');draw()}
+  const sg=fs*dpr*.15;gl.uniform1f(U.uSg,sg*sg);pack();if(!R.classList.contains('cc-wl'))R.classList.add('cc-wl');draw()}
  function pack(){PB.fill(-1e4);CN.fill(0);for(let g=1;g<=NG;g++){const b=BBL[g];if(!b)continue;let cx=0,cy=0;b.P.forEach((p,q)=>{PB[((g-1)*NP+q)*2]=p.x;PB[((g-1)*NP+q)*2+1]=p.y;cx+=p.x;cy+=p.y});CN[g*2]=cx/NP;CN[g*2+1]=cy/NP}
   gl.uniform4fv(U.uP,PB);gl.uniform2fv(U.uCn,CN)}
  /* the bubble's physics: buoyancy toward the higher side, a soft pull back to its resting place, surface tension keeping it one blob,
@@ -2251,9 +2251,9 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  const dep=(x,y,g)=>{const xi=x|0,yi=y|0;if(xi<1||yi<1||xi>=W-1||yi>=H-1)return 0;const pi=yi*W+xi;return GID[pi]===g?DEP[pi]:0};
  function sim(dt){let mv=false;const S=dlFs*dpr0,fx=-tl[0]*S*9,fy=-tl[1]*S*9;
   for(let g=1;g<=NG;g++){const b=BBL[g];if(!b)continue;let cx=0,cy=0;for(const p of b.P){cx+=p.x;cy+=p.y}cx/=NP;cy/=NP;
-   const lim=b.mx*.42;
-   for(const p of b.P){let ax=fx+(b.rx-cx)*7+(cx-p.x)*95,ay=fy+(b.ry-cy)*7+(cy-p.y)*95;
-    for(const o of b.P){if(o===p)continue;const dx=p.x-o.x,dy=p.y-o.y,dd=Math.hypot(dx,dy)||1e-3,mn=b.r0*.95;if(dd<mn){ax+=dx/dd*(mn-dd)*140;ay+=dy/dd*(mn-dd)*140}}
+   const lim=b.mx*.3;
+   for(const p of b.P){let ax=fx+(b.rx-cx)*7+(cx-p.x)*40,ay=fy+(b.ry-cy)*7+(cy-p.y)*40;
+    for(const o of b.P){if(o===p)continue;const dx=p.x-o.x,dy=p.y-o.y,dd=Math.hypot(dx,dy)||1e-3,mn=b.r0*1.05;if(dd<mn){ax+=dx/dd*(mn-dd)*240;ay+=dy/dd*(mn-dd)*240}}
     p.vx=(p.vx+ax*dt)*Math.exp(-5.5*dt);p.vy=(p.vy+ay*dt)*Math.exp(-5.5*dt);let nx=p.x+p.vx*dt,ny=p.y+p.vy*dt;
     /* walls: if the new spot is too shallow, step back up the depth slope */
     for(let it=0;it<4&&dep(nx,ny,g)<lim;it++){const gx=dep(nx+2,ny,g)-dep(nx-2,ny,g),gy=dep(nx,ny+2,g)-dep(nx,ny-2,g),gl2=Math.hypot(gx,gy);if(gl2<1e-3){nx=p.x;ny=p.y;break}nx+=gx/gl2*1.5;ny+=gy/gl2*1.5;p.vx*=.6;p.vy*=.6}
@@ -2670,8 +2670,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=16;
+const CC_VER=17;
 const CC_LOG=[
+ {v:17,new:['Much bigger bubbles in the water letters: each one fills a good part of its stroke, keeps its own rim just inside the letter’s wall, and flows along the letter as you tilt.']},
  {v:16,new:['Each water letter now has a small clear air bubble, like in a water bottle. Tilt the phone and it rolls to the higher side, following the letter’s shape and flattening against its walls.']},
  {v:16,new:['The date letters are now clear water inside a thin outline, with a small clear air bubble in each letter. Tilt the phone and the bubble flows to the higher side and flattens against the letter’s walls; the light shifts as you tilt.']},
  {v:15,new:['New bubble in the water letters: each letter is like a little level vial facing you. Tilt the phone and the air gathers on the higher side, stopping at the letter’s own walls.']},
