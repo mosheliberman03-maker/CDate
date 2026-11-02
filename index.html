@@ -316,12 +316,12 @@ body.om .foot,body.om .hint{opacity:0!important}
 
 #tg{position:fixed;inset:0;z-index:100002;touch-action:none;opacity:0;transition:opacity .45s ease}#tg.in{opacity:1}#tg.out{opacity:0;pointer-events:none}
 .tg-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:block}
-.tg-card{position:absolute;left:0;right:0;margin:0 auto;top:0;width:min(calc(100% - 28px),392px);box-sizing:border-box;padding:16px 18px 18px;border-radius:22px;background:var(--card,#fff);color:var(--ink,#222);box-shadow:0 18px 60px rgba(0,0,0,.38);border:1px solid var(--line,#0001);will-change:transform;transition:opacity .17s ease}
+.tg-card{position:absolute;left:0;right:0;margin:0 auto;top:0;width:min(calc(100% - 28px),392px);box-sizing:border-box;padding:16px 18px 18px;border-radius:22px;background:var(--gx-sheet,var(--card,#fff));color:var(--ink,#222);box-shadow:0 18px 60px rgba(0,0,0,.42);border:1px solid var(--gx-bd,var(--line,#0001));-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);will-change:transform;transition:opacity .17s ease}
 .tg-card.swap{opacity:0}.tg-card.center{text-align:center}.tg-card.center .tg-top{justify-content:center}
 .tg-bar{height:3px;border-radius:3px;background:color-mix(in srgb,var(--ink) 10%,transparent);overflow:hidden;margin-bottom:12px}.tg-bar i{display:block;height:100%;width:0;border-radius:3px;background:var(--ct,#6b7bff);transition:width .55s cubic-bezier(.2,.8,.2,1)}
 .tg-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut,#666);margin-bottom:6px}.tg-skip{border:0;background:none;color:var(--mut,#666);font:inherit;font-size:12px;letter-spacing:.02em;text-transform:none;cursor:pointer;padding:4px 0}.tg-skip:hover{color:var(--ink)}
 .tg-card h2{font:500 24px/1.15 'Frank Ruhl Libre',Georgia,serif;margin:0 0 6px}.tg-card p{font-size:14px;line-height:1.5;color:var(--mut,#666);margin:0 0 14px}
-.tg-next{width:100%;border:0;border-radius:14px;padding:13px;background:var(--ink,#111);color:var(--card,#fff);font:600 15px Figtree,system-ui;cursor:pointer;transition:transform .15s}.tg-next:active{transform:scale(.98)}
+.tg-next{width:100%;border:0;border-radius:14px;padding:13px;background:var(--gx-pri,var(--ink,#111));color:var(--gx-prit,var(--card,#fff));font:600 15px Figtree,system-ui;cursor:pointer;transition:transform .15s}.tg-next:active{transform:scale(.98)}
 .tg-press{transform:scale(.93)!important;filter:brightness(1.12);transition:transform .2s ease,filter .2s ease}
 html.tour-on .dock,html.tour-on .ai-backdrop,html.tour-on .bd,html.tour-on .foot,html.tour-on .hint,html.tour-on #loBox{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
@@ -2356,8 +2356,38 @@ function aiOpen(){aiEl('aiBackdrop').classList.add('on');aiEl('aiBackdrop').setA
 function aiClose(){try{aiCancelReset();aiEl('aiUndo').hidden=true;aiBatchReset()}catch(e){}aiEl('aiBackdrop').classList.remove('on');aiEl('aiBackdrop').setAttribute('aria-hidden','true')}
 aiEl('aiFab').addEventListener('click',aiOpen);aiEl('aiClose').addEventListener('click',aiClose);aiEl('aiBackdrop').addEventListener('click',e=>{if(e.target===aiEl('aiBackdrop'))aiClose()});
 function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
+/* ===== Updates: a "What's new" popup after small updates, a live tour for big ones =====
+   STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
+   (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
+   `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
+const CC_VER=2;
+const CC_LOG=[
+ {v:1,new:['The night and day screens were restyled as one matching glass look.','The semicircle under the sun and moon is now a soft glow of lit atmosphere — no more hard shape.']},
+ {v:2,feature:'The phone app',tour:'app',new:['New: a phone app that rings your reminders as real alarms — even with no internet or VPN. A home-screen widget is coming next.','Get it from ⋯ → App.']}
+];
+function ccNewsPopup(items,tourWhich){
+ let o=document.getElementById('newsBox');if(o)o.remove();
+ o=document.createElement('div');o.id='newsBox';o.className='dmb';
+ const esc=t=>String(t).replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
+ const li=items.map(t=>'<li>'+esc(t)+'</li>').join('');
+ o.innerHTML='<div class="dmc" role="dialog" aria-modal="true" aria-label="What’s new" style="--c:#8c94ef">'+
+  '<h2 style="margin:0 0 6px">✨ What’s new</h2>'+
+  '<ul style="margin:6px 0 16px;padding-left:20px;font-size:14px;line-height:1.7">'+li+'</ul>'+
+  '<div class="rw">'+(tourWhich?'<button class="btn" type="button" data-tour>Show me</button>':'')+'<button class="btn '+(tourWhich?'gh':'')+'" type="button" data-ok>Got it</button></div></div>';
+ document.body.appendChild(o);
+ const close=()=>o.classList.remove('on');
+ o.addEventListener('click',e=>{if(e.target===o||e.target.closest('[data-ok]'))close();
+  else if(e.target.closest('[data-tour]')){close();setTimeout(()=>{try{ccTourStart('cc_tour_feat_'+tourWhich,false,tourWhich)}catch(e){}},420)}});
+ requestAnimationFrame(()=>o.classList.add('on'));try{H.tap&&H.tap()}catch(e){}}
+function ccWhatsNew(sv){let seen=0;try{seen=+localStorage.getItem(sv)||0}catch(e){}
+ if(seen>=CC_VER)return;const fresh=CC_LOG.filter(e=>e.v>seen);
+ try{localStorage.setItem(sv,String(CC_VER))}catch(e){}
+ if(!fresh.length)return;
+ const picked=seen===0?fresh.slice(-1):fresh;      /* first time tracking: show the latest only, not a backlog */
+ const items=[];let tour=null;for(const e of picked){(e.new||[]).forEach(i=>items.push(i));if(e.tour)tour=e.tour}
+ if(!items.length&&!tour)return;setTimeout(()=>ccNewsPopup(items,tour),500);}
 // First-run guided tour (see ccTourStart). Also hooks up profile name / log out.
-(function(){const u=localStorage.getItem('cc_local_active_profile_v1');if(!u)return;const name=document.getElementById('profileName');if(name)name.textContent=u;const gate=document.getElementById('accountGate');if(gate)gate.style.display='none';const key='cc_local_tour_done_'+u;function waitForIntro(){if(document.getElementById('intro')){setTimeout(waitForIntro,180);return}if(!localStorage.getItem(key))setTimeout(()=>ccTourStart(key),700)}waitForIntro();
+(function(){const u=localStorage.getItem('cc_local_active_profile_v1');if(!u)return;const name=document.getElementById('profileName');if(name)name.textContent=u;const gate=document.getElementById('accountGate');if(gate)gate.style.display='none';const key='cc_local_tour_done_'+u,sv='cc_seen_ver_'+u;function waitForIntro(){if(document.getElementById('intro')){setTimeout(waitForIntro,180);return}if(!localStorage.getItem(key)){try{localStorage.setItem(sv,String(CC_VER))}catch(e){}setTimeout(()=>ccTourStart(key),700)}else ccWhatsNew(sv)}waitForIntro();
 const rp=document.getElementById('tourReplay');if(rp)rp.addEventListener('click',()=>{op(false);setTimeout(()=>ccTourStart(key,true),450)});
 
 /* ===== The native app, controlled only through the web app =====
@@ -2396,7 +2426,7 @@ document.getElementById('acctOut')?.addEventListener('click',()=>loShow(true));d
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&lo.classList.contains('on')){e.stopPropagation();loShow(false)}},true);
 document.getElementById('loYes').addEventListener('click',()=>{try{localStorage.removeItem('cc_local_active_profile_v1')}catch(e){}location.reload()})})();
 /* ===== Guided tour: a moving spotlight over the real app, with short live demos ===== */
-function ccTourStart(key,replay){
+function ccTourStart(key,replay,which){
  if(document.getElementById('tg'))return;
  const q=s=>document.querySelector(s),vw=()=>innerWidth,vh=()=>innerHeight,reduce=RM;
  const root=document.createElement('div');root.id='tg';
@@ -2409,33 +2439,35 @@ function ccTourStart(key,replay){
  const radiusOf=e=>{try{return parseFloat(getComputedStyle(e).borderTopLeftRadius)||12}catch(_){return 12}};
  const typeInto=async(el,text,t)=>{el.value='';for(const ch of text){el.value+=ch;el.dispatchEvent(new Event('input',{bubbles:true}));await sleep(26+Math.random()*34,t)}};
  const scrollSmooth=y=>scrollTo({top:y,behavior:reduce?'auto':'smooth'});
- const firstCard=()=>q('#p .ev.mc');
- const steps=[
-  {t:'Today at a glance',p:'The Hebrew date, with a sun and moon that follow the real sky. The day turns over at sunset.',els:()=>[q('#hdr')],pad:6,
-   enter:async()=>{scrollTo(0,0)}},
-  {t:'Tap a chip',p:'Holidays, candle lighting and your own plans appear as chips. Tap one to jump to its details.',els:()=>[q('#ch')],pad:8,
-   enter:async t=>{scrollTo(0,0);await sleep(1100,t);const c=q('#ch .c2');if(c){c.classList.add('tg-press');await sleep(380,t);c.classList.remove('tg-press')}}},
-  {t:'Details',p:'Each day has its own cards. Tap “More” to read the full story.',els:()=>[firstCard()||q('#p')],pad:8,skip:()=>!firstCard(),
-   enter:async t=>{const c=q('#ch .c2[data-go]');if(c)chipGo(c.dataset.go);await sleep(1500,t);const m=q('#p .sm');if(m){m.click();await sleep(450,t);spotOverride=()=>[q('#dmb .dmc')];await sleep(2300,t)}},
-   leave:()=>{spotOverride=null;dmClose()}},
-  {t:'Zmanim',p:'Sunrise, latest Shema, candle lighting and more, calculated for where you are.',els:()=>[q('#zm h2'),...[...document.querySelectorAll('#zm .dr')].slice(0,6)],pad:10,
-   enter:async()=>{const z=q('#zm');if(z)scrollSmooth(Math.max(0,z.getBoundingClientRect().top+scrollY-120))}},
-  {t:'Move around',p:'‹ › step between days. “Today” brings you back, and ⋯ opens your tools.',els:()=>[q('.dock')],pad:6,
-   enter:async()=>{scrollSmooth(0)}},
-  {t:'Month view',p:'See the whole month at a glance. Tap any day to open it.',els:()=>[q('#ms')],pad:0,
-   enter:async t=>{await sleep(500,t);openMonth()},leave:()=>mo(false)},
-  {t:'Your location',p:'Zmanim and sunset depend on it. Detect it automatically, or just type a city.',els:()=>[q('#locNow'),q('#ul'),q('#locMsg')],pad:10,
-   enter:async t=>{await sleep(450,t);fill(null);op(true);await sleep(700,t);const l=q('#locNow');l&&l.scrollIntoView({block:'center',behavior:reduce?'auto':'smooth'});await sleep(1000,t);const c=q('#cs');await typeInto(c,'Jerusalem',t);await sleep(1300,t)},
-   leave:()=>{const c=q('#cs');if(c)c.value='';op(false)}},
-  {t:'Add anything',p:'Tap + to add to your schedule. Just describe it in your own words.',els:()=>[q('#aiFab')],pad:8,round:true,
-   enter:async t=>{await sleep(500,t);const f=q('#aiFab');f.classList.add('tg-press');await sleep(380,t);f.classList.remove('tg-press')}},
-  {t:'Make a chavrusa',p:'Type or speak it naturally. It works out the day, time and repeat, and you confirm before anything is saved.',els:()=>[aiEl('aiInput'),aiEl('aiPlan'),aiEl('aiPreview').offsetParent?aiEl('aiPreview'):null],pad:10,top:true,
-   enter:async t=>{const b=aiEl('aiBackdrop');b.classList.add('on');b.setAttribute('aria-hidden','false');await sleep(900,t);const inp=aiEl('aiInput');
-    await typeInto(inp,'Tanya chavrusa with Yossi every Sunday and Tuesday at 8pm',t);await sleep(600,t);const go=aiEl('aiPlan');go.classList.add('tg-press');await sleep(300,t);go.classList.remove('tg-press');go.click();await sleep(2600,t)},
-   leave:()=>{try{const no=aiEl('aiNo');if(no&&aiEl('aiPreview').offsetParent)no.click()}catch(e){}aiEl('aiInput').value='';aiSetStatus('');aiClose()}},
-  {t:'You’re all set',p:'Replay this tour any time from ⋯ Tools.',els:()=>null,last:true,
-   enter:async()=>{scrollTo({top:0,behavior:'auto'})}}
- ];
+
+ const firstShiur=()=>q('#sd .ck');
+ const pressEl=async(el,t)=>{if(el){el.classList.add('tg-press');await sleep(360,t);el.classList.remove('tg-press')}};
+ const toShiur=()=>{const sd=q('#sd');if(sd)scrollSmooth(Math.max(0,sd.getBoundingClientRect().top+scrollY-110))};
+ const SETS={
+  onboard:[
+   {t:'Welcome',p:'Your Chabad calendar. The big Hebrew date sits under a living sky — the real sun and moon rise and set, and the day turns over at sunset.',els:()=>[q('#hdr .hd-he')||q('#hdr')],pad:8,enter:async()=>{scrollTo(0,0)}},
+   {t:'Change the day',p:'Swipe left or right anywhere, or tap a day on the week strip. Today’s circle glows; a teal dot marks a day with something special.',els:()=>[q('#hdr .wk')],pad:8,
+    enter:async t=>{scrollTo(0,0);await sleep(700,t);await pressEl(q('#hdr .wk .wd:nth-child(6)'),t)}},
+   {t:'Special days & your plans',p:'Holidays, candle-lighting, fasts and your own events show as chips. Tap one to jump straight to its details.',els:()=>[q('#ch')],pad:8,skip:()=>!q('#ch .c2'),
+    enter:async t=>{await sleep(300,t);await pressEl(q('#ch .c2'),t)}},
+   {t:'Scroll for the day',p:'Scroll down for Hayom Yom, today’s learning (Chitas & Rambam), your tasks, and the zmanim for where you are.',els:()=>[q('#hint')],pad:8,round:true,
+    enter:async t=>{await sleep(400,t);toShiur();await sleep(900,t)},leave:()=>scrollTo(0,0)},
+   {t:'Read a shiur',p:'Tap a learning row to read it in Hebrew. Scroll to the end and leave — it checks off by itself. Or tap the circle to check it without opening.',els:()=>[firstShiur()||q('#sd')],pad:8,skip:()=>!firstShiur(),
+    enter:async t=>{toShiur();await sleep(600,t)},leave:()=>scrollTo(0,0)},
+   {t:'Just ask',p:'Tap + and say it in your own words — “chavrusa with Adam every night at 8, remind me 2 hours before.” It works out the day, time and reminders; you confirm before anything saves.',els:()=>[aiEl('aiInput'),aiEl('aiPlan')],pad:10,top:true,
+    enter:async t=>{const b=aiEl('aiBackdrop');b.classList.add('on');b.setAttribute('aria-hidden','false');await sleep(800,t);await typeInto(aiEl('aiInput'),'Chavrusa with Adam every night at 8pm, remind me 2 hours before',t);await sleep(500,t);const go=aiEl('aiPlan');await pressEl(go,t);go.click();await sleep(2400,t)},
+    leave:()=>{try{const no=aiEl('aiNo');if(no&&aiEl('aiPreview').offsetParent)no.click()}catch(e){}aiEl('aiInput').value='';aiSetStatus('');aiClose()}},
+   {t:'Reminders that reach you',p:'In ⋯ → Reminders, turn on notifications. Install the phone app (⋯ → App) and they ring even with no internet or VPN.',els:()=>[q('.dock #mn')],pad:8,enter:async()=>{scrollSmooth(0)}},
+   {t:'Everything else is in ⋯',p:'Month view, your location, what shows on the calendar, and Help all live under ⋯.',els:()=>[q('.dock')],pad:6,enter:async()=>{scrollSmooth(0)}},
+   {t:'You’re all set',p:'Replay this tour any time from ⋯ → Help.',els:()=>null,last:true,enter:async()=>{scrollTo({top:0,behavior:'auto'})}}
+  ],
+  app:[
+   {t:'The phone app',p:'A small app that adds alarms which ring even without a VPN — and soon a home-screen widget. Everything is still controlled right here in the calendar.',els:()=>[q('.dock #mn')],pad:8,enter:async()=>{scrollTo(0,0)}},
+   {t:'Get it in ⋯',p:'Open ⋯ and tap “Download the app” under App. Install it once (Android asks to allow it), then log in as usual.',els:()=>[q('#appSec')||q('#sh')],pad:8,
+    enter:async t=>{op(true);await sleep(500,t);const a=q('#appH');a&&a.scrollIntoView({block:'center',behavior:reduce?'auto':'smooth'})},leave:()=>op(false),last:true}
+  ]
+ };
+ const steps=SETS[which||'onboard']||SETS.onboard;
  let spotOverride=null;
  const live=()=>steps.filter(s=>!(s.skip&&s.skip()));
  function frame(now){
