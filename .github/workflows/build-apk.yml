@@ -1,0 +1,74 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+      - claude/intro-animation-event-bot-concurrency-ihgy6j
+    paths:
+      - 'native/**'
+      - '.github/workflows/build-apk.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: native
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Capacitor and plugins
+        run: npm install
+
+      - name: Generate the Android project
+        run: npx cap add android
+
+      - name: Add permissions for exact alarms
+        run: node patch-android.js
+
+      - name: Sync web assets and plugins
+        run: npx cap sync android
+
+      - name: Build the debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Rename the APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk ChabadCalendar.apk
+
+      - name: Upload the APK as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChabadCalendar-apk
+          path: native/ChabadCalendar.apk
+
+      - name: Publish the APK to a stable download link
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-latest
+          name: Latest Chabad Calendar app
+          body: |
+            The newest build of the Chabad Calendar Android app.
+            On your phone, download ChabadCalendar.apk below and tap it to install.
+            (Android will ask once to allow installing from your browser.)
+          files: native/ChabadCalendar.apk
+          fail_on_unmatched_files: true
