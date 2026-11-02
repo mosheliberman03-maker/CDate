@@ -480,19 +480,17 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .sky-body .skyimg{position:relative}
 .moon .skyimg{width:114px;height:114px;margin:0;filter:drop-shadow(0 0 28px rgba(170,188,255,.28))}
 /* the glass dome that rises behind the date */
-#hdr .sky-scene::after{display:none!important}
-/* the atmosphere being lit: a soft bloom that sits on the dome's rim wherever the sun/moon is, brighter near the horizon;
-   the dome shell itself does not move or rotate. It breathes slowly so it never feels static, and fades out as you scroll. */
-#hdr .sky-scene::before{content:'';position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;pointer-events:none;mix-blend-mode:screen;transform-origin:50% 98%;
- background:radial-gradient(52% 38% at var(--lx,50%) var(--ly,66%),color-mix(in srgb,var(--lc,#cfe0ff) calc(74% * var(--li,.6)),transparent) 0%,color-mix(in srgb,var(--lc,#cfe0ff) calc(28% * var(--li,.6)),transparent) 42%,transparent 72%);
+/* The semicircle is an airy, translucent 3D glass dome: a soft glowing rim, a lit crest, and a bloom of
+   atmosphere where the sun/moon is (--lx/--ly follow the body on the dome). It rolls/turns as you scroll (dmW). */
+#hdr .sky-scene::after{content:'';position:absolute;--dd:min(90vw,400px);left:calc(50% - var(--dd) / 2);top:calc(100% - 62px);width:var(--dd);height:var(--dd);box-sizing:border-box;border-radius:50%;z-index:-1;pointer-events:none;
+ background:radial-gradient(46% 30% at var(--lx,50%) var(--ly,3%),color-mix(in srgb,var(--lc,#cfe0ff) calc(58% * var(--li,.5)),transparent) 0%,color-mix(in srgb,var(--lc,#cfe0ff) calc(20% * var(--li,.5)),transparent) 42%,transparent 72%),radial-gradient(closest-side,transparent 87%,color-mix(in srgb,var(--rbe) 32%,transparent) 94.5%,color-mix(in srgb,var(--rbe) 8%,transparent) 98%,transparent 100%),radial-gradient(74% 26% at 50% 1%,color-mix(in srgb,var(--rbe) 13%,transparent) 0%,transparent 70%),radial-gradient(120% 82% at 50% 100%,color-mix(in srgb,var(--rbf) 6%,transparent) 0%,transparent 58%);
+ -webkit-mask-image:conic-gradient(from 270deg,transparent 0deg,#000 30deg,#000 calc(var(--dl,180deg) - 30deg),transparent var(--dl,180deg));mask-image:conic-gradient(from 270deg,transparent 0deg,#000 30deg,#000 calc(var(--dl,180deg) - 30deg),transparent var(--dl,180deg))}
+/* a wider, softer halo of lit atmosphere around the dome, for airiness; breathes, and fades as you scroll */
+#hdr .sky-scene::before{content:'';position:absolute;--dd:min(90vw,400px);left:calc(50% - var(--dd) / 2);top:calc(100% - 62px);width:var(--dd);height:var(--dd);border-radius:50%;z-index:-1;pointer-events:none;mix-blend-mode:screen;transform-origin:50% 50%;
+ background:radial-gradient(56% 46% at var(--lx,50%) var(--ly,6%),color-mix(in srgb,var(--lc,#cfe0ff) calc(42% * var(--li,.5)),transparent) 0%,transparent 64%);
  animation:domeBreath 7.5s ease-in-out infinite}
-@keyframes domeBreath{0%,100%{scale:1}50%{scale:1.05}}
-@keyframes domeTurn{to{rotate:58deg;opacity:0}}
-#hdr .sky-scene::after{content:'';position:absolute;--dd:min(90vw,400px);left:calc(50% - var(--dd) / 2 + var(--dsx,0px));top:calc(100% - 62px + var(--dsy,0px));translate:var(--dmx,0) var(--dmy,0);width:var(--dd);height:var(--dd);box-sizing:border-box;border-radius:50%;z-index:-1;pointer-events:none;
- border:1px solid color-mix(in srgb,var(--rbe) 30%,transparent);
- background:radial-gradient(120% 90% at 50% 100%,transparent 54%,color-mix(in srgb,var(--rbe) 9%,transparent) 73%,transparent 100%),radial-gradient(85% 56% at 50% 0%,color-mix(in srgb,var(--rbf) 11%,transparent) 0%,color-mix(in srgb,var(--rbf) 4%,transparent) 44%,transparent 72%);
- box-shadow:inset 0 14px 34px -20px color-mix(in srgb,var(--rbe) 42%,transparent),inset 0 -3px 12px -7px color-mix(in srgb,var(--rbf) 26%,transparent);
- -webkit-mask-image:conic-gradient(from 270deg,transparent 0deg,#000 34deg,#000 calc(var(--dl) - 34deg),transparent var(--dl));mask-image:conic-gradient(from 270deg,transparent 0deg,#000 34deg,#000 calc(var(--dl) - 34deg),transparent var(--dl))}
+@keyframes domeBreath{0%,100%{scale:1}50%{scale:1.045}}
+@keyframes domeTurn{to{opacity:0}}
 /* moon-set pill */
 .sky-cap{left:50%;right:auto;bottom:4px;transform:translateX(-50%);width:max-content;max-width:88vw;display:inline-flex;align-items:center;gap:10px;padding:10px 22px 10px 18px;border-radius:999px;
  font:500 15px/1.2 Figtree,system-ui,sans-serif;letter-spacing:.01em;color:var(--gl-tx);white-space:nowrap;z-index:3;
@@ -589,6 +587,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #hdr.sky-side .hd-big{display:flex;flex-direction:column;align-items:center;font-size:min(31vw,16.5vh,150px);line-height:.98;letter-spacing:-.01em}
 #hdr.sky-side .hd-big>span{display:block;white-space:nowrap}
 #hdr.sky-side .hd-m{font-size:.86em;max-width:94vw}
+:root.tt-off-dome #hdr .sky-scene::after{animation-name:flY,flX,flP,none!important}
 :root.tt-off-dome #hdr .sky-scene::before{animation-name:flY,flX,domeBreath,none!important}
 .sky-cap2{display:none}
 :root:not(.tt-off-capdate) #hdr.sky-side .sky-cap{display:none}
@@ -1756,17 +1755,16 @@ const skyBodyKey=st=>st.kind+(st.kind==='sun'?Math.round(st.alt/4):Math.round(st
 function capSync(){const c=document.getElementById('skyCap'),c2=document.getElementById('skyCap2');if(c2){c2.innerHTML=c?c.innerHTML:'';c2.hidden=!c}}
 /* The semicircle is the lit atmosphere: its top faces the sun or moon (--dma on the scene; the scroll swivel adds to it). */
 function skyDomeAim(st){const sc=document.getElementById('skyScene');if(!sc)return;const ss=sc.style,set=(k,v)=>{if(ss.getPropertyValue(k)!==v)ss.setProperty(k,v)};
- /* No shape: just a soft glow of lit atmosphere that sits a little under the sun/moon, brighter near the horizon,
-    warm for the sun and cool for the moon. The shell is gone; this glow turns and fades on scroll. */
- let Xp=50,Yp=72,li=.45,lc='#cfe0ff';
+ /* The dome stays put and never aim-rotates; only the LIGHT on it moves. --lx/--ly are a point on the dome's rim
+    beneath the sun/moon (percent of the dome box), --li brighter near the horizon, --lc warm(sun)/cool(moon). */
+ const W=sc.offsetWidth||360,D=Math.min(innerWidth*.9,400),R=D/2,cx=W/2;
+ let Xp=50,Yp=3,li=.5,lc='#cfe0ff';
  if(st){const aim=!document.documentElement.classList.contains('tt-off-aim');
-  Xp=aim?Math.max(6,Math.min(94,st.x)):50;
-  Yp=Math.max(40,Math.min(92,st.y+11));
+  let u=aim?(st.x/100*W-cx):0;u=Math.max(-R*0.96,Math.min(R*0.96,u));
+  Xp=((u+R)/(2*R))*100;Yp=((R-Math.sqrt(Math.max(0,R*R-u*u)))/(2*R))*100;
   const low=Math.max(0,Math.min(1,(st.y-6)/52));
-  li=st.kind==='below'?.3:(.55+.45*low);
-  lc=st.kind==='sun'?'#ffdca6':'#cfe0ff'}
- set('--lx',Xp.toFixed(1)+'%');set('--ly',Yp.toFixed(1)+'%');set('--li',li.toFixed(2));set('--lc',lc);
- set('--dsx','0px');set('--dsy','0px');set('--dma','0deg')}
+  li=st.kind==='below'?.3:(.5+.45*low);lc=st.kind==='sun'?'#ffdca6':'#cfe0ff'}
+ set('--lx',Xp.toFixed(1)+'%');set('--ly',Yp.toFixed(1)+'%');set('--li',li.toFixed(2));set('--lc',lc);set('--dma','0deg')}
 /* When the sun/moon is far to one side (or below the horizon) the middle of the sky is empty: the date moves up and grows into it.
    Applied as a state, not animated. */
 function skySideSet(st){const h=document.getElementById('hdr');if(!h)return;const on=!!st&&!document.documentElement.classList.contains('tt-off-side')&&(st.kind==='below'||Math.abs(st.x-50)>34);
