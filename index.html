@@ -644,6 +644,18 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 :root[data-theme="light"]:not(.tt-off-glassui) #g .day{background:rgba(255,255,255,.42);border-color:rgba(255,255,255,.7)}
 :root[data-theme="light"]:not(.tt-off-glassui) #g .day.day[class*="w-"]{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 9%,rgba(255,255,255,.62)),rgba(255,255,255,.45))!important;border-color:color-mix(in srgb,var(--c) 45%,rgba(255,255,255,.7))}
 :root[data-theme="dark"]:not(.tt-off-glassui) #g .day.day[class*="w-"]{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 9%,rgba(46,56,128,.35)),rgba(22,30,80,.3))!important;border-color:color-mix(in srgb,var(--c) 42%,transparent)}
+/* birthday & yahrzeit touches */
+.occ-mingm{margin-top:12px;padding-top:12px;border-top:1px solid var(--gx-bd,var(--line))}
+.occ-mingm>b{font-size:14px;display:block;margin-bottom:2px}
+.occ-mingm ul{margin:6px 0;padding-left:20px;font-size:13.5px;line-height:1.6;color:var(--mut)}
+.occ-mingm small{font-size:11.5px;color:var(--mut);opacity:.85}
+.ev.occ-yz{position:relative}
+.yzc{position:absolute;top:16px;right:18px;width:22px;height:38px;pointer-events:none}
+.yzc u{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:12px;height:22px;border-radius:3px 3px 4px 4px;background:linear-gradient(#f3e7cf,#d7c29c);box-shadow:inset 0 2px 2px rgba(255,255,255,.4)}
+.yzc b{position:absolute;bottom:21px;left:50%;width:9px;height:16px;margin-left:-4.5px;border-radius:50% 50% 45% 45%/62% 62% 38% 38%;background:radial-gradient(ellipse at 50% 72%,#fff7cf 0%,#ffd666 42%,#ff8e24 82%);box-shadow:0 0 12px 4px rgba(255,170,60,.5);transform-origin:50% 100%;animation:flame 1.2s ease-in-out infinite alternate}
+@keyframes flame{0%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.08,1.14) rotate(2deg)}100%{transform:scale(.95,1.03) rotate(-1deg)}}
+#ccConfetti{position:fixed;inset:0;z-index:100003;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.yzc b{animation:none}}
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
 </style>
 </head><body>
@@ -1518,6 +1530,41 @@ function chips(h,ev,rc){const a=[],w=sel.getDay();let evi=0;
  if(c)a.push(`<span class="c2 plain" data-go="zm:Candle" role="button" tabindex="0">Candle lighting ${tf(c[1])}</span>`);if(hv)a.push(`<span class="c2 plain" data-go="zm:Havdalah" role="button" tabindex="0">Havdalah ${tf(hv[1])}</span>`);
  
  $('#ch').innerHTML=a.map((x,i)=>x.replace('<span','<span style="--i:'+(i+2)+'" ').replace('class="c2','class="rv c2')).join('')}
+/* ===== Birthdays & yahrzeits get a warm, meaningful treatment =====
+   Detected from the event's words. A yahrzeit shows a lit candle + its customs; a birthday pops confetti when
+   you open that day + its customs. Switch `occ` in Test tools turns it off. */
+function occKind(e){if(document.documentElement.classList.contains('tt-off-occ'))return null;
+ const s=((e&&e.t)||'')+' '+((e&&e.x)||'')+' '+((e&&e.person)||'');
+ if(/\b(yahr?z?eit|yohr?tzait|yartzeit|yorz?eit|yahrtzeit|hilula)\b|יארצייט|הילולא|אזכרה/i.test(s))return 'yz';
+ if(/\bbirthdays?\b|\bb-?day\b|\bbday\b|געבוירן|יום הולדת|הולדת/i.test(s))return 'bday';
+ return null}
+const BDAY_MINHAGIM=['Get an aliyah to the Torah on the Shabbos before (or on the day, when it is read).','Give extra tzedakah — before Shacharis and before Mincha.','Set aside time alone to daven, look back over the year, and make a good resolution.','From today, say the new chapter of Tehillim for your years (turning 13 → begin kapitel 14).','Add in Torah, avodah and good deeds; make a farbrengen and share a dvar Torah.'];
+const YZ_MINHAGIM=['Light a 24-hour candle at nightfall, as the day begins.','Get an aliyah, and lead the davening, on the yahrzeit and the Shabbos before.','Say Kaddish, or arrange for someone to.','Learn Mishnayos for the letters of the name, and give tzedakah l’ilui nishmas.','Visit the resting place if you can; make a good resolution in their memory.'];
+function occMingm(k){const L=k==='bday'?BDAY_MINHAGIM:YZ_MINHAGIM;
+ return `<div class="occ-mingm"><b>${k==='bday'?'🎂 Birthday customs':'Customs for the yahrzeit'}</b><ul>${L.map(x=>'<li>'+x+'</li>').join('')}</ul><small>Chabad minhagim — check with your Rav for anything specific.</small></div>`}
+function evCard(e,i){const ok=occKind(e);
+ return `<div class="ev mc k-${e.k}${ok?' occ occ-'+ok:''}" style="--i:${i+3}">`+
+  (ok==='yz'?'<span class="yzc" aria-hidden="true"><b></b><u></u></span>':'')+
+  `<small><i class="m k-${e.k}"></i>${KN[e.k]}</small>`+
+  (e.isTask?`<button class="task-check" data-task="${e.id}" data-date="${ds(sel)}" aria-pressed="${e.done?'true':'false'}" style="float:right;border:1px solid var(--line);border-radius:9px;padding:6px 10px;background:${e.done?'var(--my)':'transparent'};color:inherit">${e.done?'✓ Done':'□ Mark done'}</button>`:'')+
+  (editing?`<button class="ed" data-e="${e.id}">Edit</button>`:'')+
+  `<h3 style="${e.isTask&&e.done?'text-decoration:line-through;opacity:.65':''}">${ok==='bday'?'🎂 ':''}${e.t}${e.h?` <span class="heb" lang="he">${e.h}</span>`:''}</h3>`+
+  (lt(e)?`<p class="sm" role="button" tabindex="0" data-i="${i}">${e.x} <span class="mr">More ›</span></p>`:`<p>${e.x}</p>`)+
+  (ok?occMingm(ok):'')+
+  `</div>`}
+let ccLastConf='';
+function ccConfetti(){if(RM||document.documentElement.classList.contains('tt-off-occ'))return;
+ let c=document.getElementById('ccConfetti');if(!c){c=document.createElement('canvas');c.id='ccConfetti';document.body.appendChild(c)}
+ const dpr=Math.min(devicePixelRatio||1,2),W=innerWidth,H=innerHeight;c.width=W*dpr;c.height=H*dpr;c.style.width=W+'px';c.style.height=H+'px';
+ const g=c.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
+ const cols=['#f6c945','#ff7a9c','#6ec1ff','#8affc1','#c89bff','#ffd27a'],P=[];
+ for(let i=0;i<120;i++)P.push({x:W*(.15+.7*Math.random()),y:H*.3+Math.random()*24,vx:(Math.random()-.5)*7,vy:-6-Math.random()*9,g:.22+Math.random()*.12,r:3+Math.random()*4,rot:Math.random()*6.28,vr:(Math.random()-.5)*.45,c:cols[i%cols.length],sh:Math.random()<.5});
+ const t0=performance.now();
+ const step=now=>{const e=(now-t0)/1000;g.clearRect(0,0,W,H);let alive=0;
+  for(const p of P){p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.vx*=.995;p.rot+=p.vr;if(p.y<H+24)alive++;const a=Math.max(0,1-(e-1.3)/1.5);if(a<=0)continue;
+   g.globalAlpha=a;g.save();g.translate(p.x,p.y);g.rotate(p.rot);g.fillStyle=p.c;if(p.sh)g.fillRect(-p.r,-p.r*.6,p.r*2,p.r*1.2);else{g.beginPath();g.arc(0,0,p.r,0,6.2832);g.fill()}g.restore()}
+  g.globalAlpha=1;if(e<3.1&&alive)requestAnimationFrame(step);else c.remove()};
+ requestAnimationFrame(step);try{H.ok&&H.ok()}catch(e){}}
 function panel(dir){const{h,ev,rc}=infoD(sel),w=sel.getDay()==6,ps=parsha(sel),df=Math.round((+sel-+t0)/864e5),
  rel=df==0?'Today':df==1?'Tomorrow':df==-1?'Yesterday':df>0?'In '+df+' days':-df+' days ago',
  pr=ps?`<div class="pr rv" style="--i:3">${ps.yt?'(':''}Parshas ${ps.p.map(x=>x[0]).join('-')}${ps.yt?')':''} <span class="heb" lang="he" dir="rtl">${ps.yt?'(':''}פרשת ${ps.p.map(x=>x[1]).join('־')}${ps.yt?')':''}</span>${ps.yt?'<span class="pn">Chitas only · no leining this Shabbos</span>':''}</div>`:'';
@@ -1525,11 +1572,12 @@ function panel(dir){const{h,ev,rc}=infoD(sel),w=sel.getDay()==6,ps=parsha(sel),d
  $('#hdr').innerHTML=`${skyScene(h,df)}<h1 class="hd-he rv" lang="he" dir="rtl"><span class="hd-big"><span class="hd-d">${G(h.d)}</span> <span class="hd-m">${h.n[1]}</span></span></h1><div class="sky-cap2" id="skyCap2" aria-hidden="true"></div><div class="hd-div rv" style="--i:1"><i></i><b class="dm"></b><span class="hd-yr" lang="he" dir="rtl">${G(h.y%1000)}</span><b class="dm"></b><i></i></div><div class="hd-en rv" style="--i:1">${sel.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric'})}</div><div class="wk rv" style="--i:2">${wkStrip()}</div>`;capSync();$('#hero').style.setProperty('--aura','var(--'+(ev.length?ev[0].k:w?'yt':'ct')+')');
  $('#gh').textContent=sel.getDate();
  $('#cbt').innerHTML=`${sel.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})}<span lang="he" dir="rtl">${G(h.d)} ${h.n[1]}</span>`;
- $('#p').innerHTML=(editing?'<div class="eb">Editing mode <button class="ed" id="ex">Done</button></div>':'')+lead+pr+(ev.length?ev.map((e,i)=>`<div class="ev mc k-${e.k}" style="--i:${i+3}"><small><i class="m k-${e.k}"></i>${KN[e.k]}</small>${e.isTask?`<button class="task-check" data-task="${e.id}" data-date="${ds(sel)}" aria-pressed="${e.done?'true':'false'}" style="float:right;border:1px solid var(--line);border-radius:9px;padding:6px 10px;background:${e.done?'var(--my)':'transparent'};color:inherit">${e.done?'✓ Done':'□ Mark done'}</button>`:''}${editing?`<button class="ed" data-e="${e.id}">Edit</button>`:''}<h3 style="${e.isTask&&e.done?'text-decoration:line-through;opacity:.65':''}">${e.t}${e.h?` <span class="heb" lang="he">${e.h}</span>`:''}</h3>${lt(e)?`<p class="sm" role="button" tabindex="0" data-i="${i}">${e.x} <span class="mr">More ›</span></p>`:`<p>${e.x}</p>`}</div>`).join(''):'<p class="nospec rv" style="--i:3">No special date on this day.</p>');
+ $('#p').innerHTML=(editing?'<div class="eb">Editing mode <button class="ed" id="ex">Done</button></div>':'')+lead+pr+(ev.length?ev.map((e,i)=>evCard(e,i)).join(''):'<p class="nospec rv" style="--i:3">No special date on this day.</p>');
  zmn();chips(h,ev,rc);study(h);special();rail();nextUp();if(typeof rcRender=='function')rcRender();
  $('#cbr').innerHTML=ring(0,ALLK.length);upd();
  ['#hdr','#ch','#p','#hy','#sp','#sd','#zm'].forEach(s=>reveal($(s)));
  if(dir&&!RM)for(const el of [$('.ab'),$('#hdr'),$('#foot')])el.animate([{opacity:.0,transform:`translateX(${dir*22}px)`},{opacity:1,transform:'none'}],{duration:390,easing:'cubic-bezier(.22,.75,.25,1)'});
+ if(ev.some(e=>occKind(e)==='bday')){if(ccLastConf!==ds(sel)){ccLastConf=ds(sel);setTimeout(ccConfetti,360)}}
  mzBuild();sc()}
 function pick(dt){const nm=dt<V||dt>ad(V,hlen(V)-1),d=dt>sel?1:dt<sel?-1:0;sel=dt;
  if(nm){V=hm1(dt);render(d)}else{document.querySelectorAll('.day.sel').forEach(x=>x.classList.remove('sel'));g.querySelector(`[data-t="${+dt}"]`)?.classList.add('sel')}panel(d);scrollTo({top:0,behavior:RM?'auto':'smooth'})}
@@ -2389,8 +2437,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=2;
+const CC_VER=3;
 const CC_LOG=[
+ {v:3,new:['Add your birthdays and yahrzeits — just tell the planner (“Zaidy’s yahrzeit 3 Tishrei”, “my birthday 15 Nissan”). A birthday pops confetti when you open that day; a yahrzeit shows a lit candle. Both now show the Chabad customs for the day.']},
  {v:1,new:['The night and day screens were restyled as one matching glass look.','The semicircle under the sun and moon is now a soft glow of lit atmosphere — no more hard shape.']},
  {v:2,feature:'The phone app',tour:'app',new:['New: a phone app that rings your reminders as real alarms — even with no internet or VPN. A home-screen widget is coming next.','Get it from ⋯ → App.']}
 ];
@@ -3553,7 +3602,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
+ const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id]of FLAGS)document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{c.checked=fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
