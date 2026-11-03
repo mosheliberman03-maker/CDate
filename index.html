@@ -1159,7 +1159,7 @@ const lt=e=>L[e.t]||(e.id=='ch'?L.Chanukah:'');
 function dmOpen(e){let b=$('#dmb');if(!b){b=document.createElement('div');b.id='dmb';b.className='dmb';b.innerHTML='<div class="dmc" role="dialog" aria-modal="true"></div>';document.body.appendChild(b);b.onclick=x=>{if(x.target==b||x.target.closest('.x'))dmClose()}}
  const{h}=info(sel);b.querySelector('.dmc').style.setProperty('--c','var(--'+e.k+')');b.querySelector('.dmc').innerHTML=`<button class="x" aria-label="Close">×</button><small>${KN[e.k]}</small><h3>${e.t}${e.h?` <span class="heb" lang="he">${e.h}</span>`:''}</h3><div class="dd">${h.d} ${h.n[0]} · ${sel.toLocaleDateString('en',{month:'long',day:'numeric'})}</div><p>${lt(e)}</p>`;requestAnimationFrame(()=>b.classList.add('on'))}
 function dmClose(){const b=$('#dmb');b&&b.classList.remove('on')}
-document.addEventListener('click',e=>{const p=e.target.closest('.sm');if(p){const v=infoD(sel).ev[+p.dataset.i];v&&dmOpen(v)}});
+document.addEventListener('click',e=>{const p=e.target.closest('.sm');if(p){const v=info(sel).ev[+p.dataset.i];v&&dmOpen(v)}});
 document.addEventListener('keydown',e=>{if(e.key=='Escape')dmClose();else if((e.key=='Enter'||e.key==' ')&&e.target.classList&&e.target.classList.contains('sm')){e.preventDefault();e.target.click()}});
 const go=m=>{H.step();V=m>0?ad(V,hlen(V)):hm1(ad(V,-1));render(m)};
 $('.dow').innerHTML=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<span>${d}</span>`).join('');
@@ -1474,7 +1474,7 @@ Object.assign(TK,{
 });
 
 function tasksFor(e,h,W){let f=TK[e.id]||(e.id=='ch'&&TKC)||(e.k=='fs'&&FAST2)||(e.k=='yb'&&YB2)||(e.k=='ct'&&CT2);if(typeof f=='function')f=f(h,W,e);return f?f.filter(Boolean):[]}
-function groups(){const{h,ev,rc}=infoD(sel),W=hDay(sel).getDay(),o=[];
+function groups(){const{h,ev,rc}=info(sel),W=hDay(sel).getDay(),o=[];
  for(const e of ev){const f=tasksFor(e,h,W);if(f.length)o.push({t:e.t,k:e.k,id:e.id,items:f})}
  o.push(...dynGroups(h,W,ev,rc));
  if(W==5&&cln())o.push({t:'Erev Shabbos',k:'ys',id:'fri',items:[clt('Light Shabbos candles')]});
@@ -1630,6 +1630,8 @@ const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.tar
 function reveal(c){const x=c.querySelectorAll('.rv');x.forEach((n,i)=>{n.classList.remove('in');io.unobserve(n);n.dataset.sectionStart=i===0?'1':'0'});requestAnimationFrame(()=>requestAnimationFrame(()=>x.forEach(n=>io.observe(n))))}
 /* Your own repeating plans (daily, every other day, weekly) show only on today. Everywhere else (month grid, week strip,
    another selected day, Coming up, next-up) they are left out. info() itself keeps them, for reminders and cancelling. */
+/* v28 (owner: chavrusas 'not showing'): the opened day's panel shows ALL your plans for that day (info). Only near-daily
+   plans (daily, every other day, 4+ days a week) stay out of the month grid, week strip and Coming up, so they don't crowd them. */
 function infoD(dt){const x=info(dt);if(ds(dt)===ds(t0))return x;return{...x,ev:x.ev.filter(e=>!routine(e))}}
 function rail(){const h0=hd(sel),a=[];
  const scan=(lim,same)=>{for(let i=1;i<=lim&&a.length<14;i++){const dt=ad(sel,i),x=infoD(dt);if(same&&x.h.k!=h0.k)break;const v=x.ev.filter(e=>on[e.k]);if(v.length)a.push({dt,h:x.h,v})}};
@@ -1638,7 +1640,7 @@ function rail(){const h0=hd(sel),a=[];
  r.innerHTML=a.length?'<div class="rl"><div class="rh rv">Coming up</div>'+a.map((x,i)=>{const p=x.v[0];return `<button class="rt mc k-${p.k}" style="--i:${Math.min(i,8)}" data-t="${+x.dt}" title="${x.v.map(e=>e.t).join(', ')}" aria-label="${x.dt.toDateString()}: ${x.v.map(e=>e.t).join(', ')}"><span class="mk2">${x.v.slice(0,3).map(e=>`<i class="m k-${e.k}"></i>`).join('')}</span><small>${x.dt.toLocaleDateString('en',{weekday:'short'})}</small><b>${x.dt.getDate()}</b><span lang="he">${G(x.h.d)}</span></button>`}).join('')+'</div>':'';
  {const hn=$('#hintN');hn.textContent=a.length>9?'9+':a.length;hn.hidden=!a.length;$('#hint').setAttribute('aria-label',a.length?'See details and '+a.length+' coming up':'See details')}
  reveal(r)}
-const routine=e=>{if(e.k!='my')return false;const c=my.find(m=>m.id==e.id);return !!c&&(c.r=='weekly'||c.r=='every2'||(c.r=='custom'&&Number.isInteger(c.interval)&&c.interval<=7))};
+const routine=e=>{if(e.k!='my')return false;const c=my.find(m=>m.id==e.id);if(!c)return false;if(c.r=='weekly')return (Array.isArray(c.dows)&&c.dows.length?c.dows.length:1)>=4;return c.r=='every2'||(c.r=='custom'&&Number.isInteger(c.interval)&&c.interval<=2)};
 /* The round "next special day" button is no longer shown on the home screen (owner's choice): upcoming days live in the
    Coming Up column further down. Kept hidden so the card animation starts from the arrow instead. */
 function nextUp(){const b=$('#nxc');b.hidden=true;b.removeAttribute('data-t');return;let f=null;
@@ -1706,7 +1708,7 @@ function ccConfetti(){if(RM||document.documentElement.classList.contains('tt-off
    g.globalAlpha=a;g.save();g.translate(p.x,p.y);g.rotate(p.rot);g.fillStyle=p.c;if(p.sh)g.fillRect(-p.r,-p.r*.6,p.r*2,p.r*1.2);else{g.beginPath();g.arc(0,0,p.r,0,6.2832);g.fill()}g.restore()}
   g.globalAlpha=1;if(e<3.1&&alive)requestAnimationFrame(step);else c.remove()};
  requestAnimationFrame(step);try{H.ok&&H.ok()}catch(e){}}
-function panel(dir){const{h,ev,rc}=infoD(sel),w=hDay(sel).getDay()==6,ps=parsha(hDay(sel)),df=Math.round((+sel-+t0)/864e5),
+function panel(dir){const{h,ev,rc}=info(sel),w=hDay(sel).getDay()==6,ps=parsha(hDay(sel)),df=Math.round((+sel-+t0)/864e5),
  rel=df==0?'Today':df==1?'Tomorrow':df==-1?'Yesterday':df>0?'In '+df+' days':-df+' days ago',
  pr=ps?`<div class="pr rv" style="--i:3">${ps.yt?'(':''}Parshas ${ps.p.map(x=>x[0]).join('-')}${ps.yt?')':''} <span class="heb" lang="he" dir="rtl">${ps.yt?'(':''}פרשת ${ps.p.map(x=>x[1]).join('־')}${ps.yt?')':''}</span>${ps.yt?'<span class="pn">Chitas only · no leining this Shabbos</span>':''}</div>`:'';
  const lead=`<div class="lead rv" style="--i:2"><span>${rel}${w?' · Shabbos':''}</span><span>${h.d} ${h.n[0]} ${h.y} · ${sel.getFullYear()}</span></div>`;
@@ -2746,8 +2748,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=27;
+const CC_VER=28;
 const CC_LOG=[
+ {v:28,new:['Your repeating plans (like a weekly chavrusa) now show on every day they happen when you open that day, not only on today. Weekly ones (up to 3 days a week) also get a dot on the calendar.']},
  {v:27,new:['Updates now install by themselves: right as you open the app, or when you leave it. No more tapping “Tap to update” (it only shows if an update arrives while you’re in the middle of something).']},
  {v:26,big:1,new:['The English date now changes at midnight and the Hebrew date at sunset. Your own plans stay on their English date (“tomorrow at 8 PM” is really tomorrow), while holidays, Yom Tov and Hebrew-date plans follow the Hebrew date.','Shiurim follow the Hebrew date (the next day’s start at sunset). To keep them on the English date, use ⋯ → Shiurim.']},
  {v:25,new:['The bubbles in the water letters move freely again (no more pull toward the middle of each letter).']},
