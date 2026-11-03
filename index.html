@@ -2719,9 +2719,9 @@ const RMR=[['mine','Your plans','Reminders you asked for in Plan something'],['c
 const rmSumText=()=>{const c=nCfg();if(!c.on)return 'Off';const n=RMR.filter(r=>c[r[0]]).length;return 'On · '+n+(n==1?' type':' types')};
 function rmSum(){const e=$('#rmSum');if(e)e.textContent=rmSumText()}
 function rmLearn(c,t){const u=ltUsual(),L=c.learnLvl;
- const hint=L=='never'?'No reminders for the daily shiurim':L=='rarely'?'Once a day, if any are left':u.m==null?'Three nudges a day while it learns when you usually learn ('+u.n+' of 5 days so far)':'You usually learn around '+ltFmt(u.m)+'. A heads-up at '+ltFmt(u.m-30)+', a reminder at '+ltFmt(u.m+5)+', and one more at '+ltFmt(u.m+65);
+ const hint=L=='never'?'No reminders for the daily shiurim':L=='rarely'?'Once a day, if any are left':'Smart reminders so you never miss a shiur';
  return `<div class="qgrp" id="rmLearn"><div class="qrow"><span class="t"><b>${t}</b><small>${hint}</small></span></div><div class="qopt"><div class="qseg" data-k="learnLvl">${[['never','Never'],['rarely','Rarely'],['regular','Regularly']].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${L==v}">${l}</button>`).join('')}</div></div>`+
-  (L=='rarely'||(L=='regular'&&u.m==null)?`<div class="qopt"><span>${L=='rarely'?'Remind me at':'Last nudge at'}</span><input type="time" class="qtime" data-k="learnAt" value="${c.learnAt}"></div>`:'')+`</div>`}
+  (L=='rarely'?`<div class="qopt"><span>Remind me at</span><input type="time" class="qtime" data-k="learnAt" value="${c.learnAt}"></div>`:'')+`</div>`}
 function rmBody(){const c=nCfg();
  return `<button class="x" aria-label="Close">×</button><small>Settings</small><h3>Reminders</h3><p class="qintro">One reminder for each occasion. It fills in with short items as they come due.</p>
  <label class="qrow qmaster"><span class="t"><b>Send reminders</b><small id="rmStat"></small></span><input type="checkbox" class="qsw" data-k="on" ${c.on?'checked':''}></label>
@@ -2773,8 +2773,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=29;
+const CC_VER=30;
 const CC_LOG=[
+ {v:30,new:['Reminders: the “Regularly” option for shiurim now just says what it does: smart reminders so you never miss a shiur.']},
  {v:29,big:1,new:['Shiurim reminders now have three levels in ⋯ → Reminders: Never, Rarely (once a day) or Regularly. Regularly learns when you usually do your shiurim, then reminds you a little before, again just after, and once more an hour later to keep your streak going.']},
  {v:28,new:['Your repeating plans (like a weekly chavrusa) now show on every day they happen when you open that day, not only on today. Weekly ones (up to 3 days a week) also get a dot on the calendar.']},
  {v:27,new:['Updates now install by themselves: right as you open the app, or when you leave it. No more tapping “Tap to update” (it only shows if an update arrives while you’re in the middle of something).']},
