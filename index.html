@@ -798,7 +798,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
 <div class="sheet ms" id="ms" role="dialog" aria-label="Month"><div class="mh"><h2 id="t"></h2><div class="nav"><button id="pv" aria-label="Previous month">‹</button><button id="nx" aria-label="Next month">›</button></div></div><div class="sub" id="s"></div><section class="cal"><div class="dow"></div><div class="grid" id="g"></div></section></div>
 
 <div class="sheet" id="sh" role="dialog" aria-label="Tools"><div class="acct"><div><small>Signed in as</small><strong id="profileName"></strong></div><button class="btn gh" id="acctOut" type="button">Log out</button></div><h2>Go to date</h2><div class="dfb" id="gb"><div class="rw" style="margin-top:0"><input type="date" id="jp" aria-label="Date"><div class="hp" hidden></div><button class="btn" id="go">Go</button></div></div>
-<h2 style="margin-top:24px">Show on calendar</h2><div class="legend" id="lg"></div><h2 style="margin-top:24px">Sky</h2><label style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--ink)"><input type="checkbox" id="skyOn" style="width:auto;margin:0">Follow the sun: moving sun &amp; moon, sky colours, and the date turns over at sunset</label><h2 style="margin-top:24px">Reminders</h2><button class="rmopen" id="rmOpen" type="button"><span><b>Notifications</b><small id="rmSum">Off</small></span><i>›</i></button><h2 style="margin-top:24px">Zmanim location</h2><p id="locNow" style="margin:0 0 10px;font-size:14px"></p><button class="btn" id="ul" type="button" style="width:100%">Detect my location automatically</button><label for="cs" style="margin-top:14px">Or type a city</label><div class="rw" style="margin-top:0"><input id="cs" placeholder="e.g. Crown Heights, Jerusalem, Foshan" autocomplete="off" style="flex:1"><button class="btn gh" id="csb" type="button">Set</button></div><div id="locRes" style="display:grid;gap:6px;margin-top:8px"></div><p id="locMsg" role="status" style="margin:8px 0 0;font-size:13px;color:var(--mut)"></p>
+<h2 style="margin-top:24px">Show on calendar</h2><div class="legend" id="lg"></div><h2 style="margin-top:24px">Sky</h2><label style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--ink)"><input type="checkbox" id="skyOn" style="width:auto;margin:0">Follow the sun: moving sun &amp; moon, sky colours, and the Hebrew date turns over at sunset</label><h2 style="margin-top:24px">Shiurim</h2><label style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--ink)"><input type="checkbox" id="shEng" style="width:auto;margin:0">Follow the English date for shiurim (otherwise the next day’s shiurim start at sunset, with the Hebrew date)</label><h2 style="margin-top:24px">Reminders</h2><button class="rmopen" id="rmOpen" type="button"><span><b>Notifications</b><small id="rmSum">Off</small></span><i>›</i></button><h2 style="margin-top:24px">Zmanim location</h2><p id="locNow" style="margin:0 0 10px;font-size:14px"></p><button class="btn" id="ul" type="button" style="width:100%">Detect my location automatically</button><label for="cs" style="margin-top:14px">Or type a city</label><div class="rw" style="margin-top:0"><input id="cs" placeholder="e.g. Crown Heights, Jerusalem, Foshan" autocomplete="off" style="flex:1"><button class="btn gh" id="csb" type="button">Set</button></div><div id="locRes" style="display:grid;gap:6px;margin-top:8px"></div><p id="locMsg" role="status" style="margin:8px 0 0;font-size:13px;color:var(--mut)"></p>
 <details style="margin-top:12px"><summary style="font-size:13px;color:var(--mut);cursor:pointer">Enter coordinates manually</summary><label for="pl">Place</label><input id="pl"><div class="rw" style="margin-top:0"><div style="flex:1"><label for="la">Latitude</label><input id="la" type="number" step="any"></div><div style="flex:1"><label for="lo">Longitude</label><input id="lo" type="number" step="any"></div></div><label for="tz">Time zone</label><input id="tz" placeholder="Asia/Shanghai"><div class="rw"><button class="btn" id="ls" type="button">Save location</button></div></details>
 <h2 id="appH" style="margin-top:24px">App</h2><div id="appSec"></div><h2 style="margin-top:24px">This month</h2><div id="ag"></div><h2 style="margin-top:24px">Help</h2><button class="btn gh" id="tourReplay" type="button">Replay the tour</button><div id="fwrap" hidden><h2 id="fh" style="margin-top:24px">Edit event</h2><label for="ft">Title</label><input id="ft"><label for="fx">Notes</label><textarea id="fx" rows="3"></textarea>
 <div id="fd"><label for="fdt">Date</label><div class="dfb" id="fdb"><input type="date" id="fdt"><div class="hp" hidden></div></div><label for="fr">Repeats</label><select id="fr"><option value="once">Once</option><option value="greg">Every year (English date)</option><option value="heb">Every year (Hebrew date)</option></select></div>
@@ -1102,10 +1102,15 @@ function infoBase(dt){const key=dt.getFullYear()*10000+dt.getMonth()*100+dt.getD
  dynEv(dt,h,wd,ev);
  const r={h,rc,ev};if(IBC.size>3000)IBC.clear();IBC.set(key,r);return r}
 const PLAN_LEARN=/\b(?:chavrusa|chavrusas|kvius|seder|sedarim|shiur|shiurim|learn(?:ing)?|study(?:ing)?|class|lesson|farbrengen)\b/i;
-function info(dt){const b=infoBase(dt),h=b.h,rc=b.rc,ev=b.ev.slice(),wd=dt.getDay();
+function info(dt){const b=infoBase(hDay(dt)),h=b.h,rc=b.rc,ev=b.ev.slice(),wd=dt.getDay();
  const s=ds(dt),K=Object.keys(KN);for(const c of my)if(((c.from&&s<c.from)||(Array.isArray(c.skip)&&c.skip.some(r=>s>=r[0]&&s<=r[1])))?false:(c.r=='once'&&c.dt==s)||(c.r=='greg'&&c.dt.slice(5)==s.slice(5))||(c.r=='heb'&&c.hk==h.k&&c.hd==h.d)||(c.r=='weekly'&&(Array.isArray(c.dows)&&c.dows.length?c.dows.includes(dt.getDay()):dt.getDay()==c.dow))||(c.r=='every2'&&((Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)>=0)&&(Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)%2===0)))||(c.r=='hmonth'&&h.d==c.hd)||(c.r=='yomadpagra'&&Array.isArray(c.dates)&&c.dates.includes(h.k+'-'+h.d))||(c.r=='custom'&&((Array.isArray(c.dates)&&c.dates.includes(s))||(Number.isInteger(c.interval)&&c.interval>0&&Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)>=0&&Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)%c.interval===0))))ev.push({k:'my',t:c.t,h:'',x:c.x||'Your event.',id:c.id,isTask:c.kind==='task'&&!PLAN_LEARN.test(c.t+' '+(c.x||'')),done:!!taskDone()[c.id+'@'+s]});
  return{h,rc,ev:ev.map(e=>ov[e.id]?{...e,...ov[e.id]}:e).sort((a,b)=>K.indexOf(a.k)-K.indexOf(b.k))}}
-let t0=ad(new Date(),0);const hm1=dt=>ad(dt,1-hd(dt).d),hlen=f=>hd(ad(f,29)).d==30?30:29;let V=hm1(t0),sel=t0;const on={yt:1,ct:1,yb:1,ys:1,fs:1,my:1};
+let t0=ad(new Date(),0);
+/* Two "todays": t0 is the English date (it changes at midnight). After sunset the Hebrew date has already moved on, so anything
+   linked to the Hebrew date (holidays, Yom Tov, Hebrew-date plans, shiurim) reads the next day: hDay(dt). Your own plans stay on
+   the English date. Shiurim can be set to follow the English date instead (setting "cc_sh_eng"). */
+var HSH=0;const hDay=dt=>HSH&&+dt===+t0?ad(dt,1):dt,shEng=()=>{try{return localStorage.getItem(AK('cc_sh_eng'))==='1'}catch(e){return false}},shDay=dt=>shEng()?dt:hDay(dt);
+const hm1=dt=>ad(dt,1-hd(dt).d),hlen=f=>hd(ad(f,29)).d==30?30:29;let V=hm1(t0),sel=t0;const on={yt:1,ct:1,yb:1,ys:1,fs:1,my:1};
 const g=$('#g');
 const ds=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const AK=k=>window.ccProfileKey?window.ccProfileKey(k):k;const ST=(k,d)=>{try{return JSON.parse(localStorage.getItem(AK(k)))||d}catch(e){return d}},SV=()=>{try{localStorage.setItem(AK('cc_my'),JSON.stringify(my));localStorage.setItem(AK('cc_ov'),JSON.stringify(ov))}catch(e){}try{if(typeof notifSyncSoon=='function'&&nCfg().on)notifSyncSoon()}catch(e){}};
@@ -1255,7 +1260,7 @@ function parsha(dt){const S=ad(dt,(6-dt.getDay()+7)%7),h=hd(S),m=cycle(h.k=='Ti'
 let ZR=[];
 const DN=ST('cc_done',{});
 const SVD=()=>{try{localStorage.setItem(AK('cc_done'),JSON.stringify(DN))}catch(e){}};
-const dkey=()=>ds(sel),ck=k=>!!(DN[dkey()]&&DN[dkey()][k]);
+const dkey=()=>ds(shDay(sel)),ck=k=>!!(DN[dkey()]&&DN[dkey()][k]);
 const SH=['chumash','tehillim','tanya','rambam3','rambam1'],ALLK=[...SH,'hy'];
 const CHK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const row=(k,title,sub,link,i,gi,gk)=>`<div class="ck rv${ck(k)?' on':''}" style="--i:${i}" data-k="${k}"><button class="bx" role="checkbox" aria-checked="${ck(k)}" aria-label="${title}">${CHK}</button><div class="tx"><b>${title}</b>${sub?`<small>${sub}</small>`:''}</div>${gi>=0?`<button class="gi" type="button" data-g="${gi}" data-k="${gk||'ys'}" aria-label="How and when: ${title.replace(/"/g,'')}">How &amp; when ›</button>`:''}${link?`<a class="ex" href="${link}" target="_blank" rel="noopener" aria-label="Open the text on Chabad.org">↗</a>`:''}</div>`;
@@ -1323,12 +1328,12 @@ function dynEv(dt,h,wd,ev){
 }
 function zAt(dt,z,rise){const y=dt.getFullYear(),m=dt.getMonth()+1,d=dt.getDate(),u=ut(y,m,d,z,rise);return u==null?null:Date.UTC(y,m-1,d)+u*36e5}
 /* "tonight": the Hebrew date whose evening is the coming (or current) night. The date turns over at sunset, so after sunset it is the displayed date; before, it is the next one. */
-function tonightInfo(){const night=+sel===+t0&&typeof SKY!='undefined'&&SKY.on&&SKY.last&&!SKY.last.up,dt=night?sel:ad(sel,1);return{h:hd(dt),dt,night}}
+function tonightInfo(){const night=+sel===+t0&&typeof SKY!='undefined'&&SKY.on&&SKY.last&&!SKY.last.up,dt=night?hDay(sel):ad(sel,1);return{h:hd(dt),dt,night}}
 function chIdx(T){const h=T.h;if(h.k=='Ki'&&h.d>=25)return h.d-24;if(h.k=='Te'&&h.d<=3){const n=h.d+hd(ad(T.dt,-h.d)).d-24;return n<=8?n:0}return 0}
 function rhOf(dt){const h=hd(dt);if(h.k=='E'){let k=1;while(hd(ad(dt,k)).k=='E')k++;return ad(dt,k)}if(h.k=='Ti')return ad(dt,1-h.d);return null}
 function selichosStart(rh){const w=rh.getDay();let st=ad(rh,-(w==0?7:w));if(w==1||w==2)st=ad(st,-7);return st}
 function omerIdx(h){let n=0;if(h.k=='N'&&h.d>=16)n=h.d-15;else if(h.k=='I')n=15+h.d;else if(h.k=='Si')n=44+h.d;return n>=1&&n<=49?n:0}
-function dynGroups(h,W,ev,rc){const o=[],T=tonightInfo(),Th=T.h,eve=ad(T.dt,-1),eW=eve.getDay(),tzr=zAt(eve,98.5,0),tzs=tzr?' ('+tf(tzr)+')':'',tn=[];
+function dynGroups(h,W,ev,rc){const o=[],HD=hDay(sel),T=tonightInfo(),Th=T.h,eve=ad(T.dt,-1),eW=eve.getDay(),tzr=zAt(eve,98.5,0),tzs=tzr?' ('+tf(tzr)+')':'',tn=[];
  const second=Th.k=='Ti'&&(Th.d==2||Th.d==16||Th.d==23)||Th.k=='N'&&(Th.d==16||Th.d==22)||Th.k=='Si'&&Th.d==7;
  if(Th.k=='N'&&(Th.d==14&&eW!=5&&eW!=6||Th.d==13&&eW==4))tn.push((Th.d==13?'Erev Pesach is Shabbos, so search for chametz tonight (Thursday night) after nightfall':'Perform bedikas chametz after nightfall')+tzs,'Recite the blessing and then Kol Chamira (nullification of chametz)');
  if(Th.k=='N'&&Th.d==15)tn.push('Seder tonight: four cups, matzah and maror');
@@ -1343,9 +1348,9 @@ function dynGroups(h,W,ev,rc){const o=[],T=tonightInfo(),Th=T.h,eve=ad(T.dt,-1),
  if(eW==6&&(Th.k=='E'||Th.k=='Ti')){const rh=rhOf(eve);if(rh&&+ad(selichosStart(rh),-1)==+eve)tn.push('Selichos begin tonight: say them after midnight (Chatzos)')}
  if(tn.length)o.push({t:T.night?'This evening':'Tonight',k:'ys',id:'tonight',items:tn});
  if(rc)o.push({t:'Rosh Chodesh '+rc,k:'yt',id:'rc',items:['Add Yaaleh V’yavo in Shemoneh Esrei and in Birkas Hamazon','Say Half Hallel in Shacharis','Omit Tachanun, and say Musaf of Rosh Chodesh']});
- if(infoBase(ad(sel,1)).ev.some(e=>e.id=='eruv')&&!ev.some(e=>e.id=='eruv'))o.push({t:'Heads-up for tomorrow',k:'ys',id:'eruv-prep',items:['Tomorrow is Erev Yom Tov: prepare a matzah (or roll) and a cooked food (egg, fish or meat) for Eruv Tavshilin']});
+ if(infoBase(ad(HD,1)).ev.some(e=>e.id=='eruv')&&!ev.some(e=>e.id=='eruv'))o.push({t:'Heads-up for tomorrow',k:'ys',id:'eruv-prep',items:['Tomorrow is Erev Yom Tov: prepare a matzah (or roll) and a cooked food (egg, fish or meat) for Eruv Tavshilin']});
  if(h.k=='N'&&h.d<=13){const n=NASI[h.d-1];o.push({t:'Nissan',k:'ys',id:'nasi',items:['Read the Nasi of the day: '+(h.d<13?n[0]+' of Shevet '+n[1]+' ':'the summary ')+'(Bamidbar 7:'+n[2]+')']})}
- if(h.k=='E'&&h.d<=28){const rh=rhOf(sel),sl=rh&&+sel>=+selichosStart(rh);o.push({t:'Chodesh Elul',k:'ys',id:'elul',items:[W!=6&&'Hear the Elul shofar after Shacharis',sl&&W!=6&&'Say Selichos before Shacharis','Say Psalm 27 (L’Dovid Hashem Ori) after the morning and evening prayers',h.d==1&&'Check your tefillin and mezuzos during Elul'].filter(Boolean)})}
+ if(h.k=='E'&&h.d<=28){const rh=rhOf(HD),sl=rh&&+HD>=+selichosStart(rh);o.push({t:'Chodesh Elul',k:'ys',id:'elul',items:[W!=6&&'Hear the Elul shofar after Shacharis',sl&&W!=6&&'Say Selichos before Shacharis','Say Psalm 27 (L’Dovid Hashem Ori) after the morning and evening prayers',h.d==1&&'Check your tefillin and mezuzos during Elul'].filter(Boolean)})}
  if(h.k=='Ti'&&h.d>=3&&h.d<=9){o.push({t:'Aseres Yemei Teshuvah',k:'ys',id:'aseres',items:[W!=6&&'Say Selichos before Shacharis','Add the special Ten Days insertions in Shemoneh Esrei (Zochreinu, Mi Kamocha, U’chsov, B’sefer)','Say Hamelech Hakadosh and Hamelech Hamishpat',W!=6&&'Say Avinu Malkeinu','Say Psalm 27 after the morning and evening prayers','Increase in tzedakah and acts of kindness'].filter(Boolean)})}
  return o}
 
@@ -1469,7 +1474,7 @@ Object.assign(TK,{
 });
 
 function tasksFor(e,h,W){let f=TK[e.id]||(e.id=='ch'&&TKC)||(e.k=='fs'&&FAST2)||(e.k=='yb'&&YB2)||(e.k=='ct'&&CT2);if(typeof f=='function')f=f(h,W,e);return f?f.filter(Boolean):[]}
-function groups(){const{h,ev,rc}=infoD(sel),W=sel.getDay(),o=[];
+function groups(){const{h,ev,rc}=infoD(sel),W=hDay(sel).getDay(),o=[];
  for(const e of ev){const f=tasksFor(e,h,W);if(f.length)o.push({t:e.t,k:e.k,id:e.id,items:f})}
  o.push(...dynGroups(h,W,ev,rc));
  if(W==5&&cln())o.push({t:'Erev Shabbos',k:'ys',id:'fri',items:[clt('Light Shabbos candles')]});
@@ -1570,7 +1575,7 @@ const rdPosGet=(dk,k)=>rdPosAll()[dk+'|'+k]||null;
 function rdPosSet(dk,k,v){const A=rdPosAll(),id=dk+'|'+k;if(v)A[id]={...v,t:Date.now()};else delete A[id];
  const ks=Object.keys(A).sort((x,y)=>A[y].t-A[x].t);ks.slice(40).forEach(x=>delete A[x]);try{localStorage.setItem(AK('cc_rd_pos'),JSON.stringify(A))}catch(e){}}
 let RDS=null;const rdFS=()=>{try{return +localStorage.getItem('cc_rd_fs')||20.5}catch(e){return 20.5}};
-function rdOpen(k){const d=new Date(sel),dk=dkey(),st=RDS={k,d,dk,ok:false};
+function rdOpen(k){const d=new Date(shDay(sel)),dk=dkey(),st=RDS={k,d,dk,ok:false};
  let b=$('#rdr');if(!b){b=document.createElement('div');b.id='rdr';b.className='rdr';b.innerHTML='<div class="rdb"><button type="button" class="rdx" aria-label="Back">←</button><div class="rdt"><b></b><small></small></div><button type="button" class="rdfs" aria-label="Text size">Aa</button><div class="rdpc" aria-live="off">0%</div><div class="rdp"><i></i></div></div><div class="rdw"><div class="rdm" dir="rtl" lang="he"></div><div class="rdsb" aria-hidden="true"><div class="rdth"><span></span></div></div></div>';document.body.appendChild(b);b.querySelector('.rdx').onclick=()=>history.back();rdScrollUI(b);b.querySelector('.rdfs').onclick=()=>{const S=[18,20.5,23,26],i=(S.indexOf(rdFS())+1)%S.length;try{localStorage.setItem('cc_rd_fs',S[i])}catch(e){}H.sel();b.querySelector('.rdm').style.setProperty('--rdfs',S[i]+'px');b._rdUpd&&b._rdUpd()}}
  b.querySelector('.rdm').style.setProperty('--rdfs',rdFS()+'px');
  b.querySelector('.rdt b').textContent=RD_TITLE[k];b.querySelector('.rdt small').textContent=d.toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'})+' · '+hd(d).d+' '+hd(d).n[0];
@@ -1605,8 +1610,8 @@ function rdClose(){const st=RDS,b=$('#rdr');RDS=null;if(b)b.classList.remove('on
  if(st&&st.ok){clearTimeout(st.svT);const fin=(st.maxF||0)>=.995;if(!fin){rdPosSet(st.dk,st.k,{p:st.posF||0,m:st.maxF||0});return}rdPosSet(st.dk,st.k,null);const D=(DN[st.dk]??={});if(!D[st.k]){if(st.k==='rambam3'||st.k==='rambam1')delete D[st.k==='rambam3'?'rambam1':'rambam3'];D[st.k]=1;SVD();upd();H.ok();if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}}}
 addEventListener('popstate',()=>{if(RDS)rdClose()});
 document.addEventListener('click',e=>{const r=e.target.closest('.ck');if(r&&!e.target.closest('a')){if(RD_KEYS.includes(r.dataset.k)&&!e.target.closest('.bx'))return rdOpen(r.dataset.k);return tog(r.dataset.k)}if(e.target.closest('#hyb'))tog('hy')});
-function study(h){const u='https://www.chabad.org/dailystudy/default.asp?tdate='+encodeURIComponent(`${sel.getMonth()+1}/${sel.getDate()}/${sel.getFullYear()}`),
- th=h.d==29&&hd(ad(sel,1)).d==1?'140–150':TH[h.d-1],al=['Rishon','Sheini','Shlishi','Revii','Chamishi','Shishi','Shevii'][sel.getDay()],ps=parsha(sel),
+function study(){const S=shDay(sel),h=hd(S),u='https://www.chabad.org/dailystudy/default.asp?tdate='+encodeURIComponent(`${S.getMonth()+1}/${S.getDate()}/${S.getFullYear()}`),
+ th=h.d==29&&hd(ad(S,1)).d==1?'140–150':TH[h.d-1],al=['Rishon','Sheini','Shlishi','Revii','Chamishi','Shishi','Shevii'][S.getDay()],ps=parsha(S),
  R=[['chumash','Chumash with Rashi',ps?al+' · '+ps.p.map(x=>x[0]).join('-'):al],['tehillim','Tehillim',th],['tanya','Tanya','Daily portion'],['rambam3','Rambam · 3 chapters','Daily portion'],['rambam1','Rambam · 1 chapter','Daily portion']];
  $('#sd').innerHTML=`<div class="ph rv"><div><h2>Today’s shiurim</h2><div class="mut" id="sdn"></div></div>${ring(0,4)}</div>`+stkHtml()+R.map((r,i)=>row(r[0],r[1],r[2],'',i+1)).join('')+`<small class="rv" style="--i:7">Tap a shiur to read it in Hebrew. Tap the circle to check it off.</small>`;
  $('#hy').innerHTML=`<div class="hyc rv"><h2>Hayom Yom</h2><div class="heb" lang="he" dir="rtl">${G(h.d)} ${h.n[1]}</div><div class="hyt" id="hyt"><p class="mut">The Rebbe’s daily collection of Chassidic teachings, one entry for each day of the year.</p></div><div class="hyr"><a class="btn" href="${u}" target="_blank" rel="noopener">Read ${h.d} ${h.n[0]} ↗</a><button class="btn gh" id="hyb"></button></div></div>`;hyFill(h)}
@@ -1615,7 +1620,7 @@ function study(h){const u='https://www.chabad.org/dailystudy/default.asp?tdate='
 let HYT=null,HYL=null;
 const hyLeap=y=>((7*y+1)%19)<7;
 function hyFill(h){const el=$('#hyt');if(!el)return;
- if(!HYT){if(!HYL){el.innerHTML=LOAD;HYL=fetch('hayomyom-en.json').then(r=>r.ok?r.json():null).then(j=>{HYT=j&&j.days||{};const h2=hd(sel);hyFill(h2)}).catch(()=>{HYL=null;el.innerHTML=''});}return}
+ if(!HYT){if(!HYL){el.innerHTML=LOAD;HYL=fetch('hayomyom-en.json').then(r=>r.ok?r.json():null).then(j=>{HYT=j&&j.days||{};const h2=hd(shDay(sel));hyFill(h2)}).catch(()=>{HYL=null;el.innerHTML=''});}return}
  const ks=h.k==='A'&&!hyLeap(h.y)?['AI-'+h.d,'A-'+h.d]:[h.k+'-'+h.d],es=ks.map(k=>HYT[k]).filter(Boolean);if(!es.length)return;
  const body=es.map(e=>(es.length>1&&e.h?`<div class="hyh">${e.h}</div>`:'')+e.p.map(x=>`<p>${x}</p>`).join('')+(e.t?'<div class="hyn">Translated in the app from the original.</div>':'')).join('');
  const long=body.replace(/<[^>]+>/g,'').length>520;
@@ -1701,7 +1706,7 @@ function ccConfetti(){if(RM||document.documentElement.classList.contains('tt-off
    g.globalAlpha=a;g.save();g.translate(p.x,p.y);g.rotate(p.rot);g.fillStyle=p.c;if(p.sh)g.fillRect(-p.r,-p.r*.6,p.r*2,p.r*1.2);else{g.beginPath();g.arc(0,0,p.r,0,6.2832);g.fill()}g.restore()}
   g.globalAlpha=1;if(e<3.1&&alive)requestAnimationFrame(step);else c.remove()};
  requestAnimationFrame(step);try{H.ok&&H.ok()}catch(e){}}
-function panel(dir){const{h,ev,rc}=infoD(sel),w=sel.getDay()==6,ps=parsha(sel),df=Math.round((+sel-+t0)/864e5),
+function panel(dir){const{h,ev,rc}=infoD(sel),w=hDay(sel).getDay()==6,ps=parsha(hDay(sel)),df=Math.round((+sel-+t0)/864e5),
  rel=df==0?'Today':df==1?'Tomorrow':df==-1?'Yesterday':df>0?'In '+df+' days':-df+' days ago',
  pr=ps?`<div class="pr rv" style="--i:3">${ps.yt?'(':''}Parshas ${ps.p.map(x=>x[0]).join('-')}${ps.yt?')':''} <span class="heb" lang="he" dir="rtl">${ps.yt?'(':''}פרשת ${ps.p.map(x=>x[1]).join('־')}${ps.yt?')':''}</span>${ps.yt?'<span class="pn">Chitas only · no leining this Shabbos</span>':''}</div>`:'';
  const lead=`<div class="lead rv" style="--i:2"><span>${rel}${w?' · Shabbos':''}</span><span>${h.d} ${h.n[0]} ${h.y} · ${sel.getFullYear()}</span></div>`;
@@ -1709,7 +1714,7 @@ function panel(dir){const{h,ev,rc}=infoD(sel),w=sel.getDay()==6,ps=parsha(sel),d
  $('#gh').textContent=sel.getDate();
  $('#cbt').innerHTML=`${sel.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})}<span lang="he" dir="rtl">${G(h.d)} ${h.n[1]}</span>`;
  $('#p').innerHTML=(editing?'<div class="eb">Editing mode <button class="ed" id="ex">Done</button></div>':'')+lead+pr+(ev.length?ev.map((e,i)=>evCard(e,i)).join(''):'<p class="nospec rv" style="--i:3">No special date on this day.</p>');
- zmn();chips(h,ev,rc);study(h);special();rail();nextUp();if(typeof rcRender=='function')rcRender();
+ zmn();chips(h,ev,rc);study();special();rail();nextUp();if(typeof rcRender=='function')rcRender();
  $('#cbr').innerHTML=ring(0,ALLK.length);upd();
  ['#hdr','#ch','#p','#hy','#sp','#sd','#zm'].forEach(s=>reveal($(s)));
  if(dir&&!RM)for(const el of [$('.ab'),$('#hdr'),$('#foot')])el.animate([{opacity:.0,transform:`translateX(${dir*22}px)`},{opacity:1,transform:'none'}],{duration:390,easing:'cubic-bezier(.22,.75,.25,1)'});
@@ -2114,9 +2119,9 @@ function skyOff(){const r=document.documentElement;r.removeAttribute('data-theme
  const tc=document.querySelector('meta[name=theme-color]');if(tc)tc.content='#0a0b10'}
 function skyTick(){
  if(!SKY.on||SKYA.run)return;const st=skyCompute(Date.now());SKY.last=st;skyApply(st);if(GLS.lens)GLS.lens();
- const nt=new Date(st.ymd[0],st.ymd[1]-1,st.ymd[2]+st.shift,12);
+ const nt=new Date(st.ymd[0],st.ymd[1]-1,st.ymd[2],12),shc=HSH!==st.shift;HSH=st.shift;
  if(+nt!==+t0){const wasToday=+sel===+t0;SKY.shift=st.shift;t0=nt;if(wasToday){sel=t0;V=hm1(t0)}render(0);if(wasToday)panel(0)}
- else{SKY.shift=st.shift;skyUpdateScene(st)}
+ else{SKY.shift=st.shift;skyUpdateScene(st);if(shc){render(0);if(+sel===+t0)panel(0)}}
  if(SKY.lastUp!==undefined&&SKY.lastUp!==st.up&&+sel===+t0)panel(0);SKY.lastUp=st.up}
 (function(){const el=document.getElementById('stars');if(!el)return;let x=12345;const rnd=()=>(x=(x*1664525+1013904223)%4294967296)/4294967296,a=[];
  for(let i=0;i<48;i++){const y=Math.pow(rnd(),1.6)*58,o=(.18+Math.pow(rnd(),2)*.55).toFixed(2),sp=rnd()>.9?.6:0,tint=rnd()>.7?'214,224,255':'255,255,255';a.push(`${(rnd()*100).toFixed(1)}vw ${y.toFixed(1)}vh 0 ${sp}px rgba(${tint},${o})`)}
@@ -2342,12 +2347,13 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  GLS.lens=draw;window.dlLayout=layout;
  new MutationObserver(()=>{layout();draw();if(ok)kick()}).observe(R,{attributes:true,attributeFilter:['class','data-theme','data-night']});
  layout()})();
-if(SKY.on){const st0=skyCompute(Date.now());SKY.last=st0;SKY.shift=st0.shift;t0=new Date(st0.ymd[0],st0.ymd[1]-1,st0.ymd[2]+st0.shift,12);sel=t0;V=hm1(t0);skyApply(st0)}else skyOff();
+if(SKY.on){const st0=skyCompute(Date.now());SKY.last=st0;SKY.shift=st0.shift;HSH=st0.shift;t0=new Date(st0.ymd[0],st0.ymd[1]-1,st0.ymd[2],12);sel=t0;V=hm1(t0);skyApply(st0)}else skyOff();
 setInterval(skyTick,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)skyTick()});addEventListener('focus',skyTick);
 (function(){const cb=document.getElementById('skyOn');if(!cb)return;cb.checked=SKY.on;
+ {const se=document.getElementById('shEng');if(se){se.checked=shEng();se.addEventListener('change',()=>{try{localStorage.setItem(AK('cc_sh_eng'),se.checked?'1':'0')}catch(e){}H.sel&&H.sel();panel(0)})}}
  cb.addEventListener('change',()=>{SKY.on=cb.checked;try{localStorage.setItem('cc_sky',SKY.on?'1':'0')}catch(e){}
-  if(SKY.on)skyTick();else{skyOff();SKY.shift=0;const nt=ad(new Date(),0);if(+nt!==+t0){const w=+sel===+t0;t0=nt;if(w){sel=t0;V=hm1(t0)}}render(0)}panel(0)});
+  if(SKY.on)skyTick();else{skyOff();SKY.shift=0;HSH=0;const nt=ad(new Date(),0);if(+nt!==+t0){const w=+sel===+t0;t0=nt;if(w){sel=t0;V=hm1(t0)}}render(0)}panel(0)});
 })();
 
 /* ===== Tapping a chip on the home screen jumps to that chip's own card ===== */
@@ -2373,7 +2379,7 @@ const dayFull=k=>{const d=DN[k];return !!d&&STK_KEYS.every(x=>d[x])&&!!(d.rambam
 const dayPart=k=>{const d=DN[k];return !!d&&(STK_KEYS.some(x=>d[x])||!!(d.rambam3||d.rambam1))};
 const dayLeft=k=>{const d=DN[k]||{};return 4-(STK_KEYS.filter(x=>d[x]).length+((d.rambam3||d.rambam1)?1:0))};
 function streakInfo(){
- const todayK=ds(t0);let cur=0,d=t0;
+ const T0=shDay(t0),todayK=ds(T0);let cur=0,d=T0;
  if(!dayFull(todayK))d=ad(d,-1);
  while(dayFull(ds(d))){cur++;d=ad(d,-1)}
  let best=0,run=0,prev=null;
@@ -2381,8 +2387,8 @@ function streakInfo(){
  return{cur,best:Math.max(best,cur),todayDone:dayFull(todayK)}}
 const WL=['S','M','T','W','T','F','S'];
 function stkInner(){
- const s=streakInfo(),k0=ds(t0);
- const dots=Array.from({length:7},(_,i)=>{const d=ad(t0,i-6),k=ds(d),f=dayFull(k),p=!f&&dayPart(k);return `<span class="qdot${f?' f':p?' p':''}${i==6?' now':''}"><i></i>${WL[d.getDay()]}</span>`}).join('');
+ const s=streakInfo(),T0=shDay(t0),k0=ds(T0);
+ const dots=Array.from({length:7},(_,i)=>{const d=ad(T0,i-6),k=ds(d),f=dayFull(k),p=!f&&dayPart(k);return `<span class="qdot${f?' f':p?' p':''}${i==6?' now':''}"><i></i>${WL[d.getDay()]}</span>`}).join('');
  const l=s.cur?`<b>${s.cur}-day streak</b><small>${s.todayDone?'Today is done':'Finish today to keep it'}</small>`:`<b>Start a streak</b><small>Finish all 4 shiurim in a day</small>`;
  return `<span class="l">${l}</span><span class="qdots">${dots}</span><i class="qchev" aria-hidden="true">›</i>`}
 function stkHtml(){return `<button class="qstk rv" id="stk" type="button" aria-label="Streak history" style="--i:1">${stkInner()}</button>`}
@@ -2391,22 +2397,22 @@ function stkFill(){}
 /* ---------- Stats sheet ---------- */
 const SHI=[['chumash','Chumash'],['tehillim','Tehillim'],['tanya','Tanya'],['rambam','Rambam']];
 const doneOf=(k,i)=>{const d=DN[k];if(!d)return false;return i==3?!!(d.rambam3||d.rambam1):!!d[SHI[i][0]]};
-function runStreak(pred){const tk=ds(t0);let cur=0,d=t0;if(!pred(tk))d=ad(d,-1);while(pred(ds(d))){cur++;d=ad(d,-1)}
+function runStreak(pred){const T0=shDay(t0),tk=ds(T0);let cur=0,d=T0;if(!pred(tk))d=ad(d,-1);while(pred(ds(d))){cur++;d=ad(d,-1)}
  let best=0,run=0,prev=null;for(const k of Object.keys(DN).filter(pred).sort()){run=prev&&ds(ad(pd(prev),1))==k?run+1:1;if(run>best)best=run;prev=k}
  return{cur,best:Math.max(best,cur)}}
 const STS={i:0,o:{week:0,month:0,year:0,all:0}},STS_K=['week','month','year','all'],STS_L=['Week','Month','Year','All time'];
 const MON3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],MONL=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const fmtD=d=>MON3[d.getMonth()]+' '+d.getDate();
 let STS_F;const stsFirst=()=>{if(STS_F!==undefined)return STS_F;const ks=Object.keys(DN).filter(dayPart).sort();return STS_F=ks.length?pd(ks[0]):null};
-function stsRange(kind,o){const T=t0,first=stsFirst();let ps,pe,title,sub;
+function stsRange(kind,o){const T=shDay(t0),first=stsFirst();let ps,pe,title,sub;
  if(kind=='week'){ps=ad(T,-T.getDay()+7*o);pe=ad(ps,6);title=o==0?'This week':o==-1?'Last week':fmtD(ps)+' – '+fmtD(pe);sub=o>=-1?fmtD(ps)+' – '+fmtD(pe):ps.getFullYear()+''}
  else if(kind=='month'){ps=new Date(T.getFullYear(),T.getMonth()+o,1,12);pe=new Date(ps.getFullYear(),ps.getMonth()+1,0,12);title=MONL[ps.getMonth()];sub=o==0?'This month':ps.getFullYear()+''}
  else if(kind=='year'){ps=new Date(T.getFullYear()+o,0,1,12);pe=new Date(T.getFullYear()+o,11,31,12);title=ps.getFullYear()+'';sub=o==0?'This year':'Calendar year'}
  else{ps=first||T;pe=T;title='All time';sub=first?'Since '+fmtD(first)+(first.getFullYear()!=T.getFullYear()?', '+first.getFullYear():''):'Nothing tracked yet'}
  let s=ps,e=pe>T?T:pe;if(first&&s<first)s=first;if(e<s)e=s;
  return{kind,o,ps,pe,s,e,title,sub,canPrev:kind!='all'&&!!first&&(()=>{const p=stsRangeBounds(kind,o-1);return p>=first})(),canNext:kind!='all'&&o<0}}
-function stsRangeBounds(kind,o){const T=t0;if(kind=='week')return ad(ad(T,-T.getDay()+7*o),6);if(kind=='month')return new Date(T.getFullYear(),T.getMonth()+o+1,0,12);return new Date(T.getFullYear()+o,11,31,12)}
-function stsCalc(R){const tk=ds(t0),days=[];for(let d=R.s;+d<=+R.e;d=ad(d,1)){const k=ds(d),f=SHI.map((x,i)=>doneOf(k,i)),n=f.filter(Boolean).length;days.push({d,k,f,n,full:n==4,today:k==tk})}
+function stsRangeBounds(kind,o){const T=shDay(t0);if(kind=='week')return ad(ad(T,-T.getDay()+7*o),6);if(kind=='month')return new Date(T.getFullYear(),T.getMonth()+o+1,0,12);return new Date(T.getFullYear()+o,11,31,12)}
+function stsCalc(R){const tk=ds(shDay(t0)),days=[];for(let d=R.s;+d<=+R.e;d=ad(d,1)){const k=ds(d),f=SHI.map((x,i)=>doneOf(k,i)),n=f.filter(Boolean).length;days.push({d,k,f,n,full:n==4,today:k==tk})}
  const cnt=[0,0,0,0],den=[0,0,0,0];let dd=0,full=0,sumN=0,r3=0,r1=0,hy=0;
  for(const x of days){if(!x.today||x.full){dd++;sumN+=x.n;if(x.full)full++}
   x.f.forEach((b,i)=>{if(!x.today||b){den[i]++;if(b)cnt[i]++}});const q=DN[x.k]||{};if(q.rambam3)r3++;else if(q.rambam1)r1++;if(q.hy)hy++}
@@ -2422,15 +2428,15 @@ function stsMonth(R,S){const lead=R.ps.getDay(),n=R.pe.getDate();let c='';for(le
  for(let i=0;i<n;i++){const d=ad(R.ps,i),x=S.days.find(z=>+z.d==+d);c+=`<span class="smc${x?' l'+sLvl(x.n):' fu'}${x&&x.today?' now':''}">${d.getDate()}</span>`}
  return `<div class="mwk">${WL.map(w=>`<span>${w}</span>`).join('')}</div><div class="mgrid">${c}</div>`}
 function monthBars(list){const mx=1;return `<div class="bars">${list.map(m=>`<div class="bar${m.now?' now':''}${m.fu?' fu':''}"><em>${m.fu||m.p==null?'':sPct(m.p)}</em><span class="bt"><i style="--h:${m.fu||m.p==null?0:Math.max(.04,m.p).toFixed(3)}"></i></span><u>${m.l}</u></div>`).join('')}</div>`}
-function stsMonthsOf(y,R){const T=t0,out=[],first=stsFirst();for(let m=0;m<12;m++){const ms=new Date(y,m,1,12),me=new Date(y,m+1,0,12);let c=0,d=0;
+function stsMonthsOf(y,R){const T=shDay(t0),out=[],first=stsFirst();for(let m=0;m<12;m++){const ms=new Date(y,m,1,12),me=new Date(y,m+1,0,12);let c=0,d=0;
   for(let x=ms;+x<=+me&&+x<=+T;x=ad(x,1)){const k=ds(x),tdy=+x==+T;if(!first||+x<+first)continue;for(let i=0;i<4;i++){const b=doneOf(k,i);if(!tdy||b){d++;if(b)c++}}}
   out.push({l:MON3[m][0],p:d?c/d:null,fu:+ms>+T,now:y==T.getFullYear()&&m==T.getMonth()})}return out}
 function stsYear(R,S){return monthBars(stsMonthsOf(R.ps.getFullYear(),R))}
-function stsAll(R,S){const T=t0,out=[];let y=T.getFullYear(),m=T.getMonth();const first=stsFirst();
+function stsAll(R,S){const T=shDay(t0),out=[];let y=T.getFullYear(),m=T.getMonth();const first=stsFirst();
  for(let i=0;i<12;i++){const ms=new Date(y,m,1,12);out.unshift({y,m,ms});m--;if(m<0){m=11;y--}}
  const yc={};const list=out.filter(o=>!first||+new Date(o.y,o.m+1,0,12)>=+first).map(o=>{const arr=(yc[o.y]||(yc[o.y]=stsMonthsOf(o.y,R)))[o.m];return{l:MON3[o.m][0],p:arr.p,fu:false,now:o.y==T.getFullYear()&&o.m==T.getMonth()}});
  return monthBars(list.length?list:[{l:MON3[T.getMonth()][0],p:null,now:true}])}
-function stsBy(R,S){const g=runStreak(k=>dayFull(k)),T=t0;
+function stsBy(R,S){const g=runStreak(k=>dayFull(k)),T=shDay(t0);
  const items=SHI.map((s,i)=>{const st=runStreak(k=>doneOf(k,i)),p=S.per[i];let strip='';for(let j=27;j>=0;j--){const d=ad(T,-j);strip+=`<i class="${doneOf(ds(d),i)?'f':''}${j==0?' now':''}"></i>`}
   const extra=i==3&&(S.r3||S.r1)?`<p class="sx">${S.r3} days with 3 chapters · ${S.r1} with 1 chapter</p>`:'';
   return `<div class="scard">${sRing(p,76,29,7,'mini',`<div class="sc"><b data-n="${sPct(p)}">0</b><small>%</small></div>`)}<div class="ssm"><h4>${s[1]}</h4><p>${S.cnt[i]} of ${S.den[i]} days</p><div class="srow"><span><b>${st.cur}</b> current</span><span><b>${st.best}</b> best</span></div></div><div class="strip" aria-hidden="true">${strip}</div>${extra}</div>`}).join('');
@@ -2732,8 +2738,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=25;
+const CC_VER=26;
 const CC_LOG=[
+ {v:26,big:1,new:['The English date now changes at midnight and the Hebrew date at sunset. Your own plans stay on their English date (“tomorrow at 8 PM” is really tomorrow), while holidays, Yom Tov and Hebrew-date plans follow the Hebrew date.','Shiurim follow the Hebrew date (the next day’s start at sunset). To keep them on the English date, use ⋯ → Shiurim.']},
  {v:25,new:['The bubbles in the water letters move freely again (no more pull toward the middle of each letter).']},
  {v:24,new:['Real light: sunrise and sunset now glow warm across the whole screen (sky, cards, buttons and the water letters), in the true colour of the sunlight for that hour, with a soft edge of light on the side facing the sun or moon.']},
  {v:23,new:['Small updates now show up as this little banner instead of a big popup. Tap it to see what changed, or swipe it away.']},
