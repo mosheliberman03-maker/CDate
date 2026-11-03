@@ -1493,7 +1493,7 @@ function upd(){const sd=['chumash','tehillim','tanya'].filter(ck).length+(['ramb
  const n=$('#sdn');if(n)n.textContent=sd==st?'All done. Hatzlacha!':sd+' of '+st+' shiurim completed';
  const sp=document.querySelectorAll('#sp .ck'),a=[...sp].filter(x=>x.classList.contains('on')).length,sn=$('#spn');if(sn)sn.textContent=!sp.length?'':a==sp.length?'All done. Hatzlacha!':a+' of '+sp.length+' done';
  stkRefresh();const hb=$('#hyb');if(hb){hb.classList.toggle('on',ck('hy'));hb.textContent=ck('hy')?'✓ Read':'Mark as read'}}
-function tog(k){const d=dkey();(DN[d]??={});if(DN[d][k])delete DN[d][k];else{if(k==='rambam3'||k==='rambam1')delete DN[d][k==='rambam3'?'rambam1':'rambam3'];DN[d][k]=1}if(!Object.keys(DN[d]).length)delete DN[d];SVD();upd();H.ok();if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}
+function tog(k){const d=dkey();(DN[d]??={});if(DN[d][k])delete DN[d][k];else{if(k==='rambam3'||k==='rambam1')delete DN[d][k==='rambam3'?'rambam1':'rambam3'];DN[d][k]=1}if(!Object.keys(DN[d]).length)delete DN[d];SVD();upd();H.ok();if(DN[d]&&DN[d][k]&&d===ds(shDay(t0))&&typeof ltRecord=='function')ltRecord(d,dayLeft(d)<=0);if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}
 /* ===== Shiur reader: the day's Hebrew text from Sefaria (free texts, open API).
    Tap a shiur row to open it; leaving the reader (← or the phone's back) checks it off, once the text has loaded.
    Tap the circle to check it off without opening. ===== */
@@ -1607,7 +1607,7 @@ function rdScrollUI(b){const m=b.querySelector('.rdm'),sb=b.querySelector('.rdsb
  sb.addEventListener('pointerup',end);sb.addEventListener('pointercancel',end)}
 function rdClose(){const st=RDS,b=$('#rdr');RDS=null;if(b)b.classList.remove('on');document.body.classList.remove('rdo');
  // leaving checks it off only when the text loaded and was read to the end; otherwise the reading place is kept
- if(st&&st.ok){clearTimeout(st.svT);const fin=(st.maxF||0)>=.995;if(!fin){rdPosSet(st.dk,st.k,{p:st.posF||0,m:st.maxF||0});return}rdPosSet(st.dk,st.k,null);const D=(DN[st.dk]??={});if(!D[st.k]){if(st.k==='rambam3'||st.k==='rambam1')delete D[st.k==='rambam3'?'rambam1':'rambam3'];D[st.k]=1;SVD();upd();H.ok();if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}}}
+ if(st&&st.ok){clearTimeout(st.svT);const fin=(st.maxF||0)>=.995;if(!fin){rdPosSet(st.dk,st.k,{p:st.posF||0,m:st.maxF||0});return}rdPosSet(st.dk,st.k,null);const D=(DN[st.dk]??={});if(!D[st.k]){if(st.k==='rambam3'||st.k==='rambam1')delete D[st.k==='rambam3'?'rambam1':'rambam3'];D[st.k]=1;SVD();upd();H.ok();if(st.dk===ds(shDay(t0))&&typeof ltRecord=='function')ltRecord(st.dk,dayLeft(st.dk)<=0);if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}}}
 addEventListener('popstate',()=>{if(RDS)rdClose()});
 document.addEventListener('click',e=>{const r=e.target.closest('.ck');if(r&&!e.target.closest('a')){if(RD_KEYS.includes(r.dataset.k)&&!e.target.closest('.bx'))return rdOpen(r.dataset.k);return tog(r.dataset.k)}if(e.target.closest('#hyb'))tog('hy')});
 function study(){const S=shDay(sel),h=hd(S),u='https://www.chabad.org/dailystudy/default.asp?tdate='+encodeURIComponent(`${S.getMonth()+1}/${S.getDate()}/${S.getFullYear()}`),
@@ -2479,7 +2479,20 @@ document.addEventListener('click',e=>{if(e.target.closest('#stk')){H.tap();stsOp
 
 /* ---------- Reminders ---------- */
 const NDEF={on:false,quiet:true,cand:true,candLead:30,omer:true,hanu:true,fast:true,spec:true,specAll:false,morn:'08:00',prep:true,learn:false,learnAt:'20:00',mine:true};
-const nCfg=()=>Object.assign({},NDEF,ST('cc_notif',{}));
+const nCfg=()=>{const c=Object.assign({},NDEF,ST('cc_notif',{}));if(!['never','rarely','regular'].includes(c.learnLvl))c.learnLvl=c.learn?'rarely':'never';c.learn=c.learnLvl!=='never';return c};
+/* Daily shiurim reminders (owner, v29): Never / Rarely (once a day at learnAt, as before) / Regularly.
+   Regularly learns when you usually do your shiurim: every check-off of TODAY's shiurim records the time of day (cc_learn_t,
+   per profile: {shiur day:{m:minute of day (before 4 AM counts as after midnight of the evening before), f:1 once that day was finished}},
+   last 40 days). Until 5 days are known it nudges 3 times a day; then 30 min before your usual time, 5 min after it, and an hour
+   after that. Today's are skipped once its shiurim are done (tog/reader re-sync). Time is the English clock; after sunset the
+   reminder checks the next day's shiurim (shDay rule). */
+const LT_GET=()=>ST('cc_learn_t',{});
+function ltRecord(key,finished){try{const L=LT_GET();if(L[key]&&L[key].f)return;const p={};new Intl.DateTimeFormat('en-US',{timeZone:LC.tz,hourCycle:'h23',hour:'numeric',minute:'numeric'}).formatToParts(new Date()).forEach(x=>p[x.type]=+x.value);
+ let m=p.hour*60+p.minute;if(m<240)m+=1440;L[key]={m,f:finished?1:0};
+ const ks=Object.keys(L).sort();while(ks.length>40)delete L[ks.shift()];localStorage.setItem(AK('cc_learn_t'),JSON.stringify(L))}catch(e){}}
+function ltUsual(){const L=LT_GET(),v=Object.keys(L).sort().map(k=>L[k]),fin=v.filter(x=>x.f),use=(fin.length>=4?fin:v).slice(-14).map(x=>x.m).sort((a,b)=>a-b);
+ if(v.length<5)return{n:v.length,m:null};return{n:v.length,m:use[Math.floor(use.length/2)]}}
+const ltFmt=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mn=m%60;return (h%12||12)+':'+String(mn).padStart(2,'0')+(h<12?' AM':' PM')};
 const nSave=c=>{try{localStorage.setItem(AK('cc_notif'),JSON.stringify(c))}catch(e){}};
 let _lnp;const NP=()=>{try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;return _lnp||(_lnp=(C.Plugins&&C.Plugins.LocalNotifications)||C.registerPlugin('LocalNotifications'))}catch(e){return null}};
 const nid=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return Math.abs(h)%2147480000+10};
@@ -2558,9 +2571,17 @@ function notifPlan(c,days=30,opt){
    if(ev.some(e=>e.id=='tal'))add(T('tal',k,'V’sein Tal U’matar'),'tal:'+k,wd==5?cl-lead:ts,'Begin tonight at Maariv, in the weekday Shemoneh Esrei','prep')}
   /* learning */
   if(c.learn&&i<10&&i>=0){
-   const th=T('learn',k,'Chitas');
-   if(i==0){const left=dayLeft(k);if(left>0)add(th,'learn:'+k,wallMs(d,lh,lm),left+(left==1?' shiur':' shiurim')+' left today'+(st.cur?' · '+st.cur+'-day streak':''),'learn')}
-   else add(th,'learn:'+k,wallMs(d,lh,lm),st.cur?'Keep your streak going':'Time for today’s shiurim','learn')}
+   const th=T('learn',k,'Daily shiurim'),eng=shEng(),skey=at=>(!eng&&at>=sk)?k1:k,
+    left=at=>i==0?dayLeft(skey(at)):4,lt=n=>n+(n==1?' shiur':' shiurim')+' left',stx=st.cur?st.cur+'-day streak':'';
+   const put=(id,at,tx)=>{if(i==0&&left(at)<=0)return;add(th,id,at,tx,'learn')};
+   if(c.learnLvl=='rarely'){const at=wallMs(d,lh,lm);put('learn:'+k,at,i==0?lt(left(at))+' today'+(stx?' · '+stx:''):stx?'Keep your streak going':'Time for today’s shiurim')}
+   else if(c.learnLvl=='regular'){const U=ltUsual().m;
+    if(U==null){[[600,'Good morning! Today’s shiurim are waiting: Chumash, Tehillim, Tanya and Rambam'],[900,'A good moment for some of today’s shiurim?'],[lh*60+lm,'Don’t forget your daily shiurim'+(stx?' · keep your '+stx+' going':'')]]
+      .forEach(([m,tx],j)=>{const at=wallMs(d,0,m),n=left(at);put('learnr:'+k+':'+j,at,i==0&&n<4?lt(n)+' · '+(j==0?'Good morning!':tx):tx)})}
+    else{const a0=wallMs(d,0,U-30),a1=wallMs(d,0,U+5),a2=wallMs(d,0,U+65),n1_=left(a1);
+     put('learnr:'+k+':0',a0,'Your shiurim time is coming up, around '+ltFmt(U));
+     put('learnr:'+k+':1',a1,'Hey, don’t forget your daily shiurim!'+(i==0&&n1_<4?' '+lt(n1_)+'.':''));
+     put('learnr:'+k+':2',a2,stx?'Are we doing this? Let’s keep up your '+stx+'!':'Are we doing this? There’s still time for today’s shiurim.')}}}
  }
  /* your own plans: the reminders you asked for ("2 hours before", "the night before", ...) */
  if(c.mine!==false){const R=my.filter(p=>Array.isArray(p.rem)&&p.rem.length);
@@ -2694,16 +2715,20 @@ setInterval(()=>{if(nCfg().on)notifSync()},6*36e5);
 {const pl=NP();if(pl){try{pl.addListener('localNotificationActionPerformed',()=>{try{pick(t0)}catch(e){}})}catch(e){}}}
 
 /* settings UI */
-const RMR=[['mine','Your plans','Reminders you asked for in Plan something'],['cand','Candle lighting','Shabbos, Yom Tov and Yom Kippur'],['omer','Omer count','Each night of the Omer, at nightfall'],['hanu','Chanukah menorah','Each night, at lighting time'],['fast','Fast days','The evening before, and when it ends'],['spec','Special days','A morning note on the day'],['prep','Yom Tov prep','Eruv Tavshilin, chametz times, V’sein Tal'],['learn','Daily learning','A nudge to finish Chitas']];
+const RMR=[['mine','Your plans','Reminders you asked for in Plan something'],['cand','Candle lighting','Shabbos, Yom Tov and Yom Kippur'],['omer','Omer count','Each night of the Omer, at nightfall'],['hanu','Chanukah menorah','Each night, at lighting time'],['fast','Fast days','The evening before, and when it ends'],['spec','Special days','A morning note on the day'],['prep','Yom Tov prep','Eruv Tavshilin, chametz times, V’sein Tal'],['learn','Daily shiurim','']];
 const rmSumText=()=>{const c=nCfg();if(!c.on)return 'Off';const n=RMR.filter(r=>c[r[0]]).length;return 'On · '+n+(n==1?' type':' types')};
 function rmSum(){const e=$('#rmSum');if(e)e.textContent=rmSumText()}
+function rmLearn(c,t){const u=ltUsual(),L=c.learnLvl;
+ const hint=L=='never'?'No reminders for the daily shiurim':L=='rarely'?'Once a day, if any are left':u.m==null?'Three nudges a day while it learns when you usually learn ('+u.n+' of 5 days so far)':'You usually learn around '+ltFmt(u.m)+'. A heads-up at '+ltFmt(u.m-30)+', a reminder at '+ltFmt(u.m+5)+', and one more at '+ltFmt(u.m+65);
+ return `<div class="qgrp" id="rmLearn"><div class="qrow"><span class="t"><b>${t}</b><small>${hint}</small></span></div><div class="qopt"><div class="qseg" data-k="learnLvl">${[['never','Never'],['rarely','Rarely'],['regular','Regularly']].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${L==v}">${l}</button>`).join('')}</div></div>`+
+  (L=='rarely'||(L=='regular'&&u.m==null)?`<div class="qopt"><span>${L=='rarely'?'Remind me at':'Last nudge at'}</span><input type="time" class="qtime" data-k="learnAt" value="${c.learnAt}"></div>`:'')+`</div>`}
 function rmBody(){const c=nCfg();
  return `<button class="x" aria-label="Close">×</button><small>Settings</small><h3>Reminders</h3><p class="qintro">One reminder for each occasion. It fills in with short items as they come due.</p>
  <label class="qrow qmaster"><span class="t"><b>Send reminders</b><small id="rmStat"></small></span><input type="checkbox" class="qsw" data-k="on" ${c.on?'checked':''}></label>
- <div class="qlist${c.on?'':' off'}" id="rmList">${RMR.map(([k,t,s])=>`<div class="qgrp"><label class="qrow"><span class="t"><b>${t}</b><small>${s}</small></span><input type="checkbox" class="qsw" data-k="${k}" ${c[k]?'checked':''}></label>`+
+ <div class="qlist${c.on?'':' off'}" id="rmList">${RMR.map(([k,t,s])=>k=='learn'?rmLearn(c,t):`<div class="qgrp"><label class="qrow"><span class="t"><b>${t}</b><small>${s}</small></span><input type="checkbox" class="qsw" data-k="${k}" ${c[k]?'checked':''}></label>`+
   (k=='cand'?`<div class="qopt" ${c.cand?'':'hidden'}><span>Ahead by</span><div class="qseg" data-k="candLead">${[15,30,60].map(m=>`<button type="button" data-v="${m}" aria-pressed="${c.candLead==m}">${m} min</button>`).join('')}</div></div>`:'')+
   (k=='spec'?`<div class="qopt" ${c.spec?'':'hidden'}><div class="qseg" data-k="specAll">${[['0','Main days'],['1','All days']].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${(c.specAll?'1':'0')==v}">${l}</button>`).join('')}</div><span>at</span><input type="time" class="qtime" data-k="morn" value="${c.morn}"></div>`:'')+
-  (k=='learn'?`<div class="qopt" ${c.learn?'':'hidden'}><span>Remind me at</span><input type="time" class="qtime" data-k="learnAt" value="${c.learnAt}"></div>`:'')+`</div>`).join('')}
+`</div>`).join('')}
   <div class="qgrp"><label class="qrow"><span class="t"><b>Quiet on Shabbos and Yom Tov</b><small>Nothing is sent from candle lighting until nightfall at the end</small></span><input type="checkbox" class="qsw" data-k="quiet" ${c.quiet?'checked':''}></label></div></div>
  ${pushCan()?`<div class="qgrp" id="rmPush"><div class="qrow"><span class="t"><b>Phone notifications</b><small id="rmPS"></small></span></div><div class="qopt">${PUSH_DEFAULT?'':`<input type="url" class="qsrv" id="rmSrv" placeholder="https://name.workers.dev" value="${pushSrv()}" autocapitalize="off" autocorrect="off" spellcheck="false">`}<button class="btn gh" id="rmPB" type="button"></button></div></div>`:''}
  <button class="btn gh qtest" id="rmTest" type="button" ${c.on?'':'disabled'}>Show a sample</button>`}
@@ -2722,7 +2747,7 @@ function rmOpen(){let b=$('#rmb');
     t.closest('.qgrp')?.querySelectorAll('.qopt').forEach(o=>o.hidden=!t.checked)}
    else if(t.classList.contains('qtime')){c[k]=t.value||NDEF[k];nSave(c)}
    rmStat();rmSum();notifSyncSoon(600)});
-  b.addEventListener('click',e=>{const s=e.target.closest('.qseg button');if(s){const sg=s.parentNode,k=sg.dataset.k,c=nCfg();c[k]=k=='specAll'?s.dataset.v=='1':+s.dataset.v;nSave(c);sg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===s));notifSyncSoon(600);H.tap();return}
+  b.addEventListener('click',e=>{const s=e.target.closest('.qseg button');if(s){const sg=s.parentNode,k=sg.dataset.k,c=nCfg();c[k]=k=='specAll'?s.dataset.v=='1':k=='learnLvl'?s.dataset.v:+s.dataset.v;if(k=='learnLvl')c.learn=c.learnLvl!=='never';nSave(c);sg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===s));if(k=='learnLvl'){const g=$('#rmLearn');if(g)g.outerHTML=rmLearn(c,'Daily shiurim');rmSum()}notifSyncSoon(600);H.tap();return}
    if(e.target.closest('#rmPB')){const bt=e.target.closest('#rmPB');bt.disabled=true;(async()=>{if(bt.dataset.on){await pushTurnOff();PERR=''}else{const ok=await pushTurnOn(PUSH_DEFAULT||$('#rmSrv').value);if(ok){const c=nCfg();if(!c.on){c.on=true;nSave(c);const m=b.querySelector('[data-k=on]');if(m)m.checked=true;$('#rmList').classList.remove('off');$('#rmTest').disabled=false}notifSync()}}bt.disabled=false;rmPush();rmStat();rmSum()})();return}
    if(e.target.closest('#rmTest')){nTest()}})}
  const dc=b.querySelector('.dmc');dc.style.setProperty('--c','var(--ys)');dc.innerHTML=rmBody();rmStat();if(pushCan()){rmPush();pushCur().then(rmPush)}requestAnimationFrame(()=>b.classList.add('on'))}
@@ -2748,8 +2773,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=28;
+const CC_VER=29;
 const CC_LOG=[
+ {v:29,big:1,new:['Shiurim reminders now have three levels in ⋯ → Reminders: Never, Rarely (once a day) or Regularly. Regularly learns when you usually do your shiurim, then reminds you a little before, again just after, and once more an hour later to keep your streak going.']},
  {v:28,new:['Your repeating plans (like a weekly chavrusa) now show on every day they happen when you open that day, not only on today. Weekly ones (up to 3 days a week) also get a dot on the calendar.']},
  {v:27,new:['Updates now install by themselves: right as you open the app, or when you leave it. No more tapping “Tap to update” (it only shows if an update arrives while you’re in the middle of something).']},
  {v:26,big:1,new:['The English date now changes at midnight and the Hebrew date at sunset. Your own plans stay on their English date (“tomorrow at 8 PM” is really tomorrow), while holidays, Yom Tov and Hebrew-date plans follow the Hebrew date.','Shiurim follow the Hebrew date (the next day’s start at sunset). To keep them on the English date, use ⋯ → Shiurim.']},
