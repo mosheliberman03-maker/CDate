@@ -2315,8 +2315,10 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  vec2 bd=normalize(px-cn+1e-4);float rl=max(dot(bd,normalize(uLd)),0.);
  col=mix(col,sky(vp+n.xy*uRef*.25,3.)*1.08+uSun*.03,bub);
  col+=uSun*min(ring*(.1+.5*rl*rl),.26);col=mix(col,col*.86,ring*(1.-rl)*.45);
- /* the letter itself: only a very thin outline */
- float ol=smoothstep(.04,.3,m.a)*(1.-smoothstep(.55,.95,m.a));col=mix(col,uRim,ol*(.85-.15*uDk));
+ /* night (owner, v33): the dark sky inside the letters made the date look harsh against the background. Moonlit water: lift it toward a soft
+    pale blue (still see-through, deeper parts a touch brighter like gathered light), and a gentler outline. */
+ col=mix(col,col*.55+vec3(.7,.75,.93)*.6,uDk*.4)+uDk*vec3(.05,.06,.1)*smoothstep(.2,.9,h);
+ float ol=smoothstep(.04,.3,m.a)*(1.-smoothstep(.55,.95,m.a));col=mix(col,uRim,ol*(.85-.33*uDk));
  gl_FragColor=vec4(col*a,a);}`;
  const sh=(t,src)=>{const o=gl.createShader(t);gl.shaderSource(o,src);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o};
  let pr;try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw 0}catch(e){console.warn('water date',e);return}
@@ -2824,8 +2826,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=32;
+const CC_VER=33;
 const CC_LOG=[
+ {v:33,big:1,new:['The assistant understands you much better: times like “at 8” get the right AM/PM, “in 2 hours”, “next Friday”, “every other Tuesday”, “weeknights”, “Sunday nights 9 to 10”, “before Shabbos”, “every Motzei Shabbos”, several plans in one message, “remind me every day at 9pm to…”, and natural speech (“um, like…”). Titles read naturally (“Call my mother”, “Chavrusa with Adam”).','The Hebrew date at night is a softer, moonlit glass so it isn’t harsh against the sky.']},
  {v:32,new:['Smoother and faster: changing days, opening the app and scrolling take much less work, and the moving date no longer redraws nonstop while you hold the phone.']},
  {v:31,new:['The ⋯ menu is tidier: a short list of sections (Location, Reminders, Calendar, My schedule, App, Help). Tap one to open it. Rarely used settings moved to Advanced.']},
  {v:30,new:['Reminders: the “Regularly” option for shiurim now just says what it does: smart reminders so you never miss a shiur.']},
@@ -3075,7 +3078,7 @@ const AI_MASECHTOS='berachos|brachos|berachot|shabbos|shabbat|eruvin|pesachim|sh
 const AI_PLACES=/\b(?:in|at|inside|via|over|on)\s+(?:the\s+|a\s+|my\s+|our\s+|his\s+|her\s+|their\s+)?(beis\s+midrash|beit\s+midrash|bais\s+medrash|beis\s+medrash|zal|study\s+hall|shul|synagogue|yeshiva|yeshivah|library|home|house|office|chabad\s+house|chabad|770|zoom|online|facetime|whatsapp|skype|teams|phone|telephone|google\s+meet|meet|cafe|coffee\s+shop|dining\s+room|living\s+room|kitchen|school|mikvah|mikveh|campus|park)\b/i;
 // Speech engines mangle Yiddish/Hebrew terms; typed text has spelling variants. Repair both before parsing.
 const AI_FIXES=[
- [/\b(?:chav+e?r+[ou]+s+[ae]h?s?|chevr[ou]+s[ae]h?|chavr[ou]+t[ae]h?|chevr[ou]+t[ae]h?|[hk]havr[ou]+s[ae]h?|havr[ou]+t[ae]|jabros[ha]+|habrusa|ha\s+brusa|have\s+(?:a\s+)?roo?s[ae]h?|how\s+roo+s[ae]h?|chavrusos|חברותא)\b/gi,'chavrusa'],
+ [/\b(?:chav+e?r+[ou]+s+[ae]h?s?|chevr[ou]+s[ae]h?|chavr[ou]+t[ae]h?|chevr[ou]+t[ae]h?|[hk]havr[ou]+s[ae]h?|havr[ou]+t[ae]|jabros[ha]+|habrusa|havrusa|havruta|chavruso|ha\s+brusa|have\s+(?:a\s+)?roo?s[ae]h?|how\s+roo+s[ae]h?|chavrusos|חברותא)\b/gi,'chavrusa'],
  [/\b(?:kvius|kevius|kviut|kviyus|kvi\s*us|kuvius|kivus|keyvoos|kavius|kebius|kviyos|k\s*views?|kay\s*views?|kay\s+vius|קביעות)\b/gi,'kvius'],
  [/\b(?:far\s*brengen|farbrenging|farbrengin|farbrenguen|fabrengen|forbrengen|for\s+bringing|far\s+bring\s+in|farbrengen|התוועדות)\b/gi,'farbrengen'],
  [/\b(?:shacharit|shachris|shacharith|shaharit|shacharus|שחרית)\b/gi,'shacharis'],[/\b(?:minchah|minha|mincha|מנחה)\b/gi,'mincha'],
@@ -3095,6 +3098,8 @@ function aiNumberize(s){
  const unit='(?:days?|weeks?|months?|years?|hours?|hrs?|minutes?|mins?|times|chapters?|perek|perakim|pages?|dapim|daf|mishnayos|mishnayot|sichos|o\'?clock|a\\.?m\\.?|p\\.?m\\.?|people|sessions?)\\b';
  s=s.replace(new RegExp('\\b('+card+')\\s*(?=-?\\s*'+unit+')','gi'),(m,n)=>toN(n)+' ');
  s=s.replace(new RegExp('\\b(every|in|for|within|next|last|than|about|around|at|@)\\s+('+card+')\\b(?!\\s*(?:of|chavrusa|chavrusas))','gi'),(m,a,n)=>a+' '+toN(n));
+ // "eight thirty" / "two fifteen" anywhere (a number word + a minutes word is a clock time)
+ s=s.replace(new RegExp('\\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)[\\s-]+(oh[\\s-]?five|o[\\s-]five|ten|fifteen|twenty(?:[\\s-]?five)?|thirty(?:[\\s-]?five)?|forty(?:[\\s-]?five)?|fifty(?:[\\s-]?five)?)\\b','gi'),(m,h,mm)=>{const v=mm.toLowerCase().replace(/[\s-]+/g,' ');const n=/^o/.test(v)?5:v.split(' ').reduce((a,x)=>a+(AI_NUMW[x]||0),0);return AI_NUMW[h.toLowerCase()]+':'+String(n).padStart(2,'0')});
  // "seven thirty" after "at"
  s=s.replace(/\b(at|@|around|by)\s+(\d{1,2})\s+(fifteen|thirty|forty[\s-]?five|ten|twenty|forty|fifty)\b/gi,(m,a,h,mm)=>a+' '+h+':'+String(({fifteen:15,thirty:30,'forty five':45,'forty-five':45,fortyfive:45,ten:10,twenty:20,forty:40,fifty:50})[mm.toLowerCase()]));
  // ordinals only where a day/date reading is plausible
@@ -3109,6 +3114,21 @@ function aiNumberize(s){
  s=s.replace(/(\d)\s*-\s*(hours?|minutes?|days?|weeks?)\b/gi,'$1 $2');
  s=s.replace(/(\d)\s*([ap])\.?\s?m\b\.?/gi,'$1 $2m');
  return s}
+// Sentence case for everyday titles ("Call my mother", "Pick up the kids from school"): keeps capitals that were typed,
+// and capitalises a name right after call / text / visit / meet … ("call david" -> "Call David")
+// Speech/typing clean-up before reading a request: fillers ("um", "like", "you know"), polite openers, "w/", "9.30pm", "reminder:"
+function aiTidy(t){return String(t||'')
+ .replace(/\b(?:um+|uh+|erm+|hmm+|uhm+)\b[,.]?/gi,' ').replace(/\b(?:you\s+know|kind\s+of|sort\s+of|basically|actually|literally)\b,?/gi,' ')
+ .replace(/(?<!\b(?:i'?d|would|i|we'?d|we|you'?d|they)\s)\blike\s+(?=\d|(?:a|an|the|at|around|about|every|on|maybe|ten|eleven|twelve|one|two|three|four|five|six|seven|eight|nine)\b)/gi,'')
+ .replace(/^\s*(?:so|ok(?:ay)?\s+so|alright|all\s+right|well|hey|hi|ok(?:ay)?|yeah|yes)\b[,]?\s+/i,'')
+ .replace(/^\s*(?:can|could|would|will)\s+you\s+(?:please\s+)?/i,'').replace(/^\s*please\s+/i,'')
+ .replace(/\bw\/\s*/gi,'with ').replace(/\b(1[0-2]|0?[1-9])\.([0-5]\d)\s*(a\.?m\.?|p\.?m\.?)/gi,'$1:$2 $3')
+ .replace(/^\s*reminder\s*[:\-–]\s*/i,'remind me to ').replace(/\s+/g,' ').trim()}
+function aiSentence(s){s=String(s||'').trim().replace(/[.,;:!?]+$/,'').replace(/\s+/g,' ');if(!s)return s;
+ const KEEP=/^(?:with|to|for|about|from|at|on|in|and|or|up|out|over|re|regarding|happy|mazal|mazel|my|our|his|her|the|a|an|mom|mommy|mother|dad|daddy|father|wife|husband|son|daughter|kids|children|grandma|grandpa|bubby|zaidy|boss|doctor|dentist|bank|landlord|plumber|school|office|him|her|them|everyone|back)$/i;
+ s=s.replace(/\b(call|text|email|e-mail|visit|meet|tell|ask|thank|phone|message|congratulate|wish)\s+(\p{Ll}[\p{L}'’-]*)/gu,(m,v,w)=>KEEP.test(w)?m:v+' '+w[0].toUpperCase()+w.slice(1));
+ s=s.replace(/\b(?:rabbi|rav|reb|dr|mr|mrs|ms)\.?\s+\p{Ll}/giu,m=>m.replace(/\p{Ll}$/u,c=>c.toUpperCase()).replace(/^\p{Ll}/u,c=>c.toUpperCase()));
+ s=s.replace(/\bi\b/g,'I');return s[0].toUpperCase()+s.slice(1)}
 function aiTitleCase(s){const small=new Set(['of','the','a','an','and','or','for','to','in','on','at','with','by','from','is','vs','ben','bas','bat','bar']);
  return s.trim().replace(/[.,;:!?]+$/,'').replace(/\s+/g,' ').split(' ').map((w,i)=>{if(!w)return w;if(/^[A-Z0-9][A-Z0-9'’.-]*$/.test(w)&&w.length>1&&/[A-Z]{2}/.test(w))return w;if(i>0&&small.has(w.toLowerCase()))return w.toLowerCase();return w.replace(/^(["'(]*)(\p{L})/u,(m,a,b)=>a+b.toUpperCase())}).join(' ')}
 function aiNextHebrew(k,dn,from){for(let i=0;i<=800;i++){const d=ad(from,i),h=hd(d);if(h.k===k&&h.d===dn)return d}return null}
@@ -3116,15 +3136,25 @@ function aiNextGreg(m,dn,from){for(let y=from.getFullYear();y<=from.getFullYear(
 function aiFmtDate(d){return d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'})}
 function aiFmtTime(h,mn,ap){return h+':'+String(mn).padStart(2,'0')+(ap?' '+ap.toUpperCase():'')}
 function aiNormAp(a){return a?(/^p/i.test(a)?'PM':'AM'):''}
+// "8:00" / "9:00 – 1:00" without AM/PM -> a sensible guess (+ a short note). lean = 'PM' (evening context), 'AM' (morning context) or ''.
+function aiAmPm(t,lean){const parts=t.split(' – '),hh=x=>+x.split(':')[0];
+ const one=(x,ap)=>/[AP]M/.test(x)?x:x+' '+ap;
+ const guess=h=>h===12?'PM':h<=6?'PM':lean||'AM';
+ if(parts.length===2){const a=parts[0],b=parts[1],ha=hh(a),hb=hh(b),apA=(/([AP]M)/.exec(a)||[])[1],apB=(/([AP]M)/.exec(b)||[])[1];
+  let A=apA||(apB&&!(hb%12<ha%12)?apB:''),B=apB;
+  if(!A&&!B){A=guess(ha);B=(hb%12)<(ha%12)?(A==='AM'?'PM':'AM'):A;if(ha>=7&&ha<=11&&hb>=1&&hb<=6){A=lean==='PM'?'PM':'AM';B='PM'}if(ha>=7&&ha<=11&&hb===12){A='AM';B='PM'}}
+  if(!A)A=(hb%12)<(ha%12)?(B==='PM'?'AM':'PM'):B;if(!B)B=(hb%12)<(ha%12)?(A==='AM'?'PM':'AM'):A;
+  const r=one(a,A)+' – '+one(b,B);return{t:r,note:apA||apB?'':'I read the time as '+r+'. Say “am” or “pm” if that’s wrong.'}}
+ const h=hh(t),ap=guess(h);return{t:one(t,ap),note:(h>=7&&h<=11)?'I read '+t+' as '+ap+'. Say “am” or “pm” if that’s wrong.':''}}
 function aiHebKey(txt){for(const[re,k,n]of AI_HMONTHS)if(new RegExp('^(?:'+re+')$','i').test(txt.trim()))return[k,n];return null}
 
 const AI_NAMED_RE=AI_NAMED.map(x=>x[0]).join('|');
 const AI_PREP_TAIL=/\b(?:on|at|by|around|from|starting|beginning|commencing|since)\s*$/i;
-const AI_HEB_MAP=[[/(^|\s)עם(?=\s)/g,' with '],[/(^|\s)ב[-\s]?(?=\d)/g,' at '],[/כל\s+יום/g,' daily '],[/(?:בכל|כל)\s+שבוע/g,' weekly '],[/כל\s+חודש|חודשי/g,' monthly '],[/כל\s+שנה|שנתי/g,' yearly '],[/מחר/g,' tomorrow '],[/היום/g,' today '],
+const AI_HEB_MAP=[[/(^|\s)עם(?=\s)/g,' with '],[/(^|\s)ב[-\s]?(?=\d)/g,' at '],[/יום\s+ראשון/g,' Sunday '],[/יום\s+שני/g,' Monday '],[/יום\s+שלישי/g,' Tuesday '],[/יום\s+רביעי/g,' Wednesday '],[/יום\s+חמישי/g,' Thursday '],[/יום\s+שישי/g,' Friday '],[/כל\s+יום/g,' daily '],[/(?:^|\s)(?:ב)?כל(?=\s)/g,' every '],[/(?:^|\s)(?:ו)?גם(?=\s)/g,' also '],[/בערב|בלילה/g,' at night '],[/בבוקר/g,' in the morning '],[/(?:בכל|כל)\s+שבוע/g,' weekly '],[/כל\s+חודש|חודשי/g,' monthly '],[/כל\s+שנה|שנתי/g,' yearly '],[/מחר/g,' tomorrow '],[/היום/g,' today '],
  [/יום\s+ראשון/g,' Sunday '],[/יום\s+שני/g,' Monday '],[/יום\s+שלישי/g,' Tuesday '],[/יום\s+רביעי/g,' Wednesday '],[/יום\s+חמישי/g,' Thursday '],[/יום\s+שישי/g,' Friday '],[/שבת/g,' Shabbos '],
  [/חברותא/g,' chavrusa '],[/קביעות/g,' kvius '],[/סדרים/g,' sedarim '],[/סדר/g,' seder '],[/שיעור/g,' shiur '],[/התוועדות/g,' farbrengen '],[/מבצעים/g,' mivtzoim '],[/שחרית/g,' shacharis '],[/מנחה/g,' mincha '],[/ערבית/g,' maariv '],[/יארצייט/g,' yahrzeit '],[/יחידות/g,' yechidus '],[/יום\s+הולדת/g,' birthday '],[/פגישה/g,' meeting '],[/טלפון/g,' call ']];
 function aiDow(s){s=String(s).toLowerCase().replace(/s$/,'');if(/^shabb/.test(s))return 6;const i=AI_DAYS.indexOf(s);return i>=0?i:(AI_DAY_ABBR[s]!==undefined?AI_DAY_ABBR[s]:-1)}
-function aiNextDow(wd,from,next){let n=(wd-from.getDay()+7)%7;if(next&&n===0)n=7;return ad(from,n)}
+function aiNextDow(wd,from,next){let n=(wd-from.getDay()+7)%7;if(next&&(n===0||from.getDay()+n<=6))n+=7;return ad(from,n)}
 const AI_DOW_TOK='(?:'+AI_DAY_RE.replace(/^\(\?:|\)$/g,'')+')s?';
 
 /* Date expression finder: removes the FIRST date phrase from str. Returns {info,rest} or null.
@@ -3168,14 +3198,21 @@ function aiParseDate(str,today){
  // 7. Rosh Chodesh (the next one)
  if(m=/\brosh\s*(?:chodesh|hodesh)\b/i.exec(str)){let d=null;for(let i=0;i<40&&!d;i++){const x=ad(today,i),h=hd(x);if(h.d===1||h.d===30)d=x}return{info:{kind:'rc',date:d,label:'Rosh Chodesh'},rest:cut(m)}}
  // 8. Relative dates
+ if(m=/\b(\d{1,3}|a|an|one)\s+(days?|weeks?|months?)\s+from\s+(today|now|tomorrow)\b/i.exec(str)){const n=/^\d/.test(m[1])?+m[1]:1,u=m[2][0].toLowerCase(),b0=/tomorrow/i.test(m[3])?ad(today,1):today;return{info:{kind:'rel',date:u==='d'?ad(b0,n):u==='w'?ad(b0,7*n):new Date(b0.getFullYear(),b0.getMonth()+n,b0.getDate(),12)},rest:cut(m)}}
  if(m=/\bday\s+after\s+tomorrow\b/i.exec(str))return{info:{kind:'rel',date:ad(today,2)},rest:cut(m)};
  if(m=/\b(?:tonight|this\s+evening|this\s+afternoon|this\s+morning|today|later\s+today)\b/i.exec(str))return{info:{kind:'rel',date:ad(today,0),daypart:/tonight|evening/i.test(m[0])?'evening':/afternoon/i.test(m[0])?'afternoon':/morning/i.test(m[0])?'morning':''},rest:cut(m)};
  if(m=/\btomorrow(?:\s+(morning|afternoon|evening|night))?\b/i.exec(str))return{info:{kind:'rel',date:ad(today,1),daypart:(m[1]||'').toLowerCase()},rest:cut(m)};
+ if(m=/\bin\s+(?:(\d{1,3}(?:\.\d+)?)|(an?|one)|(half\s+an?))\s*(?:(and\s+a\s+half)\s+)?(minutes?|mins?|hours?|hrs?)(?:\s+(and\s+a\s+half))?(?:\s+from\s+now)?\b/i.exec(str)){
+  let n=m[1]?+m[1]:m[2]?1:.5;if(m[4]||m[6])n+=.5;const min=Math.round(n*(/^h/i.test(m[5])?60:1)),t=new Date(Date.now()+min*6e4);
+  return{info:{kind:'rel',date:new Date(t.getFullYear(),t.getMonth(),t.getDate(),12),clock:{h:t.getHours(),m:t.getMinutes()}},rest:cut(m)}}
  if(m=/\bin\s+(\d{1,3})\s+(days?|weeks?|months?)\b/i.exec(str)){const n=+m[1],u=m[2][0].toLowerCase();return{info:{kind:'rel',date:u==='d'?ad(today,n):u==='w'?ad(today,7*n):new Date(today.getFullYear(),today.getMonth()+n,today.getDate(),12)},rest:cut(m)}}
  if(m=/\bnext\s+week\b/i.exec(str))return{info:{kind:'rel',date:ad(today,7)},rest:cut(m)};
+ if(m=/\b(?:this\s+week|sometime\s+this\s+week|later\s+this\s+week)\b/i.exec(str))return{info:{kind:'rel',date:today},rest:cut(m)};
  if(m=/\bnext\s+month\b/i.exec(str))return{info:{kind:'rel',date:new Date(today.getFullYear(),today.getMonth()+1,today.getDate(),12)},rest:cut(m)};
  if(m=/\b(?:the\s+)?end\s+of\s+(?:the\s+)?month\b/i.exec(str))return{info:{kind:'rel',date:new Date(today.getFullYear(),today.getMonth()+1,0,12)},rest:cut(m)};
  if(m=/\b(?:the\s+)?end\s+of\s+(?:the\s+)?year\b/i.exec(str))return{info:{kind:'rel',date:new Date(today.getFullYear(),11,31,12)},rest:cut(m)};
+ // 8b. "Tuesday the 17th" (weekday + day of month: the date wins, the weekday is checked)
+ if(m=new RegExp('\\b('+AI_DAY_RE+'),?\\s+(?:the\\s+)?(\\d{1,2})(?:st|nd|rd|th)\\b','i').exec(str)){const dn=+m[2],wd=aiDow(m[1]);if(dn>=1&&dn<=31){let d=null;for(let i=0;i<400&&!d;i++){const x=ad(today,i);if(x.getDate()===dn&&x.getDay()===wd)d=x}if(!d)for(let i=0;i<62&&!d;i++){const x=ad(today,i);if(x.getDate()===dn)d=x}return{info:{kind:'dom',date:d,weekday:wd},rest:cut(m)}}}
  // 9. erev / motzei Shabbos, then plain weekday references
  if(m=/\berev\s+(?:shabbos|shabbat|shabbes)\b/i.exec(str))return{info:{kind:'dow',date:aiNextDow(5,today,false),weekday:5,daypart:'erev'},rest:cut(m)};
  if(m=/\bmotzei\s+(?:shabbos|shabbat|shabbes)\b/i.exec(str))return{info:{kind:'dow',date:aiNextDow(6,today,false),weekday:6,daypart:'motzei'},rest:cut(m)};
@@ -3185,7 +3222,7 @@ function aiParseDate(str,today){
  if(m=/\b(?:on\s+)?the\s+(\d{1,2})(?:st|nd|rd|th)\b(?!\s+(?:chapters?|perek|perakim|pages?|day|time|daf|mishna|siman|seif|sicha|maamar|letter|one))/i.exec(str)){const dn=+m[1];if(dn>=1&&dn<=31){let d=null;for(let i=0;i<62&&!d;i++){const x=ad(today,i);if(x.getDate()===dn)d=x}return{info:{kind:'dom',date:d},rest:cut(m)}}}
  return null}
 
-function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|myself|ourselves)\b/gi,' ').replace(/\s+/g,' ').trim();
+function aiLocalInterpret(raw){raw=aiTidy(String(raw||'')).replace(/\bfor\s+(?:me|us|myself|ourselves)\b/gi,' ').replace(/\s+/g,' ').trim();
  const today=ad(new Date(),0), base=new Date(sel), prefs=aiPrefs();
  const original=String(raw||'').replace(/[‘’`´]/g,"'").replace(/[“”]/g,'"').replace(/[–—]/g,'-').replace(/\s+/g,' ').trim();
  const warn=[], notes=[];
@@ -3204,6 +3241,11 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
  for(const[re,to]of AI_FIXES)W=W.replace(re,to);
  W=aiFixTimes(W).replace(/^(?:(?:and\s+)?(?:also\s+)?)(?:i|we)(?:\s+also)?\s+(?:have|'ve\s+got|have\s+got|got|ve\s+got)(?:\s+(?:a|an|my|our|the))?\s+(?=\S)/i,'').replace(/^(?:there(?:'s|\s+is)|i'?ve\s+got)(?:\s+(?:a|an|my|our|the))?\s+(?=\S)/i,'');
  W=aiNumberize(W);
+ // "Sunday nights" / "Tuesday mornings" = every Sunday night; "the 4th night of Chanukah"
+ W=W.replace(new RegExp('\\b(?:on\\s+)?('+AI_DAY_RE+')\\s+(nights|evenings|mornings|afternoons)\\b','gi'),(m,d,p)=>'every '+d+' '+p.replace(/s$/,''));
+ let chNight=null;W=W.replace(/\b(?:the\s+)?(\d)(?:st|nd|rd|th)\s+(night|candle|day)\s+of\s+chanu?kk?ah\b/i,(m,n,k)=>{chNight={n:+n,night:!/day/i.test(k)};return ' '});
+ // "before Shabbos" is a time of day, not a date
+ let relT='';W=W.replace(/\b(before|after|until|right\s+before)\s+(shabbos|shabbat|shabbes|yom\s+tov|candle\s*lighting|havdalah|havdala)\b/i,(m,a,b)=>{relT=aiTitleCase(a+' '+b.replace(/\s+/g,' '));return ' '});
  // Protect masechta names ("gemara shabbos") from being read as weekdays
  W=W.replace(new RegExp('\\b(gemara|masechta|maseches|mishnayos|mishna|daf\\s+yomi|daf|tractate)\\s+('+AI_MASECHTOS+')\\b','gi'),(m,k,ms)=>k.toLowerCase().replace(/\s+/g,'-')+'_'+ms.toLowerCase().replace(/\s+/g,'-'));
  {const ab='(?:sun|mon|tues|tue|wed|thurs|thur|thu|fri|sat)',full=n=>AI_DAY_LABEL[AI_DAY_ABBR[n.toLowerCase()]];
@@ -3218,15 +3260,18 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
  const dowList=s=>{const out=[],r=new RegExp('\\b('+AI_DOW_TOK.replace(/\)s\?$/,')')+')s?\\b','gi');let m;while(m=r.exec(s)){const d=aiDow(m[1]);if(d>=0&&!out.includes(d))out.push(d)}return out};
  const PLURAL_DAY=/\b(?:sundays|mondays|tuesdays|wednesdays|thursdays|fridays|saturdays|shabbosim|shabbosos)\b/i;
  const LIST='((?:'+AI_DOW_TOK+')(?:(?:\\s*(?:,|and|&|/)\\s*(?:and\\s+)?|\\s+)(?:'+AI_DOW_TOK+'))*)';
+ {let bm;if(/\b(?:remind\s+me|give|say|learn|do|buy|call|send|make)\b/i.test(W)&&(bm=/\b(?:on|for)\s+(my|his|her|our)\s+birthday\b/i.exec(W))){W=(W.slice(0,bm.index)+' '+W.slice(bm.index+bm[0].length)).replace(/\s+/g,' ');notes.push('On '+bm[1].toLowerCase()+' birthday')}}
  // ---- 2. Recurrence phrases
  let rec={type:'once'},partOfDay='',m;
  if(m=take(new RegExp('\\b(?:every\\s+|each\\s+|from\\s+|on\\s+)?('+AI_DOW_TOK+')\\s*(?:through|thru|to|until|till|-)\\s*('+AI_DOW_TOK+')\\b','i'))){
   const a=aiDow(m[1]),b=aiDow(m[2]),arr=[];for(let i=a;arr.length<8;i=(i+1)%7){arr.push(i);if(i===b)break}rec={type:'weekly',dows:arr,weeks:1}}
  else if(take(/\b(?:every\s+|on\s+|each\s+)?week\s*days?\b|\bweekdays\b|\bmonday\s+to\s+friday\b/i))rec={type:'weekly',dows:[1,2,3,4,5],weeks:1,note:'Weekdays = Monday–Friday'};
+ else if(take(/\b(?:every\s+|on\s+|each\s+)?week\s*nights?\b/i)){rec={type:'weekly',dows:[0,1,2,3,4],weeks:1,note:'Weeknights = Sunday–Thursday'};partOfDay='night'}
  else if(take(/\b(?:every\s+|on\s+)?weekends?\b/i))rec={type:'weekly',dows:[0,6],weeks:1,note:'Weekend = Saturday & Sunday'};
  if(rec.type==='once'){
   if(take(/\b(?:every\s+other\s+day|every\s+second\s+day|every\s+2\s+days|alternate\s+days|every\s+two\s+days)\b/i))rec={type:'days',n:2};
   else if(m=take(/\bevery\s+(\d+)\s+days?\b/i))rec={type:'days',n:Math.max(1,+m[1])};
+  else if(m=take(new RegExp('\\b(?:every|each)\\s+(?:other|second|alternate|2nd)\\s+('+AI_DOW_TOK+')\\b','i')))rec={type:'weekly',weeks:2,dows:[aiDow(m[1])]};
   else if(take(/\b(?:every\s+other\s+week|every\s+second\s+week|biweekly|bi-weekly|fortnightly|every\s+2\s+weeks)\b/i))rec={type:'weekly',weeks:2,dows:[]};
   else if(m=take(/\bevery\s+(\d+)\s+weeks?\b/i))rec={type:'weekly',weeks:Math.max(1,+m[1]),dows:[]};
   else if(m=take(new RegExp('\\b(?:the\\s+)?(first|1st|second|2nd|third|3rd|fourth|4th|last)\\s+('+AI_DOW_TOK+')\\s+of\\s+(?:every|each|the)\\s+month\\b','i'))){rec={type:'nthdow',nth:({first:1,'1st':1,second:2,'2nd':2,third:3,'3rd':3,fourth:4,'4th':4,last:-1})[m[1].toLowerCase()],dow:aiDow(m[2])}}
@@ -3235,6 +3280,7 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
   else if(take(/\b(?:daily|every\s*day|each\s+day|every\s+single\s+day|seven\s+days\s+a\s+week|7\s+days\s+a\s+week)\b/i))rec={type:'days',n:1};
   else if(m=take(/\b(?:every|each)\s+(morning|afternoon|evening|night)s?\b/i)){rec={type:'days',n:1};partOfDay=m[1].toLowerCase()}
   else if(take(/\bnightly\b/i)){rec={type:'days',n:1};partOfDay='night'}
+  else if(m=take(/\b(?:every|each)\s+(motzei|motzai|erev)\s+(?:shabbos|shabbat|shabbes)\b/i)){const mz=/^motz/i.test(m[1]);rec={type:'weekly',dows:[mz?6:5],weeks:1};relT=relT||(mz?'Motzei Shabbos':'Erev Shabbos')}
   else if(take(/\bevery\s+rosh\s*(?:chodesh|hodesh)\b|\beach\s+rosh\s*(?:chodesh|hodesh)\b|\brosh\s*(?:chodesh|hodesh)\s+(?:every|each)\s+month\b/i))rec={type:'hmonth',day:1,rc:true};
   else if(m=take(/\b(?:on\s+)?(?:the\s+)?(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?(?:every|each)\s+(hebrew\s+month|month)\b/i))rec={type:/hebrew/i.test(m[2])?'hmonth':'month?',day:+m[1]};
   else if(m=take(/\b(?:every|each)\s+(?:the\s+)?(\d{1,2})(?:st|nd|rd|th)\b(?:\s+of\s+the\s+month)?/i))rec={type:'month?',day:+m[1]};
@@ -3247,6 +3293,7 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
  }
  // ---- 3. Limits: "for 8 weeks", "for the next 10 days", "5 sessions", "until Purim"
  let limit=null,untilInfo=null;
+ let wkStart=null;if(rec.type!=='once'&&(m=take(/(?<!\b(?:starting|from|beginning|begins?|starts?|as\s+of)\s+)\b(this|next)\s+week(?:\s+only)?\b/i))){const nx=/next/i.test(m[1]),s0=nx?ad(today,7-today.getDay()):today;untilInfo={kind:'rel',date:ad(s0,6-s0.getDay())};if(nx)wkStart=s0}
  if(rec.type!=='once'){
   if(m=take(/\bfor\s+(?:the\s+next\s+)?(\d{1,3})\s+(days?|weeks?|months?)\b/i))limit={n:+m[1],unit:m[2][0].toLowerCase()};
   else if(m=take(/\b(?:for\s+)?(\d{1,3})\s+(sessions?|times)(?:\s+(?:total|only))?\b/i))limit={n:+m[1],unit:'s'};
@@ -3256,14 +3303,22 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
  // ---- 4. The date itself
  let dateInfo=null;
  {const r=aiParseDate(W,today);if(r){dateInfo=r.info;W=r.rest.replace(/\s+/g,' ')}}
+ if(!dateInfo&&wkStart)dateInfo={kind:'rel',date:wkStart};
+ if(chNight){const k0=aiNextHebrew('Ki',chNight.night?24:25,today);if(k0){dateInfo={kind:'named',date:ad(k0,chNight.n-1),label:'Chanukah'};if(chNight.night&&!partOfDay)partOfDay='night';notes.push((chNight.night?'Night ':'Day ')+chNight.n+' of Chanukah')}}
+ if(dateInfo&&['heb','named'].includes(dateInfo.kind)&&dateInfo.date){
+  if(dateInfo.weekday==null&&(m=take(new RegExp('\\b(?:on\\s+)?('+AI_DAY_RE+')\\b(?:\\s+(morning|afternoon|evening|night))?','i')))){dateInfo.weekday=aiDow(m[1]);if(m[2]&&!dateInfo.daypart)dateInfo.daypart=m[2].toLowerCase()}
+  const wd=dateInfo.weekday;if(wd!=null&&wd>=0&&dateInfo.date.getDay()!==wd){const d0=dateInfo.date;let best=null;for(let k=0;k<=6&&!best;k++){if(ad(d0,k).getDay()===wd)best=ad(d0,k);else if(ad(d0,-k).getDay()===wd&&ad(d0,-k)>=today)best=ad(d0,-k)}
+   if(best){warn.push((dateInfo.label||'That date')+' is on '+AI_DAY_LABEL[d0.getDay()]+', so I put this on '+AI_DAY_LABEL[wd]+', '+best.toLocaleDateString(undefined,{month:'short',day:'numeric'})+'.');dateInfo.date=best;dateInfo.shifted=true;dateInfo.weekday=null}}}
  if(dateInfo&&dateInfo.daypart&&dateInfo.daypart!=='erev'&&dateInfo.daypart!=='motzei'&&!partOfDay)partOfDay=dateInfo.daypart;
  W=W.replace(/\b(?:starting|beginning|commencing|begins?|starts?)\b(?:\s+(?:on|from))?/ig,' ').replace(/\s+/g,' ');
  if(m=take(/\b(?:in\s+the\s+|during\s+the\s+|at\s+|every\s+)?(morning|afternoon|evening|night)s?\b/i)){if(!partOfDay)partOfDay=m[1].toLowerCase()}
  // ---- 5. Time of day, ranges, durations
  let timeTxt='',durTxt='';
+ if(dateInfo&&dateInfo.clock){const c=dateInfo.clock;timeTxt=aiFmtTime(c.h%12||12,c.m,c.h<12?'AM':'PM')}
  const infer=(h,ap)=>{if(ap)return ap;if(partOfDay==='morning')return 'AM';if(/afternoon|evening|night/.test(partOfDay))return 'PM';return ''};
  {let tm;const PRE='(?:\\b(?:at|around|by|from|starting at|beginning at)\\s+|@\\s*)?';
-  if(tm=take(/\b(after|before|around)\s+(shacharis|mincha|maariv|shkia|sunset|sunrise|netz|neitz|chatzos|chatzot|candle\s*lighting|davening|havdalah|havdala|lunch|breakfast|dinner|seudah|work|school)\b/i))timeTxt=aiTitleCase(tm[1]+' '+tm[2].replace(/\s+/g,' '));
+  if(timeTxt){}
+  else if(!/\b\d{1,2}(?::\d{2})?\s*(?:am|pm)\b|\b(?:at|@)\s*\d|\b\d{1,2}:\d{2}\b/i.test(W)&&(tm=take(/\b(after|before|around)\s+(shabbos|shabbat|yom\s+tov|shacharis|mincha|maariv|shkia|sunset|sunrise|netz|neitz|chatzos|chatzot|candle\s*lighting|davening|havdalah|havdala|lunch|breakfast|dinner|seudah|work|school)\b/i)))timeTxt=aiTitleCase(tm[1]+' '+tm[2].replace(/\s+/g,' '));
   else if(tm=take(/\b(noon|midday|midnight)\b/i))timeTxt=tm[1].toLowerCase()==='midnight'?'12:00 AM':'12:00 PM';
   else if(tm=take(/\bhalf\s+past\s+(\d{1,2})\b/i)){const h=+tm[1];timeTxt=aiFmtTime(h,30,infer(h,''))}
   else if(tm=take(/\bquarter\s+past\s+(\d{1,2})\b/i)){const h=+tm[1];timeTxt=aiFmtTime(h,15,infer(h,''))}
@@ -3274,11 +3329,12 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
    {timeTxt=aiFmtTime(+tm[1],+(tm[2]||0),infer(+tm[1],''))+' – '+aiFmtTime(+tm[3],+(tm[4]||0),infer(+tm[3],''))}
   else if(tm=take(new RegExp(PRE+'(\\d{1,2}):(\\d{2})\\s*(a\\.?m\\.?|p\\.?m\\.?)?(?!\\d)','i'))){let h=+tm[1],mn=+tm[2],ap=aiNormAp(tm[3]);if(h>=13&&h<=23&&!ap){ap='PM';h-=12}else if(h===0&&!ap){h=12;ap='AM'}else if(!ap)ap=infer(h,'');timeTxt=aiFmtTime(h,mn,ap)}
   else if(tm=take(new RegExp(PRE+'(\\d{1,2})\\s*(a\\.?m\\.?|p\\.?m\\.?)(?!\\w)','i')))timeTxt=aiFmtTime(+tm[1],0,aiNormAp(tm[2]));
+  else if(tm=take(/\b(?:at\s+|@\s*|around\s+|by\s+|from\s+)?(\d{1,2})\s*o'?clock\b/i)){const h=+tm[1];if(h>=1&&h<=12)timeTxt=aiFmtTime(h,0,infer(h,''))}
   else if(tm=take(/\b(?:at|@|around|by|from)\s+(\d{1,2})(?:\s*o'?clock)?(?![\d:]|\s*(?:st|nd|rd|th|chapters?|pages?|days?|weeks?|months?|times|minutes?|hours?|perek|perakim|dapim|people)\b)/i))
    {const h=+tm[1];if(h>=1&&h<=12)timeTxt=aiFmtTime(h,0,infer(h,''));else W=(W+' '+tm[0]).replace(/\s+/g,' ')}
-  if(timeTxt&&/^\d/.test(timeTxt)&&!/AM|PM/.test(timeTxt)){const h=+timeTxt.split(':')[0];
-   if(!/ – /.test(timeTxt)&&(h<=6||h===12))timeTxt+=' PM';else warn.push('No AM/PM given for '+timeTxt+'. Say “am” or “pm” if it matters.')}
-  else if(timeTxt&&/ – /.test(timeTxt)&&!/AM|PM/.test(timeTxt))warn.push('No AM/PM given for '+timeTxt+'.');
+  /* AM/PM is settled further down (aiAmPm), once we know what kind of plan this is */
+  if(!timeTxt&&(tm=take(/(?:^|\s)(1[0-2]|[1-9])(?::([0-5]\d))?\s*(?:-|–|to)\s*(1[0-2]|[1-9])(?::([0-5]\d))?(?![\d:]|\s*(?:chapters?|pages?|days?|weeks?|months?|times|minutes?|mins?|hours?|hrs?|perek|perakim|dapim|people|years?|kids|boys|girls|\/))/i)))timeTxt=aiFmtTime(+tm[1],+(tm[2]||0),infer(+tm[1],''))+' – '+aiFmtTime(+tm[3],+(tm[4]||0),infer(+tm[3],''));
+  if(relT)timeTxt=timeTxt?timeTxt+' · '+relT:relT;
   if(!timeTxt&&partOfDay)timeTxt=partOfDay[0].toUpperCase()+partOfDay.slice(1);
   if(dateInfo&&dateInfo.daypart==='erev')timeTxt=(timeTxt?timeTxt+' · ':'')+'Erev Shabbos';
   if(dateInfo&&dateInfo.daypart==='motzei')timeTxt=(timeTxt?timeTxt+' · ':'')+'Motzei Shabbos';
@@ -3288,11 +3344,11 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
  let place='';
  {let pm=AI_PLACES.exec(W);
   if(pm){place=aiTitleCase(pm[1].replace(/\s+/g,' '));place=({telephone:'Phone',meet:'Google Meet','google meet':'Google Meet',zoom:'Zoom',facetime:'FaceTime',whatsapp:'WhatsApp'})[place.toLowerCase()]||place;W=(W.slice(0,pm.index)+' '+W.slice(pm.index+pm[0].length)).replace(/\s+/g,' ')}
-  else if(pm=/\b(?:at|in)\s+([A-Z][\p{L}'’-]+(?:\s+[A-Z][\p{L}'’-]+){0,2}?)(?:'s|’s)?(?:\s+(house|home|place|apartment|office|shul))?(?=\s|$|[.,;!?])/u.exec(W.replace(/\b(?:Rabbi|Reb|Rav)\b/g,m=>m))){
+  else if(pm=/\b(?:at|in)\s+([A-Z][\p{L}'’-]+(?:\s+[A-Z][\p{L}'’-]+){0,2})(?:'s|’s)?(?:\s+(house|home|place|apartment|office|shul))?(?=\s|$|[.,;!?])/u.exec(W.replace(/\b(?:Rabbi|Reb|Rav)\b/g,m=>m))){
    const cand=pm[1];if(!new RegExp('^(?:'+AI_HMONTH_RE+'|'+AI_MONTH_RE+'|'+AI_DAY_RE+'|mincha|maariv|shacharis|shkia|the|my|our|I)$','i').test(cand.split(' ')[0])&&!AI_TOPICS.some(([re])=>re.test(cand))){
     place=pm[2]?cand.replace(/['’]s$/,'')+'’s '+pm[2].toLowerCase():cand;W=(W.slice(0,pm.index)+' '+W.slice(pm.index+pm[0].length)).replace(/\s+/g,' ')}}}
  // ---- 7. People
- const STOP=new RegExp('^(?:every|each|once|twice|weekly|daily|monthly|yearly|annually|at|in|on|from|starting|beginning|for|tomorrow|today|tonight|next|this|after|before|until|till|through|to|by|around|about|during|over|since|per|then|so|but|if|when|while|because|except|besides|unless|excluding|apart|aside|other|instead|please|chavrusa|kvius|seder|sedarim|shiur|davening|shacharis|mincha|maariv|farbrengen|learn|learning|study|time|session|sessions|'+AI_DAY_RE+'s?|'+AI_MONTH_RE+'|'+AI_HMONTH_RE+'|\\d+(?:st|nd|rd|th|:\\d+)?)$','i');
+ const STOP=new RegExp('^(?:is|are|was|were|will|would|has|have|had|who|when|where|about|regarding|re|every|each|once|twice|weekly|daily|monthly|yearly|annually|at|in|on|from|starting|beginning|for|tomorrow|today|tonight|next|this|after|before|until|till|through|to|by|around|about|during|over|since|per|then|so|but|if|when|while|because|except|besides|unless|excluding|apart|aside|other|instead|please|chavrusa|kvius|seder|sedarim|shiur|davening|shacharis|mincha|maariv|farbrengen|learn|learning|study|time|session|sessions|'+AI_DAY_RE+'s?|'+AI_MONTH_RE+'|'+AI_HMONTH_RE+'|\\d+(?:st|nd|rd|th|:\\d+)?)$','i');
  const REL=/^(?:father|mother|dad|mom|wife|husband|son|daughter|brother|sister|grandfather|grandmother|zaidy|zeide|bubby|bubbe|rebbe|rebbetzin|teacher|mashpia|friend|boss|doctor)$/i;
  const isTopic=t=>AI_TOPICS.some(([re])=>re.test(t));
  const nameChain=(s)=>{const toks=s.split(/\s+/).filter(Boolean),out=[];let i=0;
@@ -3301,7 +3357,7 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
   for(;i<toks.length&&chain.length<4;i++){const t=toks[i].replace(/[,.;!?]+$/,''),end=/[,.;!?]$/.test(toks[i]);
    if(/^and$/i.test(t)){const n=(toks[i+1]||'').replace(/[,.;!?]+$/,'');if(chain.length&&n&&!STOP.test(n)&&!isTopic(n)){out.push(chain.join(' '));chain=[];used=i+1;continue}break}
    if(!t||STOP.test(t)||isTopic(t)||/^(?:the|a|an)$/i.test(t))break;
-   chain.push(t);used=i+1;if(end)break}
+   chain.push(t);used=i+1;if(end&&!/^(?:mr|mrs|ms|dr|r|rav|reb|rabbi|prof)\.$/i.test(toks[i]))break}
   if(chain.length)out.push(chain.join(' '));
   return{names:out,used,toks}};
  const people=[];
@@ -3311,23 +3367,26 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
    else W=(W.slice(0,wm.index)+' '+after).replace(/\s+/g,' ')}
   if(!people.length&&(m=/\bchavrusa\s+(?:time\s+)?(?:is\s+|named\s+|called\s+)?/i.exec(W))){const after=W.slice(m.index+m[0].length),r=nameChain(after);
    if(r.names.length){people.push(...r.names);W=(W.slice(0,m.index+m[0].length)+' '+r.toks.slice(r.used).join(' ')).replace(/\s+/g,' ')}}}
- const person=people.map(n=>n.replace(/^(?:my|our|his|her)\s+/i,'')).map(n=>aiTitleCase(n)).filter(Boolean).join(' & ');
+ const person=people.map(n=>n.replace(/^(?:my|our|his|her|the)\s+/i,'')).map(n=>aiTitleCase(n)).filter(Boolean).join(' & ');
+ const personT=people.map(n=>{if(/^(?:the|our|my)\s+\p{Ll}+$/u.test(n)&&!REL.test(n.split(' ')[1]))return n.toLowerCase();{const am=new RegExp('\\bwith\\s+(the|our)\\s+'+n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i').exec(q0);if(am&&/^\p{Ll}+$/u.test(n))return am[1].toLowerCase()+' '+n}const b=n.replace(/^(?:my|our|his|her)\s+/i,'');return REL.test(b.split(' ')[0])||/^(?:son|daughter|kids|children|boys|girls|grandson|granddaughter|nephew|niece|cousin|uncle|aunt|chavrusa|partner|husband|wife)$/i.test(b)?(/^(?:our)\s/i.test(n)?'our ':'my ')+b.toLowerCase():aiTitleCase(b)}).filter(Boolean).join(' & ');
  // ---- 8. Category + topic
  const Wq=W.toLowerCase();
  let topic='',portion='',masechta='',masKw='Gemara';
  {const pm=/\b(\d+(?:\.\d+)?)\s*(chapters?|perek|perakim|pages?|dapim|daf|mishnayos|mishnayot|sichos)\b/i.exec(W);if(pm){portion=pm[1]+' '+pm[2].toLowerCase();W=(W.slice(0,pm.index)+' '+W.slice(pm.index+pm[0].length)).replace(/\s+/g,' ')}}
  {const mm=/\b(gemara|masechta|maseches|mishnayos|mishna|daf-yomi|daf|tractate)_([a-z-]+)\b/i.exec(W);if(mm){masechta=aiTitleCase(mm[2].replace(/-/g,' '));masKw=/^mishna/i.test(mm[1])?'Mishnayos':'Gemara';W=(W.slice(0,mm.index)+' '+W.slice(mm.index+mm[0].length)).replace(/\s+/g,' ')}
+  if(!masechta&&/\b(?:gemara|masechta|maseches|daf|tractate|mishnayos|mishna)\b/i.test(W)){const m2=new RegExp('\\b('+AI_MASECHTOS+')\\b','i').exec(W);if(m2&&!/^shabb/i.test(m2[1])){masechta=aiTitleCase(m2[1]);masKw=/mishna/i.test(W)?'Mishnayos':'Gemara';W=(W.slice(0,m2.index)+' '+W.slice(m2.index+m2[0].length)).replace(/\s+/g,' ')}}
   const pr=/\bparsha(?:s|t|h)?\s+([A-Za-z][\w'’-]+)/i.exec(W);if(pr&&!STOP.test(pr[1])&&!/^(?:and|with)$/i.test(pr[1]))masechta=aiTitleCase(pr[1])}
  for(const[re,name]of AI_TOPICS)if(re.test(W)){topic=name;break}
  const has=re=>re.test(Wq)||re.test(q0);
- const isChavr=has(/\bchavrusa\b/), isKvius=has(/\bkvius\b/), isSeder=has(/\b(?:seder|sedarim)\b/), isShiur=has(/\bshiur\b/);
+ const isChavr=has(/\bchavrusa\b/), isKvius=has(/\bkvius\b/), isSeder=has(/\b(?:seder|sedarim)\b/), isShiur=has(/\bshiur\b/), isClass=has(/\b(?:class|lecture|lesson)\b/)&&(topic||masechta||isShiur);
  const learnVerb=/\b(learn|learning|study|studying|review|reviewing|chazara|iyun|prepare|prepping|farher)\b/i.test(Wq);
- const isLearning=!!(topic||isChavr||isKvius||isSeder||isShiur||learnVerb||masechta);
+ const actFirst=/^(?:(?:please\s+)?(?:remind\s+me\s+to|don'?t\s+forget\s+to|i\s+(?:need|have)\s+to|need\s+to)\s+)?(?:call|text|email|e-mail|phone|message|ask|tell|buy|pay|send|order|pick\s+up|drop\s+off|book|print|bring|return|get)\b/i.test(q0.trim());
+ const isLearning=!actFirst&&!!(topic||isChavr||isKvius||isSeder||isShiur||learnVerb||masechta);
  const cats=[
-  ['Yahrzeit',/\byahrzeit\b/],['Birthday',/\bbirthday\b/],['Anniversary',/\banniversary\b/],
+  ['Gathering',/\b(?:farbrengen|melave?h?\s+malka|kinus|siyum)\b/],['Yahrzeit',/\byahrzeit\b/],['Birthday',/^(?!.*\b(?:buy|get|order|send|wrap|bake|plan|prepare|organize|pick\s+up)\b.*\bbirthday\b)(?=.*(?<!happy\s)(?<!wish\s\w+\s)\bbirthday\b(?!\s+(?:present|gift|card|cake|party\s+for)))/],['Anniversary',/(?<!happy\s)\banniversary\b/],
   ['Simcha',/\b(wedding|chasuna|chasunah|bar\s+mitzvah|bas\s+mitzvah|bat\s+mitzvah|bris|upsherin|l'?chaim|vort|engagement|sheva\s+brachos|pidyon\s+haben)\b/],
   ['Outreach',/\b(mivtzoim|mitzvah\s+tank|tefillin\s+stand|outreach|shlichus)\b/],
-  ['Gathering',/\b(farbrengen|melave?h?\s+malka|kinus|shabbaton|tish)\b/],['Yechidus',/\byechidus\b/],['Learning',null],
+  ['Gathering',/\b(farbrengen|melave?h?\s+malka|kinus|shabbaton|tish|siyum)\b/],['Yechidus',/\byechidus\b/],['Learning',null],
   ['Prayer',/\b(shacharis|mincha|maariv|davening|minyan|tefillah|selichos|tefillin|krias\s+shema)\b/],
   ['Appointment',/\b(meeting|call|appointment|doctor|dentist|interview|flight|visit|dinner|lunch|breakfast|coffee|errand|drop-?off|pick-?up)\b/],
   ['Reminder',/\b(remind\s+me|reminder|to-?do|task|don't\s+forget|dont\s+forget|need\s+to|have\s+to|must|pay|buy|renew|submit|email|text|order)\b/]];
@@ -3342,47 +3401,50 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
   /\b(?:remind\s+me\s+(?:to|about|of)|reminder\s+(?:to|about|for)|don't\s+forget\s+to|dont\s+forget\s+to)\b/gi,/\b(?:add|schedule|set\s*up|setup|set|create|put|book|plan|make|arrange|log|enter)\s+(?:an?\s+|the\s+|me\s+(?:a\s+)?)?(?:new\s+)?/gi,
   /\b(?:on|to|in|for)\s+(?:my|the)\s+calendar\b/gi,/\bcalendar\b/gi,/\b(?:event|task|entry|session|plan)\b(?=\s*(?:for|on|at|$|[.,]))/gi,/\bhebrew\s+month\b/gi,/\bthat\s+(?:is|are)\b/gi,/\b(?:monthly|weekly|daily|yearly|annually|nightly|biweekly|fortnightly)\b/gi];
  for(const re of strip)leftover=leftover.replace(re,' ');
+ leftover=leftover.replace(/\b(?:i'?m|i\s+am|we'?re|we\s+are|i'?ll|i\s+will|i\s+usually|i\s+always|i\s+have|i'?ve\s+got|we\s+have|i\s+do|i\s+need\s+to|i\s+have\s+to|need\s+to|have\s+to|want\s+to|i)\b(?=\s|$)/gi,' ').replace(/\b(?:when\s+it'?s|it'?s|which\s+is|that'?s)\s*$/i,' ');
  const kw=/\b(?:chavrusa|kvius|sedarim|seder|shiur|farbrengen|yahrzeit|birthday|mivtzoim|davening|shacharis|mincha|maariv|yechidus|learn(?:ing)?|study(?:ing)?)\b/gi;
  const clean=s=>{let t=s.replace(/[,;]+/g,' ').replace(/\s+/g,' ').trim();for(let i=0;i<6;i++){if(/^(?:and|then|also|a|an|the|my|our|to|on|at|in|for|from|with|of|about|by|every|each|is|it'?s|there'?s|that|this|next|will|be)$/i.test(t))return '';t=t.replace(/^(?:and|then|also|a|an|the|my|our|to|on|at|in|for|from|with|of|about|by|every|each|is|it'?s|there'?s|that|this)\s+/i,'').replace(/\s+(?:and|then|also|a|an|the|my|our|to|on|at|in|for|from|with|of|about|by|every|each|is|this|next|will|be)$/i,'').replace(/^[\s.:;,-]+|[\s.:;,-]+$/g,'')}return t};
- const L=clean(leftover), Lnk=clean(L.replace(kw,' ')), dlabel=dateInfo&&dateInfo.label&&(dateInfo.kind==='named'||dateInfo.kind==='rc')?dateInfo.label:'';
+ const L=clean(leftover), Lnk=clean(L.replace(kw,' ')), dlabel=dateInfo&&dateInfo.label&&(dateInfo.kind==='named'||dateInfo.kind==='rc'||dateInfo.shifted||(category==='Gathering'&&dateInfo.kind==='heb'))?dateInfo.label:'';
  let title='';
  if(category==='Learning'){
-  const desc=isKvius?'kvius':isChavr?'chavrusa':isSeder?(/sedarim/i.test(q0)?'sedarim':'seder'):isShiur?'shiur':'study';
+  const desc=isKvius?'kvius':isChavr?'chavrusa':isSeder?(/sedarim/i.test(q0)?'sedarim':'seder'):isShiur?'shiur':isClass?'class':'study';
   let subject=masechta?(topic==='Parsha'?'Parshas '+masechta:masKw+' '+masechta):topic;
   if(!subject&&Lnk&&!/^(?:learn(?:ing)?|study)$/i.test(Lnk)&&Lnk.length<48)subject=aiTitleCase(Lnk.replace(/^(?:about|on)\s+/i,''));
   if(subject){const bare=topic==='Daf Yomi'||topic==='Chitas'||/^Parshas /.test(subject);
    title=desc==='study'?(learnVerb&&!bare?'Learn '+subject:subject):(bare&&desc==='chavrusa'?subject+' chavrusa':subject+' '+desc)}
-  else title=desc==='chavrusa'?'Chavrusa learning':desc==='study'?'Study session':aiTitleCase(desc);
-  if(isChavr&&person&&!title.toLowerCase().includes(person.toLowerCase()))title+=' with '+person;
+  else title=desc==='chavrusa'?'Chavrusa':desc==='study'?(person||learnVerb?'Learning':'Study session'):aiTitleCase(desc);
+  if(person&&!title.toLowerCase().includes(person.toLowerCase().split(' ')[0]))title+=' with '+personT;
   else if(isChavr&&!person&&desc==='kvius')title+=' with chavrusa';
-  else if(!isChavr&&person)notes.push('Learning with: '+person);
  }else if(category==='Yahrzeit'){
   let who=clean(L.replace(/\byahrzeit\b/gi,' ').replace(/\b(?:of|for)\b/i,' ')).replace(/^my\s+/i,'');if(!who&&person)who=person;
-  title=!who?'Yahrzeit':(/\b(ben|bas|bat|a"h|o"b|z"l|zt"l|ob"m)\b/i.test(who)?'Yahrzeit of '+aiTitleCase(who):aiTitleCase(who)+'’s Yahrzeit');
+  who=who.replace(/['’]s?$/,'');title=!who?'Yahrzeit':(/\b(ben|bas|bat|a"h|o"b|z"l|zt"l|ob"m)\b/i.test(who)?'Yahrzeit of '+aiTitleCase(who):aiTitleCase(who)+'’s yahrzeit');
  }else if(category==='Birthday'){
   let who=clean(L.replace(/\bbirthday\b/gi,' ').replace(/\b(?:of|for)\b/i,' '));if(!who&&person)who=person;
-  title=!who?'Birthday':(/^(?:me|i|myself)$/i.test(who)?'My Birthday':aiTitleCase(who)+'’s Birthday');
+  who=who.replace(/['’]s?$/,'').replace(/^(?:my\s+)?(?:son|daughter|brother|sister|husband|wife|friend|cousin|nephew|niece|grandson|granddaughter|boy|girl)\s+(?=\p{Lu}|\w+$)/iu,'');title=!who||/^(?:me|i|myself|mine)$/i.test(who)?(/\bmy\s+birthday\b|\bmine\b|\bi\s+was\s+born\b/i.test(q0)||!who?'My birthday':'Birthday'):aiTitleCase(who)+'’s birthday';
  }else if(['Gathering','Outreach','Yechidus','Simcha','Anniversary'].includes(category)){
   const simchaRe=/wedding|chasunah?|bar mitzvah|bas mitzvah|bat mitzvah|bris|upsherin|l'?chaim|vort|engagement|sheva brachos|pidyon haben/;
-  const canon={Gathering:Wq.match(/melave?h? malka/)?'Melaveh Malka':Wq.match(/\bkinus\b/)?'Kinus':Wq.match(/\bshabbaton\b/)?'Shabbaton':Wq.match(/\btish\b/)?'Tish':'Farbrengen',
-   Outreach:Wq.match(/mitzvah tank/)?'Mitzvah Tank':Wq.match(/tefillin stand/)?'Tefillin Stand':Wq.match(/mivtzoim/)?'Mivtzoim':'Outreach',Yechidus:'Yechidus',Simcha:aiTitleCase((Wq.match(simchaRe)||['Simcha'])[0]),Anniversary:'Anniversary'}[category];
-  const rest=clean(L.replace(/\b(?:farbrengen|mivtzoim|yechidus|anniversary|melave?h? malka|kinus|shabbaton|tish|mitzvah tank|tefillin stand|outreach|shlichus|wedding|chasunah?|bar mitzvah|bas mitzvah|bat mitzvah|bris|upsherin|l'?chaim|vort|engagement|sheva brachos|pidyon haben)\b/gi,' '));
-  const lead=dlabel&&!new RegExp(dlabel,'i').test(rest)?dlabel+' ':'';
-  title=(lead+(rest?aiTitleCase(rest)+' ':'')+canon).replace(/\s+/g,' ').trim();
+  const canon={Gathering:Wq.match(/\bsiyum\b/)?'Siyum':Wq.match(/melave?h? malka/)?'Melaveh Malka':Wq.match(/\bkinus\b/)?'Kinus':Wq.match(/\bshabbaton\b/)?'Shabbaton':Wq.match(/\btish\b/)?'Tish':'Farbrengen',
+   Outreach:Wq.match(/mitzvah tank/)?'Mitzvah Tank':Wq.match(/tefillin stand/)?'Tefillin Stand':Wq.match(/mivtzoim/)?'Mivtzoim':'Outreach',Yechidus:'Yechidus',Simcha:aiTitleCase((Wq.match(simchaRe)||['Simcha'])[0]),Anniversary:/wedding\s+anniversary/.test(Wq)?'Wedding anniversary':'Anniversary'}[category];
+  const rest=clean(L.replace(/\b(?:farbrengen|mivtzoim|yechidus|anniversary|melave?h? malka|kinus|shabbaton|tish|mitzvah tank|tefillin stand|outreach|shlichus|siyum|wedding|chasunah?|bar mitzvah|bas mitzvah|bat mitzvah|bris|upsherin|l'?chaim|vort|engagement|sheva brachos|pidyon haben)\b/gi,' '));
+  const lead=dlabel&&!rest?dlabel+' ':'';
+  const cw=canon.split(' ')[0],after=(L.split(new RegExp('\\b'+cw+'\\b','i'))[1]||'').trim();
+  if(canon==='Siyum'||(category==='Gathering'&&after&&!/^(?:at|on|in|with|for|by)\b/i.test(after)))title=aiSentence(L.replace(/^(?:a|the)\s+/i,''));else title=(category==='Simcha'&&rest&&new RegExp(canon+'\\s+of\\s','i').test(q0)?canon+' of '+aiTitleCase(rest.replace(/^of\s+/i,'')):(lead+(rest?aiTitleCase(rest)+' ':'')+canon)).replace(/\s+/g,' ').trim();
   if(person&&(category==='Simcha'||category==='Anniversary'||category==='Yechidus'))title+=' with '+person;else if(person)notes.push('With: '+person);
  }else if(category==='Prayer'){
   const canon=(Wq.match(/\b(shacharis|mincha|maariv)\b/)||[])[1]||(/tefillin/.test(Wq)?'tefillin':/minyan/.test(Wq)?'minyan':/selichos/.test(Wq)?'selichos':'davening');
-  title=({shacharis:'Shacharis',mincha:'Mincha',maariv:'Maariv',tefillin:'Tefillin',minyan:'Minyan',selichos:'Selichos',davening:'Davening'})[canon];
+  title=/\bput\s+on\s+tefillin\b/.test(Wq)?'Put on tefillin':({shacharis:'Shacharis',mincha:'Mincha',maariv:'Maariv',tefillin:'Tefillin',minyan:'Minyan',selichos:'Selichos',davening:'Davening'})[canon];
   if(person)notes.push('With: '+person);
  }else{ // Appointment, Reminder, Jewish date, or uncategorised
-  let t=(Lnk||L).replace(/^(?:about|that|to)\s+/i,'');
-  if(category==='Appointment'&&person&&!new RegExp(person.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i').test(t))t=(t||'Meeting')+' with '+person;
-  else if(person)notes.push('With: '+person);
-  if(!t&&dlabel)t=dlabel;
-  title=aiTitleCase(t);
+  let t=(L||Lnk).replace(/^(?:about|that|to)\s+/i,'');
+  if(person&&!new RegExp(person.split(' ')[0].replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i').test(t))t=(t||'Meeting')+' with '+personT;
+  if(!t&&dlabel)t=dlabel;else if(dlabel&&t&&!new RegExp(dlabel.split(' ')[0],'i').test(t)&&t.split(/\s+/).length<=3)t=dlabel+' '+t.replace(/^(?:a|the)\s+/i,'').toLowerCase();
+  title=aiSentence(t);
   if(title&&!category)category='General';
  }
  if(learned&&learned.title)title=learned.title;
+ // ---- 9b. AM/PM for a bare hour ("at 8"): 1–6 → PM, 12 → noon; 7–11 → evening for learning, farbrengens, simchas and evening words, else morning
+ if(timeTxt&&/^\d/.test(timeTxt)&&/\d(?!.*[AP]M)/.test(timeTxt)){const ev=/\b(?:night|nights|nightly|evening|tonight|motzei|maariv|dinner|supper|after\s+work|melave)\b/i.test(q0)||(/\b(?:farbrengen|wedding|chasuna|l'?chaim|vort|sheva\s+brachos|melave)\b/i.test(q0))||(category==='Learning'&&!/\b(?:daf\s+yomi|shacharis|morning|before\s+work|breakfast)\b/i.test(q0)),mo=/\b(?:morning|mornings|breakfast|shacharis|sunrise|netz)\b/i.test(q0);
+  const sp=timeTxt.split(' · '),r=aiAmPm(sp[0],ev&&!mo?'PM':mo?'AM':'');sp[0]=r.t;timeTxt=sp.join(' · ');if(r.note)warn.push(r.note)}
  // ---- 10. Notes
  const nt=[];
  if(timeTxt)nt.push('Time: '+timeTxt); if(durTxt)nt.push('Duration: '+durTxt); if(place)nt.push('Place: '+place); if(portion)nt.push('Portion: '+portion); if(rec.note)nt.push(rec.note);
@@ -3409,7 +3471,6 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
   start=first;
   if(rec.weeks===1){p.recurrence='weekly';p.dows=dows;p.dow=dows[0];summary='Every '+listDays(dows)}
   else{p.recurrence='custom';p.interval=7*rec.weeks;summary='Every '+(rec.weeks===2?'other week':rec.weeks+' weeks')+' on '+dayName(first.getDay());if(dows.length>1)warn.push('Repeating every '+rec.weeks+' weeks supports one weekday, so I used '+dayName(first.getDay())+'.')}
-  if(rec.implied)warn.push('Read as a weekly repeat. Say “once” or “this week only” if you meant a single time.');
   p.from=ds(start);
  }else if(rec.type==='days'){
   start=anchor||base;
@@ -3417,7 +3478,8 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
   if(partOfDay&&rec.n===1)summary+=' ('+partOfDay+')';
  }else if(rec.type==='hmonth'||rec.type==='month?'){
   const eng=/\b(?:english|gregorian|secular|civil)\b/i.test(q0);let day=rec.day;
-  const greg=rec.type==='month?'&&eng;
+  const hebCtx=/\b(?:hebrew|jewish)\b/i.test(q0)||(dateInfo&&['heb','named','rc'].includes(dateInfo.kind));
+  const greg=rec.type==='month?'&&(eng||!hebCtx);
   if(!day){const dd=anchor;if(dd){day=greg?dd.getDate():(dateInfo.hdn||hd(dd).d)}else{day=greg?base.getDate():hd(base).d;warn.push('No day of the month given, so I used the selected day ('+(greg?'the '+aiOrdSuffix(day):'Hebrew day '+day)+'). Edit your request to change it.')}}
   if(day<1||day>(greg?31:30)){p.needsClarification=true;p.clarify='That day number is out of range.'}
   const from=anchor||base;addLimit(from);
@@ -3468,6 +3530,7 @@ function aiLocalInterpret(raw){raw=String(raw||'').replace(/\bfor\s+(?:me|us|mys
  if(dateInfo&&dateInfo.weekday!=null&&dateInfo.weekday>=0&&dateInfo.date&&['greg','iso','heb'].includes(dateInfo.kind)&&dateInfo.date.getDay()!==dateInfo.weekday)warn.push('You said '+AI_DAY_LABEL[dateInfo.weekday]+' but that date is a '+AI_DAY_LABEL[dateInfo.date.getDay()]+'. I used the date.');
  if(dateInfo&&!dateInfo.date)warn.push('I could not work out that date, so I used the selected day.');
  if(dateInfo&&dateInfo.date&&p.recurrence==='once'&&dateInfo.explicitYear&&dateInfo.date<today)warn.push('That date has already passed.');
+ if(/^(?:schedule|add|plan|set|set up|create|book|remind me|reminder|make|put|new|event|something|a plan|plans?|calendar|note|task)$/i.test(p.title||'')&&!p.needsClarification){p.title='';p.needsClarification=true;p.clarify='What should I add? For example “Shiur every Thursday at 8pm” or “Call the bank tomorrow at 10am”.'}
  if(!p.title&&!p.needsClarification){p.needsClarification=true;p.clarify='What should I call this? (for example “Tanya chavrusa” or “Doctor appointment”)'}
  if(/\b(?:with|at|in|every|on|for|from|until)\s*$/i.test(original)&&!p.needsClarification){p.needsClarification=true;p.clarify='Your request ends mid-sentence. Finish it, or tap the microphone and say it again.'}
  p.understood={category,topic:topic||masechta||'',person,place,time:timeTxt,duration:durTxt,date:dateInfo?dateInfo.kind:'selected day',repeat:rec.type};
@@ -3666,7 +3729,7 @@ function aiCancelStart(raw){
  const today=ad(new Date(),0),W=aiNormalize(raw).toLowerCase();
  const sc=aiParseScope(W.replace(AI_CANCEL_RE,' '),today);
  const tokens=aiQTokens(sc.rest);
- const ctx={raw,tokens,forever:sc.forever||AI_FOREVER_VERB.test(W),nextOne:sc.nextOne,ranges:sc.ranges,matches:[],choiceList:[],chosen:null,awaiting:null};
+ const ctx={raw,tokens,forever:sc.forever||(AI_FOREVER_VERB.test(W)&&!sc.ranges.length&&!sc.nextOne),nextOne:sc.nextOne,ranges:sc.ranges,matches:[],choiceList:[],chosen:null,awaiting:null};
  if(!my.length){aiCancelCtx=null;aiEl('aiCancel').classList.remove('show');aiSetStatus('You have not added any plans yet, so there is nothing to cancel.');return true}
  const f=aiCancelFind(tokens);ctx.matches=f.matches;
  if(!f.matches.length){
@@ -3679,6 +3742,8 @@ function aiCancelStart(raw){
 function aiCancelAdvance(ctx){
  aiCancelCtx=ctx;aiSetStatus('');
  if(!ctx.chosen){
+  /* "delete the shiur on Tuesday" / "…tonight": if the day named fits only some of the matching plans, keep just those */
+  if(ctx.matches.length>1&&ctx.ranges&&ctx.ranges.length){const f=ctx.matches.filter(c=>ctx.ranges.some(r=>aiOccurrences(c,r[0],r[1]).length));if(f.length&&f.length<ctx.matches.length){ctx.matches=f;ctx.choiceList=f}}
   if(ctx.matches.length===1){ctx.chosen=[ctx.matches[0]]}
   else{
    const opts=ctx.choiceList.map(c=>({label:c.t+' — '+aiEvSummary(c),fn:()=>{ctx.chosen=[c];aiCancelAdvance(ctx)}}));
@@ -3834,11 +3899,17 @@ const AI_SUBJ_CUT=new RegExp('(?:every|each|on|at|@|with|daily|nightly|weekly|mo
 // "Schedule a chavrusa every Monday with JJ" -> "Schedule a chavrusa": the words before the first when/who/where
 function aiSubject(t){const m=new RegExp('\\b'+AI_SUBJ_CUT.source,'i').exec(t);const s=(m?t.slice(0,m.index):t).replace(/[\s,;.]+$/,'').trim();return aiHasTitle(s)?s:''}
 // "730pm" / "at 730" -> "7:30pm" / "at 7:30" (speech and quick typing often drop the colon)
-function aiFixTimes(t){return String(t||'').replace(/\b(1[0-2]|0?[1-9])([0-5]\d)\s*(a\.?m\.?|p\.?m\.?)(?!\w)/gi,'$1:$2 $3').replace(/\b(at|@|around|by|from|until|till)\s+([1-9])([0-5]\d)\b(?![:\d])/gi,'$1 $2:$3')}
+function aiFixTimes(t){return String(t||'').replace(/\b(1[0-2]|0?[1-9])\s+([0-5]\d)\s*(a\.?m\.?|p\.?m\.?)(?!\w)/gi,'$1:$2 $3').replace(/\b(at|@|around|by|from|until|till)\s+(1[0-2]|[1-9])\s+([0-5]\d)\b(?![:\d])/gi,'$1 $2:$3').replace(/\b(1[0-2]|0?[1-9])([0-5]\d)\s*(a\.?m\.?|p\.?m\.?)(?!\w)/gi,'$1:$2 $3').replace(/\b(at|@|around|by|from|until|till)\s+([1-9])([0-5]\d)\b(?![:\d])/gi,'$1 $2:$3')}
+// "remind me every day at 9pm to say shema" / "remind me in 30 minutes to …" / "set a reminder for tomorrow morning to call the bank"
+// -> "remind me to say shema every day at 9pm" (the task first, then when), so it is read as one plan
+function aiRemReorder(t){return t.replace(/\b((?:please\s+)?(?:remind\s+me|set\s+(?:up\s+)?(?:a\s+|me\s+a\s+)?reminder|add\s+(?:a\s+)?reminder|make\s+(?:a\s+)?reminder))\s+((?:(?!\bto\b|\bthat\b|\babout\b)[^.;\n])+?)\s+(to|that\s+i\s+(?:need|have)\s+to|about)\s+(?=\S)([^.;\n]+)/gi,(m,a,when,_to,task)=>{
+  if(!/\b(?:every|each|daily|nightly|weekly|monthly|tomorrow|tonight|today|this|next|on|at|in|by|around|before|after|from|starting|morning|afternoon|evening|night|noon|midnight|sunday|monday|tuesday|wednesday|thursday|friday|saturday|shabbos|\d)\b/i.test(when))return m;
+  return a+' to '+task.replace(/[\s,]+$/,'')+' '+when.replace(/^for\s+/i,'')})}
 function aiSplitRequests(raw){
- let text=aiFixTimes(String(raw||'').replace(/\r/g,'').replace(/[‘’`´]/g,"'")).trim();if(!text)return[];
+ let text=aiRemReorder(aiFixTimes(aiTidy(String(raw||'').replace(/\r/g,'').replace(/[‘’`´]/g,"'").replace(/\b([ap])\.\s?m\.?(?=\s|$|[,;!?])/gi,'$1m')))).trim();if(!text)return[];
  // a last sentence that is only a reminder ("Remind me 15 minutes before.") belongs to every request in the message
  let tail='';{const ss=text.split(/(?<=[.!?])\s+|\n+/);if(ss.length>1&&aiRemOnly(ss[ss.length-1])){tail=ss[ss.length-1].replace(/[.!\s]+$/,'');text=text.slice(0,text.lastIndexOf(ss[ss.length-1])).trim()}}
+ if(/^\s*1[.)]\s/.test(text))text=text.replace(/\s+(?=\d{1,2}[.)]\s+\p{L})/gu,'\n');
  // 1. lines (with bullets or numbers), semicolons, "1) … 2) …", Hebrew "וגם"
  let parts=text.split(/\n+/).map(l=>l.replace(/^\s*(?:[•*\-–]|\d{1,2}[.)])\s+/,'')).flatMap(l=>l.split(/\s*;\s*|\s+(?=\d{1,2}\)\s)|\s+וגם\s+/)).map(l=>l.replace(/^\d{1,2}\)\s+/,''));
  // 2. sentences, but not after abbreviations such as Dr. R. St. or a.m.
@@ -3855,14 +3926,23 @@ function aiSplitRequests(raw){
     if(aiRemOnly(next)){cur+=sep+next;continue}
     const also=/^also\b/i.test(next.trim())&&(/\band\b|,/i.test(sep)||(aiHasAnchor(cur)&&aiHasAnchor(rest)));
     const verb=vRe.test(next.trim());
-    const pair=aiHasTitle(cur)&&aiHasAnchor(cur)&&aiHasTitle(rest)&&aiHasAnchor(rest)&&aiHasTitle(next)&&!/^(?:with|at|on|in|for|from|to|until|every|each)\b/i.test(next.trim());
-    if(cur.trim()&&aiHasTitle(cur)&&(also||verb||pair)){out.push(cur);cur=also?next:next.replace(/^\s*also[,]?\s+/i,'')}
+    const nr=x=>aiRemParse(x).text,dayStart=new RegExp('^(?:on\\s+|the\\s+)?(?:'+AI_DAY_RE+'|sun|mon|tues?|wed|thu|thurs?|fri|sat)s?\\b','i').test(next.trim());
+    const pair=!dayStart&&aiHasTitle(cur)&&aiHasAnchor(cur)&&aiHasTitle(nr(rest))&&aiHasAnchor(rest)&&aiHasTitle(nr(next))&&!/^(?:with|at|on|in|for|from|to|until|every|each)\b/i.test(next.trim());
+    // "every morning at 8 and every night at 9": a second when for the same thing
+    const when2=/\band\b/i.test(sep)&&aiHasTitle(cur)&&(/^(?:every|each)\s+(?:morning|afternoon|evening|night|day|week|month|sun|mon|tue|wed|thu|fri|sat|shabb|other)/i.test(next.trim())||new RegExp('^(?:on\\s+)?(?:'+AI_DAY_RE+')s?\\b','i').test(next.trim()))&&/\b(?:\d|noon|midnight)/i.test(cur)&&!/\b(?:except|besides|other\s+than|apart\s+from|excluding|but\s+not)\b/i.test(cur)&&/\b(?:every|each|daily|nightly|weekdays?|weeknights?)\b/i.test(cur)&&/\b(?:\d|noon|midnight)/i.test(rest);
+    const thenS=/\bthen\b/i.test(sep)&&aiHasTitle(next)&&aiHasAnchor(next)&&aiHasAnchor(cur);
+    if(cur.trim()&&aiHasTitle(cur)&&(also||verb||pair||when2||thenS)){out.push(cur);cur=also?next:next.replace(/^\s*also[,]?\s+/i,'');
+     if(when2&&!also&&!verb){const subj=cur&&out[out.length-1].split(/\s+\b(?=(?:every|each|daily|nightly|on|at|from|tomorrow|tonight|today)\b|\d)/i)[0];const rep=/\b(?:every|each|weekdays?|weeknights?)\b/i.test(out[out.length-1])&&!/^\s*(?:every|each)\b/i.test(next)?'every ':'';if(subj&&aiHasTitle(subj))cur=subj+' '+rep+next.trim().replace(/^on\s+/i,'')}}
     else cur+=sep+next}
    out.push(cur);return out});
  // 4. a part that starts straight with a when/who ("also every night at 8 with Adam") repeats what the part before it was about
  parts=parts.map(t=>t.trim());
  for(let i=1;i<parts.length;i++){const body=parts[i].replace(/^(?:and\s+|then\s+|plus\s+)*(?:also\s+)?/i,'').replace(/^[,\s]+/,'');
   if(new RegExp('^'+AI_SUBJ_CUT.source,'i').test(body)){const subj=aiSubject(parts[i-1]);if(subj)parts[i]=subj+' '+body}}
+ {const DAYW=new RegExp('\\b(?:today|tonight|tomorrow|every|each|daily|nightly|weekly|monthly|yearly|erev|motzei|rosh\\s+chodesh|'+AI_DAY_RE+'s?|'+AI_MONTH_RE+'|'+AI_HMONTH_RE+')\\b|\\b\\d{1,2}\\/\\d{1,2}\\b|\\bthe\\s+\\d{1,2}(?:st|nd|rd|th)\\b','i'),
+   DPH=new RegExp('\\b(?:tomorrow(?:\\s+(?:morning|afternoon|evening|night))?|today|tonight|(?:(?:this|next|on)\\s+)?(?:'+AI_DAY_RE+')(?:\\s+(?:morning|afternoon|evening|night))?|(?:'+AI_MONTH_RE+')\\.?\\s+\\d{1,2}(?:st|nd|rd|th)?|\\d{1,2}(?:st|nd|rd|th)?\\s+of\\s+(?:'+AI_MONTH_RE+')|\\d{1,2}\\/\\d{1,2})\\b','i');
+  for(let i=1;i<parts.length;i++){if(DAYW.test(parts[i])||!/\b\d{1,2}(?::\d{2})?\s*(?:am|pm)\b|\bat\s+\d|\b\d{1,2}:\d{2}\b/i.test(parts[i]))continue;
+   if(/\b(?:every|each|daily|nightly|weekly|monthly)\b/i.test(parts[i-1]))continue;const dm=DPH.exec(parts[i-1]);if(dm)parts[i]=parts[i].replace(/[\s.]+$/,'')+' '+dm[0]}}
  if(tail)parts=parts.map(x=>x.replace(/[\s.]+$/,'')+'. '+tail);
  return parts.map(s=>s.replace(/^\s*(?:and|also|then|plus)\b[,]?\s*/i,'').replace(/[\s,.;!]+$/,'').trim()).filter(s=>s&&!/^(?:hi|hello|hey|thanks|thank you|please|ok|okay|that's all|that is all)$/i.test(s))}
 
@@ -3882,12 +3962,16 @@ function aiExceptParse(src){
  let text=String(src||''),reason='';
  const rm=AI_REASON_RE.exec(text);if(rm){reason=rm[0].replace(/[.!\s]+$/,'').replace(/^[\s,;]*(?:'?cause|cuz|coz|cos|bc|b\/c|since|as)(?=\s)/i,'because').replace(/^[\s,;]+/,'').trim();text=text.slice(0,rm.index)}
  const em=AI_EXCEPT_RE.exec(text);let ex=null;
- if(em){const clause=em[1],days=[];const r=new RegExp('\\b('+AI_DOW_TOK+')\\b','gi');let m;while(m=r.exec(clause)){const d=aiDow(m[1].replace(/s$/i,''));if(d>=0&&!days.includes(d))days.push(d)}
+ if(em){/* the exception is only the day list (+ its own time); words after it ("…except shabbos at 10 tanya with Levi") go back to the plan */
+  const cm=new RegExp('^((?:\\s*(?:,|and|&|or|on|the)?\\s*(?:'+AI_DOW_TOK+'|nights?|mornings?|evenings?))+)((?:\\s*,)?\\s*(?:when\\s+it.?s\\s+|it.?s\\s+|then\\s+)?(?:at\\s+|@\\s*)?\\d{1,2}(?::\\d{2})?\\s*(?:a\\.?m\\.?|p\\.?m\\.?)?(?![\\w:]))?','i').exec(em[1]);
+  const clause=cm?cm[0]:em[1],tailR=cm?em[1].slice(cm[0].length).replace(/^[\s,]+/,''):'',days=[];const r=new RegExp('\\b('+AI_DOW_TOK+')\\b','gi');let m;while(m=r.exec(clause)){const d=aiDow(m[1].replace(/s$/i,''));if(d>=0&&!days.includes(d))days.push(d)}
   if(days.length){const tm=/(?:^|\s)(?:at\s+|@\s*)?(\d{1,2})(?::(\d{2})|(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)?(?![\w:])/i.exec(clause.replace(new RegExp('\\b'+AI_DOW_TOK+'\\b','gi'),' '));
    const off=/\b(?:no|off|free|skip|not|none|without|nothing)\b/i.test(clause);
    ex={days,off:off&&!tm,h:tm?+tm[1]:null,mn:tm?+(tm[2]||tm[3]||0):0,ap:tm?aiNormAp(tm[4]):'',night:/\b(?:night|evening|afternoon)s?\b/i.test(clause),morning:/\bmornings?\b/i.test(clause)};
    if(ex.h!=null&&(ex.h<1||ex.h>12||ex.mn>59))ex.h=null;
-   text=text.slice(0,em.index)}}
+   const head=text.slice(0,em.index)+(tailR&&/\p{L}/u.test(tailR)?' '+tailR:'');
+   if(ex.h!=null&&!/\b\d{1,2}(?::\d{2})?\s*(?:am|pm)\b|\bat\s+\d|\b\d{1,2}:\d{2}\b|\b(?:noon|midnight|o'?clock)\b/i.test(head)){text=head+' at '+ex.h+(ex.mn?':'+String(ex.mn).padStart(2,'0'):'')+(ex.ap?' '+ex.ap.toLowerCase():'');ex.h=null;ex.off=true}
+   else text=head}}
  return{base:text.replace(/[\s,;.]+$/,'').trim(),ex,reason}}
 // Turn one interpreted plan into "main plan minus the exception days" (+ an exception plan with its own time, if one was given)
 function aiApplyException(p,ex,reason){
@@ -3925,10 +4009,10 @@ function aiReasonEvent(reason,ex,mainNotes){
  if(!hasDay){if(!ex||!ex.days.length)return '';ev+=' every '+ex.days.map(d=>AI_DAY_LABEL[d]).join(' and ')}
  if(!hasTime){const t=(/Time:\s*(\d{1,2}:\d{2}\s*[AP]M)/.exec(mainNotes||'')||[])[1];if(t)ev+=' at '+t;else if(ex&&ex.night)ev+=' night'}
  return ev}
-async function aiInterpretSeg(src0){const R=aiRemParse(src0),src=R.found?R.text:src0;const e=aiExceptParse(src);const p=await aiInterpretOne(e.ex||e.reason||R.found?e.base:src);
+async function aiInterpretSeg(src0){src0=aiTidy(src0);const R=aiRemParse(src0),src=R.found?R.text:src0;const e=aiExceptParse(src);const p=await aiInterpretOne(e.ex||e.reason||R.found?e.base:src);
  const out=aiApplyException(p,e.ex,e.reason);
  const rs=e.reason&&!p.unsupported&&!p.needsClarification?aiReasonEvent(e.reason,e.ex,p.notes):'';
- let rem=R.rem;if(!rem.length&&/^(?:please\s+)?(?:remind\s+me|(?:set|add|make|create)\s+(?:a|an|me\s+a)\s+reminder|reminder)\s+(?:to|about|of|for)\b/i.test(src0.trim()))rem=[{type:'rel',min:0,auto:true}];
+ let rem=R.rem;if(!rem.length&&(/^(?:please\s+)?(?:remind\s+me|(?:set|add|make|create)\s+(?:up\s+)?(?:a|an|me\s+a)\s+reminder|reminder)\s+(?:to|about|of|for)\b/i.test(src0.trim())||/\bremind\s+me\s+(?:to|about)\b/i.test(src0)))rem=[{type:'rel',min:0,auto:true}];
  if(rem.length)out.forEach(q=>{if(!q.unsupported&&!q.needsClarification)aiRemAttach(q,rem)});
  if(rs){try{const q=await aiInterpretOne(rs);if(q&&!q.unsupported&&q.title){q.fromReason=true;q.reasonSrc=rs;out.push(q)}}catch(x){}}
  return out}

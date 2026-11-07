@@ -1,0 +1,377 @@
+» Chavrusa with Adam every night at 8
+   Chavrusa with Adam · [custom i1] · 2026-11-05 · 8:00 PM · w/Adam
+» Tanya chavrusa with Yossi every Sunday and Tuesday at 8pm
+   Tanya chavrusa with Yossi · [weekly 02] · 2026-11-08 · 8:00 PM · w/Yossi
+» Schedule a chavrusa with Mendy every Sunday Monday and Wednesday at 9 p.m.
+   Chavrusa with Mendy · [weekly 013] · 2026-11-08 · 9:00 PM · w/Mendy
+» Remind me to call my mother tomorrow at 3
+   Call my mother · [once] · 2026-11-06 · 3:00 PM · TASK · rem:rel0
+» I have a dentist appointment next Tuesday at 10:30 in the morning
+   Dentist appointment · [once] · 2026-11-10 · 10:30 AM
+» Dentist on Tuesday at 10:30am
+   Dentist · [once] · 2026-11-10 · 10:30 AM
+» Doctor appointment December 3rd at 2pm remind me a day before
+   Doctor appointment · [once] · 2026-12-03 · 2:00 PM · rem:rel1440
+» Pay rent on the 1st of every month
+   Pay rent · [custom n24] · 2026-12-01 · - · TASK · W: English-date monthly plans are added for the next 24 months.
+» Pick up the kids from school every weekday at 3:30
+   Pick up the kids from school · [weekly 12345] · 2026-11-05 · 3:30 PM
+» Remind me to buy flowers every Friday at noon
+   Buy flowers · [weekly 5] · 2026-11-06 · 12:00 PM · TASK · rem:rel0
+» Farbrengen this motzei shabbos at 9
+   Farbrengen · [once] · 2026-11-07 · 9:00 PM · Motzei Shabbos · W: I read 9:00 as PM. Say “am” or “pm” if that’s wrong.
+» My father's yahrzeit is on 12 Shvat
+   Father’s yahrzeit · [heb] · 2027-01-20 · -
+» My birthday is June 3rd
+   My birthday · [greg] · 2027-06-03 · -
+» Shiur on Thursdays at 8 at the shul
+   Shiur · [weekly 4] · 2026-11-05 · 8:00 PM · W: I read 8:00 as PM. Say “am” or “pm” if that’s wrong.
+» Learn Gemara Bava Metzia every day from 7 to 8 am
+   Learn Gemara Bava Metzia · [custom i1] · 2026-11-05 · 7:00 AM – 8:00 AM
+» Call Mendy in 2 hours
+   Call Mendy · [once] · 2026-11-05 · 12:00 PM
+» Remind me in 30 minutes to take out the chicken
+   Take out the chicken · [once] · 2026-11-05 · 10:30 AM · TASK · rem:rel0
+» Meeting with Rabbi Cohen on the 15th at 11
+   Meeting with Rabbi Cohen · [once] · 2026-11-15 · 11:00 AM · w/Rabbi Cohen · W: I read 11:00 as AM. Say “am” or “pm” if that’s wrong.
+» Daf yomi every morning at 6:15
+   Daf Yomi · [custom i1] · 2026-11-05 · 6:15 AM
+» Mivtzoim every Friday afternoon
+   Mivtzoim · [weekly 5] · 2026-11-06 · Afternoon
+» schedule a meeting with david tomorrow at 4 p.m. at the office
+   Meeting with David · [once] · 2026-11-06 · 4:00 PM · w/David
+» remind me to pick up my suit from the cleaners on wednesday
+   Pick up my suit from the cleaners · [once] · 2026-11-11 · - · TASK · rem:morningOf
+» remind me every day at 9 p.m. to say shema
+   Say shema · [custom i1] · 2026-11-05 · 9:00 PM · TASK · rem:rel0
+» chavrusa with eli on monday wednesday and thursday at 8:30 p.m. remind me 15 minutes before
+   Chavrusa with Eli · [weekly 134] · 2026-11-05 · 8:30 PM · w/Eli · rem:rel15
+» I want to learn Rambam every day after maariv
+   Learn Rambam · [custom i1] · 2026-11-05 · After Maariv
+» set a reminder for tomorrow morning to call the bank
+   Call the bank · [once] · 2026-11-06 · Morning · TASK · rem:morningOf
+» add my anniversary on march 14
+   Anniversary · [greg] · 2027-03-14 · -
+» Mendy's birthday is on 5 Adar
+   Mendy’s birthday · [heb] · 2027-03-14 · -
+» Yahrzeit of my grandmother on the 3rd of Iyar
+   Grandmother’s yahrzeit · [heb] · 2027-05-10 · -
+» learning with my son every night at 7:30 except Friday
+   Learning with my son · [weekly 012346] · 2026-11-05 · 7:30 PM · w/Son
+» chavrusa with Adam every night at 8 except Wednesday at 8:30 because I have a shiur then
+   Chavrusa with Adam · [weekly 012456] · 2026-11-05 · 8:00 PM · w/Adam
+   Chavrusa with Adam · [weekly 3] · 2026-11-11 · 8:30 PM · w/Adam
+   Shiur · [weekly 3] · 2026-11-11 · 8:00 PM
+» Go to the gym Monday Wednesday Friday at 6am
+   Go to the gym · [weekly 135] · 2026-11-06 · 6:00 AM
+» Take my medicine every morning at 8 and every night at 9
+   Take my medicine · [custom i1] · 2026-11-05 · 8:00 AM
+   Take my medicine · [custom i1] · 2026-11-05 · 9:00 PM
+» Bar mitzvah of Levi on January 10th at 10am
+   Bar Mitzvah of Levi · [once] · 2027-01-10 · 10:00 AM
+» Wedding of Shmuly and Chaya on December 20 at 6pm in Crown Heights
+   Wedding of Shmuly and Chaya · [once] · 2026-12-20 · 6:00 PM
+» Lunch with Sarah next Friday at 1
+   Lunch with Sarah · [once] · 2026-11-13 · 1:00 PM · w/Sarah
+» I need to renew my passport by the end of the month
+   Renew my passport · [once] · 2026-11-30 · - · TASK
+» Pay the electric bill on the 15th
+   Pay the electric bill · [once] · 2026-11-15 · - · TASK
+» Call grandma every Sunday at 11 am
+   Call grandma · [weekly 0] · 2026-11-08 · 11:00 AM
+» Tehillim every shabbos after mincha
+   Tehillim · [weekly 6] · 2026-11-07 · After Mincha
+» Sefer HaMitzvos every day
+   Sefer Hamitzvos · [custom i1] · 2026-11-05 · -
+» Mishnayos with my father every Tuesday night
+   Mishnayos with my father · [weekly 2] · 2026-11-10 · Night · w/Father
+» Kollel from 9 to 1 every weekday
+   Kollel · [weekly 12345] · 2026-11-05 · 9:00 AM – 1:00 PM · W: I read the time as 9:00 AM – 1:00 PM. Say “am” or “pm” if that’s wrong.
+» Shacharis minyan at 7 every morning
+   Shacharis · [custom i1] · 2026-11-05 · 7:00 AM
+» Taking the car for service next Monday at 9:00
+   Taking the car for service · [once] · 2026-11-09 · 9:00 AM · W: I read 9:00 as AM. Say “am” or “pm” if that’s wrong.
+» Flight to New York on November 20 at 6:45 am
+   Flight to New York · [once] · 2026-11-20 · 6:45 AM
+» Parent teacher meeting tomorrow at 5:15pm
+   Parent teacher meeting · [once] · 2026-11-06 · 5:15 PM
+» Pick up challah every Friday morning
+   Pick up challah · [weekly 5] · 2026-11-06 · Morning
+» Do laundry tonight
+   Do laundry · [once] · 2026-11-05 · Evening
+» Clean the house on Thursday afternoon
+   Clean the house · [once] · 2026-11-05 · Afternoon
+» chavrusa at 8 o'clock at night with Shmuel on Mondays
+   Chavrusa with Shmuel · [weekly 1] · 2026-11-09 · 8:00 PM · w/Shmuel
+» Shiur at 20:00 every Wednesday
+   Shiur · [weekly 3] · 2026-11-11 · 8:00 PM
+» eight thirty tomorrow morning call the plumber
+   Call the plumber · [once] · 2026-11-06 · 8:30 AM
+» meeting at quarter to 3 on Sunday
+   Meeting · [once] · 2026-11-08 · 2:45 PM
+» call the bank at half past 10 tomorrow
+   Call the bank · [once] · 2026-11-06 · 10:30 AM · W: I read 10:30 as AM. Say “am” or “pm” if that’s wrong.
+» seder from 9:30 to 12 every day
+   Seder · [custom i1] · 2026-11-05 · 9:30 AM – 12:00 PM · W: I read the time as 9:30 AM – 12:00 PM. Say “am” or “pm” if that’s wrong.
+» learn with Moshe tonight at 9
+   Learning with Moshe · [once] · 2026-11-05 · 9:00 PM · w/Moshe
+» dentist appointment Tuesday the 17th at 2
+   Dentist appointment · [once] · 2026-11-17 · 2:00 PM
+» haircut on 11/20 at 4pm
+   Haircut · [once] · 2026-11-20 · 4:00 PM
+» pick up tickets on the 20th of November
+   Pick up tickets · [once] · 2026-11-20 · -
+» visit grandma a week from today
+   Visit grandma · [once] · 2026-11-12 · -
+» call Levi this coming Sunday at 7pm
+   Call Levi · [once] · 2026-11-08 · 7:00 PM
+» shiur every other Tuesday at 8pm
+   Shiur · [custom i14] · 2026-11-10 · 8:00 PM
+» chavrusa Sunday through Thursday at 9:30 pm with Yaakov
+   Chavrusa with Yaakov · [weekly 01234] · 2026-11-05 · 9:30 PM · w/Yaakov
+» learn every day except Shabbos at 6am
+   Learning · [weekly 012345] · 2026-11-05 · 6:00 AM
+» tanya every weeknight at 10
+   Tanya · [weekly 01234] · 2026-11-05 · 10:00 PM
+» the first Sunday of every month at 10am pancake breakfast
+   Pancake breakfast · [custom n24] · 2026-12-06 · 10:00 AM · W: Added for the next 24 months.
+» Rosh Chodesh women's gathering every rosh chodesh at 8pm
+   Rosh Chodesh women's gathering · [hmonth hd1] · 2026-11-11 · 8:00 PM
+» farbrengen on yud tes kislev at 9pm
+   19 Kislev Farbrengen · [once] · 2026-11-29 · 9:00 PM
+» gemara with Avi for the next 6 weeks every Monday at 8pm
+   Gemara with Avi · [custom n6] · 2026-11-09 · 8:00 PM · w/Avi
+» shiur every Thursday until Pesach at 8:30pm
+   Shiur · [custom n25] · 2026-11-05 · 8:30 PM
+» starting next week, chavrusa with Dovid every Monday and Thursday at 7:30am
+   Chavrusa with Dovid · [weekly 14] · 2026-11-12 · 7:30 AM · w/Dovid
+» twice a week workout
+   Workout · [weekly 4] · 2026-11-05 · - · CLARIFY: Which days of the week? (for example “Sunday and Wednesday”)
+» weekly call with my brother on Sundays
+   Call with my brother · [weekly 0] · 2026-11-08 · - · w/Brother
+» buy milk
+   Buy milk · [once] · 2026-11-05 · - · TASK
+» don't forget to send the email to the landlord tomorrow
+   Send the email to the landlord · [once] · 2026-11-06 · - · TASK
+» I need to call the insurance company on Monday morning
+   Call the insurance company · [once] · 2026-11-09 · Morning
+» remind me to take my vitamins every morning at 8 and remind me 10 minutes before
+   Take my vitamins · [custom i1] · 2026-11-05 · 8:00 AM · TASK · rem:rel10
+» pay tuition on the 10th of each month and remind me the day before
+   Pay tuition · [custom n25] · 2026-11-10 · - · TASK · rem:dayBefore · W: English-date monthly plans are added for the next 24 months.
+» text Chana happy birthday on Friday
+   Text Chana happy birthday · [once] · 2026-11-06 · - · TASK
+» remind me about the chasuna on Sunday night at 7
+   Chasuna · [once] · 2026-11-08 · 7:00 PM · rem:rel0
+» renew car registration by December 15
+   Renew car registration · [once] · 2026-12-15 · - · TASK
+» chavrusa with Adam Monday at 8 and dentist Tuesday at 10am
+   Chavrusa with Adam · [once] · 2026-11-09 · 8:00 PM · w/Adam · W: I read 8:00 as PM. Say “am” or “pm” if that’s wrong.
+   Dentist · [once] · 2026-11-10 · 10:00 AM
+» Tomorrow at 9 dentist, then at 2 call the bank
+   Dentist · [once] · 2026-11-06 · 9:00 AM · W: I read 9:00 as AM. Say “am” or “pm” if that’s wrong.
+   Call the bank · [once] · 2026-11-06 · 2:00 PM
+» I have a shiur Sunday at 8pm. Also a chavrusa Monday at 9pm with Mendy.
+   Shiur · [once] · 2026-11-08 · 8:00 PM
+   Chavrusa with Mendy · [once] · 2026-11-09 · 9:00 PM · w/Mendy
+» add mivtzoim friday at 1 and a farbrengen motzei shabbos at 9
+   Mivtzoim · [once] · 2026-11-06 · 1:00 PM
+   Farbrengen · [once] · 2026-11-07 · 9:00 PM · Motzei Shabbos · W: I read 9:00 as PM. Say “am” or “pm” if that’s wrong.
+» my mother's yahrzeit is 20 Av
+   Mother’s yahrzeit · [heb] · 2027-08-23 · -
+» yahrzeit for Yosef ben Avraham on 3 Tammuz
+   Yahrzeit of Yosef ben Avraham · [heb] · 2027-07-08 · -
+» my wedding anniversary is August 12
+   Wedding anniversary · [greg] · 2027-08-12 · -
+» my son Levi's birthday is on the 8th of Kislev
+   Levi’s birthday · [heb] · 2026-11-18 · -
+» Rivky birthday July 4
+   Rivky’s birthday · [greg] · 2027-07-04 · -
+» havrusa with menachem every night at 10
+   Chavrusa with Menachem · [custom i1] · 2026-11-05 · 10:00 PM · w/Menachem
+» chavruta with eli tuesdays and thursdays 8pm
+   Chavrusa with Eli · [weekly 24] · 2026-11-05 · 8:00 PM · w/Eli
+» kevius in tanya every morning at 7
+   Tanya kvius · [custom i1] · 2026-11-05 · 7:00 AM
+» farbrenging this shabbos
+   Farbrengen · [once] · 2026-11-07 · -
+» schedule
+   [once] · 2026-11-05 · - · CLARIFY: What should I add? For example “Shiur every Thursday at 8pm” or “Call the bank tomorrow at 10am”.
+» chavrusa with
+   Chavrusa with With · [once] · 2026-11-05 · - · w/With · CLARIFY: Your request ends mid-sentence. Finish it, or tap the microphone and say it again.
+» every Tuesday
+   [weekly 2] · 2026-11-10 · - · CLARIFY: What should I call this? (for example “Tanya chavrusa” or “Doctor appointment”)
+» at 8pm
+   [once] · 2026-11-05 · 8:00 PM · CLARIFY: What should I call this? (for example “Tanya chavrusa” or “Doctor appointment”)
+» cancel my chavrusa with Adam
+   UNSUPPORTED: To cancel a plan, tap Make a plan and I will ask which one.
+» what do I have tomorrow
+   UNSUPPORTED: I can add or cancel plans. To see what is on, check the calendar.
+» hi
+» um so I want to schedule like a chavrusa with Berel every Sunday at like 10 in the morning
+   Chavrusa with Berel · [weekly 0] · 2026-11-08 · 10:00 AM · w/Berel
+» can you please add a reminder for me to call my grandmother on Friday before Shabbos
+   Call my grandmother · [once] · 2026-11-06 · Before Shabbos · TASK · rem:morningOf
+» I'm learning with Zalman every Monday and Wednesday from 8 to 9 at night
+   Learning with Zalman · [weekly 13] · 2026-11-09 · 8:00 PM – 9:00 PM · w/Zalman
+» every night at 10:30 I learn Tanya with my wife
+   Learn Tanya with my wife · [custom i1] · 2026-11-05 · 10:30 PM · w/Wife
+» on Tuesdays at 7 I have a shiur in the shul
+   Shiur · [weekly 2] · 2026-11-10 · 7:00 PM · W: I read 7:00 as PM. Say “am” or “pm” if that’s wrong.
+» my chavrusa with Shmuly is Sunday to Thursday at 9pm except Tuesday when it's at 10pm
+   Chavrusa with Shmuly · [weekly 0134] · 2026-11-05 · 9:00 PM · w/Shmuly
+   Chavrusa with Shmuly · [weekly 2] · 2026-11-10 · 10:00 PM · w/Shmuly
+» I have a doctor's appointment on the 23rd at 9:15
+   Doctor's appointment · [once] · 2026-11-23 · 9:15 AM · W: I read 9:15 as AM. Say “am” or “pm” if that’s wrong.
+» next Wednesday at noon lunch with my boss
+   Lunch with my boss · [once] · 2026-11-11 · 12:00 PM · w/Boss
+» remind me tomorrow at 7am to put on tefillin before work
+   Put on tefillin · [once] · 2026-11-06 · 7:00 AM · rem:rel0
+» put mivtzoim on Friday from 1 to 4
+   Mivtzoim · [once] · 2026-11-06 · 1:00 PM – 4:00 PM · W: I read the time as 1:00 PM – 4:00 PM. Say “am” or “pm” if that’s wrong.
+» set up a meeting with Mrs. Goldberg Thursday 3:30pm about the school play
+   Meeting about the school play with Mrs Goldberg · [once] · 2026-11-05 · 3:30 PM · w/Mrs Goldberg
+» schedule chavrusa with Yossi every day at 2:30 for 30 minutes
+   Chavrusa with Yossi · [custom i1] · 2026-11-05 · 2:30 PM · w/Yossi
+» learn Rambam with Dovid every day for an hour starting tomorrow at 9pm
+   Learn Rambam with Dovid · [custom i1] · 2026-11-06 · 9:00 PM · w/Dovid
+» call the electrician on monday and remind me 2 hours before
+   Call the electrician · [once] · 2026-11-09 · - · rem:rel120 · W: There is no clock time for this, so “2 hours before” will come at 8:00 AM that day. Add a 
+» I need to pick up my brother from the airport on December 2nd at 11:40 pm
+   Pick up my brother from the airport · [once] · 2026-12-02 · 11:40 PM · TASK
+» Make a seder for Chassidus every morning at 6:30 except Shabbos
+   Chassidus seder · [weekly 012345] · 2026-11-05 · 6:30 AM
+» farbrengen for Yud Kislev on Monday night at 8:30
+   10 Kislev Farbrengen · [once] · 2026-11-23 · 8:30 PM · W: 10 Kislev is on Friday, so I put this on Monday, Nov 23.
+» Gemara shiur Bava Kamma Tuesdays and Thursdays 8pm in the beis medrash
+   Gemara Bava Kamma shiur · [weekly 24] · 2026-11-05 · 8:00 PM
+» daily Chitas
+   Chitas · [custom i1] · 2026-11-05 · -
+» remind me to light candles every Friday at 4pm
+   Light candles · [weekly 5] · 2026-11-06 · 4:00 PM · TASK · rem:rel0
+» reminder: take challah out of the freezer Thursday night
+   Take challah out of the freezer · [once] · 2026-11-05 · Night · TASK · rem:morningOf
+» Tanya class with Rabbi Levi every Wednesday at 8, remind me 30 minutes before and the morning of
+   Tanya class with Rabbi Levi · [weekly 3] · 2026-11-11 · 8:00 PM · w/Rabbi Levi · rem:rel30,morningOf · W: I read 8:00 as PM. Say “am” or “pm” if that’s wrong.
+» chavrusa with Adam every night at 8 except Wednesday at 8:30 because I have an English shiur then
+   Chavrusa with Adam · [weekly 012456] · 2026-11-05 · 8:00 PM · w/Adam
+   Chavrusa with Adam · [weekly 3] · 2026-11-11 · 8:30 PM · w/Adam
+   English shiur · [weekly 3] · 2026-11-11 · 8:00 PM
+» dentist tomorrow 3pm. haircut Sunday 11am. call mom tonight.
+   Dentist · [once] · 2026-11-06 · 3:00 PM
+   Haircut · [once] · 2026-11-08 · 11:00 AM
+   Call mom · [once] · 2026-11-05 · Evening
+» 1. Chavrusa with Mendy Monday 9pm 2. Shiur Tuesday 8pm 3. Mivtzoim Friday 2pm
+   Chavrusa with Mendy · [once] · 2026-11-09 · 9:00 PM · w/Mendy
+   Shiur · [once] · 2026-11-10 · 8:00 PM
+   Mivtzoim · [once] · 2026-11-06 · 2:00 PM
+» I have to submit my taxes by April 15
+   Submit my taxes · [once] · 2027-04-15 · - · TASK
+» my zaidy's yahrzeit is on the 15th of Shevat
+   Zaidy’s yahrzeit · [heb] · 2027-01-23 · -
+» Rebbetzin Chaya Mushka yahrzeit 22 Shvat farbrengen at 8pm
+   Rebbetzin Chaya Mushka Yahrzeit Farbrengen · [once] · 2027-01-30 · 8:00 PM
+» book a call with the accountant on 12/3 at 11 am
+   Call with the accountant · [once] · 2026-12-03 · 11:00 AM · w/Accountant
+» every year on my birthday june 3rd remind me to give tzedakah
+   Give tzedakah · [greg] · 2027-06-03 · - · TASK · rem:morningOf
+» siyum on the Rambam on December 10 at 7:30pm
+   Siyum on the Rambam · [once] · 2026-12-10 · 7:30 PM
+» mincha at 1:45 every weekday at work
+   Mincha · [weekly 12345] · 2026-11-05 · 1:45 PM
+» chavrusa מחר ב 9 עם יוסי
+   Chavrusa with יוסי · [once] · 2026-11-06 · 9:00 PM · w/יוסי · W: I read 9:00 as PM. Say “am” or “pm” if that’s wrong.
+» שיעור כל יום שלישי ב 8
+   Shiur · [weekly 2] · 2026-11-10 · 8:00 PM · W: I read 8:00 as PM. Say “am” or “pm” if that’s wrong.
+» learning with Levi on sunday, monday, and tuesday at 9:00
+   Learning with Levi · [weekly 012] · 2026-11-08 · 9:00 PM · w/Levi · W: I read 9:00 as PM. Say “am” or “pm” if that’s wrong.
+» chavrusa every sunday & wednesday @ 9:30pm w/ Sholom
+   Chavrusa with Sholom · [weekly 03] · 2026-11-08 · 9:30 PM · w/Sholom
+» chavrusa every sun and wed 9.30pm with Sholom
+   Chavrusa with Sholom · [weekly 03] · 2026-11-08 · 9:30 PM · w/Sholom
+» call Shaya in an hour
+   Call Shaya · [once] · 2026-11-05 · 11:00 AM
+» remind me in 15 min to check the oven
+   Check the oven · [once] · 2026-11-05 · 10:15 AM · TASK · rem:rel0
+» chavrusa with Adam at 8
+   Chavrusa with Adam · [once] · 2026-11-05 · 8:00 PM · w/Adam · W: I read 8:00 as PM. Say “am” or “pm” if that’s wrong.
+» add chavrusa with Mottel on Sunday nights 9 to 10
+   Chavrusa with Mottel · [weekly 0] · 2026-11-08 · 9:00 PM – 10:00 PM · w/Mottel
+» shiur with Rabbi Paltiel every Shabbos at 4:30 in 770
+   Shiur with Rabbi Paltiel · [weekly 6] · 2026-11-07 · 4:30 PM · w/Rabbi Paltiel
+» remind me to daven mincha every day at 4:15
+   Mincha · [custom i1] · 2026-11-05 · 4:15 PM · rem:rel0
+» call my mother every Friday before Shabbos
+   Call my mother · [weekly 5] · 2026-11-06 · Before Shabbos
+» I learn with my father every Motzei Shabbos
+   Learning with my father · [weekly 6] · 2026-11-07 · Motzei Shabbos · w/Father
+» learn Hayom Yom every morning
+   Learn Hayom Yom · [custom i1] · 2026-11-05 · Morning
+» Torah Ohr shiur every Monday at 9:15pm
+   Torah Ohr shiur · [weekly 1] · 2026-11-09 · 9:15 PM
+» the Rebbe's farbrengen video on Sunday at 2
+   Rebbe's farbrengen video · [once] · 2026-11-08 · 2:00 PM
+» send money to Mendel tomorrow
+   Send money to Mendel · [once] · 2026-11-06 · -
+» buy a present for Chaya's birthday by next Thursday
+   Buy a present for Chaya's birthday · [once] · 2026-11-12 · - · TASK
+» order sefarim online this week
+   Order sefarim online · [once] · 2026-11-05 · - · TASK
+» pay credit card bill on the 25th of each month remind me 2 days before
+   Pay credit card bill · [custom n24] · 2026-11-25 · - · TASK · rem:rel2880 · W: English-date monthly plans are added for the next 24 months.
+» chavrusa 3 times a week
+   Chavrusa · [weekly 4] · 2026-11-05 · - · CLARIFY: Which days of the week? (for example “Sunday and Wednesday”)
+» chavrusa with Adam every night except Friday and Saturday at 8
+   Chavrusa with Adam · [weekly 01234] · 2026-11-05 · 8:00 PM · w/Adam
+» every night except shabbos at 10 tanya with Levi
+   Tanya with Levi · [weekly 012345] · 2026-11-05 · 10:00 PM · w/Levi
+» learn with Adam every weekday at 7am and on Sunday at 9am
+   Learning with Adam · [weekly 12345] · 2026-11-05 · 7:00 AM · w/Adam
+   Learning with Adam · [weekly 0] · 2026-11-08 · 9:00 AM · w/Adam
+» chavrusa every day this week at 8pm
+   Chavrusa · [custom n3] · 2026-11-05 · 8:00 PM
+» chavrusa every Tuesday for 10 weeks at 8pm
+   Chavrusa · [custom n10] · 2026-11-10 · 8:00 PM
+» gym every Monday and Thursday until the end of the year at 6:30am
+   Gym · [custom n17] · 2026-11-05 · 6:30 AM
+» doctor next Monday 9:40
+   Doctor · [once] · 2026-11-09 · 9:40 AM · W: I read 9:40 as AM. Say “am” or “pm” if that’s wrong.
+» meeting with Yossi at 10 tomorrow, remind me an hour before
+   Meeting with Yossi · [once] · 2026-11-06 · 10:00 AM · w/Yossi · rem:rel60 · W: I read 10:00 as AM. Say “am” or “pm” if that’s wrong.
+» remind me at 6pm to call Dovid
+   Call Dovid · [once] · 2026-11-05 · 6:00 PM · TASK · rem:rel0
+» remind me tonight to take out the garbage
+   Take out the garbage · [once] · 2026-11-05 · Evening · TASK · rem:morningOf
+» remind me on Sunday morning about the PTA meeting
+   PTA meeting · [once] · 2026-11-08 · Morning · TASK · rem:morningOf
+» Dentist Dec 3 2:30
+   Dentist · [once] · 2026-12-03 · 2:30 PM
+» appointment with Dr. Katz on the 2nd at 3
+   Appointment with Dr Katz · [once] · 2026-12-02 · 3:00 PM · w/Dr Katz
+» Chanukah party on the 4th night of Chanukah at 6pm
+   Chanukah party · [once] · 2026-12-07 · 6:00 PM
+» melave malka this motzei shabbos
+   Melaveh Malka · [once] · 2026-11-07 · Motzei Shabbos
+» lag baomer bonfire
+   Lag BaOmer bonfire · [once] · 2027-05-25 · -
+» purim seudah at 4pm
+   Purim seudah · [once] · 2027-03-23 · 4:00 PM
+» yud tes kislev farbrengen
+   19 Kislev Farbrengen · [once] · 2026-11-29 · -
+» a farbrengen on 19 Kislev at 8:30 pm at the Chabad House
+   19 Kislev Farbrengen · [once] · 2026-11-29 · 8:30 PM
+» learn every day from Rosh Chodesh Kislev until Chanukah
+   Learning · [custom n25] · 2026-11-11 · -
+» Mivtzoim with the bochurim every Friday 12-3
+   Mivtzoim · [weekly 5] · 2026-11-06 · 12:00 PM – 3:00 PM · w/Bochurim · W: I read the time as 12:00 PM – 3:00 PM. Say “am” or “pm” if that’s wrong.
+» shiur at 8:30 every other Wednesday starting next week
+   Shiur · [custom i14] · 2026-11-18 · 8:30 PM · W: I read 8:30 as PM. Say “am” or “pm” if that’s wrong.
+» chavrusa today 5-6pm with Shlomo and Moshe
+   Chavrusa with Shlomo & Moshe · [once] · 2026-11-05 · 5:00 PM – 6:00 PM · w/Shlomo & Moshe
+» I'm meeting Avraham for coffee tomorrow at 10:30
+   Meeting Avraham for coffee · [once] · 2026-11-06 · 10:30 AM · W: I read 10:30 as AM. Say “am” or “pm” if that’s wrong.
+» my daughter's school play is on December 15th at 6pm
+   Daughter's school play · [once] · 2026-12-15 · 6:00 PM
+» Call Mendy about the shiur tomorrow at 10am
+   Call Mendy about the shiur · [once] · 2026-11-06 · 10:00 AM
+errors []
