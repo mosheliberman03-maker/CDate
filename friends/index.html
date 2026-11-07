@@ -392,7 +392,7 @@ Coral Springs Mesivta|26.27|-80.27|America/New_York|Chaim Gorelik,Dovber Bernsti
 Pittsburgh Zal|40.44|-80.00|America/New_York|Leibel Gold,Nosson Gurary,Sholom Wineman,Yitzchok Tzvi Hafter
 Sydney Gems|-33.87|151.21|Australia/Sydney|Binyomin Konikov,Shimshon Cohen,Shneur Baran,Sholom Posner
 Cincinnati Zal|39.10|-84.51|America/New_York|Mendel Konikov,Mendel Zerba,Motti groner,Yuda Hertzel,Zalmen Bershivitzi
-Sydney|-33.87|151.21|Australia/Sydney|Avi Baitelman,Mochkin
+Sydney|-33.87|151.21|Australia/Sydney|Avi Baitelman,Mendel Mochkin
 Sydney "#Yg!" (name unclear)|-33.87|151.21|Australia/Sydney|Eli Bronstien,Mendel Hecht,Mendel Laufer,Mendel Pikarski,Shmuly Hendel,Shneur Jordan
 New Haven Zal|41.31|-72.92|America/New_York|Aron Pinson,Elchonon Goldberg,Michael Tietelbaum,Reuven Dorn,Yitzchok Wolowik,Yitzi Gorelik,Zalman Newman,Zevi Riecher
 New Haven Mesivta|41.31|-72.92|America/New_York|Avraham Heber,Eli Lebovics,Mendel Levertov,Sholom Ber Oster LA,Sholom Gurevitz,Sholom Volvovsky,Yakov Plotkin,Yankel Makhlin,Yisroel Levin,Yosef Lubin
@@ -428,7 +428,7 @@ const $=id=>document.getElementById(id);
 let saved=[];try{saved=JSON.parse(localStorage.getItem("sc_saved")||"[]")}catch(e){}saved.forEach(v=>{if(v&&v.city=="China"&&Math.abs(v.lat-31.23)<.01&&Math.abs(v.lon-121.47)<.01){v.lat=23.02;v.lon=113.12}});
 const persist=()=>{try{localStorage.setItem("sc_saved",JSON.stringify(saved))}catch(e){}};
 // names corrected to how the people spell them (owner, Nov 2026)
-const RENAMED={"Berel Stien|Budapest": "Berel Stein", "Chezki Chazan|YOEC Zal": "Chezky Hazan", "Issac Andrusier|Aventura, Miami": "Isaac Andrusier", "Levi Griesman|OT Mesivta": "Levi Greisman", "Mendy Borenstien|Coral Springs Mesivta": "Mendy Borenstein", "Moshe Glasman|Klurman Miami Mesivta": "Moishy Glasman", "Motti Muchnik|Johannesburg Zal": "Moti Muchnik", "Mendel Herbsman|Pittsburgh Mesivta": "Mendel Herbstman", "Mendel Kornhouser|Klurman Miami Mesivta": "Mendel Kornhauser", "Shabsi Gordon|Pittsburgh Mesivta": "Schabse Gordon", "Sholom Blachman|Dallas Texas": "Shalom Blachman", "Yankel Machlin|New Haven Mesivta": "Yankel Makhlin", "Yitzchok Volovik|New Haven Zal": "Yitzchok Wolowik", "Yoss Rosenbaum|Johannesburg Zal": "Yosef Rosenbaum", "Yitchok Alush|Johannesburg Zal": "Isaac Allouche"};
+const RENAMED={"Mochkin|Sydney": "Mendel Mochkin", "Berel Stien|Budapest": "Berel Stein", "Chezki Chazan|YOEC Zal": "Chezky Hazan", "Issac Andrusier|Aventura, Miami": "Isaac Andrusier", "Levi Griesman|OT Mesivta": "Levi Greisman", "Mendy Borenstien|Coral Springs Mesivta": "Mendy Borenstein", "Moshe Glasman|Klurman Miami Mesivta": "Moishy Glasman", "Motti Muchnik|Johannesburg Zal": "Moti Muchnik", "Mendel Herbsman|Pittsburgh Mesivta": "Mendel Herbstman", "Mendel Kornhouser|Klurman Miami Mesivta": "Mendel Kornhauser", "Shabsi Gordon|Pittsburgh Mesivta": "Schabse Gordon", "Sholom Blachman|Dallas Texas": "Shalom Blachman", "Yankel Machlin|New Haven Mesivta": "Yankel Makhlin", "Yitzchok Volovik|New Haven Zal": "Yitzchok Wolowik", "Yoss Rosenbaum|Johannesburg Zal": "Yosef Rosenbaum", "Yitchok Alush|Johannesburg Zal": "Isaac Allouche"};
 (()=>{let ch=0;saved.forEach(v=>{const n=RENAMED[v.name+"|"+v.city];if(n){v.name=n;ch=1}});if(ch)persist();
  try{const f=JSON.parse(localStorage.getItem("sc_favs")||"[]").map(k=>RENAMED[k]?RENAMED[k]+"|"+k.split("|").slice(1).join("|"):k);localStorage.setItem("sc_favs",JSON.stringify(f));
   const r=JSON.parse(localStorage.getItem("sc_rem")||"{}"),r2={};Object.keys(r).forEach(k=>{const n=RENAMED[k];if(n){r[k].name=n;r2[n+"|"+k.split("|").slice(1).join("|")]=r[k]}else r2[k]=r[k]});localStorage.setItem("sc_rem",JSON.stringify(r2));
@@ -1063,7 +1063,7 @@ sync()})();
 // ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
 // Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=10,KIT_APK=1;
+const KIT_VER=11,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
