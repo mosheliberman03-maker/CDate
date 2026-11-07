@@ -43,7 +43,7 @@ jobs:
       - name: Generate the app icon
         run: |
           npm i -D @capacitor/assets@3
-          npx capacitor-assets generate --android --iconBackgroundColor '#04060f' --iconBackgroundColorDark '#04060f' --splashBackgroundColor '#04060f' --splashBackgroundColorDark '#04060f'
+          npx capacitor-assets generate --android --iconBackgroundColor '#0b1030' --iconBackgroundColorDark '#0b1030' --splashBackgroundColor '#0b1030' --splashBackgroundColorDark '#0b1030'
 
       - name: Add the home-screen widgets and the signing key
         run: node patch-android.js
