@@ -364,7 +364,7 @@ body.tour.tpass #top,body.tour.tpass #bar{z-index:41}
 <script>
 const CITIES=("New York|USA|40.71|-74.01|America/New_York;Brooklyn|USA|40.65|-73.95|America/New_York;Crown Heights|USA|40.67|-73.94|America/New_York;Monsey|USA|41.11|-74.07|America/New_York;Lakewood|USA|40.10|-74.21|America/New_York;Boston|USA|42.36|-71.06|America/New_York;Baltimore|USA|39.29|-76.61|America/New_York;Miami|USA|25.76|-80.19|America/New_York;Atlanta|USA|33.75|-84.39|America/New_York;Cleveland|USA|41.50|-81.69|America/New_York;Chicago|USA|41.88|-87.63|America/Chicago;Houston|USA|29.76|-95.37|America/Chicago;Denver|USA|39.74|-104.99|America/Denver;Phoenix|USA|33.45|-112.07|America/Phoenix;Los Angeles|USA|34.05|-118.24|America/Los_Angeles;San Francisco|USA|37.77|-122.42|America/Los_Angeles;Seattle|USA|47.61|-122.33|America/Los_Angeles;Honolulu|USA|21.31|-157.86|Pacific/Honolulu;Toronto|Canada|43.65|-79.38|America/Toronto;Montreal|Canada|45.50|-73.57|America/Toronto;Vancouver|Canada|49.28|-123.12|America/Vancouver;Mexico City|Mexico|19.43|-99.13|America/Mexico_City;Panama City|Panama|8.98|-79.52|America/Panama;Bogotá|Colombia|4.71|-74.07|America/Bogota;Lima|Peru|-12.05|-77.04|America/Lima;Quito|Ecuador|-0.18|-78.47|America/Guayaquil;São Paulo|Brazil|-23.55|-46.63|America/Sao_Paulo;Buenos Aires|Argentina|-34.60|-58.38|America/Argentina/Buenos_Aires;Santiago|Chile|-33.45|-70.67|America/Santiago;Montevideo|Uruguay|-34.90|-56.16|America/Montevideo;London|UK|51.51|-0.13|Europe/London;Manchester|UK|53.48|-2.24|Europe/London;Dublin|Ireland|53.35|-6.26|Europe/Dublin;Paris|France|48.86|2.35|Europe/Paris;Antwerp|Belgium|51.22|4.40|Europe/Brussels;Amsterdam|Netherlands|52.37|4.90|Europe/Amsterdam;Zurich|Switzerland|47.38|8.54|Europe/Zurich;Milan|Italy|45.46|9.19|Europe/Rome;Rome|Italy|41.90|12.50|Europe/Rome;Madrid|Spain|40.42|-3.70|Europe/Madrid;Barcelona|Spain|41.39|2.17|Europe/Madrid;Lisbon|Portugal|38.72|-9.14|Europe/Lisbon;Berlin|Germany|52.52|13.41|Europe/Berlin;Vienna|Austria|48.21|16.37|Europe/Vienna;Budapest|Hungary|47.50|19.04|Europe/Budapest;Prague|Czechia|50.08|14.44|Europe/Prague;Warsaw|Poland|52.23|21.01|Europe/Warsaw;Kyiv|Ukraine|50.45|30.52|Europe/Kyiv;Moscow|Russia|55.76|37.62|Europe/Moscow;Minsk|Belarus|53.90|27.57|Europe/Minsk;Tbilisi|Georgia|41.72|44.79|Asia/Tbilisi;Istanbul|Turkey|41.01|28.98|Europe/Istanbul;Jerusalem|Israel|31.77|35.21|Asia/Jerusalem;Tel Aviv|Israel|32.09|34.78|Asia/Jerusalem;Dubai|UAE|25.20|55.27|Asia/Dubai;Tashkent|Uzbekistan|41.30|69.24|Asia/Tashkent;Almaty|Kazakhstan|43.24|76.89|Asia/Almaty;Mumbai|India|19.08|72.88|Asia/Kolkata;Delhi|India|28.61|77.21|Asia/Kolkata;Kathmandu|Nepal|27.72|85.32|Asia/Kathmandu;Bangkok|Thailand|13.76|100.50|Asia/Bangkok;Singapore|Singapore|1.35|103.82|Asia/Singapore;Hong Kong|China|22.32|114.17|Asia/Hong_Kong;Shanghai|China|31.23|121.47|Asia/Shanghai;Tokyo|Japan|35.68|139.69|Asia/Tokyo;Seoul|South Korea|37.57|126.98|Asia/Seoul;Sydney|Australia|-33.87|151.21|Australia/Sydney;Melbourne|Australia|-37.81|144.96|Australia/Melbourne;Perth|Australia|-31.95|115.86|Australia/Perth;Auckland|New Zealand|-36.85|174.76|Pacific/Auckland;Johannesburg|South Africa|-26.20|28.05|Africa/Johannesburg;Cape Town|South Africa|-33.92|18.42|Africa/Johannesburg;Nairobi|Kenya|-1.29|36.82|Africa/Nairobi;Addis Ababa|Ethiopia|9.03|38.74|Africa/Addis_Ababa;Lagos|Nigeria|6.52|3.38|Africa/Lagos;Casablanca|Morocco|33.57|-7.59|Africa/Casablanca;Cairo|Egypt|30.04|31.24|Africa/Cairo").split(";").map(s=>{const a=s.split("|");return{city:a[0],country:a[1],lat:+a[2],lon:+a[3],tz:a[4]}});
 const DIRSTR=`New York Zal|40.67|-73.94|America/New_York|Zalman Meyers
-Toronto - Or Temimim|43.78|-79.45|America/Toronto|Mendel Brook,Mendel Hafinger,Schneur Geisinsky,Schneur Goldberg,Shraga Chariton,Zalmen Kozliner
+Toronto - Or Temimim|43.78|-79.45|America/Toronto|Mendel Bruck,Mendel Hafinger,Schneur Geisinsky,Schneur Goldberg,Shraga Chariton,Zalmen Kozliner
 London Zal|51.57|-0.07|Europe/London|Boruch Paris,Levi Simons,Mendel Zirkind,Shmuel Kogen
 Fort Lauderdale|26.12|-80.14|America/New_York|Beryl Lipskar,Shmully Brody
 Brunoy|48.70|2.50|Europe/Paris|Aron Segal,Asher Dietch,Boruch Abrams,Chaim Hillel Azimov,Dovid Okonov BB,Mendel Plotkin,Mendel Traurig,Shimon Lubeski,Zalmen Laufer,Zevi Lipskier
@@ -373,28 +373,28 @@ Kfar Chabad|31.99|34.85|Asia/Jerusalem|Chaim Sarfati,Elchonon Nizar,Levi Danav,M
 Aventura, Miami|25.96|-80.14|America/New_York|Isaac Andrusier,Mendel Elmakies,Mendel Wolowik,Shaya Simon
 Beit Shemesh|31.75|34.99|Asia/Jerusalem|Chaim Benshimon,Nisson Hecht,Sholom Rivkin,Shraga Feldman,Tzvi Pinson,Yisroel Liberow,Yossi Hidingsfeld
 Budapest|47.50|19.04|Europe/Budapest|Berel Stein,Mendel Weiser,Shmuel Mergi,Zalmi Rubenfeld
-Chicago Mesivta|42.03|-87.73|America/Chicago|Hudi Safran,Lazer Klein,Levi Blotner,Mendel Shapiro,Mordechai Schmerling,Moshe Binyomin Kaplan,Nochum Barash,Tzvi Perlstein
-Detroit|42.46|-83.18|America/Detroit|Berel Gottlieb,Levi Tenenbaum,Mendel Brook,Mendel Feldman,Mendel Kantor PA,Mendel Korosik,Moshe Tursh
+Chicago Mesivta|42.03|-87.73|America/Chicago|Hudi Safran,Lazer Klein,Levi Blotner,Mendel Brook,Mendel Shapiro,Mordechai Schmerling,Moshe Binyomin Kaplan,Nochum Barash,Tzvi Perlstein
+Detroit|42.46|-83.18|America/Detroit|Berel Gottlieb,Levi Tenenbaum,Mendel Feldman,Mendel Kantor PA,Mendel Korosik,Moshe Tursh
 Westchester Mesivta|41.03|-73.76|America/New_York|Levi Rosenov,Mendel Pevzner CH,Mendel Werner,Yoisef Dietch,Yosefyitzchok Heller,Zalmen Bentzion
 Dallas Texas|32.78|-96.80|America/Chicago|Levi Goldman,Mordechai Chein,Schneur Speevak,Shalom Blachman
 Argentina Zal|-34.60|-58.38|America/Argentina/Buenos_Aires|Levi Altein,Levi Halberstam,Moshe Drukman,Tzvi Hirsh Liberman,Yehuda Rapaport
 Arizona Mesivta|33.45|-112.07|America/Phoenix|Hershy Goodfriend,Moshe Goldshmit,Nochum Avtzon,Shaya Aisenbach,Shmuly Kivman,Sholom Ber Oster CH
 Atlanta School|33.75|-84.39|America/New_York|Isaac Greenwald,Moshe Teldon,Moshe Weiss,Yosef Dorn
-Baltimore Mesivta|39.29|-76.61|America/New_York|Elya Chaim Shwei,Levi Korer,Mendel Horowitz,Shmuel Citron,Yosef Webb,Zalmen Lipskier
+Baltimore Mesivta|39.29|-76.61|America/New_York|Elya Chaim Shwei,Levi Korer,Mendel Horowitz,Shmuel Citron,Zalmen Lipskier
 Brazil Mesivta|-23.55|-46.63|America/Sao_Paulo|Boruch Kulski,Boruch Lapidus,Efraim Francis,Levi Yitzchok Semama,Mendel Rodal,Shimon Landa,Tzviki Avizrat,Zechariah Evenchik
-Tzfat|32.96|35.50|Asia/Jerusalem|Binyomin Gvirtsman,Eli Rudd,Mendel Pinson,Yechiel Chosid,Yehuda Lustig,Yosef Dietch
+Tzfat|32.96|35.50|Asia/Jerusalem|Alon Eldar,Benji Houseman,Binyomin Gvirtsman,Eli Rudd,Mendel Pinson,Yechiel Chosid,Yehuda Lustig,Yosef Dietch
 Chazon Eliyahu - Tel Aviv|32.07|34.78|Asia/Jerusalem|Isser Shlomo Leiblech,Levi Gopin,Levi Greenberg (thailand),Mendel Sasonkin,Mendel Wilhelm (ben Shaul),Shmuel Eisenbach,Shneur Grossbaum
 Thailand|13.76|100.50|Asia/Bangkok|Avraham Bart,Dovid Cunin,Shneur Cohen,Yehuda Morozov,Yehuda Shalman
 OT Mesivta|40.67|-73.94|America/New_York|Avraham Meir Lezell,Avremi Pink,Dovber Frankel,Levi Greisman,Mendel Gershovitz,Mendel Pevzner FR,Nosson Labkowski,Yosef Tubenblat
 Panama|8.98|-79.52|America/Panama|Dovid Pomanski,Reuven Kaminetski,Shneur Ganzburg,Shneur Steinberg,Sholom Dugan,Tzvi Shusterman,Uri Ashkenazi,Yossi Pikarski
 Pittsburgh Mesivta|40.44|-80.00|America/New_York|Dovid Barber,Lazer Grossbaum,Mendel Herbstman,Michel Simon,Schabse Gordon,Yehuda Perl
-Pomona Mesivta|41.17|-74.04|America/New_York|Mendel Cyrulnik,Yisrael Broner,Yossel Melul,Zalmy Goldtsien
+Pomona Mesivta|41.17|-74.04|America/New_York|Mendel Cyrulnik,Yisrael Broner,Yossel Melul,Yossi Silberstein,Zalmy Goldtsien
 Coral Springs Mesivta|26.27|-80.27|America/New_York|Chaim Gorelik,Dovber Bernstein,Eli Rosenfeld,Mendel Wilhelm TN,Mendy Borenstein,Moshe Altshul,Yakov Finkelstein,Yisroel Cohen
-Pittsburgh Zal|40.44|-80.00|America/New_York|Leibel Gold,Nosson Gurary,Sholom Posner,Sholom Wineman,Yitzchok Tzvi Hafter
-Sydney Gems|-33.87|151.21|Australia/Sydney|Binyomin Konikov,Shimshon Cohen,Shneur Baran
+Pittsburgh Zal|40.44|-80.00|America/New_York|Leibel Gold,Nosson Gurary,Sholom Wineman,Yitzchok Tzvi Hafter
+Sydney Gems|-33.87|151.21|Australia/Sydney|Binyomin Konikov,Shimshon Cohen,Shneur Baran,Sholom Posner
 Cincinnati Zal|39.10|-84.51|America/New_York|Dovid Okonov,Mendel Konikov,Mendel Zerba,Motti groner,Yuda Hertzel,Zalmen Bershivitzi
 Sydney|-33.87|151.21|Australia/Sydney|Avi Baitelman,Mendel Mochkin
-Melbourne Zal|-37.81|144.96|Australia/Melbourne|Eli Bronstien,Mendel Hecht,Mendel Laufer,Mendel Pikarski,Shmuly Hendel,Shneur Jordan
+Sydney "#Yg!" (name unclear)|-33.87|151.21|Australia/Sydney|Eli Bronstien,Mendel Hecht,Mendel Laufer,Mendel Pikarski,Shmuly Hendel,Shneur Jordan
 New Haven Zal|41.31|-72.92|America/New_York|Aron Pinson,Elchonon Goldberg,Michael Tietelbaum,Reuven Dorn,Yitzchok Wolowik,Yitzi Gorelik,Zalman Newman,Zevi Riecher
 New Haven Mesivta|41.31|-72.92|America/New_York|Avraham Heber,Eli Lebovics,Mendel Levertov,Sholom Ber Oster LA,Sholom Gurevitz,Sholom Volvovsky,Yakov Plotkin,Yankel Makhlin,Yisroel Levin,Yosef Lubin
 Miami - Lec|25.76|-80.19|America/New_York|Michel Rapoport,Mordy Glasman,Sender Pollen,Yakov Karnovski
@@ -404,7 +404,7 @@ China|23.02|113.12|Asia/Shanghai|Moshe Liberman,Shneor Sudak,Simcha Goldberg,Yos
 YOEC Zal|34.07|-118.37|America/Los_Angeles|Chananya Gurary,Chezky Hazan,Lazer Shapiro,Levi Teldon,Yakov Leiberman,Yisroelik Plotkin
 YOEC Mesivta|34.07|-118.37|America/Los_Angeles|Eli Mizrachi,Mendel Volvovsky,Mordy Bietch,Sruly Berkowitz,Yakov Lang,Yehoshua Zelig Leiberman,Yisroel Andrusier,Yudi Brown
 YC Melbourne|-37.81|144.96|Australia/Melbourne|Ari Vail,Dovi Pink,Eliezer Goldman,JJ Raskin,Shlomo Levy,Shneor Chein,Shneur Cousin,Yoel Balkany
-The Shul - Bal Harbour|25.89|-80.13|America/New_York|Arshan Mordechai Akhavan,Eli Rimler,Mendel Rodkin
+The Shul - Bal Harbour|25.89|-80.13|America/New_York|Arshan Mordechai Akhavan,Calev Cohen,Eli Rimler,Mendel Rodkin
 Toronto Zal|43.65|-79.38|America/Toronto|Aron Ashkenazi,Elchonon Greenbaum,Levi Wolf,Shneur Rivkin,Yisroel Moss,Zalman Gurary
 Toronto Mesivta|43.65|-79.38|America/Toronto|Menachem Lefkowitz,Mendel Blesofsky,Yochanan Groner,Zalmy Fried
 Berlin|52.52|13.41|Europe/Berlin|Aron Lipskier,Avremel Backman,Berel Jacobson,Shmuly Glick,Yisroel Haskelevich,Yisroel Minkowitz
@@ -416,15 +416,21 @@ Singapore|1.35|103.82|Asia/Singapore|Aaron Zeligwarger,Dovid Brodovitsh
 Moscow Zal|55.76|37.62|Europe/Moscow|Chananya Haller,Levi Kopf,Mendel Silberberg,Nussi Mijers,Pinchas Avrami,Tzali Miers,Tzviki Nerboni,Zalmen Bisk
 Suffield Zal|41.98|-72.65|America/New_York|Chaim Nota Elevitch,Mendel Hershkop,Mendel Weber,Shimon Laufer,Yehuda Leib Silverman
 Suffield Mesivta|41.98|-72.65|America/New_York|Chanoch Eidleman,Mendel Silverstein,Yechiel Pikarski,Yudi Kogan
-Monsey Mesivta|41.11|-74.07|America/New_York|Avraham Greenberg,Berel Munitz,Chaikel Baumgarten,Dovid Shwei,Mendel Brennan,Tzvi Zajac,Yankel Sirota
-Highland Lakes, Miami|25.95|-80.15|America/New_York|Binyomin Sufrin,Mendel Ezagui,Mendy Yerushalmy,Yaakov Fisher`;
+Monsey Mesivta|41.11|-74.07|America/New_York|Avraham Greenberg,Berel Munitz,Chaikel Baumgarten,Dovid Shwei,Mendel Brennan,Tzvi Zajac,Yankel Sirota,Yosef Webb
+Hong Kong|22.32|114.17|Asia/Hong_Kong|Levi Croitoru,Mendel Neiman,Yehuda Pinson
+North-beach Miami|25.85|-80.13|America/New_York|Dovid Rubinstein,Mendel Feiglin
+Venice|45.44|12.32|Europe/Rome|Avi Levin,Meir Bankhalter,Mendel Geisinsky,Mendel Rosenblum,Mendy Dashevsky,Menny Levilev,Yisroel Minkowitz,Yossi Shkolnik
+Highland Lakes, Miami|25.95|-80.15|America/New_York|Binyomin Sufrin,Mendel Ezagui,Mendy Yerushalmy,Yaakov Fisher
+Brickell / Downtown Miami|25.76|-80.19|America/New_York|Ephi Simpson,Sholom Schwartz
+Costa Rica|9.93|-84.08|America/Costa_Rica|Levi Cohen,Mottel Muska,Shmuli Hagege,Yakov Amitai
+Wilkes-Barre Yeshiva|41.25|-75.88|America/New_York|Levik Gurkov`;
 const DIRG=DIRSTR.split('\n').map(l=>{const a=l.split('|');return{city:a[0],lat:+a[1],lon:+a[2],tz:a[3],country:'Chabad yeshiva',people:a[4].split(',')}});
 const DIRP=[];DIRG.forEach(g=>g.people.forEach(n=>DIRP.push({name:n.trim(),city:g.city,country:g.country,lat:g.lat,lon:g.lon,tz:g.tz})));
 const $=id=>document.getElementById(id);
 let saved=[];try{saved=JSON.parse(localStorage.getItem("sc_saved")||"[]")}catch(e){}saved.forEach(v=>{if(v&&v.city=="China"&&Math.abs(v.lat-31.23)<.01&&Math.abs(v.lon-121.47)<.01){v.lat=23.02;v.lon=113.12}});
 const persist=()=>{try{localStorage.setItem("sc_saved",JSON.stringify(saved))}catch(e){}};
 // moves/renames from the official list (owner, Nov 2026)
-const MOVED={"Mendel Brook|Chicago Mesivta": ["Mendel Brook", "Detroit"], "Sholom Posner|Sydney Gems": ["Sholom Posner", "Pittsburgh Zal"], "Yosef Webb|Monsey Mesivta": ["Yosef Webb", "Baltimore Mesivta"], "Eli Bronstien|Sydney \"#Yg!\" (name unclear)": ["Eli Bronstien", "Melbourne Zal"], "Mendel Hecht|Sydney \"#Yg!\" (name unclear)": ["Mendel Hecht", "Melbourne Zal"], "Mendel Laufer|Sydney \"#Yg!\" (name unclear)": ["Mendel Laufer", "Melbourne Zal"], "Mendel Pikarski|Sydney \"#Yg!\" (name unclear)": ["Mendel Pikarski", "Melbourne Zal"], "Shmuly Hendel|Sydney \"#Yg!\" (name unclear)": ["Shmuly Hendel", "Melbourne Zal"], "Shneur Jordan|Sydney \"#Yg!\" (name unclear)": ["Shneur Jordan", "Melbourne Zal"], "YLP|Pittsburgh Mesivta": ["Yehuda Perl", "Pittsburgh Mesivta"], "Michel Raps|Miami - Lec": ["Michel Rapoport", "Miami - Lec"], "Ay Borenstien|Torah Emes (Jerusalem, assumed)": ["Avraham Yaakov Bernstein", "Torah Emes (Jerusalem, assumed)"], "Mendel Bruck|Toronto - Or Temimim": ["Mendel Brook", "Toronto - Or Temimim"], "Schnuer Giesinsky|Toronto - Or Temimim": ["Schneur Geisinsky", "Toronto - Or Temimim"], "Levi Rosenal|Westchester Mesivta": ["Levi Rosenov", "Westchester Mesivta"], "Moshe Wiess|Atlanta School": ["Moshe Weiss", "Atlanta School"], "Yisroel Wiess|Chile": ["Yisroel Weiss", "Chile"], "Shmue Citron|Baltimore Mesivta": ["Shmuel Citron", "Baltimore Mesivta"], "Shneur Stienberg|Panama": ["Shneur Steinberg", "Panama"], "Lazer Klien|Chicago Mesivta": ["Lazer Klein", "Chicago Mesivta"], "Dovber Bernstien|Coral Springs Mesivta": ["Dovber Bernstein", "Coral Springs Mesivta"], "Yakov Finkelstien|Coral Springs Mesivta": ["Yakov Finkelstein", "Coral Springs Mesivta"], "Mendel Silverstien|Suffield Mesivta": ["Mendel Silverstein", "Suffield Mesivta"], "Levi Altien|Argentina Zal": ["Levi Altein", "Argentina Zal"], "Nachi Gutnik|Klurman Miami Mesivta": ["Mendel Gutnik", "Klurman Miami Mesivta"], "Shmuel Yehuda Moss|Toronto Zal": ["Yisroel Moss", "Toronto Zal"], "M. Broner|Pomona Mesivta": ["Yisrael Broner", "Pomona Mesivta"], "Avraham Pollen|Miami - Lec": ["Sender Pollen", "Miami - Lec"]};
+const MOVED={"YLP|Pittsburgh Mesivta": ["Yehuda Perl", "Pittsburgh Mesivta"], "Michel Raps|Miami - Lec": ["Michel Rapoport", "Miami - Lec"], "Ay Borenstien|Torah Emes (Jerusalem, assumed)": ["Avraham Yaakov Bernstein", "Torah Emes (Jerusalem, assumed)"], "Schnuer Giesinsky|Toronto - Or Temimim": ["Schneur Geisinsky", "Toronto - Or Temimim"], "Levi Rosenal|Westchester Mesivta": ["Levi Rosenov", "Westchester Mesivta"], "Moshe Wiess|Atlanta School": ["Moshe Weiss", "Atlanta School"], "Yisroel Wiess|Chile": ["Yisroel Weiss", "Chile"], "Shmue Citron|Baltimore Mesivta": ["Shmuel Citron", "Baltimore Mesivta"], "Shneur Stienberg|Panama": ["Shneur Steinberg", "Panama"], "Lazer Klien|Chicago Mesivta": ["Lazer Klein", "Chicago Mesivta"], "Dovber Bernstien|Coral Springs Mesivta": ["Dovber Bernstein", "Coral Springs Mesivta"], "Yakov Finkelstien|Coral Springs Mesivta": ["Yakov Finkelstein", "Coral Springs Mesivta"], "Mendel Silverstien|Suffield Mesivta": ["Mendel Silverstein", "Suffield Mesivta"], "Levi Altien|Argentina Zal": ["Levi Altein", "Argentina Zal"], "Nachi Gutnik|Klurman Miami Mesivta": ["Mendel Gutnik", "Klurman Miami Mesivta"], "yisrael Broner|Pomona Mesivta": ["Yisrael Broner", "Pomona Mesivta"], "Mendel Brook|Detroit": ["Mendel Brook", "Chicago Mesivta"], "Sholom Posner|Pittsburgh Zal": ["Sholom Posner", "Sydney Gems"], "Yosef Webb|Baltimore Mesivta": ["Yosef Webb", "Monsey Mesivta"], "Mendel Brook|Toronto - Or Temimim": ["Mendel Bruck", "Toronto - Or Temimim"], "Shmuel Yehuda Moss|Toronto Zal": ["Yisroel Moss", "Toronto Zal"], "M. Broner|Pomona Mesivta": ["Yisrael Broner", "Pomona Mesivta"], "Avraham Pollen|Miami - Lec": ["Sender Pollen", "Miami - Lec"], "Eli Bronstien|Melbourne Zal": ["Eli Bronstien", "Sydney \"#Yg!\" (name unclear)"], "Mendel Hecht|Melbourne Zal": ["Mendel Hecht", "Sydney \"#Yg!\" (name unclear)"], "Mendel Laufer|Melbourne Zal": ["Mendel Laufer", "Sydney \"#Yg!\" (name unclear)"], "Mendel Pikarski|Melbourne Zal": ["Mendel Pikarski", "Sydney \"#Yg!\" (name unclear)"], "Shmuly Hendel|Melbourne Zal": ["Shmuly Hendel", "Sydney \"#Yg!\" (name unclear)"], "Shneur Jordan|Melbourne Zal": ["Shneur Jordan", "Sydney \"#Yg!\" (name unclear)"]};
 (()=>{const G=c=>{const l=DIRSTR.split("\n").find(x=>x.split("|")[0]==c);if(!l)return null;const a=l.split("|");return{lat:+a[1],lon:+a[2],tz:a[3]}};let ch=0;
  saved.forEach(v=>{const m=MOVED[v.name+"|"+v.city];if(m){v.name=m[0];if(m[1]!=v.city){const g=G(m[1]);v.city=m[1];if(g){v.lat=g.lat;v.lon=g.lon;v.tz=g.tz}}ch=1}});if(ch)persist();
  try{const k2=k=>{const m=MOVED[k];return m?m[0]+"|"+m[1]:k};localStorage.setItem("sc_favs",JSON.stringify(JSON.parse(localStorage.getItem("sc_favs")||"[]").map(k2)));
@@ -1066,7 +1072,7 @@ sync()})();
 // ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
 // Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=13,KIT_APK=1;
+const KIT_VER=14,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1078,7 +1084,7 @@ const KIT_LOG=[
  {v:7,big:1,t:"Send us a suggestion",d:"Have an idea, found a problem, or a question? Menu → Suggestions & contact. We read every message.",go:"feedback"},
  {v:9,t:"Easier sign-up: name suggestions as you type, and your number fills in if we have it"},
  {v:10,t:"Some names now spelled the way people write them"},
- {v:12,big:1,t:"The list now matches the official shlichus list",d:"New people and places were added, a few people moved to their correct yeshiva, and names were corrected. If someone you saved moved, your list updates by itself."}
+ {v:12,big:1,t:"New people and places",d:"New people and places were added from the official shlichus list, and some names were corrected. Your saved list updates by itself."}
 ];
 const kitIsApp=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const kitSeenKey=()=>"kit_seen_"+(me&&me.match?slug(pkey(me.match.name,me.match.city)):"x");
