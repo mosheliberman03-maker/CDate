@@ -323,6 +323,11 @@ body.tour.tpass #top,body.tour.tpass #bar{z-index:41}
 .kb-list{display:none;margin-top:10px;font-size:14px;color:#dfe4f7;line-height:1.6}
 #kitBar.open .kb-list{display:block}
 .kb-list .btn{display:block;width:100%;margin-top:8px;padding:11px}
+
+#kitUpd{position:fixed;z-index:55;left:14px;right:14px;max-width:460px;margin:0 auto;top:calc(env(safe-area-inset-top,0px) + 62px);display:flex;align-items:center;gap:9px;font-size:14px;border-radius:18px;padding:12px 14px;background:#9db4f5;color:#0b1022;box-shadow:0 10px 30px rgba(0,0,0,.4);transform:translateY(-140%);transition:transform .35s cubic-bezier(.2,.8,.2,1);cursor:pointer}
+#kitUpd.on{transform:none}
+#kitUpd .kb-dot{background:#0b1022;box-shadow:none}
+#kitUpd .kb-n{color:#0b1022;opacity:.7;flex:1;text-align:right}
 </style></head><body>
 <canvas id="g"></canvas>
 <div id="su"><div class="sucard glass"><span class="lg lg-l" role="img" aria-label="Logo"></span><h1>Shluchim Keep in Touch <span class="beta">Beta</span></h1><p>This app is in beta, so things may change or break while we test it. Pick your name from the list. First time: add your number and choose a code. Already signed up: enter your code.</p><input id="suN" placeholder="Your name" autocomplete="off" autocapitalize="words"><div id="suH"></div><div id="suM"></div><div id="suPW" style="display:none"></div><div id="suCW" style="display:none"><input id="suC" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Code"><div class="phh" id="suCH"></div></div><button class="btn p" id="suB" style="width:100%" disabled>Continue</button></div></div>
@@ -1021,13 +1026,14 @@ sync()})();
 // ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
 // Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=4,KIT_APK=1;
+const KIT_VER=5,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
  {v:2,t:"New globe app icon",apk:1},
  {v:3,big:1,t:"A hands-on tour",d:"Find a bochur, save him, and see your list, step by step. Replay it anytime from the menu.",go:"tour"},
- {v:4,t:"A tidier menu: your account on top, everything else grouped"}
+ {v:4,t:"A tidier menu: your account on top, everything else grouped"},
+ {v:5,t:"The app now updates itself when you come back to it"}
 ];
 const kitIsApp=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const kitSeenKey=()=>"kit_seen_"+(me&&me.match?slug(pkey(me.match.name,me.match.city)):"x");
@@ -1062,4 +1068,17 @@ function kitBar(items,needApk){const el=document.createElement("div");el.id="kit
  el.addEventListener("touchmove",e=>{if(x0==null)return;dx=e.touches[0].clientX-x0;dy=Math.min(0,e.touches[0].clientY-y0);el.style.transform=Math.abs(dx)>Math.abs(dy)?"translateX("+dx+"px)":"translateY("+dy+"px)"},{passive:true});
  el.addEventListener("touchend",()=>{el.style.transition="";if(Math.abs(dx)>80)close(dx);else if(dy<-40)close();else el.style.transform="";x0=null})}
 setTimeout(kitNews,1800);
+
+// ---------- updates apply themselves (owner — same as the calendar): on opening/returning, fetch the live page and compare KIT_VER.
+// Newer → reload at once if nothing is open (or as soon as the app is left); otherwise show a "Tap to update" banner.
+let kitUpdPending=false,kitNewV=0;
+// reload past the phone's saved copy (new address each version), and never twice for the same version (no loops)
+function kitReload(){try{if(+sessionStorage.getItem("kit_tried")>=kitNewV){return}sessionStorage.setItem("kit_tried",kitNewV)}catch(e){}location.replace(location.pathname+"?u="+kitNewV)}
+const kitBusy=()=>document.body.classList.contains("tour")||document.body.classList.contains("open")||document.body.classList.contains("fullc")||sheet.style.display=="block"||res.style.display=="block"||document.activeElement==q||!!$("kitNew");
+async function kitCheckUpd(){try{const r=await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"});if(!r.ok)return;const t=await r.text(),m=t.match(/const KIT_VER=(\d+)/);if(!m||+m[1]<=KIT_VER)return;
+ kitNewV=+m[1];let tried=0;try{tried=+sessionStorage.getItem("kit_tried")||0}catch(e){}
+ kitUpdPending=tried<kitNewV;if(kitUpdPending&&!document.hidden&&!kitBusy()){kitReload();return}
+ if(!$("kitUpd")){const b=document.createElement("div");b.id="kitUpd";b.innerHTML='<span class="kb-dot"></span><b>New version ready</b><span class="kb-n">Tap to update</span>';b.onclick=()=>{try{sessionStorage.removeItem("kit_tried")}catch(e){}kitReload()};document.body.appendChild(b);requestAnimationFrame(()=>b.classList.add("on"))}}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(document.hidden){if(kitUpdPending)kitReload()}else kitCheckUpd()});
+setTimeout(kitCheckUpd,2500);setInterval(()=>{if(!document.hidden)kitCheckUpd()},10*60000);
 </script></body></html>
