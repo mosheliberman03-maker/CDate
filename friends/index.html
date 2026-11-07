@@ -88,6 +88,7 @@ body.su canvas{pointer-events:none;opacity:.8}
 .sucard input{width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--tx);font-size:16px;outline:0;margin-bottom:10px}
 #suH,#suPH{color:var(--mut);font-size:13px;margin:4px 4px 6px}#suPH{margin:-2px 4px 12px}#suPH.ok{color:var(--day)}#suPH.bad{color:var(--night)}
 #suM .r{border:1px solid transparent}
+#suPN{color:var(--day);font-size:13px;margin:-4px 4px 10px}#suPN:empty{display:none}
 #suM .r.sel{background:rgba(124,156,255,.2);border-color:rgba(124,156,255,.6)}
 .btn:disabled{opacity:.4;cursor:default}
 .pc .ph{display:none;margin-left:6px;color:var(--acc);font-weight:500;font-size:14px;text-decoration:none}
@@ -348,7 +349,7 @@ body.tour.tpass #top,body.tour.tpass #bar{z-index:41}
 .fbi .a a,.fbi .a button{flex:1;text-align:center;text-decoration:none;padding:8px;border-radius:10px;font:inherit;font-size:13px;font-weight:700;border:0;cursor:pointer;background:rgba(255,255,255,.1);color:var(--tx)}
 </style></head><body>
 <canvas id="g"></canvas>
-<div id="su"><div class="sucard glass"><span class="lg lg-l" role="img" aria-label="Logo"></span><h1>Shluchim Keep in Touch <span class="beta">Beta</span></h1><p>This app is in beta, so things may change or break while we test it. Pick your name from the list. First time: add your number and choose a code. Already signed up: enter your code.</p><input id="suN" placeholder="Your name" autocomplete="off" autocapitalize="words"><div id="suH"></div><div id="suM"></div><div id="suPW" style="display:none"></div><div id="suCW" style="display:none"><input id="suC" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Code"><div class="phh" id="suCH"></div></div><button class="btn p" id="suB" style="width:100%" disabled>Continue</button></div></div>
+<div id="su"><div class="sucard glass"><span class="lg lg-l" role="img" aria-label="Logo"></span><h1>Shluchim Keep in Touch <span class="beta">Beta</span></h1><p>This app is in beta, so things may change or break while we test it. Pick your name from the list. First time: add your number and choose a code. Already signed up: enter your code.</p><input id="suN" placeholder="Your name" autocomplete="off" autocapitalize="words"><div id="suH"></div><div id="suM"></div><div id="suPW" style="display:none"></div><div id="suPN"></div><div id="suCW" style="display:none"><input id="suC" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Code"><div class="phh" id="suCH"></div></div><button class="btn p" id="suB" style="width:100%" disabled>Continue</button></div></div>
 <div id="cards"></div>
 <div id="fcard"><div class="fw"><button class="btn" id="fback">‹ Back</button><div class="fbig"><div id="fcity"></div><div id="ftime"></div><div id="fmeta"></div></div><div id="fpl"></div><div class="fhint">Swipe a name left to remove</div></div></div>
 <div id="tour"><div class="tcard" id="tc"></div></div>
@@ -852,15 +853,26 @@ function randSalt(){try{return[...crypto.getRandomValues(new Uint8Array(12))].ma
 async function hashCode(c,salt){try{if(crypto&&crypto.subtle){const en=new TextEncoder(),key=await crypto.subtle.importKey("raw",en.encode(c),"PBKDF2",false,["deriveBits"]),bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:en.encode(salt),iterations:150000,hash:"SHA-256"},key,256);return[...new Uint8Array(bits)].map(b=>b.toString(16).padStart(2,"0")).join("")}}catch(e){}
  let h=2166136261;const t=salt+":"+c;for(let r=0;r<2000;r++)for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)}return"f"+(h>>>0).toString(16)}
 function suMode(){if(!selM)return"";if(dbState=="pending")return"wait";return accts[pkey(selM.name,selM.city)]?"login":"new"}
-function suCheck(){const m=suMode(),c=$("suC").value.replace(/\D/g,""),ch=$("suCH");$("suPW").style.display=m=="new"?"":"none";$("suCW").style.display=m=="new"||m=="login"?"":"none";$("suC").placeholder=m=="login"?"Your code":"Choose a code (4–8 digits)";
+function suCheck(){{const n=$("suPN");if(n&&n.textContent&&pw.val().e164!=suAuto)n.textContent=""}const m=suMode(),c=$("suC").value.replace(/\D/g,""),ch=$("suCH");$("suPW").style.display=m=="new"?"":"none";$("suPN").style.display=m=="new"?"":"none";$("suCW").style.display=m=="new"||m=="login"?"":"none";$("suC").placeholder=m=="login"?"Your code":"Choose a code (4–8 digits)";
  if(!ch.classList.contains("bad")||!c)ch.className="phh";
  if(!ch.classList.contains("bad"))ch.textContent=m=="wait"?"Connecting…":m=="login"?"This name already has an account. Enter your code.":m=="new"?"You’ll use this code to log in on other devices.":"";
  suB.textContent=m=="login"?"Log in":"Continue";suB.disabled=!(m=="login"?c.length>=4:m=="new"&&pw.val().ok&&c.length>=4)}
-function pickM(i){selM=suM._m[i].p;pw.tz(selM.tz);[...suM.children].forEach((r,k)=>r.classList.toggle("sel",k==i));suCheck()}
-suN.oninput=()=>{selM=null;$("suC").value="";$("suCH").className="phh";const q=suN.value.trim(),m=matches(q);suM._m=m;
- suH.textContent=!q?"":m.length?(m[0].sc>=.97?"Is this you?":"Closest matches. Select the one that is you:"):(toks(q).length<2?"Type your first and last name.":"No similar name found. Check the spelling.");
- suM.innerHTML=m.map((x,i)=>'<div class="r" data-i="'+i+'"><div><b>'+esc(x.p.name)+'</b><small>'+esc(x.p.city)+'</small></div><span class="tag">'+Math.round(x.sc*100)+'%</span></div>').join("");
- if(m.length&&m[0].sc>=.97)pickM(0);suCheck()};
+// a number we already have for this person fills itself in; he can still change it
+let suAuto="";
+function suAutoClear(){if(suAuto&&pw.val().e164==suAuto)pw.clear();suAuto="";const n=$("suPN");if(n)n.textContent=""}
+function pickM(i){suAutoClear();selM=suM._m[i].p;const ph=phoneOf(selM.name,selM.city);if(ph&&!pw.val().ok){pw.set(ph);suAuto=pw.val().e164||"";const n=$("suPN");if(n&&suAuto)n.textContent="We already have this number for you. Change it if it’s wrong."}pw.tz(selM.tz);[...suM.children].forEach((r,k)=>r.classList.toggle("sel",k==i));suCheck()}
+// sign-up name box: suggestions from the first letters (any word), then fuzzy matches for typos
+function suFind(q){const qt=toks(q);if(!qt.length)return[];const out=[],seen=new Set(),add=(p,sc)=>{const k=p.name+"|"+p.city;if(seen.has(k))return;seen.add(k);out.push({p,sc})};
+ DIRP.forEach(p=>{const w=toks(p.name);if(qt.every(t=>w.some(x=>x.startsWith(t)||(NG[t]!=null&&NG[t]==NG[x]))))add(p,qt.length>1&&w.join(" ")==qt.join(" ")?1:.9)});
+ out.sort((a,b)=>b.sc-a.sc||a.p.name.localeCompare(b.p.name));
+ if(out.length<6)matches(q).forEach(x=>add(x.p,Math.min(x.sc,.89)));
+ return out.slice(0,8)}
+suN.oninput=()=>{selM=null;$("suC").value="";$("suCH").className="phh";suAutoClear();const q=suN.value.trim(),m=suFind(q);suM._m=m;
+ suH.textContent=!q?"":m.length?(m.length==1||m[0].sc>=1?"Is this you? Tap your name:":"Tap your name:"):(toks(q).length<2?"Keep typing your first and last name.":"No similar name found. Check the spelling.");
+ suM.innerHTML=m.map((x,i)=>{const ph=phoneOf(x.p.name,x.p.city);return'<div class="r" data-i="'+i+'"><div><b>'+esc(x.p.name)+'</b><small>'+esc(x.p.city)+'</small></div>'+(accts[pkey(x.p.name,x.p.city)]?'<span class="tag">Has account</span>':ph?'<span class="tag">📞 Number saved</span>':'')+'</div>'}).join("");
+ if(m.length&&m[0].sc>=1&&(m.length==1||m[1].sc<1))pickM(0);suCheck()};
+// keep the name box near the top while typing, so the suggestions stay above the keyboard
+suN.addEventListener("focus",()=>setTimeout(()=>{try{suN.scrollIntoView({block:"start",behavior:"smooth"})}catch(e){}},250));
 suM.onclick=e=>{const r=e.target.closest(".r");if(r)pickM(+r.dataset.i)};
 suCheck();
 $("suC").oninput=()=>{const c=$("suC");c.value=c.value.replace(/\D/g,"");$("suCH").className="phh";suCheck()};
@@ -1044,7 +1056,7 @@ sync()})();
 // ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
 // Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=8,KIT_APK=1;
+const KIT_VER=9,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1053,7 +1065,8 @@ const KIT_LOG=[
  {v:4,t:"A tidier menu: your account on top, everything else grouped"},
  {v:5,t:"The app now updates itself when you come back to it"},
  {v:6,t:"The version number is now at the bottom of the menu"},
- {v:7,big:1,t:"Send us a suggestion",d:"Have an idea, found a problem, or a question? Menu → Suggestions & contact. We read every message.",go:"feedback"}
+ {v:7,big:1,t:"Send us a suggestion",d:"Have an idea, found a problem, or a question? Menu → Suggestions & contact. We read every message.",go:"feedback"},
+ {v:9,t:"Easier sign-up: name suggestions as you type, and your number fills in if we have it"}
 ];
 const kitIsApp=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const kitSeenKey=()=>"kit_seen_"+(me&&me.match?slug(pkey(me.match.name,me.match.city)):"x");
