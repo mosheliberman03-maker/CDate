@@ -710,7 +710,8 @@ function draw(){
   if(sv){const ph=(t*.8+c.x/97)%1;ctx.strokeStyle=col;ctx.globalAlpha=1-ph;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(c.x,c.y,r+ph*18,(r+ph*18)*Math.max(nz,.3),rho+Math.PI/2,0,7);ctx.stroke();ctx.globalAlpha=1}
   if(s=="day"){const br=.5+.5*Math.sin(t*3.2);ctx.shadowColor="rgba(140,196,255,"+(.45+.45*br).toFixed(2)+")";ctx.shadowBlur=4+12*br}const pp=pyr(c.x,c.y,r,col,t,c.x/97,nx,ny,nz);ctx.shadowBlur=0;c.hx=nx*r*.85;c.hy=ny*r*.85;
   if(n>1){ctx.font="700 15px -apple-system,system-ui,sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fff";ctx.shadowColor="rgba(0,0,0,.4)";ctx.shadowBlur=3;ctx.fillText(n,pp.x,pp.y+.5);ctx.shadowBlur=0;ctx.textAlign="start";ctx.textBaseline="alphabetic"}
-  else if(sv){ctx.font="600 13px system-ui,sans-serif";ctx.fillStyle="#fff";ctx.shadowColor="#000";ctx.shadowBlur=6;ctx.fillText(c.items[0].grp.city,c.x+c.hx+r+8,c.y-c.hy+4);ctx.shadowBlur=0}})}
+  else if(sv){ctx.font="600 13px system-ui,sans-serif";ctx.fillStyle="#fff";ctx.shadowColor="#000";ctx.shadowBlur=6;ctx.fillText(c.items[0].grp.city,c.x+c.hx+r+8,c.y-c.hy+4);ctx.shadowBlur=0}})
+ try{if(SHOOT.on)shootDraw()}catch(e){}}
 function frame(){try{draw()}catch(e){console.error(e)}requestAnimationFrame(frame)}
 frame();
 function fly(lon,lat,dur){auto=false;vel=[0,0];let a0=rot[0],b0=-lon;while(b0-a0>180)b0-=360;while(b0-a0<-180)b0+=360;tween={a:[a0,rot[1]],b:[b0,-lat],t0:performance.now(),d:dur||1100,io:!!dur}}
@@ -992,7 +993,7 @@ function renderCards(){const el=$("cards"),ord={day:0,gray:1,night:2},good=saved
  if(!gs.length)h+='<div class="empty">No cards match these filters.</div>';
  el.innerHTML=h;el.scrollTop=sc;
  if(newCity){const p=el.querySelector(".pop");if(p)p.scrollIntoView({block:"nearest",behavior:"smooth"});newCity=null}
- renderFull();kitBridge()}
+ renderFull();kitBridge();try{linksPush()}catch(e){}}
 function row(v){if(!v.name)return'<div class="sw"><div class="pr" data-id="'+v.id+'"><div class="pt"><div class="pi"><b>Place only</b><small>No person saved here</small></div></div></div></div>';
  const k=fk(v),ph=phoneOf(v.name,v.city),dg=ph.replace(/\D/g,""),st=status(v.tz);
  return'<div class="sw"><div class="pr" data-id="'+v.id+'"><div class="pt"><div class="pi"><b>'+esc(v.name)+'</b><small>'+(ph?esc(fmtPhone(ph)):"No number yet")+'</small></div><button class="ib'+(favs.has(k)?"":" off")+'" data-star="1" aria-label="Favorite">'+(favs.has(k)?"★":"☆")+"</button>"+(st!="day"?'<button class="ib'+(rem[k]?"":" off")+'" data-bell="1" aria-label="Remind me">'+(rem[k]?"🔔":"🔕")+"</button>":"")+"</div>"+(ph?'<div class="pa"><a class="ab" href="tel:+'+dg+'">📞 Call</a><a class="ab wa" href="https://wa.me/'+dg+'" target="_blank" rel="noopener">💬 WhatsApp</a></div>':"")+"</div></div>"}
@@ -1072,7 +1073,7 @@ sync()})();
 // ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
 // Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=14,KIT_APK=1;
+const KIT_VER=15,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1084,7 +1085,8 @@ const KIT_LOG=[
  {v:7,big:1,t:"Send us a suggestion",d:"Have an idea, found a problem, or a question? Menu → Suggestions & contact. We read every message.",go:"feedback"},
  {v:9,t:"Easier sign-up: name suggestions as you type, and your number fills in if we have it"},
  {v:10,t:"Some names now spelled the way people write them"},
- {v:12,big:1,t:"New people and places",d:"New people and places were added from the official shlichus list, and some names were corrected. Your saved list updates by itself."}
+ {v:12,big:1,t:"New people and places",d:"New people and places were added from the official shlichus list, and some names were corrected. Your saved list updates by itself."},
+ {v:15,t:"A new opening: shooting stars between friends who saved each other"}
 ];
 const kitIsApp=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const kitSeenKey=()=>"kit_seen_"+(me&&me.match?slug(pkey(me.match.name,me.match.city)):"x");
@@ -1166,4 +1168,60 @@ $("fbk").onclick=fbOpen;$("fbin").onclick=fbInbox;
  const c=prompt("Code");if(!c)return;let h="";try{const d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("kit-admin:"+c.trim()));h=[...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,"0")).join("")}catch(e){}
  if(h==ADMIN_H){lsSet("kit_admin",h);hap([12,40,12]);toast("Messages inbox is on for this phone");fbLoad()}else{hap(40);toast("Wrong code")}})})();
 setTimeout(fbLoad,2000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)fbLoad()});
+
+// ---------- opening animation (owner): bright light-blue "shooting stars" between places whose people saved each other.
+// One after another (overlapping, never all at once), each arcs over the spinning globe and fades into its destination.
+// Links: everyone's (server list links3: "my yeshiva → yeshivas I saved") plus this phone's own saves.
+const SHOOT={on:false,t0:0,arcs:[],next:0,pairs:[],fired:0,dur:7600};
+let kitLinks=[];
+function cityLL(c){const g=DIRG.find(x=>x.city==c);if(g)return[g.lon,g.lat];const v=saved.find(x=>x.city==c);return v?[v.lon,v.lat]:null}
+function myLinks(){if(!me||!me.match)return[];const a=me.match.city,out=new Set();saved.forEach(v=>{if(v.city&&v.city!=a)out.add(v.city)});return[...out].map(b=>[a,b])}
+async function linksLoad(){try{const r=await fetch(KIT_SRV+"links3",{cache:"no-store"});if(!r.ok)return;const d=(await r.json()).docs||{};const L=[];
+ Object.values(d).forEach(x=>{const[a]=(x.k||"").split("|").slice(1);String(x.l||"").split(";").forEach(b=>{if(a&&b&&a!=b)L.push([a,b])})});kitLinks=L}catch(e){}}
+let linksSent="";
+async function linksPush(){if(!me||!me.match)return;const L=myLinks().map(x=>x[1]).sort();let l=L.join(";");if(l.length>1500)l=l.slice(0,l.lastIndexOf(";",1500));if(!l||l==linksSent)return;
+ try{const k=pkey(me.match.name,me.match.city),r=await fetch(KIT_SRV+"links3/set",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({id:slug(k),data:{k,l}})});if(r.ok)linksSent=l}catch(e){}}
+function shootPairs(){const seen=new Set(),P0=[];[...kitLinks,...myLinks()].forEach(([a,b])=>{const k=a<b?a+"|"+b:b+"|"+a;if(seen.has(k))return;seen.add(k);const A=cityLL(a),B=cityLL(b);if(A&&B&&(Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1]))>3)P0.push(Math.random()<.5?[A,B]:[B,A])});
+ if(P0.length<12){// not enough real links yet: connect yeshivas where people are reachable (have a number), so the opening still tells the story
+  const cs=[...new Set(Object.keys(phones).map(k=>k.split("|").slice(1).join("|")))].map(cityLL).filter(Boolean);
+  for(let i=0;i<80&&P0.length<18&&cs.length>1;i++){const A=cs[Math.floor(Math.random()*cs.length)],B=cs[Math.floor(Math.random()*cs.length)];if(A!=B&&(Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1]))>3)P0.push([A,B])}}
+ for(let i=P0.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[P0[i],P0[j]]=[P0[j],P0[i]]}return P0}
+const v3=(lon,lat)=>{const l=lon*D,f=lat*D;return[Math.cos(f)*Math.sin(l),Math.sin(f),Math.cos(f)*Math.cos(l)]};
+function shootStart(){if(SHOOT.on||matchMedia("(prefers-reduced-motion: reduce)").matches)return;SHOOT.pairs=shootPairs();
+ SHOOT.fill=[...new Set(Object.keys(phones).map(k=>k.split("|").slice(1).join("|")))].map(cityLL).filter(Boolean);if(SHOOT.fill.length<4)SHOOT.fill=DIRG.map(g=>[g.lon,g.lat]);SHOOT.on=true;SHOOT.t0=performance.now();SHOOT.next=SHOOT.t0+350;SHOOT.arcs=[];SHOOT.fired=0;auto=true}
+// a point on the arc between A and B (unit vectors) at fraction u, lifted off the surface, projected like P()
+function arcPt(a,b,om,u,lift){const s=Math.sin(om),k1=Math.sin((1-u)*om)/s,k2=Math.sin(u*om)/s;let x=a[0]*k1+b[0]*k2,y=a[1]*k1+b[1]*k2,z=a[2]*k1+b[2]*k2;
+ const h=1+lift*Math.sin(Math.PI*u);const lon=Math.atan2(x,z)/D,lat=Math.asin(Math.max(-1,Math.min(1,y)))/D;
+ const l=(lon+rv[0])*D,f=lat*D,al=rv[1]*D,X=Math.cos(f)*Math.sin(l),Y=Math.sin(f),Z=Math.cos(f)*Math.cos(l),yy=Y*Math.cos(al)+Z*Math.sin(al),zz=-Y*Math.sin(al)+Z*Math.cos(al);
+ const vis=zz>0||Math.hypot(X,yy)*h>1.002;return[cx+R*h*X,cy-R*h*yy,vis,zz]}
+function shootDraw(){const now=performance.now(),el=now-SHOOT.t0;rot[0]+=.1; // a little extra spin while the stars fly
+ if(el<SHOOT.dur&&now>=SHOOT.next){
+  // only links whose both ends face us right now (so no star flies off behind the globe); reuse links if we run out
+  let pick=-1;const free=SHOOT.pairs.filter(p=>!p.used);if(!free.length)SHOOT.pairs.forEach(p=>p.used=0);
+  for(let i=0;i<SHOOT.pairs.length;i++){const p=SHOOT.pairs[i];if(p.used)continue;const A=P(p[0][0],p[0][1]),B=P(p[1][0],p[1][1]);if(A[2]>.1&&B[2]>.18){pick=i;break}}
+  if(pick<0){// nothing real is facing us right now: keep the rhythm with two yeshivas on this side that have reachable people
+   const vis=SHOOT.fill.filter(c=>P(c[0],c[1])[2]>.15);if(vis.length>1){const A=vis[Math.floor(Math.random()*vis.length)];let B=vis[Math.floor(Math.random()*vis.length)];if(B!=A&&(Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1]))>4){SHOOT.pairs.push([A,B]);pick=SHOOT.pairs.length-1}}}
+  if(pick>=0){const p=SHOOT.pairs[pick];p.used=1;SHOOT.fired++;const a=v3(p[0][0],p[0][1]),b=v3(p[1][0],p[1][1]),om=Math.acos(Math.max(-1,Math.min(1,a[0]*b[0]+a[1]*b[1]+a[2]*b[2])));
+   SHOOT.arcs.push({a,b,om,lift:Math.min(.16,.035+om*.1),t0:now,d:1400+om*380,dest:p[1]});SHOOT.next=now+380+Math.random()*420}
+  else SHOOT.next=now+120}
+ ctx.save();ctx.globalCompositeOperation="lighter";ctx.lineCap="round";ctx.lineJoin="round";
+ const ease=x=>x<0?0:x>1?1:1-Math.pow(1-x,2.2);   // fast launch, gentle arrival
+ SHOOT.arcs=SHOOT.arcs.filter(A=>{const k=(now-A.t0)/A.d;if(k>1.4)return false;
+  const head=ease(k),tail=ease(k-.34);              // the tail keeps coming after the head lands: it "drags in"
+  if(head-tail<.002)return true;
+  const N=30,pts=[];for(let i=0;i<=N;i++)pts.push(arcPt(A.a,A.b,A.om,tail+(head-tail)*i/N,A.lift));
+  const h=pts[N],t=pts[0];
+  // one smooth streak in three passes (wide glow, body, bright core), each fading from the tail to the head
+  [[12,.13],[4.4,.4],[1.8,1]].forEach(([w,al],j)=>{const g=ctx.createLinearGradient(t[0],t[1],h[0],h[1]);
+   g.addColorStop(0,"rgba(140,210,255,0)");g.addColorStop(.6,"rgba(150,215,255,"+(al*.35).toFixed(3)+")");g.addColorStop(1,j==2?"rgba(240,252,255,"+al+")":"rgba(150,215,255,"+al+")");
+   ctx.strokeStyle=g;ctx.lineWidth=w;ctx.beginPath();let pen=false;pts.forEach(q=>{if(!q[2]){pen=false;return}if(pen)ctx.lineTo(q[0],q[1]);else{ctx.moveTo(q[0],q[1]);pen=true}});ctx.stroke()});
+  if(k<1&&h[2]){const r=10,g=ctx.createRadialGradient(h[0],h[1],0,h[0],h[1],r);g.addColorStop(0,"rgba(245,253,255,1)");g.addColorStop(.3,"rgba(160,220,255,.6)");g.addColorStop(1,"rgba(150,215,255,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(h[0],h[1],r,0,7);ctx.fill()}
+  // landing: a soft glow that sinks into the destination
+  if(k>.95){const q=Math.min(1,(k-.95)/.45),d=P(A.dest[0],A.dest[1]);if(d[2]>0){const r=4+q*14,g=ctx.createRadialGradient(d[0],d[1],0,d[0],d[1],r);g.addColorStop(0,"rgba(190,232,255,"+((1-q)*.55).toFixed(3)+")");g.addColorStop(1,"rgba(150,215,255,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(d[0],d[1],r,0,7);ctx.fill()}}
+  return true});
+ ctx.restore();
+ if(el>SHOOT.dur&&!SHOOT.arcs.length)SHOOT.on=false}
+// play it when the app opens (signed in, globe showing, not during the tour)
+function shootMaybe(){if(su||!me||document.body.classList.contains("tour")||view=="cards")return;shootStart()}
+(async()=>{const t0=Date.now();await Promise.race([linksLoad(),new Promise(r=>setTimeout(r,1200))]);setTimeout(shootMaybe,Math.max(0,700-(Date.now()-t0)));linksPush()})();
 </script></body></html>
