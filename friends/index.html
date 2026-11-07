@@ -271,6 +271,14 @@ html,body{background:var(--bg)}
 .kw .tx small{display:block;color:var(--mut);font-size:12.5px;margin:2px 0 8px;line-height:1.4}
 .kw .tx .btn{width:100%;padding:10px;flex:none}
 .kw .tx .btn.done{background:rgba(111,214,160,.18);color:#6fd6a0}
+
+/* hands-on tour: let taps reach the real app under the card, and a glowing ring on what to tap */
+body.tpass #tour{pointer-events:none}
+body.tpass #tour .tcard{pointer-events:auto}
+#tour{z-index:40}
+.tpulse{position:relative;z-index:41;outline:2.5px solid #9fd0ff;outline-offset:3px;animation:tpulse 1.3s ease-out infinite!important}
+@keyframes tpulse{0%{box-shadow:0 0 0 3px rgba(140,196,255,.9),0 0 22px 4px rgba(140,196,255,.7)}70%{box-shadow:0 0 0 18px rgba(140,196,255,0),0 0 22px 4px rgba(140,196,255,.45)}100%{box-shadow:0 0 0 3px rgba(140,196,255,0),0 0 22px 4px rgba(140,196,255,.7)}}
+body.tour.tpass #top,body.tour.tpass #bar{z-index:41}
 </style></head><body>
 <canvas id="g"></canvas>
 <div id="su"><div class="sucard glass"><span class="lg lg-l" role="img" aria-label="Logo"></span><h1>Shluchim Keep in Touch <span class="beta">Beta</span></h1><p>This app is in beta, so things may change or break while we test it. Pick your name from the list. First time: add your number and choose a code. Already signed up: enter your code.</p><input id="suN" placeholder="Your name" autocomplete="off" autocapitalize="words"><div id="suH"></div><div id="suM"></div><div id="suPW" style="display:none"></div><div id="suCW" style="display:none"><input id="suC" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Code"><div class="phh" id="suCH"></div></div><button class="btn p" id="suB" style="width:100%" disabled>Continue</button></div></div>
@@ -816,23 +824,63 @@ function kitBridge(){try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C
  saved.forEach(v=>{if(!v.name)return;const k=fk(v);if(seen.has(k))return;seen.add(k);ppl.push({n:v.name,c:v.city,tz:v.tz,p:phoneOf(v.name,v.city).replace(/\D/g,""),f:favs.has(k)?1:0,m:v.city==mc?1:0})});
  const d=JSON.stringify({v:1,me:me&&me.match?me.match.name:"",ppl});if(d==kitLast)return;kitLast=d;P.save({data:d}).catch(()=>{kitLast=""})}catch(e){}}
 function toast(msg,act,lab,ms){const t=$("toast");t.innerHTML="<span>"+esc(msg)+"</span>"+(act?"<button>"+(lab||"Undo")+"</button>":"");const b=t.querySelector("button");if(b)b.onclick=()=>{act();t.classList.remove("on")};t.classList.add("on");clearTimeout(tT);tT=setTimeout(()=>t.classList.remove("on"),ms||(act?6000:4500))}
-const TOUR=[
-{pos:"bot",h:"Who’s awake?",p:"Every pin is a shliach or yeshiva.",leg:1,go(){setView("world");focusK=null;tween=null;auto=true;zoomT=1}},
-{pos:"bot",h:"Zoom in",p:"Pinch, or tap a pin to see who’s there.",go(){setView("world");auto=false;fly(-73.94,40.67,2600);zoomT=5}},
-{pos:"top",h:"Find anyone",p:"Search a name, tap to save.",go(){setView("world");zoomT=1;auto=true;tour.t(()=>{let i=0,w="Mendel";const k=()=>{if(i>w.length){return}q.value=w.slice(0,i++);q.dispatchEvent(new Event("input"));tour.t(k,260)};k()},500)}},
-{pos:"bot",h:"Your list",p:"Best to call first. Tap a city for Call or WhatsApp.",go(){tour.demo();setView("cards")}}];
-const tour={i:0,T:[],real:null,
+// ---------- guided tour (hands-on): what the colours mean → search a bochur → save him → your list → back to the globe
+const TOUR_LEG='<div class="tl"><span><i style="background:'+PINCOL.day+';box-shadow:0 0 8px '+PINCOL.day+'"></i>Awake</span><span><i style="background:'+PINCOL.gray+';border:1px solid #8cc4ff88"></i>Maybe up</span><span><i style="background:'+PINCOL.night+';border:1px solid '+PINCOL.gray+'"></i>Asleep</span></div>';
+const tour={i:0,T:[],off:[],who:null,
  t(f,ms){this.T.push(setTimeout(f,ms))},
- clear(){this.T.forEach(clearTimeout);this.T=[];q.value="";res.style.display="none";sheet.style.display="none"},
- demo(){if(this.real)return;this.real=saved;saved=["Kfar Chabad","Toronto Zal","Sydney Gems","Brazil Mesivta","Panama"].map((c,k)=>{const g=DIRG.find(x=>x.city==c);return{id:"demo"+k,name:g.people[0],city:g.city,country:g.country,lat:g.lat,lon:g.lon,tz:g.tz}})},
- undemo(){if(!this.real)return;saved=this.real;this.real=null},
- show(){this.i=0;document.body.classList.add("tour");closeAll();$("tc").innerHTML="";this.step()},
- step(){this.clear();const t=TOUR[this.i],last=this.i==TOUR.length-1,tc=$("tc");if(this.i<3)this.undemo();t.go();
-  const html="<h2>"+t.h+' <span class="beta">Beta</span></h2><p>'+t.p+"</p>"+(t.leg?'<div class="tl"><span><i style="background:'+PINCOL.day+';box-shadow:0 0 8px '+PINCOL.day+'"></i>Awake</span><span><i style="background:'+PINCOL.gray+'"></i>Borderline</span><span><i style="background:'+PINCOL.night+';border:1px solid '+PINCOL.gray+'"></i>Asleep</span></div>':"")+'<div class="tdots">'+TOUR.map((x,k)=>"<i"+(k==this.i?' class="on"':"")+"></i>").join("")+'</div><div class="tb">'+(last?"":'<button class="btn" id="tk">Skip</button>')+'<button class="btn p" id="tn">'+(last?"Got it":"Next")+"</button></div>";
-  const swap=()=>{tc.className="tcard sw "+t.pos;tc.innerHTML=html;void tc.offsetWidth;tc.className="tcard "+t.pos};
+ every(f,ms){const id=setInterval(f,ms);this.off.push(()=>clearInterval(id))},
+ on(el,ev,f,cap){el.addEventListener(ev,f,cap);this.off.push(()=>el.removeEventListener(ev,f,cap))},
+ clear(){this.T.forEach(clearTimeout);this.T=[];this.off.forEach(f=>f());this.off=[];document.querySelectorAll(".tpulse").forEach(e=>e.classList.remove("tpulse"));document.body.classList.remove("tpass")},
+ pulse(el){if(el)el.classList.add("tpulse")},
+ card(pos,h,p,o){o=o||{};const tc=$("tc"),N=7,k=Math.min(this.i,N-1);
+  const html='<h2>'+h+'</h2><p>'+p+'</p>'+(o.extra||"")+'<div class="tdots">'+Array.from({length:N},(_,j)=>"<i"+(j==k?' class="on"':"")+"></i>").join("")+'</div><div class="tb">'+(o.last?"":'<button class="btn" id="tk">Skip tour</button>')+(o.next?'<button class="btn p" id="tn">'+o.next+'</button>':'')+'</div>';
+  const swap=()=>{tc.className="tcard sw "+pos;tc.innerHTML=html;void tc.offsetWidth;tc.className="tcard "+pos};
   if(tc.innerHTML){tc.classList.add("sw");this.t(swap,230)}else swap()},
- end(){this.clear();this.undemo();document.body.classList.remove("tour");lsSet("sc_tour","1");zoomT=1;auto=true;setView(saved.length?"cards":"world")}};
-$("tour").onclick=e=>{if(e.target.closest("#tk"))tour.end();else if(e.target.closest("#tn")){if(tour.i>=TOUR.length-1)tour.end();else{tour.i++;tour.step()}}};
+ // the user does the real thing under the card; the card only guides
+ pass(){document.body.classList.add("tpass")},
+ show(){this.i=0;this.who=null;document.body.classList.add("tour");closeAll();closeFull();$("tc").innerHTML="";this.step()},
+ next(){this.i++;this.step()},
+ step(){this.clear();const S=[this.s0,this.s1,this.s2,this.s3,this.s4,this.s5,this.s6][this.i];if(S)S.call(this);else this.end()},
+ // 1. the globe and its colours
+ s0(){setView("world");focusK=null;tween=null;auto=true;zoomT=1;
+  this.card("bot","Who’s awake right now?","Every pin is a yeshiva or a shliach. Its colour tells you if it’s a good time to call there.",{extra:TOUR_LEG,next:"Next"})},
+ // 2. search a bochur (the real search bar)
+ s1(){setView("world");auto=false;this.pass();this.pulse($("sb"));
+  this.card("top","Find a bochur","Type the name of a bochur you know in the search bar below, then tap Search on your keyboard (or tap his name).",{});
+  this.t(()=>{try{q.focus()}catch(e){}},450);
+  const go=v=>{if(!v)return false;this.who=v;q.value="";q.blur();res.style.display="none";this.next();return true};
+  const find=()=>{const s=q.value.trim();if(!s)return null;const exact=DIRP.find(v=>v.name.toLowerCase()==s.toLowerCase());if(exact)return exact;const m=matches(s);if(m.length)return m[0].p;return DIRP.find(v=>mt(v.name,s.toLowerCase()))||null};
+  this.on(q,"keydown",e=>{if(e.key!="Enter")return;e.preventDefault();const v=find();if(!go(v)){hap(30);this.card("top","Hmm, no one by that name","Check the spelling, or try just a first and last name, like “Mendel Plotkin”.",{})}});
+  this.on(res,"click",e=>{const r=e.target.closest(".r[data-i]");if(!r||!res._items)return;const it=res._items[+r.dataset.i];if(!it)return;e.stopImmediatePropagation();
+   let v=it.dir||it.saved?it.v:null;if(!v&&it.yesh){const g=it.g;v=DIRP.find(x=>x.city==g.city&&!saved.some(y=>y.name==x.name&&y.city==x.city))||DIRP.find(x=>x.city==g.city)}
+   if(!v)v=find();go(v)},true)},
+ // 3. fly there, open the yeshiva, pulse his Save button
+ s2(){const v=this.who,g=DIRG.find(x=>x.city==v.city);if(!g){this.next();return}
+  auto=false;fly(g.lon,g.lat,1500);zoomT=7;sheet.style.display="none";
+  const first=v.name.split(" ")[0];
+  this.card("top","Here’s "+esc(v.city),"Flying you there…",{});
+  this.t(()=>{showSheet([g]);this.pass();
+   const mark=()=>{const b=sheet.querySelector('[data-n="'+v.name.replace(/"/g,'\\"')+'"]');if(!b)return;const isSaved=saved.some(x=>x.name==v.name&&x.city==v.city);
+    if(isSaved){this.next();return}if(!b.classList.contains("tpulse")){document.querySelectorAll(".tpulse").forEach(e=>e.classList.remove("tpulse"));b.classList.add("tpulse");b.closest(".r").scrollIntoView({block:"center",behavior:"smooth"})}};
+   if(saved.some(x=>x.name==v.name&&x.city==v.city)){this.card("top",esc(first)+" is already saved","He’s already in your list. Let’s go see it.",{next:"Next"});return}
+   this.card("top","Save "+esc(first),"This is "+esc(v.city)+", with everyone who learns there. Tap the glowing <b>Save</b> next to "+esc(v.name)+" to add him to your list.",{});
+   mark();this.every(mark,300)},1300)},
+ // 4. go to your list (the cards button)
+ s3(){hap([12,40,12]);this.pass();this.t(()=>{sheet.style.display="none"},700);const b=$("gb");b.style.display="grid";this.pulse(b);
+  this.card("top","Saved! Now open your list","Tap the glowing button at the top right to see everyone you’ve saved.",{});
+  this.every(()=>{if(view=="cards")this.next()},200)},
+ // 5. the list
+ s4(){sheet.style.display="none";
+  this.card("bot","This is your list","Everyone you save lives here, sorted so the best people to call right now are on top. Tap a place for <b>Call</b> and <b>WhatsApp</b>, and tap ☆ to make someone a favourite.",{next:"Next"})},
+ // 6. back to the globe
+ s5(){this.pass();this.pulse($("gb"));
+  this.card("top","Find more people","Tap the glowing globe button to go back to the world and save more friends.",{});
+  this.every(()=>{if(view!="cards")this.next()},200)},
+ // 7. done
+ s6(){const app=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+  this.card("bot","You’re all set","Search, save, call. That’s it."+(app?" Tip: open ☰ → <b>Add widgets to my home screen</b> to see who’s up without opening the app.":""),{next:"Got it",last:1})},
+ end(){this.clear();document.body.classList.remove("tour");$("tc").innerHTML="";lsSet("sc_tour","1");zoomT=1;auto=true;setView(saved.length?"cards":"world")}};
+$("tour").addEventListener("click",e=>{if(e.target.closest("#tk"))tour.end();else if(e.target.closest("#tn")){if(tour.i>=6)tour.end();else tour.next()}});
 $("tr").onclick=()=>{open(false);tour.show()};
 function welcome(){if(lsGet("sc_tour"))return;tour.show()}
 function removeSaved(id){const i=saved.findIndex(v=>v.id==id);if(i<0)return;const v=saved.splice(i,1)[0];persist();hap(25);render();commit();toast("Removed "+(v.name||v.city),()=>{saved.splice(Math.min(i,saved.length),0,v);persist();render();commit()})}
