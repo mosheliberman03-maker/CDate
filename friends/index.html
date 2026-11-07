@@ -1073,7 +1073,7 @@ sync()})();
 // ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
 // Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=15,KIT_APK=1;
+const KIT_VER=16,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1086,7 +1086,7 @@ const KIT_LOG=[
  {v:9,t:"Easier sign-up: name suggestions as you type, and your number fills in if we have it"},
  {v:10,t:"Some names now spelled the way people write them"},
  {v:12,big:1,t:"New people and places",d:"New people and places were added from the official shlichus list, and some names were corrected. Your saved list updates by itself."},
- {v:15,t:"A new opening: shooting stars between friends who saved each other"}
+ {v:15,t:"Shooting stars on the globe between friends who saved each other"}
 ];
 const kitIsApp=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const kitSeenKey=()=>"kit_seen_"+(me&&me.match?slug(pkey(me.match.name,me.match.city)):"x");
@@ -1188,26 +1188,27 @@ function shootPairs(){const seen=new Set(),P0=[];[...kitLinks,...myLinks()].forE
  for(let i=P0.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[P0[i],P0[j]]=[P0[j],P0[i]]}return P0}
 const v3=(lon,lat)=>{const l=lon*D,f=lat*D;return[Math.cos(f)*Math.sin(l),Math.sin(f),Math.cos(f)*Math.cos(l)]};
 function shootStart(){if(SHOOT.on||matchMedia("(prefers-reduced-motion: reduce)").matches)return;SHOOT.pairs=shootPairs();
- SHOOT.fill=[...new Set(Object.keys(phones).map(k=>k.split("|").slice(1).join("|")))].map(cityLL).filter(Boolean);if(SHOOT.fill.length<4)SHOOT.fill=DIRG.map(g=>[g.lon,g.lat]);SHOOT.on=true;SHOOT.t0=performance.now();SHOOT.next=SHOOT.t0+350;SHOOT.arcs=[];SHOOT.fired=0;auto=true}
+ SHOOT.fill=[...new Set(Object.keys(phones).map(k=>k.split("|").slice(1).join("|")))].map(cityLL).filter(Boolean);if(SHOOT.fill.length<4)SHOOT.fill=DIRG.map(g=>[g.lon,g.lat]);
+ SHOOT.on=true;SHOOT.next=performance.now()+600;SHOOT.arcs=[]}
 // a point on the arc between A and B (unit vectors) at fraction u, lifted off the surface, projected like P()
 function arcPt(a,b,om,u,lift){const s=Math.sin(om),k1=Math.sin((1-u)*om)/s,k2=Math.sin(u*om)/s;let x=a[0]*k1+b[0]*k2,y=a[1]*k1+b[1]*k2,z=a[2]*k1+b[2]*k2;
  const h=1+lift*Math.sin(Math.PI*u);const lon=Math.atan2(x,z)/D,lat=Math.asin(Math.max(-1,Math.min(1,y)))/D;
  const l=(lon+rv[0])*D,f=lat*D,al=rv[1]*D,X=Math.cos(f)*Math.sin(l),Y=Math.sin(f),Z=Math.cos(f)*Math.cos(l),yy=Y*Math.cos(al)+Z*Math.sin(al),zz=-Y*Math.sin(al)+Z*Math.cos(al);
  const vis=zz>0||Math.hypot(X,yy)*h>1.002;return[cx+R*h*X,cy-R*h*yy,vis,zz]}
-function shootDraw(){const now=performance.now(),el=now-SHOOT.t0;rot[0]+=.1; // a little extra spin while the stars fly
- if(el<SHOOT.dur&&now>=SHOOT.next){
-  // only links whose both ends face us right now (so no star flies off behind the globe); reuse links if we run out
-  let pick=-1;const free=SHOOT.pairs.filter(p=>!p.used);if(!free.length)SHOOT.pairs.forEach(p=>p.used=0);
-  for(let i=0;i<SHOOT.pairs.length;i++){const p=SHOOT.pairs[i];if(p.used)continue;const A=P(p[0][0],p[0][1]),B=P(p[1][0],p[1][1]);if(A[2]>.1&&B[2]>.18){pick=i;break}}
-  if(pick<0){// nothing real is facing us right now: keep the rhythm with two yeshivas on this side that have reachable people
-   const vis=SHOOT.fill.filter(c=>P(c[0],c[1])[2]>.15);if(vis.length>1){const A=vis[Math.floor(Math.random()*vis.length)];let B=vis[Math.floor(Math.random()*vis.length)];if(B!=A&&(Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1]))>4){SHOOT.pairs.push([A,B]);pick=SHOOT.pairs.length-1}}}
-  if(pick>=0){const p=SHOOT.pairs[pick];p.used=1;SHOOT.fired++;const a=v3(p[0][0],p[0][1]),b=v3(p[1][0],p[1][1]),om=Math.acos(Math.max(-1,Math.min(1,a[0]*b[0]+a[1]*b[1]+a[2]*b[2])));
-   SHOOT.arcs.push({a,b,om,lift:Math.min(.16,.035+om*.1),t0:now,d:1400+om*380,dest:p[1]});SHOOT.next=now+380+Math.random()*420}
-  else SHOOT.next=now+120}
+function shootDraw(){const now=performance.now();
+ // always running on the globe view (owner): at most 3 stars at once, unhurried, to anywhere in the world (behind the globe too)
+ const canSpawn=view!="cards"&&!su&&zoom<2.2&&!document.hidden;
+ if(canSpawn&&now>=SHOOT.next&&SHOOT.arcs.length<3){
+  if(!SHOOT.pairs.length||SHOOT.pairs.every(p=>p.used)){SHOOT.pairs=shootPairs();SHOOT.pairs.forEach(p=>p.used=0)}
+  let p=SHOOT.pairs.find(q=>!q.used);
+  if(!p&&SHOOT.fill.length>1){const A=SHOOT.fill[Math.floor(Math.random()*SHOOT.fill.length)],B=SHOOT.fill[Math.floor(Math.random()*SHOOT.fill.length)];if(A!=B&&(Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1]))>4)p=[A,B]}
+  if(p){p.used=1;const a=v3(p[0][0],p[0][1]),b=v3(p[1][0],p[1][1]),om=Math.acos(Math.max(-1,Math.min(1,a[0]*b[0]+a[1]*b[1]+a[2]*b[2])));
+   SHOOT.arcs.push({a,b,om,lift:Math.min(.16,.035+om*.1),t0:now,d:2600+om*800,dest:p[1]})}
+  SHOOT.next=now+900+Math.random()*900}
  ctx.save();ctx.globalCompositeOperation="lighter";ctx.lineCap="round";ctx.lineJoin="round";
  const ease=x=>x<0?0:x>1?1:1-Math.pow(1-x,2.2);   // fast launch, gentle arrival
  SHOOT.arcs=SHOOT.arcs.filter(A=>{const k=(now-A.t0)/A.d;if(k>1.4)return false;
-  const head=ease(k),tail=ease(k-.34);              // the tail keeps coming after the head lands: it "drags in"
+  const head=ease(k),tail=ease(k-.38);              // the tail keeps coming after the head lands: it "drags in"
   if(head-tail<.002)return true;
   const N=30,pts=[];for(let i=0;i<=N;i++)pts.push(arcPt(A.a,A.b,A.om,tail+(head-tail)*i/N,A.lift));
   const h=pts[N],t=pts[0];
@@ -1220,8 +1221,8 @@ function shootDraw(){const now=performance.now(),el=now-SHOOT.t0;rot[0]+=.1; // 
   if(k>.95){const q=Math.min(1,(k-.95)/.45),d=P(A.dest[0],A.dest[1]);if(d[2]>0){const r=4+q*14,g=ctx.createRadialGradient(d[0],d[1],0,d[0],d[1],r);g.addColorStop(0,"rgba(190,232,255,"+((1-q)*.55).toFixed(3)+")");g.addColorStop(1,"rgba(150,215,255,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(d[0],d[1],r,0,7);ctx.fill()}}
   return true});
  ctx.restore();
- if(el>SHOOT.dur&&!SHOOT.arcs.length)SHOOT.on=false}
+}
 // play it when the app opens (signed in, globe showing, not during the tour)
-function shootMaybe(){if(su||!me||document.body.classList.contains("tour")||view=="cards")return;shootStart()}
-(async()=>{const t0=Date.now();await Promise.race([linksLoad(),new Promise(r=>setTimeout(r,1200))]);setTimeout(shootMaybe,Math.max(0,700-(Date.now()-t0)));linksPush()})();
+function shootMaybe(){shootStart()}
+(async()=>{const t0=Date.now();await Promise.race([linksLoad(),new Promise(r=>setTimeout(r,1200))]);setTimeout(shootMaybe,Math.max(0,700-(Date.now()-t0)));linksPush();setInterval(()=>{if(!document.hidden)linksLoad()},5*60000)})();
 </script></body></html>
