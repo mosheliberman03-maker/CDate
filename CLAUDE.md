@@ -1,6 +1,7 @@
 # CDate: Chabad Calendar (notes for Claude)
 
 This repository is a hosted web app: a Chabad/Jewish calendar that is installed on the owner's phone (Pixel 6 Pro, Android) from GitHub Pages and sends push reminders. The owner works **from a phone only** and is not a programmer. Explain things in plain words, one step at a time, and do the git work yourself.
+- **Links (owner's standing rule): always send every link in a text box (a code block), on its own line, so it can be copied easily on the phone.**
 
 - Live site: https://mosheliberman03-maker.github.io/CDate/ (GitHub Pages, `main` branch, root folder)
 - Push server: https://cdate-push.mosheliberman03.workers.dev (Cloudflare Worker named `cdate-push`, source in `server/worker.js`)
