@@ -97,6 +97,31 @@ async function handle(req, env) {
       return new Response(r.body, { status: r.status, headers: { ...H, 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
     } catch (e) { return j({ error: 'sefaria unreachable' }, 502); }
   }
+  // "Keep in Touch" friends app (/CDate/friends/ and its Android app): the shared list of phone numbers and
+  // sign-in codes (salted hashes only). One KV key per collection; a few dozen people, so a whole-list read is cheap.
+  if (p.startsWith('/kit/')) {
+    if (!ALLOW.includes(originOf(req))) return j({ error: 'This request did not come from the Keep in Touch app.' }, 403);
+    const [, , col, op] = p.split('/');
+    const SPEC = { phones3: { k: 200, p: 32 }, accounts3: { k: 200, salt: 64, h: 128 } };
+    const spec = SPEC[col];
+    if (!spec) return j({ error: 'not found' }, 404);
+    const key = 'kit:' + col;
+    const all = (await env.KV.get(key, 'json')) || {};
+    if (req.method === 'GET' && !op) return j({ docs: all });
+    if (req.method !== 'POST' || (op !== 'set' && op !== 'del')) return j({ error: 'not found' }, 404);
+    let b; try { b = await req.json(); } catch (e) { return j({ error: 'bad json' }, 400); }
+    const id = clip(b && b.id, 140);
+    if (!id || !/^[a-z0-9_]+$/.test(id)) return j({ error: 'bad id' }, 400);
+    if (op === 'del') delete all[id];
+    else {
+      const d = b.data || {}, clean = {};
+      for (const f of Object.keys(spec)) { if (typeof d[f] !== 'string' || !d[f] || d[f].length > spec[f]) return j({ error: 'bad ' + f }, 400); clean[f] = d[f]; }
+      if (!all[id] && Object.keys(all).length >= 2000) return j({ error: 'full' }, 507);
+      all[id] = clean;
+    }
+    await env.KV.put(key, JSON.stringify(all));
+    return j({ ok: true });
+  }
   if (req.method !== 'POST') return j({ error: 'not found' }, 404);
   let b; try { b = await req.json(); } catch (e) { return j({ error: 'bad json' }, 400); }
   const sub = b && b.sub;

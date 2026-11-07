@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kit_who_desc">Who’s up now: your friends sorted by who is awake, with Call and WhatsApp buttons. Filter and sort on the widget.</string>
+    <string name="kit_best_desc">Call now: how many friends are up, and the 3 best to call this minute.</string>
+</resources>

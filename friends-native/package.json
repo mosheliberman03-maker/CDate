@@ -1,0 +1,14 @@
+{
+  "name": "keepintouch-native",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Android wrapper for Shluchim Keep in Touch: home-screen widgets showing which friends are awake, with one-tap calling.",
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/app": "^6.0.0"
+  }
+}

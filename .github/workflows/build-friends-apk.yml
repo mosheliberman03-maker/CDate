@@ -1,0 +1,86 @@
+name: Build Keep in Touch APK
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+      - claude/friends-availability-app-widgets-6q88f6
+    paths:
+      - 'friends-native/**'
+      - '.github/workflows/build-friends-apk.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: friends-native
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Capacitor
+        run: npm install
+
+      - name: Generate the Android project
+        run: npx cap add android
+
+      - name: Generate the app icon
+        run: |
+          npm i -D @capacitor/assets@3
+          npx capacitor-assets generate --android --iconBackgroundColor '#04060f' --iconBackgroundColorDark '#04060f' --splashBackgroundColor '#04060f' --splashBackgroundColorDark '#04060f'
+
+      - name: Add the home-screen widgets and the signing key
+        run: node patch-android.js
+
+      - name: Sync web assets and plugins
+        run: npx cap sync android
+
+      - name: Build the debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Rename the APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk KeepInTouch.apk
+
+      - name: Check the APK is signed with the permanent key (otherwise phones refuse the update)
+        run: |
+          WANT=$(keytool -list -v -keystore ../native/cdate-debug.keystore -storepass android -alias androiddebugkey | grep 'SHA256:' | awk '{print $2}')
+          GOT=$($ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)/apksigner verify --print-certs KeepInTouch.apk | grep 'SHA-256 digest' | head -1 | awk '{print $NF}' | tr a-f A-F | sed 's/../&:/g;s/:$//')
+          echo "want $WANT"; echo "got  $GOT"
+          [ "$WANT" = "$GOT" ]
+
+      - name: Upload the APK as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: KeepInTouch-apk
+          path: friends-native/KeepInTouch.apk
+
+      - name: Publish the APK to a stable download link
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: friends-apk-latest
+          name: Latest Keep in Touch app
+          body: |
+            The newest build of the Shluchim Keep in Touch Android app (with home-screen widgets).
+            On your phone, download KeepInTouch.apk below and tap it to install.
+            (Android will ask once to allow installing from your browser.)
+          files: friends-native/KeepInTouch.apk
+          fail_on_unmatched_files: true

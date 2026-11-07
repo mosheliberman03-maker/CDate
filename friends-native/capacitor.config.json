@@ -1,0 +1,13 @@
+{
+  "appId": "com.mosheliberman.keepintouch",
+  "appName": "Keep in Touch",
+  "webDir": "www",
+  "server": {
+    "url": "https://mosheliberman03-maker.github.io/CDate/friends/",
+    "cleartext": false,
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
