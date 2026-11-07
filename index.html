@@ -256,7 +256,7 @@ body.om #ms .lbl{display:none}
 @media(max-height:650px){body.om #ms .cal{height:calc(100dvh - 165px);max-height:calc(100dvh - 165px)}body.om #ms .day{padding:4px 3px;gap:4px}body.om #ms .top{gap:3px}}
 
 /* Calendar assistant: isolated UI layer, separate from the daily-view renderer. */
-.ai-fab{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:calc(82px + env(safe-area-inset-bottom,0px));z-index:18;width:58px;height:58px;border:0;border-radius:50%;background:var(--ink);color:var(--card);font:400 31px/1 Figtree,system-ui;box-shadow:0 8px 28px #0003;display:grid;place-items:center;cursor:pointer;transition:transform .2s,box-shadow .2s}.ai-fab:active{transform:scale(.93)}
+.ai-fab{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:calc(82px + env(safe-area-inset-bottom,0px));z-index:18;width:58px;height:58px;border:0;border-radius:50%;background:var(--ink);color:var(--card);font:400 31px/1 Figtree,system-ui;box-shadow:0 8px 28px #0003;display:grid;place-items:center;cursor:pointer;transition:transform .2s,box-shadow .2s}.ai-fab:active{scale:.93}#skyBody.anim{animation:none!important}
 .ai-backdrop{position:fixed;inset:0;z-index:80;background:#090b18a8;backdrop-filter:blur(7px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}.ai-backdrop.on{opacity:1;pointer-events:auto}.ai-card{width:min(100%,540px);max-height:min(82dvh,760px);overflow:auto;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:25px;padding:20px;box-shadow:0 24px 90px #0004;transform:translateY(20px);transition:transform .25s}.ai-backdrop.on .ai-card{transform:none}.ai-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.ai-head h2{font:500 25px/1.1 'Frank Ruhl Libre',Georgia,serif;margin:0}.ai-close{border:1px solid var(--line);background:transparent;color:inherit;border-radius:50%;width:38px;height:38px;font-size:23px}.ai-hint{color:var(--mut);font-size:13px;margin:0 0 12px}.ai-input{width:100%;box-sizing:border-box;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:14px;font:inherit;min-height:112px;resize:vertical}.ai-actions{display:flex;gap:9px;margin-top:10px}.ai-actions button,.ai-confirm button{border:1px solid var(--line);border-radius:13px;padding:11px 14px;background:var(--bg);color:var(--ink);font:600 14px Figtree,system-ui;cursor:pointer}.ai-actions .ai-primary,.ai-confirm .ai-yes{background:var(--ink);color:var(--card);border-color:var(--ink)}.ai-mic{min-width:48px;font-size:19px!important}.ai-choices{display:flex;flex-direction:column;gap:8px;margin-top:12px}.ai-choices button{border:1px solid var(--line);border-radius:13px;padding:11px 14px;background:var(--bg);color:var(--ink);font:600 14px Figtree,system-ui;cursor:pointer;text-align:left}.ai-choices .ai-yes{background:var(--ink);color:var(--card);border-color:var(--ink)}.ai-undo{border:1px solid var(--line);border-radius:13px;padding:9px 14px;background:var(--bg);color:var(--ink);font:600 14px Figtree,system-ui;cursor:pointer;margin:0 0 8px}.ai-undo[hidden]{display:none}.ai-lang{border:1px solid var(--line);border-radius:13px;background:var(--bg);color:var(--ink);font:600 13px Figtree,system-ui;padding:0 8px}.ai-mic.rec{background:#c0392b!important;color:#fff!important;border-color:#c0392b!important;animation:aiPulse 1.2s ease-in-out infinite}@keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 #c0392b66}50%{box-shadow:0 0 0 9px #c0392b00}}@media(prefers-reduced-motion:reduce){.ai-mic.rec{animation:none}}.ai-status{min-height:20px;color:var(--mut);font-size:13px;margin:10px 0}.ai-preview{display:none;border:1px solid var(--line);border-radius:17px;padding:15px;margin-top:12px;background:color-mix(in srgb,var(--ct) 5%,var(--card))}.ai-preview.show{display:block}.ai-preview h3{font:500 22px 'Frank Ruhl Libre',Georgia,serif;margin:0 0 5px}.ai-preview p{margin:5px 0;color:var(--mut);font-size:14px}.ai-confirm{display:flex;gap:9px;margin-top:13px}.ai-confirm button{flex:1}.ai-multi{display:none}.ai-multi.show{display:block}.ai-mhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-size:13px;color:var(--mut)}.ai-mhead button{border:1px solid var(--ink);border-radius:13px;padding:9px 13px;background:var(--ink);color:var(--card);font:600 14px Figtree,system-ui;cursor:pointer;flex:none}.ai-mcard{margin-top:10px}.ai-msrc{font-size:12px;color:var(--mut);margin:0 0 6px;overflow-wrap:anywhere}.ai-mcard .ai-confirm{gap:7px}.ai-mcard .ai-confirm button{padding:10px 8px}.ai-mwarn{color:var(--ink)!important;font-weight:600}.ai-mstate{font-weight:600;color:var(--ink)!important;margin-top:8px!important}.ai-mdone{opacity:.62}.ai-memory{border-top:1px solid var(--line);margin-top:15px;padding-top:12px;font-size:12px;color:var(--mut)}.ai-memory button{border:0;background:none;color:var(--ct);font:inherit;text-decoration:underline;padding:0;cursor:pointer}
 @media(min-width:700px){.ai-backdrop{align-items:center}.ai-fab{bottom:28px}}
 /* Device-local profiles: each username gets its own schedule on this browser. */
@@ -653,7 +653,10 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 /* each piece floats on its own clock and sits at its own depth when you scroll; pure CSS so the browser runs it off the main thread */
 @keyframes flY{from{translate:0 calc(var(--fa) * -1)}to{translate:0 var(--fa)}}
 @keyframes flX{from{translate:calc(var(--fa) * -.45) 0}to{translate:calc(var(--fa) * .45) 0}}
-@keyframes flP{from{translate:0 0}to{translate:0 calc(var(--pd) * 1000px)}}
+/* perf (v32): one float animation per piece (flY+flX stacked with animation-composition:add ran on the main thread every frame);
+   scroll depth moved to `transform` so it no longer stacks on `translate` either. Both now run on the compositor. */
+@keyframes flXY{0.0%{translate:calc(var(--fa) * 0.254) calc(var(--fa) * -1.000)}8.33%{translate:calc(var(--fa) * 0.449) calc(var(--fa) * -0.866)}16.67%{translate:calc(var(--fa) * 0.195) calc(var(--fa) * -0.500)}25.0%{translate:calc(var(--fa) * -0.254) calc(var(--fa) * -0.000)}33.33%{translate:calc(var(--fa) * -0.449) calc(var(--fa) * 0.500)}41.67%{translate:calc(var(--fa) * -0.195) calc(var(--fa) * 0.866)}50.0%{translate:calc(var(--fa) * 0.254) calc(var(--fa) * 1.000)}58.33%{translate:calc(var(--fa) * 0.449) calc(var(--fa) * 0.866)}66.67%{translate:calc(var(--fa) * 0.195) calc(var(--fa) * 0.500)}75.0%{translate:calc(var(--fa) * -0.254) calc(var(--fa) * 0.000)}83.33%{translate:calc(var(--fa) * -0.449) calc(var(--fa) * -0.500)}91.67%{translate:calc(var(--fa) * -0.195) calc(var(--fa) * -0.866)}100.0%{translate:calc(var(--fa) * 0.254) calc(var(--fa) * -1.000)}}
+@keyframes flP{from{transform:none}to{transform:translateY(calc(var(--pd) * 1000px))}}
 #skyBody,#skyTrailC{--fa:4px;--fy:9.2s;--fx:13.6s;--fd:-3.1s;--pd:.2}
 #hdr .sky-scene::after{--fa:3px;--fy:11.4s;--fx:7.8s;--fd:-6.2s;--pd:.1}
 #hdr .sky-scene::before{--fa:3px;--fy:11.4s;--fx:7.8s;--fd:-6.2s}
@@ -664,11 +667,11 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #hdr .wk{--fa:2.2px;--fy:9.7s;--fx:11.9s;--fd:-7.4s;--pd:-.015}
 .ai-fab{--fa:2.4px;--fy:8.1s;--fx:12.3s;--fd:-2.2s;--pd:0}
 
-#skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate;animation-composition:replace,add}
-:is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:rv .75s cubic-bezier(.2,.8,.2,1) calc(var(--i,0)*70ms) backwards,flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate;animation-composition:replace,replace,add}
+#skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab{animation:flXY calc(var(--fy) * 2) linear var(--fd) infinite;animation-composition:replace}
+:is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:rv .75s cubic-bezier(.2,.8,.2,1) calc(var(--i,0)*70ms) backwards,flXY calc(var(--fy) * 2) linear var(--fd) infinite;animation-composition:replace,replace}
 @supports (animation-timeline:scroll()){
- #skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both;animation-timeline:auto,auto,scroll(root block);animation-range:normal,normal,0px 1000px;animation-composition:replace,add,add}
- :is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:rv .75s cubic-bezier(.2,.8,.2,1) calc(var(--i,0)*70ms) backwards,flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both;animation-timeline:auto,auto,auto,scroll(root block);animation-range:normal,normal,normal,0px 1000px;animation-composition:replace,replace,add,add}}
+ #skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab{animation:flXY calc(var(--fy) * 2) linear var(--fd) infinite,flP 1s linear both;animation-timeline:auto,scroll(root block);animation-range:normal,0px 1000px;animation-composition:replace,replace}
+ :is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:rv .75s cubic-bezier(.2,.8,.2,1) calc(var(--i,0)*70ms) backwards,flXY calc(var(--fy) * 2) linear var(--fd) infinite,flP 1s linear both;animation-timeline:auto,auto,scroll(root block);animation-range:normal,normal,0px 1000px;animation-composition:replace,replace,add}}
 .cc-away :is(#skyBody,#skyTrailC,.sky-cap,#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk),.cc-away #hdr .sky-scene::after,.cc-away #hdr .sky-scene::before{animation-play-state:paused!important}
 /* the semicircle swivels as you scroll down: it is the top half of a true circle, so turning it clockwise around the circle's centre keeps every
    point on the same circle (nothing rises above its top); it turns, whole, into a backwards C, then keeps turning while it is eaten away from its lower end */
@@ -676,8 +679,8 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 @keyframes dmW{0%{rotate:var(--dma,0deg);--dl:180deg}50%{rotate:calc(var(--dma,0deg) + 90deg);--dl:180deg}100%{rotate:calc(var(--dma,0deg) + 180deg);--dl:0deg}}
 #hdr .sky-scene::after{rotate:var(--dma,0deg);transition:rotate .9s ease,left .9s ease,top .9s ease}
 @supports (animation-timeline:scroll()){
- #hdr .sky-scene::after{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,flP 1s linear both,dmW 1s linear both;animation-timeline:auto,auto,scroll(root block),scroll(root block);animation-range:normal,normal,0px 1000px,0px 380px;animation-composition:replace,add,add,replace}
- #hdr .sky-scene::before{animation:flY var(--fy) ease-in-out var(--fd) infinite alternate,flX var(--fx) ease-in-out var(--fd) infinite alternate,domeBreath 7.5s ease-in-out infinite,domeTurn 1s linear both;animation-timeline:auto,auto,auto,scroll(root block);animation-range:normal,normal,normal,0px 300px;animation-composition:add,add,replace,replace}}
+ #hdr .sky-scene::after{animation:flXY calc(var(--fy) * 2) linear var(--fd) infinite,flP 1s linear both,dmW 1s linear both;animation-timeline:auto,scroll(root block),scroll(root block);animation-range:normal,0px 1000px,0px 380px;animation-composition:replace,replace,replace}
+ #hdr .sky-scene::before{animation:flXY calc(var(--fy) * 2) linear var(--fd) infinite,domeBreath 7.5s ease-in-out infinite,domeTurn 1s linear both;animation-timeline:auto,auto,scroll(root block);animation-range:normal,normal,0px 300px;animation-composition:replace,replace,replace}}
 @media(prefers-reduced-motion:reduce){#skyBody,#skyTrailC,#hdr .sky-scene::after,.sky-cap,.ai-fab,.dock,#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk,:is(#hdr .hd-he,#hdr .hd-div,#hdr .hd-en,#hdr .wk).rv.in{animation:none!important}}
 /* event labels at the bottom: one tidy row that scrolls sideways, never stacked over the week panel */
 .foot .chips2{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;justify-content:safe center;padding:3px 12px;margin:0 -12px;
@@ -691,8 +694,8 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #hdr.sky-side .hd-big{display:flex;flex-direction:column;align-items:center;font-size:min(31vw,16.5vh,150px);line-height:.98;letter-spacing:-.01em}
 #hdr.sky-side .hd-big>span{display:block;white-space:nowrap}
 #hdr.sky-side .hd-m{font-size:.86em;max-width:94vw}
-:root.tt-off-dome #hdr .sky-scene::after{animation-name:flY,flX,flP,none!important}
-:root.tt-off-dome #hdr .sky-scene::before{animation-name:flY,flX,domeBreath,none!important}
+:root.tt-off-dome #hdr .sky-scene::after{animation-name:flXY,flP,none!important}
+:root.tt-off-dome #hdr .sky-scene::before{animation-name:flXY,domeBreath,none!important}
 .sky-cap2{display:none}
 :root:not(.tt-off-capdate) #hdr.sky-side .sky-cap{display:none}
 :root.tt-off-capdate .sky-cap2{display:none!important}
@@ -1905,10 +1908,10 @@ function artMoonBase(){
  return ART_MOON={A,Hh}}
 /* Realistic moon: a lunar photo-map (assets/moon-disc.jpg, the near side projected onto a sphere) lit by the real phase. */
 let MOON_PX=null;const MOON_PC={};
-(function(){const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.drawImage(im,0,0);MOON_PX={N:c.width,d:g.getImageData(0,0,c.width,c.height).data};
+(function(){const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);MOON_PX={N:c.width,d:g.getImageData(0,0,c.width,c.height).data};
  for(const k in ART_MC)delete ART_MC[k];document.querySelectorAll('img.mimg').forEach(e=>{e.src=artMoonUrl(+e.dataset.f)});const b=document.getElementById('skyBody');if(b)b.dataset.key=''}catch(e){}};im.src='assets/moon-disc.jpg'})();
-function artMoonPhoto(f){const day=document.documentElement.dataset.theme==='light',key=Math.round(f*120)+(day?'d':'');if(MOON_PC[key])return MOON_PC[key];const{N,d}=MOON_PX,C=(N-1)/2,R=N*.4773,c=document.createElement('canvas');c.width=c.height=N;
- const g=c.getContext('2d'),img=g.createImageData(N,N),D=img.data,al=2*Math.PI*(Math.round(f*120)/120),Lx=Math.sin(al),Lz=-Math.cos(al),illum=(1-Math.cos(al))/2,es=.05*(1-illum)+.012;
+function artMoonPhoto(f){const day=document.documentElement.dataset.theme==='light',key=Math.round(f*120)+(day?'d':'');if(MOON_PC[key])return MOON_PC[key];{const ks=Object.keys(MOON_PC);if(ks.length>10)ks.forEach(k=>delete MOON_PC[k])}const{N,d}=MOON_PX,C=(N-1)/2,R=N*.4773,c=document.createElement('canvas');c.width=c.height=N;
+ const g=c.getContext('2d',{willReadFrequently:true}),img=g.createImageData(N,N),D=img.data,al=2*Math.PI*(Math.round(f*120)/120),Lx=Math.sin(al),Lz=-Math.cos(al),illum=(1-Math.cos(al))/2,es=.05*(1-illum)+.012;
  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=(i-C)/R,y=(j-C)/R,r2=x*x+y*y,o=(j*N+i)*4;if(r2>1.01)continue;
   const rr=Math.sqrt(r2),nz=Math.sqrt(Math.max(0,1-r2)),a=d[o]/255,mu=x*Lx+nz*Lz;
   let I=0;if(mu>0)I=a*2*mu/(mu+nz+.04);I*=artSm(-.015,.09,mu);I=Math.min(1.08,Math.pow(I*1.06,.92));
@@ -1917,8 +1920,8 @@ function artMoonPhoto(f){const day=document.documentElement.dataset.theme==='lig
  g.putImageData(img,0,0);return MOON_PC[key]=c}
 const ART_MCV={};function artMoonCanvas(f){
  if(MOON_PX)return artMoonPhoto(f);
- const key=Math.round(f*120);if(ART_MCV[key])return ART_MCV[key];
-const{A,Hh}=artMoonBase(),N=ART_N,c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d'),img=g.createImageData(N,N),D=img.data,
+ const key=Math.round(f*120);if(ART_MCV[key])return ART_MCV[key];{const ks=Object.keys(ART_MCV);if(ks.length>10)ks.forEach(k=>delete ART_MCV[k])}
+const{A,Hh}=artMoonBase(),N=ART_N,c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d',{willReadFrequently:true}),img=g.createImageData(N,N),D=img.data,
  al=2*Math.PI*(key/120),Lx=Math.sin(al),Lz=-Math.cos(al),illum=(1-Math.cos(al))/2;
  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=(i-ART_C+.5)/ART_R,y=(j-ART_C+.5)/ART_R,r=Math.hypot(x,y),o=(j*N+i)*4;let R=0,G=0,B=0,al_=0;
   if(r<1.02){const z=Math.sqrt(Math.max(0,1-r*r)),k=j*N+i,gx=(i<N-1?Hh[k+1]:Hh[k])-(i>0?Hh[k-1]:Hh[k]),gy=(j<N-1?Hh[k+N]:Hh[k])-(j>0?Hh[k-N]:Hh[k]),S=5.2;
@@ -1932,7 +1935,15 @@ const{A,Hh}=artMoonBase(),N=ART_N,c=document.createElement('canvas');c.width=c.h
   if(al_<1&&glow>0){const ga=glow*(1-al_);R=(R*al_+246*ga)/(al_+ga||1);G=(G*al_+238*ga)/(al_+ga||1);B=(B*al_+205*ga)/(al_+ga||1);al_=al_+ga}
   D[o]=R;D[o+1]=G;D[o+2]=B;D[o+3]=Math.min(255,al_*255)}
  g.putImageData(img,0,0);return ART_MCV[key]=c}
-function artMoonUrl(f){const key=Math.round(f*120)+(MOON_PX?'p':'')+(document.documentElement.dataset.theme==='light'?'d':'');if(ART_MC[key])return ART_MC[key];return ART_MC[key]=artMoonCanvas(f).toDataURL('image/png')}
+function artMoonUrl(f){const key=Math.round(f*120)+(MOON_PX?'p':'')+(document.documentElement.dataset.theme==='light'?'d':'');if(ART_MC[key])return ART_MC[key];{/* perf (v32): keep at most ~16 moon images (each phase used to stay in memory forever) */const ks=Object.keys(ART_MC).filter(k=>!/^s/.test(k));if(ks.length>16)ks.forEach(k=>delete ART_MC[k])}return ART_MC[key]=artMoonCanvas(f).toDataURL('image/png')}
+/* perf (v32): changing days shouldn't wait for a new moon picture. Use the nearest phase already drawn (a day's difference is invisible at this size),
+   draw the exact one when the phone is idle, then swap it in. */
+let MQ=null;function artMoonUrlSoon(f){const sfx=(MOON_PX?'p':'')+(document.documentElement.dataset.theme==='light'?'d':''),k=Math.round(f*120),key=k+sfx;if(ART_MC[key])return ART_MC[key];
+ let best=null,bd=9;for(const kk in ART_MC){const m=/^(\d+)(\D*)$/.exec(kk);if(!m||m[2]!==sfx)continue;const d=Math.min(Math.abs(+m[1]-k),120-Math.abs(+m[1]-k));if(d<bd){bd=d;best=kk}}
+ if(!best)return artMoonUrl(f);
+ const first=!MQ;MQ=MQ||new Map();MQ.set(key,f);if(first){const ric=window.requestIdleCallback||(fn=>setTimeout(fn,120));ric(()=>{const q=MQ;MQ=null;
+  for(const [,ff] of q){const kk=Math.round(ff*120),u=artMoonUrl(ff);document.querySelectorAll('img.mimg').forEach(i=>{if(Math.round(+i.dataset.f*120)===kk&&i.getAttribute('src')!==u)i.src=u})}},{timeout:400})}
+ return ART_MC[best]}
 /* sun texture: everything that does not depend on how low the sun is (noise, halo, edge) is computed once; each colour variant then only mixes colours */
 let ART_SF=null;const ART_SCV={};
 function artSunFieldRows(n){
@@ -1946,7 +1957,7 @@ function artSunFieldRows(n){
  return S.row>=N}
 function artSunField(){while(!artSunFieldRows(64));return ART_SF.F}
 function artSunCanvasKey(key){
- if(ART_SCV[key])return ART_SCV[key];const F=artSunField(),lo2=key/12,N=ART_N,c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d'),img=g.createImageData(N,N),D=img.data,
+ if(ART_SCV[key])return ART_SCV[key];const F=artSunField(),lo2=key/12,N=ART_N,c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d',{willReadFrequently:true}),img=g.createImageData(N,N),D=img.data,
  mx=(a,b)=>a.map((v,i)=>v+(b[i]-v)*lo2),
  hot=mx([255,243,206],[255,196,104]),mid=mx([255,206,86],[255,134,44]),rim=mx([246,142,32],[204,62,18]),
  halo=mx([255,176,64],[255,86,34]),far=mx([255,150,92],[214,62,74]);
@@ -1960,7 +1971,7 @@ function artSunCanvasKey(key){
  g.putImageData(img,0,0);return ART_SCV[key]=c}
 const artSunKey=alt=>Math.round((1-artSm(-.5,24,alt))*12);
 function artSunUrl(alt){const key=artSunKey(alt);if(ART_SC[key])return ART_SC[key];return ART_SC[key]=artSunCanvasKey(key).toDataURL('image/png')}
-function moonSvg(d,ph){const f=ph!=null?Math.min(.999,Math.max(0,ph)):Math.min(.999,(d-.5)/29.53);return `<img class="skyimg mimg" data-f="${f.toFixed(4)}" alt="" draggable="false" src="${artMoonUrl(f)}">`}
+function moonSvg(d,ph){const f=ph!=null?Math.min(.999,Math.max(0,ph)):Math.min(.999,(d-.5)/29.53);return `<img class="skyimg mimg" data-f="${f.toFixed(4)}" alt="" draggable="false" src="${artMoonUrlSoon(f)}">`}
 function skyBodySvg(st){return st.kind==='sun'?`<img class="skyimg" alt="" draggable="false" src="${artSunUrl(st.alt)}">`:moonSvg(null,st.phase)}
 /* ===== breath-on-glass trail, rising/setting intro ===== */
 const SKYA={run:false,arm:false,hiddenAt:0,rootT:0,lastDark:null};
@@ -2251,7 +2262,9 @@ vec4 silk(vec2 p,float px){
  const hex=v=>{v=(v||'').trim();const m=/^#?([0-9a-f]{6})$/i.exec(v);if(!m)return[1,1,1];const n=parseInt(m[1],16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]};
  /* Drawn only when something changes (scroll, size, colours): no idle animation, so nothing runs while you just look. */
  let colT=-1e9,W=0,Hh=0,sc=-1,raf=0,Q=.4,dirty=true,lastD=0,lastG=0,gT=0;const T0=7.0;
- const size=()=>{const d=Math.min(devicePixelRatio||1,2)*Q,w=Math.round(host.clientWidth*d),h=Math.round(host.clientHeight*d);if(w&&h&&(w!==W||h!==Hh)){W=cv.width=w;Hh=cv.height=h;gl.viewport(0,0,w,h);dirty=true}};
+ /* perf (v32): the host's size comes from a ResizeObserver, so drawing never forces a layout mid-scroll */
+ let HW=host.clientWidth,HHt=host.clientHeight;try{new ResizeObserver(e=>{const r=e[e.length-1].contentRect;if(r.width!==HW||r.height!==HHt){HW=r.width;HHt=r.height;dirty=true;requestAnimationFrame(()=>draw())}}).observe(host)}catch(e){}
+ const size=()=>{if(!window.ResizeObserver){HW=host.clientWidth;HHt=host.clientHeight}const d=Math.min(devicePixelRatio||1,2)*Q,w=Math.round(HW*d),h=Math.round(HHt*d);if(w&&h&&(w!==W||h!==Hh)){W=cv.width=w;Hh=cv.height=h;gl.viewport(0,0,w,h);dirty=true}};
  const colors=()=>{const cs=getComputedStyle(document.documentElement);GLS.F=hex(cs.getPropertyValue('--rbf'));GLS.E=hex(cs.getPropertyValue('--rbe'));gl.uniform3fv(U.uF,GLS.F);gl.uniform3fv(U.uE,GLS.E);const nightW=document.documentElement.dataset.night==='1';GLS.O=parseFloat(cs.getPropertyValue('--wo'))||1;GLS.WO=parseFloat(cs.getPropertyValue('--waveo'))||1;gl.uniform1f(U.uO,GLS.O);
   /* night waves are kept soft and quiet so they stay in the background (owner); Test tools switch "swave" turns that off */
   const rc=document.documentElement.classList;GLS.K=nightW?(rc.contains('tt-off-swave')?0:1):(parseFloat(cs.getPropertyValue('--wk'))||0);gl.uniform1f(U.uK,GLS.K)};
@@ -2322,17 +2335,24 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
   if(cv.parentNode!==h1)h1.appendChild(cv);
   const sp=[...big.querySelectorAll('.hd-d,.hd-m')],dpr=Math.min(devicePixelRatio||1,2.5),w=h1.offsetWidth+PAD*2,h=h1.offsetHeight+PAD*2;if(!w||!h||!sp.length)return;
   const k=[w,h,dpr,h1.className,document.getElementById('hdr').className,sp.map(x=>x.textContent+x.offsetLeft+','+x.offsetTop).join('|')].join(';');if(k===key&&ok)return;key=k;
-  W=Math.round(w*dpr);H=Math.round(h*dpr);cv.width=W;cv.height=H;Object.assign(cv.style,{left:-PAD+'px',top:-PAD+'px',width:w+'px',height:h+'px'});gl.viewport(0,0,W,H);dpr0=dpr;
-  const mk=()=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c},A=mk(),a=A.getContext('2d');a.scale(dpr,dpr);a.fillStyle=a.strokeStyle='#fff';a.textBaseline='alphabetic';a.lineJoin='round';a.lineCap='round';
+  /* perf (v32): size the canvas in 64px steps and only touch it when the step changes (a WebGL resize stalls the GPU, and every date has a slightly different width) */
+  W=Math.ceil(w*dpr/64)*64;H=Math.ceil(h*dpr/64)*64;if(cv.width!==W)cv.width=W;if(cv.height!==H)cv.height=H;Object.assign(cv.style,{left:-PAD+'px',top:-PAD+'px',width:W/dpr+'px',height:H/dpr+'px'});gl.viewport(0,0,W,H);dpr0=dpr;
+  const mk=()=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c},A=mk(),a=A.getContext('2d',{willReadFrequently:true});a.scale(dpr,dpr);a.fillStyle=a.strokeStyle='#fff';a.textBaseline='alphabetic';a.lineJoin='round';a.lineCap='round';
   let fs=60;const G=[];for(const x of sp){const cs=getComputedStyle(x);fs=parseFloat(cs.fontSize)||fs;a.font=cs.fontStyle+' '+cs.fontWeight+' '+cs.fontSize+' '+cs.fontFamily;const t=x.textContent,mt=a.measureText(t),asc=mt.fontBoundingBoxAscent||fs*.8,ds=mt.fontBoundingBoxDescent||fs*.25;
    const ty=x.offsetTop+PAD+(x.offsetHeight-(asc+ds))/2+asc;let xr=x.offsetLeft+x.offsetWidth/2+PAD+mt.width/2;a.lineWidth=fs*.07;a.textAlign='right';
    for(const ch of t){if(!ch.trim()){xr-=a.measureText(ch).width;continue}const cm=a.measureText(ch),lw=fs*.05;a.strokeText(ch,xr,ty);a.fillText(ch,xr,ty);
     G.push({ch,font:a.font,x:xr,y:ty,lw:a.lineWidth,b:[xr-(cm.actualBoundingBoxLeft||cm.width)-lw,ty-(cm.actualBoundingBoxAscent||fs*.7)-lw,xr+(cm.actualBoundingBoxRight||0)+lw,ty+(cm.actualBoundingBoxDescent||0)+lw]});xr-=cm.width}}
-  const blur=(r)=>{const c=mk(),x=c.getContext('2d');x.filter='blur('+r.toFixed(2)+'px)';x.drawImage(A,0,0);return x.getImageData(0,0,W,H).data};
-  const da=a.getImageData(0,0,W,H).data,db=blur(fs*dpr*.07),ds=blur(Math.max(.6,dpr*.55)),o=new Uint8Array(W*H*4);DEP=new Uint8Array(W*H);GID=new Uint8Array(W*H);
+  /* perf (v32): blur the letter shapes in plain JS (3 box passes ≈ Gaussian) instead of a canvas filter + GPU read-back, which stalled phones */
+  const da=a.getImageData(0,0,W,H).data,AL=new Float32Array(W*H);for(let p=0;p<AL.length;p++)AL[p]=da[p*4+3];
+  const blur=sg=>{const wI=Math.floor(Math.sqrt(12*sg*sg/3+1)),wl=wI%2?wI:wI-1,m=Math.round((12*sg*sg-3*wl*wl-12*wl-9)/(-4*wl-4));let A1=AL.slice(),B1=new Float32Array(W*H);
+   for(let n=0;n<3;n++){const r=((n<m?wl:wl+2)-1)>>1;if(r<1)continue;const iv=1/(2*r+1);
+    for(let y=0;y<H;y++){const o=y*W;let acc=0;for(let x=-r-1;x<r;x++)acc+=A1[o+Math.min(W-1,Math.max(0,x))];for(let x=0;x<W;x++){acc+=A1[o+Math.min(W-1,x+r)]-A1[o+Math.max(0,x-r-1)];B1[o+x]=acc*iv}}
+    for(let x=0;x<W;x++){let acc=0;for(let y=-r-1;y<r;y++)acc+=B1[Math.min(H-1,Math.max(0,y))*W+x];for(let y=0;y<H;y++){acc+=B1[Math.min(H-1,y+r)*W+x]-B1[Math.max(0,y-r-1)*W+x];A1[y*W+x]=acc*iv}}}
+   const out=new Uint8ClampedArray(W*H*4);for(let p=0;p<A1.length;p++)out[p*4+3]=A1[p];return out};
+  const db=blur(fs*dpr*.07),ds=blur(Math.max(.6,dpr*.55)),o=new Uint8Array(W*H*4);DEP=new Uint8Array(W*H);GID=new Uint8Array(W*H);
   for(let i=0,p=0;i<da.length;i+=4,p++){o[i]=da[i+3];const dv=Math.min(255,db[i+3]*1.6);o[i+1]=dv;DEP[p]=dv;o[i+2]=0;o[i+3]=ds[i+3]}
   /* which letter each pixel belongs to, and where its bubble rests (the deepest point of that letter) */
-  const C=mk(),c=C.getContext('2d');let gid=0;BBL=[];for(const g of G){gid++;if(gid>NG)break;c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,W,H);c.scale(dpr,dpr);c.font=g.font;c.textAlign='right';c.textBaseline='alphabetic';c.fillStyle=c.strokeStyle='#fff';c.lineJoin='round';c.lineWidth=g.lw;c.strokeText(g.ch,g.x,g.y);c.fillText(g.ch,g.x,g.y);
+  const C=mk(),c=C.getContext('2d',{willReadFrequently:true});let gid=0;BBL=[];for(const g of G){gid++;if(gid>NG)break;c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,W,H);c.scale(dpr,dpr);c.font=g.font;c.textAlign='right';c.textBaseline='alphabetic';c.fillStyle=c.strokeStyle='#fff';c.lineJoin='round';c.lineWidth=g.lw;c.strokeText(g.ch,g.x,g.y);c.fillText(g.ch,g.x,g.y);
    const x0=Math.max(0,Math.floor(g.b[0]*dpr)),y0=Math.max(0,Math.floor(g.b[1]*dpr)),x1=Math.min(W,Math.ceil(g.b[2]*dpr)),y1=Math.min(H,Math.ceil(g.b[3]*dpr)),bw=x1-x0,bh=y1-y0;if(bw<=0||bh<=0)continue;
    const d=c.getImageData(x0,y0,bw,bh).data;let bv=-1,sx=0,sy=0,sn=0;for(let yy=0;yy<bh;yy++)for(let xx=0;xx<bw;xx++){if(d[(yy*bw+xx)*4+3]<60)continue;const pi=(y0+yy)*W+x0+xx;o[pi*4+2]=gid;GID[pi]=gid;if(DEP[pi]>bv)bv=DEP[pi];sx+=x0+xx;sy+=y0+yy;sn++}
    if(bv<40||!sn)continue;let bx=0,by=0,bd=1e18;sx/=sn;sy/=sn;for(let yy=0;yy<bh;yy+=2)for(let xx=0;xx<bw;xx+=2){const pi=(y0+yy)*W+x0+xx;if(GID[pi]!==gid||DEP[pi]<bv*.8)continue;const dd=(x0+xx-sx)**2+(y0+yy-sy)**2;if(dd<bd){bd=dd;bx=x0+xx;by=y0+yy}}const r0=fs*dpr*.12,P=[];for(let q=0;q<NP;q++){const an=q/NP*6.283;P.push({x:bx+Math.cos(an)*r0,y:by+Math.sin(an)*r0*.7,vx:0,vy:0})}
@@ -2373,7 +2393,8 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  let kT=0;const kick=()=>{kT=performance.now();if(!traf)traf=requestAnimationFrame(step)};
  /* gamma: tilt right -> bubble goes left. beta (from how the phone is normally held): top tipped down/forward -> bubble goes down */
  let bB=null;addEventListener('deviceorientation',e=>{if(e.gamma==null||!ok)return;const be=e.beta==null?45:e.beta;bB=bB==null?be:bB+(be-bB)*.025;const gx=Math.max(-1,Math.min(1,e.gamma/30)),gy=Math.max(-1,Math.min(1,(be-bB)/25));
-  if(Math.abs(gx-tg[0])+Math.abs(gy-tg[1])<.01)return;tg=[gx,gy];kick()},{passive:true});
+  /* perf (v32): ignore hand tremor (< ~1°) and don't animate while the date is scrolled away or covered by a sheet/reader */
+  if(Math.abs(gx-tg[0])+Math.abs(gy-tg[1])<.035)return;tg=[gx,gy];const bc=document.body.classList;if(R.classList.contains('cc-away')||document.hidden||bc.contains('op')||bc.contains('om')||bc.contains('rdo'))return;kick()},{passive:true});
  /* iPhone: Safari needs a tap before a website may read the tilt sensor; ask once, on the first tap */
  if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function'){const ask=()=>{removeEventListener('touchend',ask,true);removeEventListener('click',ask,true);try{DeviceOrientationEvent.requestPermission().catch(()=>{})}catch(e){}};addEventListener('touchend',ask,true);addEventListener('click',ask,true)}
  GLS.lens=draw;window.dlLayout=layout;
@@ -2803,8 +2824,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=31;
+const CC_VER=32;
 const CC_LOG=[
+ {v:32,new:['Smoother and faster: changing days, opening the app and scrolling take much less work, and the moving date no longer redraws nonstop while you hold the phone.']},
  {v:31,new:['The ⋯ menu is tidier: a short list of sections (Location, Reminders, Calendar, My schedule, App, Help). Tap one to open it. Rarely used settings moved to Advanced.']},
  {v:30,new:['Reminders: the “Regularly” option for shiurim now just says what it does: smart reminders so you never miss a shiur.']},
  {v:29,big:1,new:['Shiurim reminders now have three levels in ⋯ → Reminders: Never, Rarely (once a day) or Regularly. Regularly learns when you usually do your shiurim, then reminds you a little before, again just after, and once more an hour later to keep your streak going.']},
