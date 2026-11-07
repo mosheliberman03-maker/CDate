@@ -102,7 +102,7 @@ async function handle(req, env) {
   if (p.startsWith('/kit/')) {
     if (!ALLOW.includes(originOf(req))) return j({ error: 'This request did not come from the Keep in Touch app.' }, 403);
     const [, , col, op] = p.split('/');
-    const SPEC = { phones3: { k: 200, p: 32 }, accounts3: { k: 200, salt: 64, h: 128 } };
+    const SPEC = { phones3: { k: 200, p: 32 }, accounts3: { k: 200, salt: 64, h: 128 }, feedback3: { k: 200, t: 20, m: 1500, at: 30 } };
     const spec = SPEC[col];
     if (!spec) return j({ error: 'not found' }, 404);
     const key = 'kit:' + col;
