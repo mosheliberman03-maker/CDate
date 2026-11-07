@@ -296,7 +296,7 @@ body.tour.tpass #top,body.tour.tpass #bar{z-index:41}
 #dr .mr:active,#dr .macc:active{background:rgba(255,255,255,.12)}
 #dr .mi{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none;background:rgba(157,180,245,.14);color:var(--acc)}
 #dr .chv{flex:none;opacity:.45}
-#dr .mver{text-align:center;font-size:11.5px;color:var(--mut);opacity:.7;margin-top:8px}
+#dr .mver{user-select:none;-webkit-user-select:none;cursor:default;text-align:center;font-size:11.5px;color:var(--mut);opacity:.7;margin-top:8px}
 #dr .mout{margin:12px 6px 2px;padding:12px;border:0;border-radius:14px;background:none;color:#ff9aa8;font:inherit;font-weight:700;font-size:15px;cursor:pointer;text-align:center;border:1px solid rgba(255,154,168,.25)}
 
 /* What's new: popup for real features, slim banner for small ones (same rule as the calendar) */
@@ -1044,7 +1044,7 @@ sync()})();
 // ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
 // Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=7,KIT_APK=1;
+const KIT_VER=8,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1102,25 +1102,25 @@ async function kitCheckUpd(){try{const r=await fetch(location.pathname+"?v="+Dat
 document.addEventListener("visibilitychange",()=>{if(document.hidden){if(kitUpdPending)kitReload()}else kitCheckUpd()});
 setTimeout(kitCheckUpd,2500);setInterval(()=>{if(!document.hidden)kitCheckUpd()},10*60000);
 
-// ---------- Suggestions & contact (owner): messages go to the server list feedback3; the owner reads them under Messages.
-// If the server doesn't have the list yet (old server code), the message opens in WhatsApp to the owner instead.
-const KIT_OWNER="Moshe Liberman|China";
-const isOwner=()=>!!(me&&me.match&&pkey(me.match.name,me.match.city)==KIT_OWNER);
+// ---------- Suggestions & contact: messages go to the server list feedback3. Nothing in here names or links to the owner (owner's rule).
+// The Messages inbox appears only on a device unlocked with the admin code (tap the version line 5 times); only a hash of the code is here.
+const ADMIN_H="34d068ea17660c0fbd764ffddee3d59a576971f66ea8578d77ca5dffb38c56b8";
+const isAdmin=()=>lsGet("kit_admin")==ADMIN_H;
 const FBT={idea:"💡 Suggestion",bug:"🐞 Problem",q:"❓ Question"};
 let fbDocs={},fbSeen=0;
-function fbWa(text){const d=phoneOf(...KIT_OWNER.split("|")).replace(/\D/g,"");return d?"https://wa.me/"+d+"?text="+encodeURIComponent(text):""}
+const fbQ=()=>{try{return JSON.parse(lsGet("kit_fb_q")||"[]")}catch(e){return[]}};
+async function fbPost(x){const r=await fetch(KIT_SRV+"feedback3/set",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(x)});if(!r.ok)throw 0}
+async function fbFlush(){const q=fbQ();if(!q.length)return;const left=[];for(const x of q){try{await fbPost(x)}catch(e){left.push(x)}}lsSet("kit_fb_q",JSON.stringify(left))}
 function fbOpen(){open(false);sheet._gs=null;let t="idea";const who=me&&me.match?me.match.name+" ("+me.match.city+")":"";
- sheet.innerHTML='<h3>Suggestions &amp; contact</h3><p>Have an idea, found a problem, or a question? Tell us. We read every message.</p><div class="fbt">'+Object.keys(FBT).map(k=>'<button data-t="'+k+'"'+(k==t?' class="on"':'')+'>'+FBT[k]+'</button>').join("")+'</div><textarea id="fbm" maxlength="1500" placeholder="Write your message…"></textarea><div class="btns"><button class="btn" id="fbc">Cancel</button><button class="btn p" id="fbs" disabled>Send</button></div>'+(fbWa("")?'<span class="fbw">or <a id="fbwa" href="#">message us on WhatsApp</a></span>':'');
+ sheet.innerHTML='<h3>Suggestions &amp; contact</h3><p>Have an idea, found a problem, or a question? Tell us. We read every message.</p><div class="fbt">'+Object.keys(FBT).map(k=>'<button data-t="'+k+'"'+(k==t?' class="on"':'')+'>'+FBT[k]+'</button>').join("")+'</div><textarea id="fbm" maxlength="1500" placeholder="Write your message…"></textarea><div class="btns"><button class="btn" id="fbc">Cancel</button><button class="btn p" id="fbs" disabled>Send</button></div>';
  sheet.style.display="block";const m=$("fbm"),sb=$("fbs");setTimeout(()=>m.focus(),80);
  sheet.querySelector(".fbt").onclick=e=>{const b=e.target.closest("[data-t]");if(!b)return;t=b.dataset.t;sheet.querySelectorAll(".fbt button").forEach(x=>x.classList.toggle("on",x==b));hap(8)};
  m.oninput=()=>sb.disabled=!m.value.trim();$("fbc").onclick=()=>sheet.style.display="none";
- const wa=$("fbwa");if(wa)wa.onclick=e=>{e.preventDefault();location.href=fbWa(FBT[t]+(m.value.trim()?": "+m.value.trim():""))};
  sb.onclick=async()=>{const txt=m.value.trim();if(!txt)return;sb.disabled=true;sb.textContent="Sending…";
-  const id="f_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7);
-  try{const r=await fetch(KIT_SRV+"feedback3/set",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({id,data:{k:who||"Someone",t,m:txt,at:new Date().toISOString()}})});if(!r.ok)throw 0;
-   hap([12,40,12]);sheet.innerHTML='<h3>Thank you! 🙏</h3><p>Your message was sent. We’ll look at it soon.</p><div class="btns"><button class="btn p" id="fbc">Done</button></div>';$("fbc").onclick=()=>sheet.style.display="none"}
-  catch(e){const u=fbWa(FBT[t]+": "+txt);if(u){toast("Opening WhatsApp to send it…");location.href=u}else{sb.disabled=false;sb.textContent="Send";toast("Couldn’t send. Check your internet and try again.")}}}}
-async function fbLoad(){if(!isOwner())return;try{const r=await fetch(KIT_SRV+"feedback3",{cache:"no-store"});if(!r.ok)return;fbDocs=(await r.json()).docs||{}}catch(e){return}
+  const x={id:"f_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7),data:{k:who||"Someone",t,m:txt,at:new Date().toISOString()}};
+  let sent=true;try{await fbPost(x)}catch(e){sent=false;const q=fbQ();q.push(x);lsSet("kit_fb_q",JSON.stringify(q.slice(-20)))}
+  hap([12,40,12]);sheet.innerHTML='<h3>Thank you! 🙏</h3><p>'+(sent?"Your message was sent. We’ll look at it soon.":"Your message is saved and will be sent automatically as soon as it can.")+'</p><div class="btns"><button class="btn p" id="fbc">Done</button></div>';$("fbc").onclick=()=>sheet.style.display="none"}}
+async function fbLoad(){fbFlush();if(!isAdmin())return;try{const r=await fetch(KIT_SRV+"feedback3",{cache:"no-store"});if(!r.ok)return;fbDocs=(await r.json()).docs||{}}catch(e){return}
  fbSeen=+lsGet("kit_fb_seen")||0;const n=Object.values(fbDocs).filter(x=>Date.parse(x.at)>fbSeen).length;$("fbin").style.display="";$("fbn").textContent=n?String(n):""}
 function fbInbox(){open(false);sheet._gs=null;lsSet("kit_fb_seen",Date.now());$("fbn").textContent="";
  const L=Object.entries(fbDocs).sort((a,b)=>Date.parse(b[1].at)-Date.parse(a[1].at));
@@ -1129,5 +1129,10 @@ function fbInbox(){open(false);sheet._gs=null;lsSet("kit_fb_seen",Date.now());$(
  sheet.style.display="block";$("fbc").onclick=()=>sheet.style.display="none";
  sheet.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{if(b.dataset.ok!="1"){b.dataset.ok="1";b.textContent="Tap again";return}try{await fetch(KIT_SRV+"feedback3/del",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({id:b.dataset.del})});delete fbDocs[b.dataset.del];fbInbox()}catch(e){toast("Couldn’t delete it.")}})}
 $("fbk").onclick=fbOpen;$("fbin").onclick=fbInbox;
+// admin unlock: tap the version line 5 times, enter the code
+(()=>{let n=0,t0=0;$("mver").addEventListener("click",async()=>{const now=Date.now();n=now-t0<700?n+1:1;t0=now;if(n<5)return;n=0;
+ if(isAdmin()){if(confirm("Turn off the Messages inbox on this phone?")){try{localStorage.removeItem("kit_admin")}catch(e){}$("fbin").style.display="none"}return}
+ const c=prompt("Code");if(!c)return;let h="";try{const d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("kit-admin:"+c.trim()));h=[...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,"0")).join("")}catch(e){}
+ if(h==ADMIN_H){lsSet("kit_admin",h);hap([12,40,12]);toast("Messages inbox is on for this phone");fbLoad()}else{hap(40);toast("Wrong code")}})})();
 setTimeout(fbLoad,2000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)fbLoad()});
 </script></body></html>
