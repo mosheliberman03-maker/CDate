@@ -27,6 +27,9 @@ import java.util.TimeZone;
 public final class KitData {
     private KitData() {}
 
+    /** Version of the installed app (the native part). The web app asks for at least KIT_APK. */
+    static final int APP_VER = 1;
+
     static final String PREFS = "kit_widget";
     static final String KEY = "data";
 

@@ -297,6 +297,32 @@ body.tour.tpass #top,body.tour.tpass #bar{z-index:41}
 #dr .mi{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none;background:rgba(157,180,245,.14);color:var(--acc)}
 #dr .chv{flex:none;opacity:.45}
 #dr .mout{margin:12px 6px 2px;padding:12px;border:0;border-radius:14px;background:none;color:#ff9aa8;font:inherit;font-weight:700;font-size:15px;cursor:pointer;text-align:center;border:1px solid rgba(255,154,168,.25)}
+
+/* What's new: popup for real features, slim banner for small ones (same rule as the calendar) */
+#kitNew{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:20px;background:rgba(4,6,15,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .3s}
+#kitNew.on{opacity:1}
+.kn-card{width:min(420px,100%);max-height:84vh;overflow:auto;border-radius:26px;padding:22px 20px 16px;background:rgba(36,48,94,.97);border:1px solid rgba(255,255,255,.16);box-shadow:0 24px 60px rgba(0,0,0,.55);transform:translateY(14px) scale(.98);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+#kitNew.on .kn-card{transform:none}
+.kn-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0b1022;background:#9db4f5;border-radius:99px;padding:4px 10px}
+.kn-card h2{margin:12px 0 10px;font-size:22px;letter-spacing:-.02em}
+.kn-it{display:flex;gap:12px;padding:10px 0;border-top:1px solid rgba(255,255,255,.08)}
+.kn-it:first-child{border-top:0}
+.kn-dot{width:9px;height:9px;border-radius:50%;margin-top:6px;flex:none;background:rgba(255,255,255,.35)}
+.kn-it.big .kn-dot{background:#6fd6a0;box-shadow:0 0 10px #6fd6a0}
+.kn-it b{display:block;font-size:15px}
+.kn-it small{display:block;color:#c9d0ee;font-size:13.5px;line-height:1.45;margin-top:2px}
+.kn-show{margin-top:8px;border:0;border-radius:99px;padding:7px 14px;font:inherit;font-size:13px;font-weight:700;color:#9db4f5;background:rgba(157,180,245,.16);cursor:pointer}
+.kn-card .btn{display:block;width:100%;margin-top:12px;text-align:center;text-decoration:none;padding:13px}
+.kn-note{font-size:12.5px;color:#aab3d6;margin-top:8px;text-align:center}
+#kitBar{position:fixed;z-index:50;left:14px;right:14px;max-width:460px;margin:0 auto;top:calc(env(safe-area-inset-top,0px) + 62px);border-radius:18px;padding:10px 14px;background:rgba(36,48,94,.96);border:1px solid rgba(255,255,255,.15);box-shadow:0 10px 30px rgba(0,0,0,.4);transform:translateY(-140%);opacity:0;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .3s;cursor:pointer}
+#kitBar.on{transform:none;opacity:1}
+.kb-row{display:flex;align-items:center;gap:9px;font-size:14px}
+.kb-dot{width:8px;height:8px;border-radius:50%;background:#9db4f5;box-shadow:0 0 8px #9db4f5}
+.kb-n{color:#aab3d6;flex:1}
+.kb-x{opacity:.6;padding:2px 4px}
+.kb-list{display:none;margin-top:10px;font-size:14px;color:#dfe4f7;line-height:1.6}
+#kitBar.open .kb-list{display:block}
+.kb-list .btn{display:block;width:100%;margin-top:8px;padding:11px}
 </style></head><body>
 <canvas id="g"></canvas>
 <div id="su"><div class="sucard glass"><span class="lg lg-l" role="img" aria-label="Logo"></span><h1>Shluchim Keep in Touch <span class="beta">Beta</span></h1><p>This app is in beta, so things may change or break while we test it. Pick your name from the list. First time: add your number and choose a code. Already signed up: enter your code.</p><input id="suN" placeholder="Your name" autocomplete="off" autocapitalize="words"><div id="suH"></div><div id="suM"></div><div id="suPW" style="display:none"></div><div id="suCW" style="display:none"><input id="suC" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Code"><div class="phh" id="suCH"></div></div><button class="btn p" id="suB" style="width:100%" disabled>Continue</button></div></div>
@@ -901,7 +927,7 @@ const tour={i:0,T:[],off:[],who:null,
  end(){this.clear();document.body.classList.remove("tour");$("tc").innerHTML="";lsSet("sc_tour","1");zoomT=1;auto=true;setView(saved.length?"cards":"world")}};
 $("tour").addEventListener("click",e=>{if(e.target.closest("#tk"))tour.end();else if(e.target.closest("#tn")){if(tour.i>=6)tour.end();else tour.next()}});
 $("tr").onclick=()=>{open(false);tour.show()};
-function welcome(){if(lsGet("sc_tour"))return;tour.show()}
+function welcome(){if(lsGet("sc_tour")){setTimeout(()=>{try{kitNews()}catch(e){}},800);return}try{lsSet(kitSeenKey(),KIT_VER)}catch(e){}tour.show()}
 function removeSaved(id){const i=saved.findIndex(v=>v.id==id);if(i<0)return;const v=saved.splice(i,1)[0];persist();hap(25);render();commit();toast("Removed "+(v.name||v.city),()=>{saved.splice(Math.min(i,saved.length),0,v);persist();render();commit()})}
 function checkRem(){let ch=0;Object.keys(rem).forEach(k=>{const r=rem[k];if(status(r.tz)=="day"){delete rem[k];ch=1;hap([200,100,200]);toast("⏰ "+r.name+" is up. Good to call now.",null,null,9000);try{if("Notification" in window&&Notification.permission=="granted")new Notification(r.name+" is up",{body:"Good to call now in "+r.city})}catch(e){}}});if(ch){saveF();renderCards()}}
 function toggleBell(v){const k=fk(v);if(rem[k]){delete rem[k];toast("Reminder off for "+v.name)}else{rem[k]={name:v.name,city:v.city,tz:v.tz};try{if("Notification" in window&&Notification.permission=="default")Notification.requestPermission()}catch(e){}toast("We’ll tell you when "+v.name+" is up. Keep this page open.")}saveF();hap(10);renderFull()}
@@ -991,4 +1017,49 @@ sync()})();
  b.onclick=()=>{open(false);show()};
  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&sheet.style.display=="block"&&sheet.querySelector("[data-pin]"))show()});
 })();
+
+// ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
+// Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
+// apk:N = this needs app version N (a new download); the app then also shows "Update the app".
+const KIT_VER=4,KIT_APK=1;
+const KIT_LOG=[
+ {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
+ {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
+ {v:2,t:"New globe app icon",apk:1},
+ {v:3,big:1,t:"A hands-on tour",d:"Find a bochur, save him, and see your list, step by step. Replay it anytime from the menu.",go:"tour"},
+ {v:4,t:"A tidier menu: your account on top, everything else grouped"}
+];
+const kitIsApp=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+const kitSeenKey=()=>"kit_seen_"+(me&&me.match?slug(pkey(me.match.name,me.match.city)):"x");
+async function kitApkVer(){if(!kitIsApp())return 99;try{const P=Capacitor.Plugins.KitWidget;const r=await P.info();return r&&r.ver?r.ver:1}catch(e){return 0}}
+const APK_PAGE="https://mosheliberman03-maker.github.io/CDate/friends/download/";
+async function kitNews(){if(!me||!me.match||su||document.body.classList.contains("tour"))return;
+ let seen=+lsGet(kitSeenKey())||0;
+ if(!lsGet("sc_tour")){lsSet(kitSeenKey(),KIT_VER);return} // brand-new users get the tour, not a backlog
+ if(!seen){seen=KIT_VER-1} // first time tracked: only the latest note
+ const av=await kitApkVer(),items=KIT_LOG.filter(x=>x.v>seen&&(!x.apk||kitIsApp()||!x.go));
+ const needApk=kitIsApp()&&av<KIT_APK;
+ if(!items.length){if(needApk&&!sessionStorage.getItem("kit_apk_later"))kitBar([{t:"A new version of the app is ready"}],true);return}
+ if(items.some(x=>x.big))kitPopup(items,needApk);else kitBar(items,needApk)}
+function kitDone(){lsSet(kitSeenKey(),KIT_VER)}
+function kitGo(g){if(g=="tour"){open(false);tour.show()}else if(g=="widgets"){const b=$("wgt");if(b&&b.style.display!="none")b.click();else toast("Widgets are in the Android app.")}}
+function kitPopup(items,needApk){const el=document.createElement("div");el.id="kitNew";
+ el.innerHTML='<div class="kn-card"><div class="kn-tag">What’s new</div><h2>'+(items.filter(x=>x.big).length>1?"New in Keep in Touch":esc(items.find(x=>x.big).t))+'</h2><div class="kn-list">'+
+  items.map((x,i)=>'<div class="kn-it'+(x.big?" big":"")+'"><span class="kn-dot"></span><div><b>'+esc(x.t)+'</b>'+(x.d?'<small>'+esc(x.d)+'</small>':'')+(x.go&&(x.go!="widgets"||kitIsApp())?'<button class="kn-show" data-go="'+x.go+'">Show me</button>':'')+'</div></div>').join("")+'</div>'+
+  (needApk?'<a class="btn p kn-upd" href="'+APK_PAGE+'">Update the app</a><div class="kn-note">Some of these need the newest app. Install it over this one: your list stays.</div>':'')+
+  '<button class="btn kn-ok">Got it</button></div>';
+ document.body.appendChild(el);requestAnimationFrame(()=>el.classList.add("on"));hap(12);
+ const close=()=>{kitDone();el.classList.remove("on");setTimeout(()=>el.remove(),300)};
+ el.onclick=e=>{const g=e.target.closest("[data-go]");if(g){close();setTimeout(()=>kitGo(g.dataset.go),320);return}if(e.target.closest(".kn-ok")||e.target==el)close();if(e.target.closest(".kn-upd"))kitDone()}}
+function kitBar(items,needApk){const el=document.createElement("div");el.id="kitBar";
+ const n=items.length,apkOnly=needApk&&items.length==1&&!items[0].v;
+ el.innerHTML='<div class="kb-row"><span class="kb-dot"></span><b>'+(apkOnly?"App update":"What’s new")+'</b><span class="kb-n">'+(apkOnly?"Tap to update":n+" small update"+(n>1?"s":""))+'</span><span class="kb-x" aria-label="Dismiss">✕</span></div>'+
+  (apkOnly?'':'<div class="kb-list">'+items.map(x=>'<div>• '+esc(x.t)+'</div>').join("")+(needApk?'<a class="btn p" href="'+APK_PAGE+'" style="display:block;text-align:center;text-decoration:none;margin-top:10px">Update the app</a>':'')+'<button class="btn kb-ok">Got it</button></div>');
+ document.body.appendChild(el);requestAnimationFrame(()=>el.classList.add("on"));
+ const close=dx=>{if(!apkOnly)kitDone();else sessionStorage.setItem("kit_apk_later","1");el.style.transform=dx?"translateX("+(dx>0?120:-120)+"%)":"translateY(-140%)";el.style.opacity="0";setTimeout(()=>el.remove(),300)};
+ el.onclick=e=>{if(e.target.closest(".kb-x")){close();return}if(e.target.closest(".kb-ok")){close();return}if(apkOnly){location.href=APK_PAGE;return}if(e.target.closest("a"))return;el.classList.toggle("open");hap(8)};
+ let x0=null,y0=0,dx=0,dy=0;el.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY;dx=dy=0;el.style.transition="none"},{passive:true});
+ el.addEventListener("touchmove",e=>{if(x0==null)return;dx=e.touches[0].clientX-x0;dy=Math.min(0,e.touches[0].clientY-y0);el.style.transform=Math.abs(dx)>Math.abs(dy)?"translateX("+dx+"px)":"translateY("+dy+"px)"},{passive:true});
+ el.addEventListener("touchend",()=>{el.style.transition="";if(Math.abs(dx)>80)close(dx);else if(dy<-40)close();else el.style.transform="";x0=null})}
+setTimeout(kitNews,1800);
 </script></body></html>

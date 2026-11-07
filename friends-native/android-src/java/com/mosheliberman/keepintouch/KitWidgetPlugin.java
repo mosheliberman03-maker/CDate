@@ -32,6 +32,7 @@ public class KitWidgetPlugin extends Plugin {
         JSObject r = new JSObject();
         r.put("who", m.getAppWidgetIds(new ComponentName(getContext(), WhoWidget.class)).length);
         r.put("best", m.getAppWidgetIds(new ComponentName(getContext(), BestWidget.class)).length);
+        r.put("ver", KitData.APP_VER); // bump with KIT_APK in friends/index.html when the app itself changes
         r.put("canPin", Build.VERSION.SDK_INT >= 26 && m.isRequestPinAppWidgetSupported());
         call.resolve(r);
     }
