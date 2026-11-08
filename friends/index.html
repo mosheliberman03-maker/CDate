@@ -1073,7 +1073,7 @@ sync()})();
 // ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
 // Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=21,KIT_APK=1;
+const KIT_VER=22,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1091,7 +1091,8 @@ const KIT_LOG=[
  {v:18,t:"Shooting stars fly closer to the globe"},
  {v:19,t:"Shooting stars also show when you zoom in"},
  {v:20,t:"Most shooting stars now fly to or from places you can see"},
- {v:21,t:"Smoother, slower shooting stars when zoomed in"}
+ {v:21,t:"Smoother, slower shooting stars when zoomed in"},
+ {v:22,t:"Shooting stars only show real connections between friends"}
 ];
 const kitIsApp=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const kitSeenKey=()=>"kit_seen_"+(me&&me.match?slug(pkey(me.match.name,me.match.city)):"x");
@@ -1187,9 +1188,6 @@ let linksSent="";
 async function linksPush(){if(!me||!me.match)return;const L=myLinks().map(x=>x[1]).sort();let l=L.join(";");if(l.length>1500)l=l.slice(0,l.lastIndexOf(";",1500));if(!l||l==linksSent)return;
  try{const k=pkey(me.match.name,me.match.city),r=await fetch(KIT_SRV+"links3/set",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({id:slug(k),data:{k,l}})});if(r.ok)linksSent=l}catch(e){}}
 function shootPairs(){const seen=new Set(),P0=[];[...kitLinks,...myLinks()].forEach(([a,b])=>{const k=a<b?a+"|"+b:b+"|"+a;if(seen.has(k))return;seen.add(k);const A=cityLL(a),B=cityLL(b);if(A&&B&&(Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1]))>3)P0.push(Math.random()<.5?[A,B]:[B,A])});
- if(P0.length<12){// not enough real links yet: connect yeshivas where people are reachable (have a number), so the opening still tells the story
-  const cs=[...new Set(Object.keys(phones).map(k=>k.split("|").slice(1).join("|")))].map(cityLL).filter(Boolean);
-  for(let i=0;i<80&&P0.length<18&&cs.length>1;i++){const A=cs[Math.floor(Math.random()*cs.length)],B=cs[Math.floor(Math.random()*cs.length)];if(A!=B&&(Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1]))>3)P0.push([A,B])}}
  for(let i=P0.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[P0[i],P0[j]]=[P0[j],P0[i]]}return P0}
 const v3=(lon,lat)=>{const l=lon*D,f=lat*D;return[Math.cos(f)*Math.sin(l),Math.sin(f),Math.cos(f)*Math.cos(l)]};
 function shootStart(){if(SHOOT.on||matchMedia("(prefers-reduced-motion: reduce)").matches)return;SHOOT.pairs=shootPairs();
@@ -1204,16 +1202,13 @@ function shootDraw(){const now=performance.now();
  // always running on the globe view (owner): at most 3 stars at once, unhurried, to anywhere in the world (behind the globe too)
  const canSpawn=view!="cards"&&!su&&!document.hidden;
  if(canSpawn&&now>=SHOOT.next&&SHOOT.arcs.length<3){
-  if(!SHOOT.pairs.length||SHOOT.pairs.every(p=>p.used)){SHOOT.pairs=shootPairs();SHOOT.pairs.forEach(p=>p.used=0)}
+  if(!SHOOT.pairs.length&&now-(SHOOT.lastBuild||0)>5000){SHOOT.lastBuild=now;SHOOT.pairs=shootPairs()}
   // owner: 65% of the stars touch what's on screen (going to or from a place you can see right now); the rest can be anywhere
   const onScr=c=>{const q=P(c[0],c[1]);return q[2]>.02&&q[0]>-20&&q[0]<W+20&&q[1]>-20&&q[1]<H+20};
   const want=Math.random()<.65,touches=q=>onScr(q[0])||onScr(q[1]);
-  let p=SHOOT.pairs.find(q=>!q.used&&touches(q)==want);
-  if(!p&&want){const vis=SHOOT.fill.filter(onScr),all=SHOOT.fill;if(vis.length&&all.length>1){const A=vis[Math.floor(Math.random()*vis.length)];const near=all.filter(x=>x!=A).sort((x,y)=>(Math.abs(x[0]-A[0])+Math.abs(x[1]-A[1]))-(Math.abs(y[0]-A[0])+Math.abs(y[1]-A[1])));
-   const B=zoom>1.6?near[Math.floor(Math.random()*Math.min(6,near.length))]:near[Math.floor(Math.random()*near.length)];if(B)p=Math.random()<.5?[A,B]:[B,A]}}
-  if(!p&&!want){const off=DIRG.map(g=>[g.lon,g.lat]).filter(c=>!onScr(c));for(let i=0;i<12&&!p&&off.length>1;i++){const A=off[Math.floor(Math.random()*off.length)],B=off[Math.floor(Math.random()*off.length)];if(A!=B&&(Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1]))>4)p=[A,B]}}
-  if(!p)p=SHOOT.pairs.find(q=>!q.used);
-  if(!p&&SHOOT.fill.length>1){const A=SHOOT.fill[Math.floor(Math.random()*SHOOT.fill.length)],B=SHOOT.fill[Math.floor(Math.random()*SHOOT.fill.length)];if(A!=B&&(Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1]))>4)p=[A,B]}
+  // owner: ONLY real connections (people who saved each other). The 65% rule is a preference; never invent a link to meet it.
+  let p=SHOOT.pairs.find(q=>!q.used&&touches(q)==want)||SHOOT.pairs.find(q=>!q.used);
+  if(!p&&SHOOT.pairs.length){SHOOT.pairs.forEach(q=>q.used=0);p=SHOOT.pairs.find(q=>touches(q)==want)||SHOOT.pairs[0]}
   if(p){p.used=1;const a=v3(p[0][0],p[0][1]),b=v3(p[1][0],p[1][1]),om=Math.acos(Math.max(-1,Math.min(1,a[0]*b[0]+a[1]*b[1]+a[2]*b[2])));
    SHOOT.arcs.push({a,b,om,lift:Math.min(.09,.02+om*.055)/Math.sqrt(Math.max(1,zoom)),t0:now,d:(2600+om*800)*(zoom>1.6?1.45:1),zi:zoom>1.6,dest:p[1]})}
   SHOOT.next=now+900+Math.random()*900}
