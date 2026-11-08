@@ -993,40 +993,55 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   var hop=function(u){return 4*u*(1-u)};
   /* a point on his head sphere: eye at horizontal offset d from the centre, head turned by th (radians) */
   function eye3(d,th){var R=80,p0=Math.asin(Math.max(-1,Math.min(1,d/R))),p=p0+th;return{dx:R*Math.sin(p)-d,s:Math.max(.12,Math.cos(p)/Math.cos(p0)),vis:Math.cos(p)>.15?1:0}}
+  var bell=function(t,a,b){var u=P(t,a,b);return u<=0||u>=1?0:.5-.5*Math.cos(2*Math.PI*u)};       // smooth 0→1→0
+  var soft=function(x){if(x<=0)return 0;if(x>=1)return 1;var c1=.9,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)}; // gentle overshoot
+  var land=function(t,t0,A){var d=t-t0;return d<0?0:A*Math.exp(-7*d)*Math.sin(19*d)/.62};             // damped squash after a landing
+  /* where his body is: gravity arcs for the hops (y), the jump off to the side (x), and the stretch from his speed */
+  function bodyY(t){var y=0,x=0,st=0,arc=function(a,b,h){var u=P(t,a,b);if(u<=0||u>=1)return;y-=h*4*u*(1-u);var v=Math.abs(1-2*u);st+=.15*v*Math.min(1,u/.12)*Math.min(1,(1-u)/.12+.35)*h/70}; 
+    arc(1.2,1.72,72);arc(4.17,4.72,58);
+    var j=P(t,5.95,6.55);if(j>0){x=1500*Math.pow(j,1.5);y-=190*Math.sin(Math.PI*Math.min(1,j*.85));st+=.18*Math.min(1,j*3)}
+    return{y:y,x:x,st:st}}
+  var FS={t:-1,h:0,hv:0,k:0,kv:0};
+  /* follow-through: two damped springs (head, hat) pushed by the body's vertical acceleration */
+  function follow(t,sY){if(FS.t<0||t<FS.t){FS.t=t;return{h:0,k:0}}var dt=Math.min(.05,t-FS.t),n=Math.max(1,Math.ceil(dt/.004)),h=dt/n,i,tt;
+    for(i=0;i<n;i++){tt=FS.t+h*(i+1);var e=.004,acc=(bodyY(tt+e).y-2*bodyY(tt).y+bodyY(tt-e).y)/(e*e);acc=Math.max(-9000,Math.min(9000,acc));
+      FS.hv+=(-260*FS.h-17*FS.hv-acc*.012)*h;FS.h+=FS.hv*h;FS.kv+=(-150*FS.k-10*FS.kv-acc*.02)*h;FS.k+=FS.kv*h}
+    FS.t=t;return{h:Math.max(-26,Math.min(26,FS.h)),k:Math.max(-40,Math.min(40,FS.k))}}
   function chRender(t){var c=chInit();if(!c)return;c.g.setAttribute('opacity',t>.3?'1':'0');
     // the stage lights up, the camera pushes in slowly
     c.stage.setAttribute('opacity',sm(P(t,0,.45)).toFixed(3));
     var cz=1+.06*sm(P(t,0,5.6));chT(c.cam,0,-8*sm(P(t,0,5.6)),0,cz,cz,480,c.FY);
-    // 1. the book pops up (springy, from below the floor's edge)
+    // v62 (owner: "smoother and more professional"): smooth bell-shaped anticipations, gravity arcs, velocity-driven stretch,
+    // damped-spring squash on every landing, and follow-through on the head and hat (springs driven by the body's motion)
+    // 1. the book pops up (springy)
     var bp=back(P(t,.35,.85));chT(c.book,0,46*(1-Math.min(1,bp)),0,bp,bp,184,378);
-    // 2. anticipation, hop, the head pops out at the top of the hop, land and settle
-    var c1=Math.sin(Math.PI*P(t,.95,1.2)),j1=P(t,1.2,1.72),l1=Math.sin(Math.PI*P(t,1.7,1.9))*(1-.5*P(t,1.8,1.95));
+    var sY=bodyY(t),air=-sY.y,y=sY.y,jx=sY.x;
     var hp=back(P(t,1.32,1.8));
-    // 3. looks right, left, forward (a real head turn), blinks
-    var th=.42*sm(P(t,2.1,2.4))-.84*sm(P(t,2.65,3.0))+.42*sm(P(t,3.2,3.45));
-    var bl=(t>3.65&&t<3.78)?.08:1;
-    // 4. anticipation, hop while turning to the right (90°), land
-    var c2=Math.sin(Math.PI*P(t,3.98,4.15)),j2=P(t,4.15,4.72),tu=sm(P(t,4.2,4.66)),l2=Math.sin(Math.PI*P(t,4.7,4.9));
-    th+=1.5708*tu;
-    // 5. deep crouch to get ready (book closes), jump off up and to the right (book opens like wings)
-    var c3=sm(P(t,5.0,5.75))*(1+.04*Math.sin(t*60)*P(t,5.6,5.95)*(1-P(t,5.95,6))),j3=P(t,5.95,6.55),e3=j3*j3,cl=c3*(1-sm(P(t,5.95,6.12)));   // v60: a long, deep wind-up for a big jump
-    var jx=1500*Math.pow(j3,1.5),air=70*hop(j1)+60*hop(j2)+190*Math.sin(Math.PI*Math.min(1,j3*.85)),y=-air;   // v61: off to the side in a low arc
-    var sq=.16*c1+.1*l1+.1*c2+.1*l2+.26*c3*(1-Math.min(1,j3*4)),st=.14*Math.sin(Math.PI*Math.min(1,j1*2.2))*(j1<.45?1:0)+.1*Math.sin(Math.PI*Math.min(1,j2*2.2))*(j2<.45?1:0)+.16*Math.min(1,j3*2);
-    var sx=1+sq*.7-st*.4,sy=1-sq+st;
-    // head: pops out, turns (slight lean into the turn), hat follows a little late
-    chT(c.head,0,215*(1-hp),th*5*(1-tu)+2*Math.sin(th),1,1,182,262);
+    // 3. looks right, left, forward (a real head turn with a soft overshoot), blinks (eyelids close and open smoothly)
+    var th=.42*soft(P(t,2.05,2.45))-.84*soft(P(t,2.6,3.05))+.42*soft(P(t,3.15,3.5));
+    var bl=1-.92*bell(t,3.6,3.84);
+    // 4. the turn to the right during the second hop
+    var tu=.5-.5*Math.cos(Math.PI*P(t,4.18,4.68));th+=1.5708*tu;
+    var j3=P(t,5.95,6.55),c3=sm(P(t,5.0,5.75))*(1-sm(P(t,5.9,6.0))),cl=c3*(1-sm(P(t,5.95,6.12)))+(t<5.95?0:0);
+    // squash & stretch: anticipation bells + landing springs + stretch from speed
+    var sq=.16*bell(t,.93,1.22)+.12*bell(t,3.96,4.17)+.27*c3+land(t,1.72,.13)+land(t,4.72,.12),st=sY.st;
+    var sx=1+sq*.7-st*.45,sy=1-sq+st;
+    // follow-through: head and hat lag behind the body like they're attached by springs
+    var F=follow(t,sY);
+    chT(c.head,0,215*(1-hp)+F.h,th*5*(1-tu)+2*Math.sin(th)+F.h*.08,1,1,182,262);
     var L=eye3(-33.1,th),Rr=eye3(33.3,th);
     chT(c.eL,L.dx,0,0,L.s,bl,149.5,171.3);chT(c.eR,Rr.dx,0,0,Rr.s,bl,215.9,171.1);
     c.eL.setAttribute('opacity',L.vis);c.eR.setAttribute('opacity',Rr.vis);
     c.gL.setAttribute('cx',(143+L.dx*1.05).toFixed(1));c.gR.setAttribute('cx',(209+Rr.dx*1.05).toFixed(1));
-    c.gL.setAttribute('opacity',(L.vis*(bl<1?0:.9)).toFixed(2));c.gR.setAttribute('opacity',(Rr.vis*(bl<1?0:.9)).toFixed(2));
-    chT(c.hat,6*Math.sin(th),-18*Math.sin(Math.PI*P(t,1.55,2.05))+9*c1+6*c3-18*Math.sin(Math.PI*P(t,5.95,6.35)),-7*Math.sin(Math.PI*P(t,1.55,2.05))-3*Math.sin(th),1-.06*Math.abs(Math.sin(th)),1,172,104);
-    // body turn: the front book narrows like a real object turning; at the side we see the book edge-on
+    c.gL.setAttribute('opacity',(L.vis*(bl<.6?0:.9)).toFixed(2));c.gR.setAttribute('opacity',(Rr.vis*(bl<.6?0:.9)).toFixed(2));
+    chT(c.hat,6*Math.sin(th),F.k-14*Math.sin(Math.PI*P(t,1.5,2.0)),-F.k*.25-6*Math.sin(Math.PI*P(t,1.5,2.0))-3*Math.sin(th),1-.06*Math.abs(Math.sin(th)),1,172,104);
+    // body turn: the front book narrows like a real object turning, then the side view
     var bt=Math.cos(1.5708*tu),side=tu>.75;
     c.book.setAttribute('opacity',side?'0':'1');c.sd.setAttribute('opacity',side?'1':'0');
     if(!side&&bp>=1)chT(c.book,0,0,0,Math.max(.4,bt),1-.04*Math.sin(Math.PI*tu),186,378);
-    chT(c.root,jx,y,8*Math.sin(Math.PI*Math.min(1,j3*1.2)),sx,sy,182,396);
-    chT(c.sd,jx,y,8*Math.sin(Math.PI*Math.min(1,j3*1.2)),sx,sy,188,396);
+    var lean=8*Math.sin(Math.PI*Math.min(1,j3*1.2))+2.5*bell(t,4.15,4.72);
+    chT(c.root,jx,y,lean,sx,sy,182,396);
+    chT(c.sd,jx,y,lean,sx,sy,188,396);
     // v59/v60 (owner): from the side the book IS his body, centred under his head, with the SPINE FACING FRONT (the way he
     // faces). We see the near cover's face; when the book opens the pages and the far cover fan out behind it (to the back),
     // a little at rest, closed in the wind-up, wide like wings as he jumps. (Drawn facing left here; the group is mirrored.)
@@ -1104,23 +1119,40 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
       o.connect(g);g.connect(lp);o.start(t);o.stop(t+dur+.05);
     }
   }
-  var C3=130.81,C4=261.63,E4=329.63,G4=392,C5=523.25,E5=659.25,G5=783.99,C6=1046.5,D6=1174.66,E6=1318.51,G6=1567.98;
+  /* v62 (owner: "audio more fitting the style"): a short animated-film score made in the browser: a warm swelling pad, a
+     bouncy pop for the book, a higher "boop" when his head pops out, soft wooden taps for landings and glances, whooshes for the
+     hops and the turn, a twinkle for the blink, a rising build during the wind-up, and a sparkle arpeggio + resolving chord as
+     he leaps away. All synthesized, no files. */
+  var NB=null;function noise(){if(NB)return NB;var n=AC.sampleRate*1.2,b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0),i;for(i=0;i<n;i++)d[i]=Math.random()*2-1;return NB=b}
+  function env(g,t,a,p,d){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(p,t+a);g.gain.exponentialRampToValueAtTime(.0003,t+a+d)}
+  function tone(type,f0,f1,t,a,p,d,dest){var o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);if(f1)o.frequency.exponentialRampToValueAtTime(f1,t+a+d*.6);env(g,t,a,p,d);o.connect(g);g.connect(dest||mst);o.start(t);o.stop(t+a+d+.05)}
+  function pad(t,dur){var lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(300,t);lp.frequency.linearRampToValueAtTime(1600,t+dur*.8);lp.Q.value=.5;lp.connect(mst);
+    [[130.81,.07],[196,.055],[329.63,.05],[493.88,.035],[587.33,.03]].forEach(function(n,i){[-4,4].forEach(function(dt){var o=AC.createOscillator(),g=AC.createGain();o.type='sawtooth';o.frequency.value=n[0];o.detune.value=dt;
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(n[1]*.5,t+1.2+i*.1);g.gain.setValueAtTime(n[1]*.5,t+dur-1.2);g.gain.linearRampToValueAtTime(0,t+dur);o.connect(g);g.connect(lp);o.start(t);o.stop(t+dur+.1)})})}
+  function pop(t,lo,hi,v){tone('sine',lo,hi,t,.006,v||.32,.16);tone('triangle',lo*2,hi*2,t,.004,(v||.32)*.25,.08)}
+  function tap(t,f,v){tone('sine',f,f*.92,t,.002,v||.16,.09);var s2=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain();s2.buffer=noise();bp.type='bandpass';bp.frequency.value=f*2.2;bp.Q.value=6;env(g,t,.001,(v||.16)*.6,.04);s2.connect(bp);bp.connect(g);g.connect(mst);s2.start(t);s2.stop(t+.08)}
+  function whoosh(t,d,f0,f1,v){var s2=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain();s2.buffer=noise();bp.type='bandpass';bp.Q.value=1.4;bp.frequency.setValueAtTime(f0,t);bp.frequency.exponentialRampToValueAtTime(f1,t+d);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v||.22,t+d*.45);g.gain.linearRampToValueAtTime(0,t+d);s2.connect(bp);bp.connect(g);g.connect(mst);s2.start(t);s2.stop(t+d+.05)}
+  function bellN(t,f,v){[[1,1],[2.76,.32],[5.4,.12]].forEach(function(p){tone('sine',f*p[0],0,t,.003,(v||.12)*p[1],1.4/p[0])})}
+  function build(t,d){tone('triangle',196,392,t,d*.9,.05,d*.25);whoosh(t,d,250,1200,.08)}
+  function finale(t){whoosh(t,.55,300,3200,.3);[1046.5,1318.5,1568,2093,2637].forEach(function(f,i){bellN(t+.06+i*.07,f,.1)});
+    [261.63,329.63,392,523.25].forEach(function(f,i){tone('triangle',f,0,t+.1,.03,.07,2.2-i*.2)})}
   var SE=[
-    [.05,[[C3,.18,3.4,0],[G4,.12,3.2,.1]]],
-    [.4,[[C5,.32,1.6,0],[G5,.22,1.6,.06]]],
-    [1.2,[[E5,.24,1.2,0]]],
-    [1.34,[[G5,.3,1.8,0],[C6,.22,1.8,.07]]],
-    [3.66,[[E6,.11,1,0]]],
-    [4.15,[[E5,.22,1.2,0]]],
-    [4.7,[[G4,.22,1.4,0]]],
-    [5.95,[[C3,.4,3,0],[C4,.34,2.8,.05],[G4,.3,2.6,.1],[E5,.3,2.4,.15],[C6,.26,2.2,.2],[G6,.16,2,.28]]]
-],sn=0;
+    [0,function(t){pad(t,7.4)}],
+    [.4,function(t){pop(t,180,520,.34)}],
+    [1.2,function(t){whoosh(t,.35,500,1500,.12)}],
+    [1.36,function(t){pop(t,320,900,.26)}],
+    [1.72,function(t){tap(t,520,.18)}],
+    [2.08,function(t){tap(t,880,.06)}],[2.63,function(t){tap(t,780,.06)}],[3.18,function(t){tap(t,840,.06)}],
+    [3.62,function(t){bellN(t,1975.5,.08)}],
+    [4.17,function(t){whoosh(t,.5,400,1800,.16)}],
+    [4.72,function(t){tap(t,470,.18)}],
+    [5.0,function(t){build(t,.95)}],
+    [5.95,function(t){finale(t)}]
+  ],sn=0;
   function sound(t){
     if(!AC||AC.state!=='running')return;
-    while(sn<SE.length&&SE[sn][0]<=t){
-      var ev=SE[sn][1],k;sn++;
-      for(k=0;k<ev.length;k++)note(ev[k][0],ev[k][1],ev[k][2],ev[k][3]);
-    }
+    while(sn<SE.length&&SE[sn][0]<=t){var ev=SE[sn];sn++;try{ev[1](AC.currentTime+.01)}catch(e){}}
   }
   var raf=0,t0=0,lastNow=0,done=false;
   function finish(){
@@ -3334,8 +3366,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=61;
+const CC_VER=62;
 const CC_LOG=[
+ {v:62,new:['The opening is smoother, with new sound effects.']},
  {v:61,new:['In the opening, the character now jumps off to the side.']},
  {v:60,new:['In the opening, the side-view book has its spine facing forward, and he winds up longer before his big jump.']},
  {v:59,new:['In the opening, the side view now shows the book as his body, right under his head.']},
