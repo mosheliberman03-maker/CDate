@@ -277,7 +277,8 @@ html.cc-shab,html.cc-shab body{overflow:hidden!important;overscroll-behavior:non
 #shabGate .sg-he{font:500 24px/1.4 'Noto Serif Hebrew','FRL App',serif;color:#f3cf8a;margin:0 0 18px}
 #shabGate p{color:#c9cbe0;font-size:16px}
 #shabGate #shabE{color:#9ea3c6;font-size:14px}
-#shabGate .glink{color:#6f7499;font-size:13px;margin-top:22px}
+#shabGate .glink{color:#6f7499;font-size:13px;margin-top:14px}
+#shabGate .sg-loc{display:block;margin:26px auto 0;padding:11px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#c9cbe0;font:500 14px Figtree,system-ui,sans-serif;cursor:pointer}#shabGate .sg-loc b{color:#f3cf8a;font-weight:600}
 html.cc-webblock,html.cc-webblock body{overflow:hidden!important;overscroll-behavior:none}
 .cc-gate .gc{width:min(100%,370px);background:rgba(22,26,48,.94);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:26px 22px 22px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.5)}
 .cc-gate img{width:64px;height:64px;border-radius:16px;display:block;margin:0 auto 14px}
@@ -897,7 +898,7 @@ body.sd-hide>:not(#sdr):not(script):not(style){visibility:hidden!important}
 <div id="lightCast" aria-hidden="true"></div><div id="sky" hidden><div id="skyGrad"></div><div id="skyNight"></div><div id="stars"></div><div id="skyWaves" aria-hidden="true"></div></div>
 <div class="cc-gate" id="webOnly" role="alertdialog" aria-modal="true" aria-labelledby="webOnlyT"><div class="gc"><img src="icon-192.png" alt=""><h1 id="webOnlyT">Please use the app</h1><p class="gb">BETA</p><p>Chabad Calendar now runs in its Android app. Install it to continue: your reminders there ring as alarms, even with no internet or VPN.</p><div class="cc-andr-yes"><ol><li>Tap <b>Download the app</b>.</li><li>Open the downloaded file and allow installing.</li><li>Open the app and create your account there.</li></ol><a class="gbtn" id="webOnlyDl" href="https://github.com/mosheliberman03-maker/CDate/releases/download/apk-latest/ChabadCalendar.apk">Download the app</a><p class="gs" id="webOnlyS"></p></div><div class="cc-andr-no"><p>The app is for Android phones. Open this page on your Android phone to install it.</p></div></div></div>
 <div class="cc-gate" id="permGate" role="dialog" aria-modal="true" aria-labelledby="permGateT"><div class="gc"><img src="icon-192.png" alt=""><h1 id="permGateT">Two quick permissions</h1><p class="gb">BETA</p><p><b>Location</b> works out sunrise, sunset and candle-lighting for where you are. <b>Microphone</b> lets you speak to the planner instead of typing.</p><button class="gbtn" id="permAllow" type="button">Allow</button><button class="glink" id="permLater" type="button">Not now</button><p class="gs" id="permS"></p></div></div>
-<div class="cc-gate" id="shabGate" role="alertdialog" aria-modal="true" aria-labelledby="shabT"><div class="gc"><div class="sg-s" aria-hidden="true"><i class="sg-k"></i><span class="cch" id="shabCh"></span><i class="sg-k"></i></div><h1 id="shabT">Good Shabbos</h1><p class="sg-he" lang="he" dir="rtl" id="shabH">שבת שלום</p><p id="shabP">The app is resting for Shabbos.</p><p id="shabE"></p><button class="glink" id="shabAdm" type="button" hidden>Admin: open the app anyway</button></div></div>
+<div class="cc-gate" id="shabGate" role="alertdialog" aria-modal="true" aria-labelledby="shabT"><div class="gc"><div class="sg-s" aria-hidden="true"><i class="sg-k"></i><span class="cch" id="shabCh"></span><i class="sg-k"></i></div><h1 id="shabT">Good Shabbos</h1><p class="sg-he" lang="he" dir="rtl" id="shabH">שבת שלום</p><p id="shabP">The app is resting for Shabbos.</p><p id="shabE"></p><button class="sg-loc" id="shabLoc" type="button"><b>Not right?</b> Tap here to switch your location</button><button class="glink" id="shabAdm" type="button" hidden>Admin: open the app anyway</button></div></div>
 <script>/* Shabbos screen: fill it from the saved window on the first frame */(function(){var w=window.CC_SHAB;if(!w)return;function f(i,t){var e=document.getElementById(i);if(e&&t!=null)e.textContent=t}f('shabT',w.g);f('shabH',w.he);f('shabP',w.p);f('shabE',w.x);for(var c=document.body.children,i=0;i<c.length;i++)if(c[i].id!=='shabGate')c[i].inert=true})();</script>
 <script>/* Beta: the website is closed (only the Android app works); the app asks for location + microphone once, before sign-in. */
 function ccIsApp(){try{var C=window.Capacitor;return !!(C&&C.isNativePlatform&&C.isNativePlatform())}catch(e){return false}}
@@ -1189,6 +1190,8 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     setTimeout(function(){try{AC&&AC.close()}catch(e){}},4500);
   }
   function frame(now){
+    // Shabbos / Yom Tov screen came up (first launch, before the times were saved): no intro and no sound
+    if(document.documentElement.classList.contains('cc-shab')){try{AC&&AC.close()}catch(e){}AC=null;finish();return}
     if(!chInit()){raf=requestAnimationFrame(frame);return}   // wait until the character's drawing is loaded
     if(!t0)t0=now;
     // if the phone was busy (still loading the app) and a frame came late, hold the animation instead of jumping ahead
@@ -1432,7 +1435,7 @@ const fl=()=>{$('#pl').value=LC.n;$('#la').value=LC.la;$('#lo').value=LC.lo;$('#
 const locMsg=(t,bad)=>{const m=$('#locMsg');m.textContent=t;m.style.color=bad?'#d9534f':'var(--mut)'};
 function setLoc(n,la,lo,tz){try{new Intl.DateTimeFormat('en',{timeZone:tz})}catch(e){tz=Intl.DateTimeFormat().resolvedOptions().timeZone}
  LC={n:n||'My location',la:+(+la).toFixed(3),lo:+(+lo).toFixed(3),tz};try{localStorage.setItem(AK('cc_loc'),JSON.stringify(LC))}catch(e){}
- fl();if(typeof skyTick=='function'&&SKY.on)skyTick();panel(0);if(typeof SKY!='undefined'&&SKY.on&&SKY.last)skyApply(SKY.last);if(typeof notifSyncSoon=='function')notifSyncSoon()}
+ fl();if(typeof skyTick=='function'&&SKY.on)skyTick();panel(0);if(typeof SKY!='undefined'&&SKY.on&&SKY.last)skyApply(SKY.last);if(typeof notifSyncSoon=='function')notifSyncSoon();if(window.ccShab)ccShab()}
 $('#ls').onclick=()=>{const la=parseFloat($('#la').value),lo=parseFloat($('#lo').value),tz=$('#tz').value.trim();if(isNaN(la)||isNaN(lo))return locMsg('Enter a latitude and longitude.',1);try{new Intl.DateTimeFormat('en',{timeZone:tz})}catch(e){locMsg('That time zone is not valid.',1);return $('#tz').focus()}setLoc($('#pl').value.trim(),la,lo,tz);locMsg('Location saved.');op(false)};
 const fj=async(u)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),9000);try{const r=await fetch(u,{signal:c.signal});if(!r.ok)throw 0;return await r.json()}finally{clearTimeout(t)}};
 $('#ul').onclick=()=>{if(!navigator.geolocation)return locMsg('This browser cannot detect location. Type a city instead.',1);locMsg('Detecting…');
@@ -3441,9 +3444,9 @@ addEventListener('keydown',()=>{CCH_ACT=Date.now()},{passive:true});
  if(v>1.6&&FABC.brace&&!FABC.sleep&&!document.documentElement.classList.contains('tt-off-charlife'))FABC.brace(dy<0?-1:1)},{passive:true})}
 /* finishing a shiur: a happy hop and his book claps shut and open */
 /* Shabbos / Yom Tov lock: checked on load, every 30 s and on return; saves the current/next window for the first frame of the next launch */
-{let shL=null,shC=null;const R=document.documentElement,gate=document.getElementById('shabGate');
+{let shL=null,shC=null,shLoc=false;const R=document.documentElement,gate=document.getElementById('shabGate');
  const inertAll=on=>{for(const c of document.body.children)if(c.id!=='shabGate'&&!(R.classList.contains('cc-webblock')&&c.id!=='webOnly'))c.inert=on;if(R.classList.contains('cc-webblock')){const g=document.getElementById('webOnly');if(g)g.inert=on}};
- window.ccShab=()=>{try{const now=Date.now(),w=ccHolyNext(now),off=R.classList.contains('tt-off-shabbos')||(()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}').shabbos===false}catch(e){return false}})(),skip=(()=>{try{return!!sessionStorage.getItem('cc_shab_skip')}catch(e){return false}})();
+ window.ccShab=()=>{try{const now=Date.now(),w=ccHolyNext(now),off=R.classList.contains('tt-off-shabbos')||(()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}').shabbos===false}catch(e){return false}})(),skip=shLoc||(()=>{try{return!!sessionStorage.getItem('cc_shab_skip')}catch(e){return false}})();
   if(w){const T=ccHolyText(w);try{localStorage.setItem('cc_shab_win',JSON.stringify({s:w.s,e:w.e,...T}))}catch(e){}
    [['shabT',T.g],['shabH',T.he],['shabP',T.p],['shabE',T.x]].forEach(([i,t])=>{const e=document.getElementById(i);if(e&&e.textContent!==t)e.textContent=t})}
   const on=!!w&&now>=w.s&&now<w.e&&!off&&!skip;
@@ -3452,6 +3455,9 @@ addEventListener('keydown',()=>{CCH_ACT=Date.now()},{passive:true});
    else if(shL===false&&typeof notifSyncSoon=='function')notifSyncSoon(3000)}
   const a=document.getElementById('shabAdm');if(a)a.hidden=!(window.CC_ADMIN||window.CC_TEST)}catch(e){}};
  const a=document.getElementById('shabAdm');if(a)a.onclick=()=>{try{sessionStorage.setItem('cc_shab_skip','1')}catch(e){}ccShab()};
+ /* "Not right? Tap here to switch your location": the screen steps aside, ⋯ opens on Location; closing ⋯ checks again for the new place */
+ const lb=document.getElementById('shabLoc');if(lb)lb.onclick=()=>{shLoc=true;ccShab();op(true);shGo('loc',0,1)};
+ new MutationObserver(()=>{if(shLoc&&!document.body.classList.contains('op')){shLoc=false;ccShab()}}).observe(document.body,{attributes:true,attributeFilter:['class']});
  if(window.CC_SHAB)shL=true;ccShab();setInterval(ccShab,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)ccShab()});}
 window.ccCharShiur=()=>{try{if(!document.documentElement.classList.contains('tt-off-charlife')&&FABC.clap)setTimeout(FABC.clap,250)}catch(e){}};
 /* opening: the sheet grows out of the character button, and the character pops in and says hello */
@@ -3479,8 +3485,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=72;
+const CC_VER=73;
 const CC_LOG=[
+ {v:73,new:['The Shabbos / Yom Tov screen has a “Not right? Tap here to switch your location” button, in case the app is set to another place.']},
  {v:72,big:1,new:['The app now rests on Shabbos and Yom Tov. From candle lighting until nightfall it shows a Good Shabbos / Good Yom Tov screen with the time it opens again, and no reminders ring during that time.']},
  {v:71,new:['The assistant’s moves now come in different versions: he tips his hat left or right (or lifts it high), sways and tilts to either side, winks with either eye, blinks slowly, glances around with his head, stretches leaning to a side, and leans the way the wind blows when you scroll up or down.']},
  {v:70,mid:1,new:['The assistant is more alive: he breathes with his book, double-blinks, fixes his hat, reads line by line, stretches, flips through pages, follows your finger with his eyes, gets surprised (or dizzy!) when you tap him, leans into the wind when you scroll fast, cheers when you finish a shiur, dozes off when left alone, yawns at night and is calm and content on Shabbos.']},
