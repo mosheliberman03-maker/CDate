@@ -61,3 +61,15 @@ try {
 } catch (e) {
   console.log('patch-android: character pictures skipped (' + e.message + ')');
 }
+
+/* App version (owner, v54: update the app from inside the app). native/app-version.txt holds the number; the web app's
+   CC_APK says which number it needs, reads it back with App.getInfo().build and offers "Update the app" when it's older. */
+try {
+  const v = parseInt(fs.readFileSync('app-version.txt', 'utf8'), 10) || 1;
+  let g = fs.readFileSync(gradle, 'utf8');
+  g = g.replace(/versionCode\s+\d+/, 'versionCode ' + v).replace(/versionName\s+"[^"]*"/, 'versionName "' + v + '"');
+  fs.writeFileSync(gradle, g);
+  console.log('patch-android: app version ' + v);
+} catch (e) {
+  console.log('patch-android: app version not set (' + e.message + ')');
+}

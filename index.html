@@ -788,6 +788,13 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 @media(prefers-reduced-motion:reduce){.yzc b{animation:none}}
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
 </style>
+<style id="cc-apk">
+#apkBar{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:9001;display:flex;align-items:center;gap:10px;max-width:92vw;padding:10px 12px 10px 16px;border-radius:999px;border:1px solid var(--gx-bd,var(--line));background:var(--gx-sheet,var(--card));-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:var(--ink);font:500 14px Figtree,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.25);transform:translate(-50%,-150%);transition:transform .4s cubic-bezier(.2,.9,.25,1.1);cursor:pointer}
+#apkBar{white-space:nowrap}#apkBar.on{transform:translate(-50%,0)}#apkBar b{color:var(--acc,#4655c8)}#apkBar i{font-style:normal;opacity:.6;padding:0 4px;font-size:18px}
+.apk-box{position:fixed;inset:0;z-index:9002;display:none;align-items:flex-end;justify-content:center;padding:12px;background:#090b18a8}.apk-box.on{display:flex}
+.apk-card{width:min(100%,460px);box-sizing:border-box;padding:20px;border-radius:24px;background:var(--gx-sheet,var(--card));color:var(--ink);border:1px solid var(--gx-bd,var(--line));-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.apk-card h3{margin:6px 0 6px;font:500 23px 'Frank Ruhl Libre',Georgia,serif}.apk-card p,.apk-card ol{font-size:14px;line-height:1.5;margin:0 0 10px}.apk-card ol{padding-left:20px}.apk-av{--cw:52px}
+</style>
 <style id="cc-char">
 /* ===== The assistant character (owner, v48; v50 = a live rig): his drawing traced into parts (hat, head, eyes, brows,
    book) that move on their own, so he really animates instead of swapping pictures. Always black and white like the
@@ -1313,7 +1320,7 @@ function shGo(p,back,quiet){const sh=$('#sh');if(!sh)return;const cur=sh.querySe
 function shSum(){const t=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
  t('shsLoc',LC.n);t('shsSched',my.length?my.length+(my.length==1?' plan':' plans')+' of your own':'Nothing added yet');
  try{t('ccVer','Version '+ccVerStr(CC_VER)+(window.CC_NATIVE?' · Android app':''))}catch(e){}
- t('shsApp',window.CC_NATIVE?'You’re using the app':ccIOS&&ccIOS()?'Add to Home Screen':'Download and offline alarms')}
+ t('shsApp',window.CC_NATIVE?(window.CC_APK_OLD?'Update available':'You’re using the app'):ccIOS&&ccIOS()?'Add to Home Screen':'Download and offline alarms')}
 document.addEventListener('click',e=>{const g=e.target.closest('#sh [data-go]');if(g){shGo(g.dataset.go);return}if(e.target.closest('#sh [data-back]'))shGo('home',1)});
 /* The manual "Add an event" form is gone (the assistant does that now); the form only appears to edit an existing event. */
 function fill(e){eid=e?e.id:null;$('#fwrap').hidden=!e;if(e&&typeof shGo=='function')shGo('sched',0,1);const c=e&&my.find(m=>m.id==e.id);$('#fh').textContent=e?'Edit event':'Add an event';$('#ft').value=e?e.t:'';$('#fx').value=e&&e.x!='Your event.'?e.x:'';$('#fd').hidden=!!e&&!c;$('#fdt').value=c?c.dt:ds(sel);dfSet($('#fdb'),pd($('#fdt').value));$('#fr').value=c?c.r:'once';$('#dl').hidden=!e;$('#dl').textContent=c?'Delete':'Reset to original'}
@@ -3291,8 +3298,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=53;
+const CC_VER=54;
 const CC_LOG=[
+ {v:54,mid:1,new:['When the app itself needs an update, you’ll see “App update ready” at the top and an Update the app button in ⋯ → App. Tap it to download and install the new version right over the old one.']},
  {v:53,new:['The assistant changes expression smoothly without flashing.']},
  {v:52,new:['The assistant no longer flashes in the Plan window, and his page turn now looks like a page turning inside his book.']},
  {v:51,new:['Fixed the assistant flashing between his animations.']},
@@ -3418,8 +3426,23 @@ function appShow(){let o=document.getElementById('appBox');
  requestAnimationFrame(()=>o.classList.add('on'));H.tap&&H.tap()}
 function CC_LOGGED(){const g=document.getElementById('accountGate');return !g||getComputedStyle(g).display==='none'}
 function findDemoDay(){try{for(let i=0;i<40;i++){const d=ad(t0,i),inf=info(d);if(inf.ev&&inf.ev.length>=2)return d}}catch(e){}return t0}
+/* ===== Updating the app itself (owner, v54): "when I need to update the actual app, it should be sent to the app, with a button
+   inside the app". CC_APK = the app version this page needs (native/app-version.txt, set into the APK by patch-android.js).
+   An older app (or one too old to tell, = 0) gets a bar at the top and an "Update the app" button in ⋯ → App. ===== */
+const CC_APK=2;let APKV=null;
+async function ccApkVer(){if(!CC_NATIVE)return 99;if(APKV!=null)return APKV;try{const C=window.Capacitor,A=(C.Plugins&&C.Plugins.App)||C.registerPlugin('App');const i=await A.getInfo();APKV=+i.build||0}catch(e){APKV=0}return APKV}
+function apkUpdate(){try{H.tap()}catch(e){}let o=document.getElementById('apkBox');if(!o){o=document.createElement('div');o.id='apkBox';o.className='apk-box';document.body.appendChild(o)}
+ o.innerHTML=`<div class="apk-card" role="dialog" aria-label="Update the app">${typeof cchHtml==='function'?cchHtml('alert','apk-av'):''}<h3>Update the app</h3><p>A new version of the app is ready. It installs over this one, and everything you saved stays.</p><ol><li>Tap <b>Download the update</b>.</li><li>When it finishes, open the downloaded file.</li><li>Tap <b>Update</b>, then open the app again.</li></ol><a class="btn" id="apkGo" href="${APK_URL}" style="display:block;text-align:center;text-decoration:none">Download the update</a><button class="btn gh" type="button" id="apkLater" style="width:100%;margin-top:8px">Later</button></div>`;
+ o.classList.add('on');if(typeof cchLive==='function')cchLive(o.querySelector('.cch'),'alert');
+ o.onclick=e=>{if(e.target===o||e.target.closest('#apkLater')){o.classList.remove('on');try{sessionStorage.setItem('cc_apk_later','1')}catch(x){}const b=document.getElementById('apkBar');if(b)b.remove()}}}
+async function apkCheck(){if(!CC_NATIVE||!(typeof CC_LOGGED==='function'&&CC_LOGGED()))return;const v=await ccApkVer();window.CC_APK_OLD=v<CC_APK;window.CC_NATIVE=CC_NATIVE;appSync();if(v>=CC_APK||document.getElementById('apkBar'))return;
+ if(sessionStorage.getItem('cc_apk_later'))return;
+ const b=document.createElement('button');b.id='apkBar';b.type='button';b.innerHTML='<span>App update ready</span><b>Tap to update</b><i aria-label="Not now">×</i>';document.body.appendChild(b);requestAnimationFrame(()=>b.classList.add('on'));
+ b.onclick=e=>{if(e.target.closest('i')){b.remove();try{sessionStorage.setItem('cc_apk_later','1')}catch(x){}return}apkUpdate()}}
+setTimeout(apkCheck,4000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(apkCheck,1500)});
 function appSync(){const el=document.getElementById('appSec'),h=document.getElementById('appH');if(!el)return;
- if(CC_NATIVE){el.innerHTML='<p class="mut" style="font-size:14px;margin:4px 0 0">✓ You’re using the app. Your reminders here ring as alarms on this phone, even offline.</p>';return}
+ if(CC_NATIVE){const old=APKV!=null&&APKV<CC_APK;el.innerHTML=old?'<p style="font-size:14px;margin:4px 0 10px"><b>A new version of the app is ready.</b> It installs over this one; everything you saved stays.</p><button class="btn" type="button" id="apkBtn" style="width:100%">Update the app</button>':'<p class="mut" style="font-size:14px;margin:4px 0 0">✓ You’re using the newest app. Your reminders here ring as alarms on this phone, even offline.</p>';
+  const ub=el.querySelector('#apkBtn');if(ub)ub.addEventListener('click',apkUpdate);return}
  if(ccAndroid){el.innerHTML='<button class="btn" type="button" id="appGet">Download the app</button><p class="mut" style="font-size:13px;margin:8px 0 0">Adds offline alarms (no VPN needed) and a home-screen widget. You still control everything from here.</p>';
   const b=el.querySelector('#appGet');if(b)b.addEventListener('click',appShow);return}
  el.innerHTML=ccIOS()?'<p class="mut" style="font-size:14px;margin:4px 0 0">On iPhone and iPad, this website is the app. Tip: tap Share, then <b>Add to Home Screen</b>, and open it from there; that is also how reminders can reach you.</p>':'<p class="mut" style="font-size:14px;margin:4px 0 0">The app is for Android phones. Open this site on your Android phone to install it.</p>'}
