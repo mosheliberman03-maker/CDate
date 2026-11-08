@@ -1081,10 +1081,10 @@ sync()})();
 // big:1 = MAJOR (a real new feature) → full popup, version X.0.0 · mid:1 = MEDIUM → slim banner at the top, version X.Y.0 ·
 // neither = SMALL (looks, tweaks, fixes) → only a little round "i" in the corner, version X.Y.Z. The shown version is worked out from these sizes.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=23,KIT_APK=1;
+const KIT_VER=24,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
- {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
+ {v:2,mid:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
  {v:2,t:"New globe app icon",apk:1},
  {v:3,big:1,t:"A hands-on tour",d:"Find a bochur, save him, and see your list, step by step. Replay it anytime from the menu.",go:"tour"},
  {v:4,mid:1,t:"A tidier menu: your account on top, everything else grouped"},
@@ -1093,7 +1093,7 @@ const KIT_LOG=[
  {v:7,big:1,t:"Send us a suggestion",d:"Have an idea, found a problem, or a question? Menu → Suggestions & contact. We read every message.",go:"feedback"},
  {v:9,mid:1,t:"Easier sign-up: name suggestions as you type, and your number fills in if we have it"},
  {v:10,t:"Some names now spelled the way people write them"},
- {v:12,big:1,t:"New people and places",d:"New people and places were added from the official shlichus list, and some names were corrected. Your saved list updates by itself."},
+ {v:12,mid:1,t:"New people and places",d:"New people and places were added from the official shlichus list, and some names were corrected. Your saved list updates by itself."},
  {v:15,mid:1,t:"Shooting stars on the globe between friends who saved each other"},
  {v:17,t:"Softer, pastel shooting stars"},
  {v:18,t:"Shooting stars fly closer to the globe"},
@@ -1101,7 +1101,8 @@ const KIT_LOG=[
  {v:20,t:"Most shooting stars now fly to or from places you can see"},
  {v:21,t:"Smoother, slower shooting stars when zoomed in"},
  {v:22,t:"Shooting stars only show real connections between friends"},
- {v:23,mid:1,t:"Clearer version numbers (big.medium.small), and small updates now just show a little ⓘ in the corner"}
+ {v:23,mid:1,t:"Clearer version numbers (big.medium.small), and small updates now just show a little ⓘ in the corner"},
+ {v:24,t:"Version numbers recounted with the new big / medium / small rule"}
 ];
 function kitVerStr(b){let M=0,m=0,p=0;const by={};KIT_LOG.forEach(x=>{const l=x.big?3:x.mid?2:1;by[x.v]=Math.max(by[x.v]||0,l)});
  Object.keys(by).map(Number).sort((a,c)=>a-c).forEach(v=>{if(v>b)return;if(by[v]==3){M++;m=0;p=0}else if(by[v]==2){m++;p=0}else p++});return M+"."+m+"."+p}
