@@ -895,7 +895,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
 <div class="account-shade" id="accountGate" role="dialog" aria-modal="true" aria-labelledby="accountTitle"><form class="account-card" id="accountForm"><h1 id="accountTitle">Chabad Calendar</h1><p id="accountBeta" style="color:#8c94ef;font-weight:500;margin-bottom:8px;text-align:center">✓ Beta Program</p><p id="accountSub">Sign in or create a private profile for this device.</p><label for="accountUser">Username</label><input id="accountUser" autocomplete="username" minlength="3" maxlength="32" required placeholder="Choose a username"><label for="accountPass">Password</label><input id="accountPass" type="password" autocomplete="current-password" minlength="4" required placeholder="At least 4 characters"><div class="account-buttons"><button id="accountSubmit" type="submit">Log in</button><button id="accountMode" class="alt" type="button">Create account</button></div><div class="account-error" id="accountError" role="status"></div><p class="account-note">Your profile and schedule stay in this browser on this device. This is not a cloud account: another person or device has separate data, and your schedule will not sync between devices. This simple offline lock is not suitable for sensitive information.</p></form></div>
 <div id="intro"><svg id="in-logo" viewBox="95 85 770 675" role="img" aria-label="Logo">
   <defs><linearGradient id="in-fade" gradientUnits="userSpaceOnUse" x1="556" y1="536" x2="548" y2="590"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient></defs>
-  <g id="in-all">
+  <g id="in-all" style="display:none">
     <g id="in-rest">
       <circle id="in-dot" cx="508" cy="415" r="0"/>
       <path id="in-nun" class="p" d=""/>
@@ -940,7 +940,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   var io=function(x){return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2};
   var out=function(x){return 1-Math.pow(1-x,3)};
   var sm=function(x){return x*x*(3-2*x)};
-  var END=12.9,SPEED=1.65,SPEED2=1.05,ov=document.getElementById('intro'),app=document.querySelector('main');
+  var END=6.2,SPEED=1,SPEED2=1,ov=document.getElementById('intro'),app=document.querySelector('main');
 
   var ZA=[[512,518],[318,628],[212,550],[120,735]],ZB=[[660,242],[480,472],[300,242],[300,602]];
   var SA=[[556,536],[522,725]],SB=[[660,242],[660,602]];
@@ -958,16 +958,16 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
 
   var CH=null;
   function chInit(){if(CH)return CH;if(typeof CCH_SVG==='undefined')return null;
-    var w=380,h=447,x=480-184*w/340,y=430-300*h/400;
+    var w=440,h=518,x=480-184*w/340,y=450-300*h/400;
     var m=CCH_SVG.replace('<svg viewBox="0 0 340 400"','<svg x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+w+'" height="'+h+'" viewBox="0 0 340 400" overflow="visible"')
       .replace('<g class="c-head">','<clipPath id="in-hc"><rect x="-300" y="-900" width="940" height="1140"/></clipPath><g clip-path="url(#in-hc)"><g class="c-head">').replace('\n<g class="c-book">','</g>\n<g class="c-book">');
     /* v56: a side view (facing left) for the turn and the jump: the same head, one eye, the hat from the side, and the book
        seen edge-on as two covers hinged at the spine, which close as he crouches and open like wings as he jumps */
-    var side='<g class="c-sd" opacity="0"><g class="c-sdb">'
+    var side='<g class="c-sd" opacity="0"><g transform="matrix(-1 0 0 1 376 0)"><g class="c-sdb">'
       +'<circle class="c-halo" cx="188" cy="172" r="83.5"/><circle class="c-face" cx="188" cy="172" r="83.5"/>'
       +'<g class="c-sde"><ellipse class="k" cx="132" cy="168" rx="12" ry="25"/></g>'
       +'<g class="c-sdh"><path class="k" d="M122 102L134 40Q188 20 244 38L256 102Z"/><ellipse class="k" cx="186" cy="106" rx="150" ry="14" transform="rotate(-4 186 106)"/></g>'
-      +'<g class="c-sdk"><path class="k c-sb"/><path class="w c-sp" style="stroke:var(--ink);stroke-width:4;stroke-linejoin:round"/></g></g></g>';
+      +'<g class="c-sdk"><path class="k c-sb"/><path class="w c-sp" style="stroke:var(--ink);stroke-width:4;stroke-linejoin:round"/></g></g></g></g>';
     m=m.replace('</svg>',side+'</svg>');
     svg.insertAdjacentHTML('beforeend','<g id="in-ch" class="cchI" style="--ink:#05060c;--fill:#fff;--halo:rgba(255,255,255,.95)" opacity="0">'+m+'</g>');
     var g=document.getElementById('in-ch'),q=function(c){return g.querySelector(c)};
@@ -975,84 +975,41 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
       sd:q('.c-sd'),sdb:q('.c-sdb'),sdh:q('.c-sdh'),sdk:q('.c-sdk'),sb:q('.c-sb'),sp:q('.c-sp')};return CH}
   function chT(n,x,y,r,sx,sy,px,py){if(n)n.setAttribute('transform','translate('+(x+px).toFixed(2)+' '+(y+py).toFixed(2)+') rotate('+r.toFixed(2)+') scale('+sx.toFixed(3)+' '+sy.toFixed(3)+') translate('+(-px)+' '+(-py)+')')}
   var back=function(x){var c1=1.9,c3=c1+1;return x<=0?0:1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
-  function chRender(t){if(t<7.15)return;var c=chInit();if(!c)return;c.g.setAttribute('opacity','1');
-    var bs=back(P(t,7.2,7.85));chT(c.book,0,0,0,bs,bs,184,300);                       // the book grows out of the dot
-    var hp=back(P(t,7.95,8.55));                                                           // his head pops up from behind it
-    var lx=-15*sm(P(t,8.85,9.2))+30*sm(P(t,9.45,9.85))-15*sm(P(t,10.05,10.3));               // looks left, right, straight
-    chT(c.head,0,215*(1-hp),lx*.22,1,1,182,262);
-    chT(c.look,lx,0,0,1,1,182,171);
-    chT(c.hat,0,-16*Math.sin(Math.PI*P(t,8.3,8.85)),-6*Math.sin(Math.PI*P(t,8.3,8.85)),1,1,172,104);
-    var bl=(t>10.45&&t<10.6)?.08:1;chT(c.eL,0,0,0,1,bl,149.5,171.3);chT(c.eR,0,0,0,1,bl,215.9,171.1);  // blink
-    // he turns to his left: the front view narrows to nothing, the side view widens out of it
-    var ta=P(t,10.85,11.08),tb=P(t,11.08,11.32);
-    chT(c.root,0,0,0,Math.max(.001,1-sm(ta)),1,182,300);
-    if(t>=11.08){c.root.setAttribute('opacity','0');c.sd.setAttribute('opacity','1')}else{c.root.setAttribute('opacity','1');c.sd.setAttribute('opacity','0')}
-    // crouch (the book closes), then jump up and away to the left (the book opens like wings)
-    var cr=Math.sin(Math.PI*P(t,11.45,11.9)),cl=sm(P(t,11.4,11.75))*(1-sm(P(t,11.85,12.1))),ju=P(t,11.85,12.55),e=ju*ju;
-    chT(c.sd,-160*e,-1450*e,-14*e,Math.max(.001,sm(tb))*(1+.07*cr-.05*ju),1-.12*cr+.12*ju,188,396);
-    // the book from the side: spine on the left, its covers opening toward his face. w = how open (thin when closed, wide
-    // like wings during the jump); the white strip is the page edges facing him
-    var op=1-cl,w=16+44*op+46*Math.sin(Math.PI*Math.min(1,ju*1.5)),sp=8*op+18*Math.sin(Math.PI*Math.min(1,ju*1.5)),X=58;
+  /* v57 (owner: "scratch the whole intro"): a cartoon. The book pops up, crouches, hops, and his head pops out of it; he looks
+     right, left, forward and blinks; hops while turning to the right (side view); crouches to get ready (book closes) and
+     jumps off to the right (book opens); then the app. Squash and stretch everywhere, anchored at his feet. */
+  var hop=function(u){return 4*u*(1-u)};                                    // 0 → 1 → 0 arc
+  function chRender(t){var c=chInit();if(!c)return;c.g.setAttribute('opacity','1');
+    // 1. the book pops up out of nothing (springy), anchored at the bottom
+    var bp=back(P(t,.15,.6));chT(c.book,0,40*(1-Math.min(1,bp)),0,bp,bp,184,378);
+    // 2. it crouches, then hops; the head pops up out of it on the way up
+    var c1=Math.sin(Math.PI*P(t,.75,1.02)),j1=P(t,1.0,1.5),l1=Math.sin(Math.PI*P(t,1.48,1.68));
+    var hp=back(P(t,1.08,1.6));
+    // 3. looks right, left, forward, blinks
+    var lx=16*sm(P(t,1.95,2.2))-32*sm(P(t,2.5,2.85))+16*sm(P(t,3.05,3.3));
+    var bl=(t>3.5&&t<3.62)?.08:1;
+    // 4. hops and turns to the right while in the air, lands
+    var j2=P(t,3.85,4.45),ta=P(t,3.98,4.13),tb=P(t,4.13,4.28),l2=Math.sin(Math.PI*P(t,4.43,4.6));
+    // 5. crouches to get ready (the book closes), then jumps off to the right (the book opens)
+    var c3=sm(P(t,4.75,5.15)),j3=P(t,5.15,5.75),e3=j3*j3,cl=c3*(1-sm(P(t,5.15,5.35)));
+    var y=-70*hop(j1)-55*hop(j2)-1500*e3,sq=.16*c1+.08*l1+.08*l2+.14*c3*(1-j3),st=.12*Math.sin(Math.PI*Math.min(1,j1*2))*(1-j1)+.1*Math.sin(Math.PI*Math.min(1,j3*3))*(j3<.34?1:0)+.14*j3;
+    var sx=1+sq*.7-st*.4,sy=1-sq+st;
+    chT(c.head,0,215*(1-hp),lx*.22,1,1,182,262);chT(c.look,lx,0,0,1,1,182,171);
+    chT(c.hat,0,-18*Math.sin(Math.PI*P(t,1.35,1.85))+10*c1,-7*Math.sin(Math.PI*P(t,1.35,1.85)),1,1,172,104);
+    chT(c.eL,0,0,0,1,bl,149.5,171.3);chT(c.eR,0,0,0,1,bl,215.9,171.1);
+    var turned=t>=4.13;c.root.setAttribute('opacity',turned?'0':'1');c.sd.setAttribute('opacity',turned?'1':'0');
+    chT(c.root,0,y,0,sx*Math.max(.001,1-sm(ta)),sy,182,396);
+    chT(c.sd,260*e3,y,10*e3,sx*Math.max(.001,sm(tb)),sy,188,396);
+    var op=1-cl,w=16+44*op+40*Math.sin(Math.PI*Math.min(1,j3*1.4)),sp=8*op+16*Math.sin(Math.PI*Math.min(1,j3*1.4)),X=58;
     c.sb.setAttribute('d','M'+X+' 226L'+X+' 362L'+(X+w).toFixed(1)+' '+(374+sp).toFixed(1)+'L'+(X+w).toFixed(1)+' '+(214-sp).toFixed(1)+'Z');
     var pw=Math.max(0,Math.min(12,w-14));c.sp.setAttribute('opacity',op>.15?'1':'0');
     c.sp.setAttribute('d','M'+(X+w-pw).toFixed(1)+' '+(222-sp*.8).toFixed(1)+'L'+(X+w-2).toFixed(1)+' '+(220-sp).toFixed(1)+'L'+(X+w-2).toFixed(1)+' '+(368+sp).toFixed(1)+'L'+(X+w-pw).toFixed(1)+' '+(366+sp*.8).toFixed(1)+'Z');
-    chT(c.sdh,0,30*cr*0+(-10*Math.sin(Math.PI*P(t,11.85,12.2))),-4*cr,1,1,188,104);
-    chT(c.sde,0,6*cr,0,1,cr>.6?.25:1,132,168)}
+    chT(c.sdh,0,-12*Math.sin(Math.PI*P(t,5.15,5.5))+8*c3,-4*c3,1,1,188,104)}
   function render(t){
-    // 1. dot, then a long centred vertical line grows up and down from it
-    dot.setAttribute('r',12.5*out(P(t,.15,.6))*(1-P(t,1.1,1.4)));
-    var g=io(P(t,.5,1.6));
-    var yTop=415-305*g, yBot=415+320*g;
-
-    // 2. line splits into top and bottom
-    var split=io(P(t,1.45,2.2));
-    var topY=415+89*split;
-
-    // 3. top: line parts into two stems, which draw out into the Nun and the L
-    var tn=508-48*io(P(t,1.55,2.35)), tl=508+48*io(P(t,1.65,2.45));
-    var an=300*io(P(t,3.1,4.2)), al=250*io(P(t,3.35,4.45));
-    var rn=30*sm(clamp(an/40)), rl=30*sm(clamp(al/40));
-    nun.setAttribute('d','M'+tn+' '+yTop+' V'+(415-rn)+' Q'+tn+' 415 '+(tn-rn)+' 415 H'+(tn-rn-an));
-    el.setAttribute('d','M'+tl+' '+yTop+' V'+(415-rl)+' Q'+tl+' 415 '+(tl+rl)+' 415 H'+(tl+rl+al));
-
-    // 4. bottom: the M is drawn out from right next to the line
-    zig.style.strokeDashoffset=ZL*(1-io(P(t,2.9,4.1)));
-    zig.style.opacity=t>2.9?(1-P(t,4.9,5.3)):0;
-
-    // 5. the bottom line finishes into the lamed
-    var s=io(P(t,1.6,2.5)), a=230*io(P(t,3.1,4.2)), r=36*sm(clamp(a/40));
-    var tx=508+48*s, bx=508+14*s, by=yBot-10*s;
-    lam.setAttribute('d','M'+(tx+r+a)+' '+topY+' H'+(tx+r)+' Q'+tx+' '+topY+' '+tx+' '+(topY+r)+' L'+bx+' '+by);
-
-    // 6. the M glows slightly
-    var gl=sm(P(t,4.4,5.4));
-    zw.style.opacity=gl;sw.style.opacity=gl;
-
-    // 7. the M comes together into a perfect M; everything else shrinks and fades away
-    fade.setAttribute('y2',590-52*sm(P(t,4.8,5.3)));
-    sw.style.stroke=t>=5.3?'#fff':'url(#in-fade)';
-    var mp=io(P(t,5.2,6.4));
-    if(mp>0){
-      zw.setAttribute('d',poly(ZA,ZB,mp));
-      sw.setAttribute('d',poly(SA,SB,mp));
-    }
-    var rs=io(P(t,5.0,6.2));
-    rest.setAttribute('transform','translate(508 422) scale('+(1-.45*rs)+') translate(-508 -422)');
-    rest.style.opacity=1-sm(P(t,5.0,6.0));
-
-    // 7b. the finished M shrinks into a dot
-    var ms=io(P(t,6.45,7.12)),ks=1-ms;
-    zw.setAttribute('transform','translate(480 422) scale('+ks.toFixed(4)+') translate(-480 -422)');
-    sw.setAttribute('transform','translate(480 422) scale('+ks.toFixed(4)+') translate(-480 -422)');
-    pt.setAttribute('r',(16*sm(P(t,6.72,7.08))*(1-P(t,7.3,7.6))).toFixed(2));
-    af.style.opacity=0;
-    // 8. (owner, v55) the dot grows into the character's book, his head pops up from behind it, he looks left, right and
-    //    straight, blinks, and jumps off the screen into the app
     chRender(t);
-    ov.style.background='rgba(10,11,16,'+(1-sm(P(t,12.15,12.7))).toFixed(3)+')';
-    all.style.opacity=1-P(t,12.1,12.5);
+    ov.style.background='rgba(10,11,16,'+(1-sm(P(t,5.45,5.95))).toFixed(3)+')';
     if(app.style.transformOrigin!=='50% 40vh'){app.style.transformOrigin='50% 40vh';app.style.willChange='transform'}
-    var asc='scale('+(1+.1*(1-sm(P(t,12.0,12.9)))).toFixed(4)+')';if(app.style.transform!==asc)app.style.transform=asc;
+    var asc='scale('+(1+.1*(1-sm(P(t,5.4,6.2)))).toFixed(4)+')';if(app.style.transform!==asc)app.style.transform=asc;
   }
 
   // vibration feedback that follows how hard the animation is moving
@@ -1073,11 +1030,10 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   }
   var h1=false,h2=false,h3=false,h4=false,h5=false;
   function haptics(t){
-    if(!h1&&t>=.3){h1=true;buzz(false)}
-    if(!h2&&t>=5.2){h2=true;buzz(true)}
-    if(!h3&&t>=7.3){h3=true;buzz(false)}
-    if(!h4&&t>=8.0){h4=true;buzz(false)}
-    if(!h5&&t>=11.9){h5=true;buzz(true)}
+    if(!h1&&t>=.2){h1=true;buzz(false)}
+    if(!h2&&t>=1.12){h2=true;buzz(false)}
+    if(!h3&&t>=4.45){h3=true;buzz(false)}
+    if(!h4&&t>=5.15){h4=true;buzz(true)}
   }
   function hstop(){try{if(navigator.vibrate)navigator.vibrate(0)}catch(e){}}
   // soft synthesized piano: a broken C-major chord that builds with the animation
@@ -1114,16 +1070,14 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   }
   var C3=130.81,C4=261.63,E4=329.63,G4=392,C5=523.25,E5=659.25,G5=783.99,C6=1046.5,D6=1174.66,E6=1318.51,G6=1567.98;
   var SE=[
-    [.4,[[G4,.34,2.4,0]]],
-    [1.7,[[C5,.36,2.4,0]]],
-    [3.1,[[E5,.36,2.4,0]]],
-    [4.4,[[G5,.34,2.6,0]]],
-    [5.2,[[C3,.5,4,0],[C4,.42,3.6,.06],[G4,.4,3.4,.13],[E5,.4,3.2,.2],[C6,.34,3,.28]]],
-    [6.4,[[G5,.26,2.4,0],[D6,.24,2.2,.12],[G6,.2,2,.24]]],
-    [7.3,[[C5,.3,3,0],[G5,.24,3,.1],[E6,.18,3,.2]]],
-    [8.05,[[E6,.17,2,0]]],
-    [11.9,[[G5,.22,1.8,0],[C6,.2,1.8,.07],[G6,.15,1.8,.14]]]
-  ],sn=0;
+    [.2,[[C5,.34,1.6,0],[G5,.24,1.6,.06]]],
+    [1.0,[[E5,.26,1.2,0]]],
+    [1.12,[[G5,.3,1.8,0],[C6,.24,1.8,.07]]],
+    [3.5,[[E6,.12,1,0]]],
+    [3.85,[[E5,.24,1.2,0]]],
+    [4.45,[[G4,.24,1.4,0]]],
+    [5.15,[[C3,.4,3,0],[C4,.34,2.8,.05],[G4,.3,2.6,.1],[E5,.3,2.4,.15],[C6,.26,2.2,.2],[G6,.16,2,.28]]]
+],sn=0;
   function sound(t){
     if(!AC||AC.state!=='running')return;
     while(sn<SE.length&&SE[sn][0]<=t){
@@ -1140,11 +1094,12 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     setTimeout(function(){try{AC&&AC.close()}catch(e){}},4500);
   }
   function frame(now){
+    if(!chInit()){raf=requestAnimationFrame(frame);return}   // wait until the character's drawing is loaded
     if(!t0)t0=now;
     // if the phone was busy (still loading the app) and a frame came late, hold the animation instead of jumping ahead
     if(lastNow&&now-lastNow>50)t0+=now-lastNow-16.7;lastNow=now;
     // SPEED plays the whole timeline faster (10.7 s of animation in about 6.5 s)
-    var tr=(now-t0)/1000,t=tr*SPEED;if(t>7.2)t=7.2+(tr-7.2/SPEED)*SPEED2;   // v56: the character's part plays slower
+    var t=(now-t0)/1000*SPEED;
     render(Math.min(t,END));
     haptics(t);sound(t);
     if(t<END)raf=requestAnimationFrame(frame);else finish();
@@ -3342,8 +3297,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=56;
+const CC_VER=57;
 const CC_LOG=[
+ {v:57,mid:1,new:['A brand-new opening: the character’s book pops up, hops, and he pops out of it, looks around, blinks, turns and jumps into the app.']},
  {v:56,new:['The opening: the character now turns to the side, crouches as his book closes, and jumps away as it opens, a little slower.']},
  {v:55,mid:1,new:['A new look: the app’s icon is now the curious little character, and the opening animation ends with him peeking out from behind his book, looking around, blinking and jumping into the app.']},
  {v:54,mid:1,new:['When the app itself needs an update, you’ll see “App update ready” at the top and an Update the app button in ⋯ → App. Tap it to download and install the new version right over the old one.']},
