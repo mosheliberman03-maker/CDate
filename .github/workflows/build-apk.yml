@@ -35,7 +35,7 @@ jobs:
           java-version: '17'
 
       - name: Install Capacitor and plugins
-        run: npm install
+        run: for i in 1 2 3; do npm install && exit 0; sleep 15; done; exit 1
 
       - name: Generate the Android project
         run: npx cap add android
@@ -43,7 +43,7 @@ jobs:
       - name: Generate the app icon (the web-app aleph logo)
         # our own small script (Pillow); @capacitor/assets kept failing to download its image library on GitHub's servers
         run: |
-          python3 -m pip install --quiet pillow
+          for i in 1 2 3; do python3 -m pip install --quiet pillow && break; sleep 10; done
           python3 make-icons.py
 
       - name: Add permissions for exact alarms
@@ -56,7 +56,8 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          # GitHub's network sometimes times out downloading Gradle: try up to 4 times
+          for i in 1 2 3 4; do ./gradlew assembleDebug --no-daemon --stacktrace && exit 0; echo "attempt $i failed, retrying"; sleep 25; done; exit 1
 
       - name: Rename the APK
         run: cp android/app/build/outputs/apk/debug/app-debug.apk ChabadCalendar.apk
