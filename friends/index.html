@@ -1073,7 +1073,7 @@ sync()})();
 // ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
 // Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=17,KIT_APK=1;
+const KIT_VER=18,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1087,7 +1087,8 @@ const KIT_LOG=[
  {v:10,t:"Some names now spelled the way people write them"},
  {v:12,big:1,t:"New people and places",d:"New people and places were added from the official shlichus list, and some names were corrected. Your saved list updates by itself."},
  {v:15,t:"Shooting stars on the globe between friends who saved each other"},
- {v:17,t:"Softer, pastel shooting stars"}
+ {v:17,t:"Softer, pastel shooting stars"},
+ {v:18,t:"Shooting stars fly closer to the globe"}
 ];
 const kitIsApp=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const kitSeenKey=()=>"kit_seen_"+(me&&me.match?slug(pkey(me.match.name,me.match.city)):"x");
@@ -1204,7 +1205,7 @@ function shootDraw(){const now=performance.now();
   let p=SHOOT.pairs.find(q=>!q.used);
   if(!p&&SHOOT.fill.length>1){const A=SHOOT.fill[Math.floor(Math.random()*SHOOT.fill.length)],B=SHOOT.fill[Math.floor(Math.random()*SHOOT.fill.length)];if(A!=B&&(Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1]))>4)p=[A,B]}
   if(p){p.used=1;const a=v3(p[0][0],p[0][1]),b=v3(p[1][0],p[1][1]),om=Math.acos(Math.max(-1,Math.min(1,a[0]*b[0]+a[1]*b[1]+a[2]*b[2])));
-   SHOOT.arcs.push({a,b,om,lift:Math.min(.16,.035+om*.1),t0:now,d:2600+om*800,dest:p[1]})}
+   SHOOT.arcs.push({a,b,om,lift:Math.min(.09,.02+om*.055),t0:now,d:2600+om*800,dest:p[1]})}
   SHOOT.next=now+900+Math.random()*900}
  ctx.save();ctx.globalCompositeOperation="lighter";ctx.lineCap="round";ctx.lineJoin="round";
  const ease=x=>x<0?0:x>1?1:1-Math.pow(1-x,2.2);   // fast launch, gentle arrival
