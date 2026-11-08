@@ -10,7 +10,7 @@ self.addEventListener('push', (e) => {
   const t = String(d.body || '') + ' ' + String(d.title || '');
   const p = /🎉|Yasher|Beautiful|What a streak|done ✓/.test(t) ? 5 : /⏳|Last chance|Quick!|ends soon/.test(t) ? 2
     : /pause|miss you|missed you|been \d+ days|whenever you’re ready/i.test(t) ? 6 : /streak|tzaddik|Fresh|start again|do it again|building/i.test(t) ? 4
-    : /shiur|Chitas|Tehillim|Tanya|Rambam|Chumash/i.test(t) ? 8 : d.tag === 'test' ? 5 : 1;
+    : /shiur|Chitas|Tehillim|Tanya|Rambam|Chumash/i.test(t) ? 8 : d.tag === 'test' ? 5 : 3;
   e.waitUntil(self.registration.showNotification(d.title || 'Chabad Calendar', {
     body: d.body || '', tag: d.tag || undefined, renotify: !!d.tag,
     icon: 'assets/char/c' + p + '.png', badge: 'assets/char/stat.png',
