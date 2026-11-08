@@ -112,7 +112,7 @@ body.op .bd,body.om .bd{opacity:1;pointer-events:auto}body.op #sh,body.om #ms{tr
 .dr{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);color:inherit;text-decoration:none;transition:padding .25s,color .2s}.dr:hover{padding-left:6px;color:var(--ct)}.dr b{font-weight:600}.dr span{color:var(--mut);text-align:right;font-size:14px}.ds small{display:block;margin-top:10px;color:var(--mut)}.lnk{display:inline-block;text-decoration:none;margin-top:14px}.ev small .m{margin-right:7px}.panel>small{display:block;margin-top:10px;color:var(--mut)}div.dr:hover{padding-left:0;color:inherit}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.rv{opacity:1!important}}
 
-#intro{position:fixed;inset:0;z-index:99999;background:#0a0b10;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;overflow:hidden;color-scheme:dark}
+#intro{position:fixed;inset:0;z-index:99999;background:radial-gradient(130% 85% at 50% 36%,#1a2244 0%,#0b1020 52%,#04050a 100%);display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;overflow:hidden;color-scheme:dark}
 #intro svg{width:min(90vw,calc(38vh * 770 / 675));height:auto;overflow:visible}
 #intro .p{fill:none;stroke:#c2bfb8;stroke-width:25;stroke-linecap:round;stroke-linejoin:round}
 #intro .w{fill:none;stroke:#fff;stroke-width:25;stroke-linecap:round;stroke-linejoin:round;opacity:0}
@@ -940,7 +940,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   var io=function(x){return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2};
   var out=function(x){return 1-Math.pow(1-x,3)};
   var sm=function(x){return x*x*(3-2*x)};
-  var END=6.2,SPEED=1,SPEED2=1,ov=document.getElementById('intro'),app=document.querySelector('main');
+  var END=6.8,SPEED=1,SPEED2=1,ov=document.getElementById('intro'),app=document.querySelector('main');
 
   var ZA=[[512,518],[318,628],[212,550],[120,735]],ZB=[[660,242],[480,472],[300,242],[300,602]];
   var SA=[[556,536],[522,725]],SB=[[660,242],[660,602]];
@@ -957,59 +957,89 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   }
 
   var CH=null;
+  /* v58 (owner: "more professional, like the Pixar intro, almost 3D"): a lit stage (spotlight cone, a pool of light on the
+     floor, a soft contact shadow that grows and shrinks as he hops), shading on his parts (sphere-lit face, glossy black
+     hat/book/eyes with catch-lights, a faint rim light), a real 3D head turn (eyes travel round the sphere), and a slow camera
+     push-in. All drawn with SVG gradients, moved by attributes (no CSS filters or transitions). */
+  var CH=null;
   function chInit(){if(CH)return CH;if(typeof CCH_SVG==='undefined')return null;
-    var w=440,h=518,x=480-184*w/340,y=450-300*h/400;
+    var w=440,h=518,x=480-184*w/340,y=450-300*h/400,FY=y+378*h/400;
     var m=CCH_SVG.replace('<svg viewBox="0 0 340 400"','<svg x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+w+'" height="'+h+'" viewBox="0 0 340 400" overflow="visible"')
-      .replace('<g class="c-head">','<clipPath id="in-hc"><rect x="-300" y="-900" width="940" height="1140"/></clipPath><g clip-path="url(#in-hc)"><g class="c-head">').replace('\n<g class="c-book">','</g>\n<g class="c-book">');
-    /* v56: a side view (facing left) for the turn and the jump: the same head, one eye, the hat from the side, and the book
-       seen edge-on as two covers hinged at the spine, which close as he crouches and open like wings as he jumps */
-    var side='<g class="c-sd" opacity="0"><g transform="matrix(-1 0 0 1 376 0)"><g class="c-sdb">'
-      +'<circle class="c-halo" cx="188" cy="172" r="83.5"/><circle class="c-face" cx="188" cy="172" r="83.5"/>'
-      +'<g class="c-sde"><ellipse class="k" cx="132" cy="168" rx="12" ry="25"/></g>'
-      +'<g class="c-sdh"><path class="k" d="M122 102L134 40Q188 20 244 38L256 102Z"/><ellipse class="k" cx="186" cy="106" rx="150" ry="14" transform="rotate(-4 186 106)"/></g>'
-      +'<g class="c-sdk"><path class="k c-sb"/><path class="w c-sp" style="stroke:var(--ink);stroke-width:4;stroke-linejoin:round"/></g></g></g></g>';
+      .replace('<g class="c-head">','<clipPath id="in-hc"><rect x="-300" y="-900" width="940" height="1140"/></clipPath><g clip-path="url(#in-hc)"><g class="c-head">').replace('\n<g class="c-book">','</g>\n<g class="c-book">')
+      .replace('<path class="c-hap','<circle class="c-gl l" cx="143" cy="160" r="5" fill="#fff" opacity=".9"/><circle class="c-gl r" cx="209" cy="160" r="5" fill="#fff" opacity=".9"/><path class="c-hap');
+    var side='<g class="c-sd" opacity="0"><g transform="matrix(-1 0 0 1 376 0)"><g class="c-sdk"><path class="k c-sb"/><path class="w c-sp" style="stroke:#05060c;stroke-width:4;stroke-linejoin:round"/></g></g></g>';
     m=m.replace('</svg>',side+'</svg>');
-    svg.insertAdjacentHTML('beforeend','<g id="in-ch" class="cchI" style="--ink:#05060c;--fill:#fff;--halo:rgba(255,255,255,.95)" opacity="0">'+m+'</g>');
+    var defs='<defs>'
+      +'<radialGradient id="in-gf" cx=".36" cy=".3" r=".78"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#eef1f8"/><stop offset=".85" stop-color="#cdd4e4"/><stop offset="1" stop-color="#aeb7cc"/></radialGradient>'
+      +'<linearGradient id="in-gk" x1="0" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#3a4258"/><stop offset=".35" stop-color="#151a27"/><stop offset="1" stop-color="#030409"/></linearGradient>'
+      +'<radialGradient id="in-pool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#cfdcff" stop-opacity=".30"/><stop offset=".6" stop-color="#9fb3f0" stop-opacity=".10"/><stop offset="1" stop-color="#9fb3f0" stop-opacity="0"/></radialGradient>'
+      +'<radialGradient id="in-shd" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".75"/><stop offset=".6" stop-color="#000" stop-opacity=".3"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>'
+      +'<linearGradient id="in-cone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfe7ff" stop-opacity=".16"/><stop offset="1" stop-color="#dfe7ff" stop-opacity="0"/></linearGradient>'
+      +'<linearGradient id="in-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2342" stop-opacity="0"/><stop offset=".25" stop-color="#1b2342" stop-opacity=".55"/><stop offset="1" stop-color="#05060b" stop-opacity="1"/></linearGradient>'
+      +'</defs>';
+    svg.insertAdjacentHTML('beforeend',defs+'<g id="in-cam"><g id="in-stage" opacity="0">'
+      +'<rect x="-400" y="'+(FY-6)+'" width="1800" height="600" fill="url(#in-floor)"/>'
+      +'<path id="in-conep" d="M430 -100L530 -100L760 '+(FY+30)+'L200 '+(FY+30)+'Z" fill="url(#in-cone)"/>'
+      +'<ellipse cx="480" cy="'+(FY+6)+'" rx="300" ry="54" fill="url(#in-pool)"/>'
+      +'<ellipse id="in-shd" cx="480" cy="'+(FY+4)+'" rx="150" ry="20" fill="url(#in-shd)"/></g>'
+      +'<g id="in-ch" class="cchI" style="--ink:url(#in-gk);--fill:url(#in-gf);--halo:rgba(220,230,255,.28)" opacity="0">'+m+'</g></g>');
     var g=document.getElementById('in-ch'),q=function(c){return g.querySelector(c)};
-    CH={g:g,root:q('.c-root'),head:q('.c-head'),hat:q('.c-hatb'),look:q('.c-look'),eL:q('.c-e.l'),eR:q('.c-e.r'),book:q('.c-book'),
-      sd:q('.c-sd'),sdb:q('.c-sdb'),sdh:q('.c-sdh'),sdk:q('.c-sdk'),sb:q('.c-sb'),sp:q('.c-sp')};return CH}
+    CH={g:g,cam:document.getElementById('in-cam'),stage:document.getElementById('in-stage'),shd:document.getElementById('in-shd'),FY:FY,
+      root:q('.c-root'),head:q('.c-head'),hat:q('.c-hatb'),look:q('.c-look'),eL:q('.c-e.l'),eR:q('.c-e.r'),gL:q('.c-gl.l'),gR:q('.c-gl.r'),book:q('.c-book'),
+      sd:q('.c-sd'),sb:q('.c-sb'),sp:q('.c-sp')};
+    return CH}
   function chT(n,x,y,r,sx,sy,px,py){if(n)n.setAttribute('transform','translate('+(x+px).toFixed(2)+' '+(y+py).toFixed(2)+') rotate('+r.toFixed(2)+') scale('+sx.toFixed(3)+' '+sy.toFixed(3)+') translate('+(-px)+' '+(-py)+')')}
   var back=function(x){var c1=1.9,c3=c1+1;return x<=0?0:1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
-  /* v57 (owner: "scratch the whole intro"): a cartoon. The book pops up, crouches, hops, and his head pops out of it; he looks
-     right, left, forward and blinks; hops while turning to the right (side view); crouches to get ready (book closes) and
-     jumps off to the right (book opens); then the app. Squash and stretch everywhere, anchored at his feet. */
-  var hop=function(u){return 4*u*(1-u)};                                    // 0 → 1 → 0 arc
-  function chRender(t){var c=chInit();if(!c)return;c.g.setAttribute('opacity','1');
-    // 1. the book pops up out of nothing (springy), anchored at the bottom
-    var bp=back(P(t,.15,.6));chT(c.book,0,40*(1-Math.min(1,bp)),0,bp,bp,184,378);
-    // 2. it crouches, then hops; the head pops up out of it on the way up
-    var c1=Math.sin(Math.PI*P(t,.75,1.02)),j1=P(t,1.0,1.5),l1=Math.sin(Math.PI*P(t,1.48,1.68));
-    var hp=back(P(t,1.08,1.6));
-    // 3. looks right, left, forward, blinks
-    var lx=16*sm(P(t,1.95,2.2))-32*sm(P(t,2.5,2.85))+16*sm(P(t,3.05,3.3));
-    var bl=(t>3.5&&t<3.62)?.08:1;
-    // 4. hops and turns to the right while in the air, lands
-    var j2=P(t,3.85,4.45),ta=P(t,3.98,4.13),tb=P(t,4.13,4.28),l2=Math.sin(Math.PI*P(t,4.43,4.6));
-    // 5. crouches to get ready (the book closes), then jumps off to the right (the book opens)
-    var c3=sm(P(t,4.75,5.15)),j3=P(t,5.15,5.75),e3=j3*j3,cl=c3*(1-sm(P(t,5.15,5.35)));
-    var y=-70*hop(j1)-55*hop(j2)-1500*e3,sq=.16*c1+.08*l1+.08*l2+.14*c3*(1-j3),st=.12*Math.sin(Math.PI*Math.min(1,j1*2))*(1-j1)+.1*Math.sin(Math.PI*Math.min(1,j3*3))*(j3<.34?1:0)+.14*j3;
+  var hop=function(u){return 4*u*(1-u)};
+  /* a point on his head sphere: eye at horizontal offset d from the centre, head turned by th (radians) */
+  function eye3(d,th){var R=80,p0=Math.asin(Math.max(-1,Math.min(1,d/R))),p=p0+th;return{dx:R*Math.sin(p)-d,s:Math.max(.12,Math.cos(p)/Math.cos(p0)),vis:Math.cos(p)>.15?1:0}}
+  function chRender(t){var c=chInit();if(!c)return;c.g.setAttribute('opacity',t>.3?'1':'0');
+    // the stage lights up, the camera pushes in slowly
+    c.stage.setAttribute('opacity',sm(P(t,0,.45)).toFixed(3));
+    var cz=1+.06*sm(P(t,0,5.6));chT(c.cam,0,-8*sm(P(t,0,5.6)),0,cz,cz,480,c.FY);
+    // 1. the book pops up (springy, from below the floor's edge)
+    var bp=back(P(t,.35,.85));chT(c.book,0,46*(1-Math.min(1,bp)),0,bp,bp,184,378);
+    // 2. anticipation, hop, the head pops out at the top of the hop, land and settle
+    var c1=Math.sin(Math.PI*P(t,.95,1.2)),j1=P(t,1.2,1.72),l1=Math.sin(Math.PI*P(t,1.7,1.9))*(1-.5*P(t,1.8,1.95));
+    var hp=back(P(t,1.32,1.8));
+    // 3. looks right, left, forward (a real head turn), blinks
+    var th=.42*sm(P(t,2.1,2.4))-.84*sm(P(t,2.65,3.0))+.42*sm(P(t,3.2,3.45));
+    var bl=(t>3.65&&t<3.78)?.08:1;
+    // 4. anticipation, hop while turning to the right (90°), land
+    var c2=Math.sin(Math.PI*P(t,3.98,4.15)),j2=P(t,4.15,4.72),tu=sm(P(t,4.2,4.66)),l2=Math.sin(Math.PI*P(t,4.7,4.9));
+    th+=1.5708*tu;
+    // 5. deep crouch to get ready (book closes), jump off up and to the right (book opens like wings)
+    var c3=sm(P(t,5.02,5.42)),j3=P(t,5.42,6.0),e3=j3*j3,cl=c3*(1-sm(P(t,5.42,5.6)));
+    var air=70*hop(j1)+60*hop(j2)+1500*e3,y=-air;
+    var sq=.16*c1+.1*l1+.1*c2+.1*l2+.16*c3*(1-j3),st=.14*Math.sin(Math.PI*Math.min(1,j1*2.2))*(j1<.45?1:0)+.1*Math.sin(Math.PI*Math.min(1,j2*2.2))*(j2<.45?1:0)+.16*Math.min(1,j3*2);
     var sx=1+sq*.7-st*.4,sy=1-sq+st;
-    chT(c.head,0,215*(1-hp),lx*.22,1,1,182,262);chT(c.look,lx,0,0,1,1,182,171);
-    chT(c.hat,0,-18*Math.sin(Math.PI*P(t,1.35,1.85))+10*c1,-7*Math.sin(Math.PI*P(t,1.35,1.85)),1,1,172,104);
-    chT(c.eL,0,0,0,1,bl,149.5,171.3);chT(c.eR,0,0,0,1,bl,215.9,171.1);
-    var turned=t>=4.13;c.root.setAttribute('opacity',turned?'0':'1');c.sd.setAttribute('opacity',turned?'1':'0');
-    chT(c.root,0,y,0,sx*Math.max(.001,1-sm(ta)),sy,182,396);
-    chT(c.sd,260*e3,y,10*e3,sx*Math.max(.001,sm(tb)),sy,188,396);
+    // head: pops out, turns (slight lean into the turn), hat follows a little late
+    chT(c.head,0,215*(1-hp),th*5*(1-tu)+2*Math.sin(th),1,1,182,262);
+    var L=eye3(-33.1,th),Rr=eye3(33.3,th);
+    chT(c.eL,L.dx,0,0,L.s,bl,149.5,171.3);chT(c.eR,Rr.dx,0,0,Rr.s,bl,215.9,171.1);
+    c.eL.setAttribute('opacity',L.vis);c.eR.setAttribute('opacity',Rr.vis);
+    c.gL.setAttribute('cx',(143+L.dx*1.05).toFixed(1));c.gR.setAttribute('cx',(209+Rr.dx*1.05).toFixed(1));
+    c.gL.setAttribute('opacity',(L.vis*(bl<1?0:.9)).toFixed(2));c.gR.setAttribute('opacity',(Rr.vis*(bl<1?0:.9)).toFixed(2));
+    chT(c.hat,6*Math.sin(th),-18*Math.sin(Math.PI*P(t,1.55,2.05))+9*c1+6*c3-14*Math.sin(Math.PI*P(t,5.42,5.8)),-7*Math.sin(Math.PI*P(t,1.55,2.05))-3*Math.sin(th),1-.06*Math.abs(Math.sin(th)),1,172,104);
+    // body turn: the front book narrows like a real object turning; at the side we see the book edge-on
+    var bt=Math.cos(1.5708*tu),side=tu>.82;
+    c.book.setAttribute('opacity',side?'0':'1');c.sd.setAttribute('opacity',side?'1':'0');
+    if(!side&&bp>=1)chT(c.book,26*Math.sin(1.5708*tu),0,0,Math.max(.06,bt),1-.04*Math.sin(Math.PI*tu),184,378);
+    chT(c.root,0,y,0,sx,sy,182,396);
+    chT(c.sd,240*e3,y,9*e3,sx,sy,188,396);
     var op=1-cl,w=16+44*op+40*Math.sin(Math.PI*Math.min(1,j3*1.4)),sp=8*op+16*Math.sin(Math.PI*Math.min(1,j3*1.4)),X=58;
     c.sb.setAttribute('d','M'+X+' 226L'+X+' 362L'+(X+w).toFixed(1)+' '+(374+sp).toFixed(1)+'L'+(X+w).toFixed(1)+' '+(214-sp).toFixed(1)+'Z');
     var pw=Math.max(0,Math.min(12,w-14));c.sp.setAttribute('opacity',op>.15?'1':'0');
     c.sp.setAttribute('d','M'+(X+w-pw).toFixed(1)+' '+(222-sp*.8).toFixed(1)+'L'+(X+w-2).toFixed(1)+' '+(220-sp).toFixed(1)+'L'+(X+w-2).toFixed(1)+' '+(368+sp).toFixed(1)+'L'+(X+w-pw).toFixed(1)+' '+(366+sp*.8).toFixed(1)+'Z');
-    chT(c.sdh,0,-12*Math.sin(Math.PI*P(t,5.15,5.5))+8*c3,-4*c3,1,1,188,104)}
+    // contact shadow: tighter and darker on the floor, wide and faint when he's in the air
+    var ha=Math.min(1,air/260),sh=bp>0?Math.min(1,bp):0;
+    c.shd.setAttribute('transform','translate(480 '+(c.FY+4)+') scale('+((1-.45*ha)*(.6+.4*sh)*(1+.15*sq)).toFixed(3)+' '+((1-.3*ha)*(1+.2*sq)).toFixed(3)+') translate(-480 '+(-(c.FY+4))+')');
+    c.shd.setAttribute('opacity',(sh*(1-.75*ha)).toFixed(3))}
   function render(t){
     chRender(t);
-    ov.style.background='rgba(10,11,16,'+(1-sm(P(t,5.45,5.95))).toFixed(3)+')';
+    ov.style.opacity=(1-sm(P(t,6.1,6.6))).toFixed(3);
     if(app.style.transformOrigin!=='50% 40vh'){app.style.transformOrigin='50% 40vh';app.style.willChange='transform'}
-    var asc='scale('+(1+.1*(1-sm(P(t,5.4,6.2)))).toFixed(4)+')';if(app.style.transform!==asc)app.style.transform=asc;
+    var asc='scale('+(1+.08*(1-sm(P(t,6.0,6.8)))).toFixed(4)+')';if(app.style.transform!==asc)app.style.transform=asc;
   }
 
   // vibration feedback that follows how hard the animation is moving
@@ -1030,10 +1060,10 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   }
   var h1=false,h2=false,h3=false,h4=false,h5=false;
   function haptics(t){
-    if(!h1&&t>=.2){h1=true;buzz(false)}
-    if(!h2&&t>=1.12){h2=true;buzz(false)}
-    if(!h3&&t>=4.45){h3=true;buzz(false)}
-    if(!h4&&t>=5.15){h4=true;buzz(true)}
+    if(!h1&&t>=.4){h1=true;buzz(false)}
+    if(!h2&&t>=1.34){h2=true;buzz(false)}
+    if(!h3&&t>=4.7){h3=true;buzz(false)}
+    if(!h4&&t>=5.42){h4=true;buzz(true)}
   }
   function hstop(){try{if(navigator.vibrate)navigator.vibrate(0)}catch(e){}}
   // soft synthesized piano: a broken C-major chord that builds with the animation
@@ -1070,13 +1100,14 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   }
   var C3=130.81,C4=261.63,E4=329.63,G4=392,C5=523.25,E5=659.25,G5=783.99,C6=1046.5,D6=1174.66,E6=1318.51,G6=1567.98;
   var SE=[
-    [.2,[[C5,.34,1.6,0],[G5,.24,1.6,.06]]],
-    [1.0,[[E5,.26,1.2,0]]],
-    [1.12,[[G5,.3,1.8,0],[C6,.24,1.8,.07]]],
-    [3.5,[[E6,.12,1,0]]],
-    [3.85,[[E5,.24,1.2,0]]],
-    [4.45,[[G4,.24,1.4,0]]],
-    [5.15,[[C3,.4,3,0],[C4,.34,2.8,.05],[G4,.3,2.6,.1],[E5,.3,2.4,.15],[C6,.26,2.2,.2],[G6,.16,2,.28]]]
+    [.05,[[C3,.18,3.4,0],[G4,.12,3.2,.1]]],
+    [.4,[[C5,.32,1.6,0],[G5,.22,1.6,.06]]],
+    [1.2,[[E5,.24,1.2,0]]],
+    [1.34,[[G5,.3,1.8,0],[C6,.22,1.8,.07]]],
+    [3.66,[[E6,.11,1,0]]],
+    [4.15,[[E5,.22,1.2,0]]],
+    [4.7,[[G4,.22,1.4,0]]],
+    [5.42,[[C3,.4,3,0],[C4,.34,2.8,.05],[G4,.3,2.6,.1],[E5,.3,2.4,.15],[C6,.26,2.2,.2],[G6,.16,2,.28]]]
 ],sn=0;
   function sound(t){
     if(!AC||AC.state!=='running')return;
@@ -3297,8 +3328,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=57;
+const CC_VER=58;
 const CC_LOG=[
+ {v:58,new:['The opening looks like a little film now: a lit stage, shading, a shadow under the character and a real 3D head turn.']},
  {v:57,mid:1,new:['A brand-new opening: the character’s book pops up, hops, and he pops out of it, looks around, blinks, turns and jumps into the app.']},
  {v:56,new:['The opening: the character now turns to the side, crouches as his book closes, and jumps away as it opens, a little slower.']},
  {v:55,mid:1,new:['A new look: the app’s icon is now the curious little character, and the opening animation ends with him peeking out from behind his book, looking around, blinking and jumping into the app.']},
