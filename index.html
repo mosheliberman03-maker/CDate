@@ -1711,7 +1711,7 @@ function upd(){const sd=['chumash','tehillim','tanya'].filter(ck).length+(['ramb
  const n=$('#sdn');if(n)n.textContent=sd==st?'All done. Hatzlacha!':sd+' of '+st+' shiurim completed';
  const sp=document.querySelectorAll('#sp .ck'),a=[...sp].filter(x=>x.classList.contains('on')).length,sn=$('#spn');if(sn)sn.textContent=!sp.length?'':a==sp.length?'All done. Hatzlacha!':a+' of '+sp.length+' done';
  stkRefresh();const hb=$('#hyb');if(hb){hb.classList.toggle('on',ck('hy'));hb.textContent=ck('hy')?'✓ Read':'Mark as read'}}
-function tog(k){const d=dkey();(DN[d]??={});if(DN[d][k])delete DN[d][k];else{if(k==='rambam3'||k==='rambam1')delete DN[d][k==='rambam3'?'rambam1':'rambam3'];DN[d][k]=1}if(!Object.keys(DN[d]).length)delete DN[d];SVD();upd();H.ok();if(DN[d]&&DN[d][k]&&d===ds(shDay(t0))&&typeof ltRecord=='function')ltRecord(d,dayLeft(d)<=0);if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}
+function tog(k){const d=dkey();(DN[d]??={});if(DN[d][k])delete DN[d][k];else{if(k==='rambam3'||k==='rambam1')delete DN[d][k==='rambam3'?'rambam1':'rambam3'];DN[d][k]=1}if(!Object.keys(DN[d]).length)delete DN[d];SVD();upd();H.ok();if(DN[d]&&DN[d][k]&&d===ds(shDay(t0))&&typeof ltRecord=='function'){ltRecord(d,dayLeft(d)<=0);if(window.ccCharShiur)ccCharShiur()}if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}
 /* ===== Shiur reader: the day's Hebrew text from Sefaria (free texts, open API).
    Tap a shiur row to open it; leaving the reader (← or the phone's back) checks it off, once the text has loaded.
    Tap the circle to check it off without opening. ===== */
@@ -1825,7 +1825,7 @@ function rdScrollUI(b){const m=b.querySelector('.rdm'),sb=b.querySelector('.rdsb
  sb.addEventListener('pointerup',end);sb.addEventListener('pointercancel',end)}
 function rdClose(){const st=RDS,b=$('#rdr');RDS=null;if(b)b.classList.remove('on');document.body.classList.remove('rdo');
  // leaving checks it off only when the text loaded and was read to the end; otherwise the reading place is kept
- if(st&&st.ok){clearTimeout(st.svT);const fin=(st.maxF||0)>=.995;if(!fin){rdPosSet(st.dk,st.k,{p:st.posF||0,m:st.maxF||0});return}rdPosSet(st.dk,st.k,null);const D=(DN[st.dk]??={});if(!D[st.k]){if(st.k==='rambam3'||st.k==='rambam1')delete D[st.k==='rambam3'?'rambam1':'rambam3'];D[st.k]=1;SVD();upd();H.ok();if(st.dk===ds(shDay(t0))&&typeof ltRecord=='function')ltRecord(st.dk,dayLeft(st.dk)<=0);if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}}}
+ if(st&&st.ok){clearTimeout(st.svT);const fin=(st.maxF||0)>=.995;if(!fin){rdPosSet(st.dk,st.k,{p:st.posF||0,m:st.maxF||0});return}rdPosSet(st.dk,st.k,null);const D=(DN[st.dk]??={});if(!D[st.k]){if(st.k==='rambam3'||st.k==='rambam1')delete D[st.k==='rambam3'?'rambam1':'rambam3'];D[st.k]=1;SVD();upd();H.ok();if(st.dk===ds(shDay(t0))&&typeof ltRecord=='function'){ltRecord(st.dk,dayLeft(st.dk)<=0);if(window.ccCharShiur)ccCharShiur()}if(typeof nCfg=='function'){const q=nCfg();if(q.on&&q.learn)notifSyncSoon(2500)}}}}
 addEventListener('popstate',()=>{if(RDS)rdClose()});
 /* ===== Siddur (owner, v36; v37 = paged): Siddur Tehillat Hashem (Kehot) Hebrew davening pages from the owner's PDF
    (owner has permission; no credit line on screen, owner's choice). siddur/p/<i>.webp = alpha stencils painted in var(--ink);
@@ -3269,12 +3269,12 @@ const CCH_HAT=`M46.0 162.6C29.3 157.8 26.4 146.9 38.2 133.5C44.3 126.5 61.0 116.
 const CCH_SVG=`<svg viewBox="0 0 340 400" aria-hidden="true"><g class="c-root"><g class="c-head"><g class="c-sway">
 <circle class="c-halo" cx="182.6" cy="171.8" r="83.5"/><circle class="c-face" cx="182.6" cy="171.8" r="83.5"/>
 <g class="c-eyes"><g class="c-look"><ellipse class="c-e l k" cx="149.5" cy="171.3" rx="12.5" ry="31"/><ellipse class="c-e r k" cx="215.9" cy="171.1" rx="12.5" ry="31"/>
-<path class="c-hap ln" opacity="0" d="M135 180Q149.5 152 164 180M201.5 180Q216 152 230.5 180"/><path class="c-cls ln" opacity="0" d="M135 166Q149.5 186 164 166M201.5 166Q216 186 230.5 166"/></g></g>
+<path class="c-hap ln" opacity="0" d="M135 180Q149.5 152 164 180M201.5 180Q216 152 230.5 180"/><path class="c-cls ln" opacity="0" d="M135 166Q149.5 186 164 166M201.5 166Q216 186 230.5 166"/><g class="c-dz l" opacity="0"><path class="ln" style="stroke-width:5;fill:none" d="M146.5 171.3a3 3 0 1 1 6 0a6 6 0 1 1 -12 0a9 9 0 1 1 18 0a12 12 0 1 1 -24 0"/></g><g class="c-dz r" opacity="0"><path class="ln" style="stroke-width:5;fill:none" d="M212.9 171.1a3 3 0 1 1 6 0a6 6 0 1 1 -12 0a9 9 0 1 1 18 0a12 12 0 1 1 -24 0"/></g></g></g>
 <path class="c-br l ln" opacity="0" d="M133 131Q149.5 121 166 131"/><path class="c-br r ln" opacity="0" d="M199.5 131Q216 121 232.5 131"/>
 <g class="c-hat"><g class="c-hatb"><path class="k" fill-rule="evenodd" d="${CCH_HAT}"/></g></g>
 <g class="c-alr ln" opacity="0"><path style="stroke:var(--halo);stroke-width:15" d="M280 140L304 124M284 162L312 160M282 184L304 196"/><path d="M280 140L304 124M284 162L312 160M282 184L304 196"/></g></g></g>
 <g class="c-book"><path class="c-page" opacity="0" d="M186 240L186 172Q236 160 288 176L288 240Z" style="fill:var(--fill);stroke:var(--ink);stroke-width:6;stroke-linejoin:round"/><path class="w" d="${CCH_BOOKW}"/><path class="k" fill-rule="evenodd" d="${CCH_BOOK}"/></g>
-<g class="c-thk k" opacity="0"><circle cx="250" cy="16" r="6"/><circle cx="272" cy="-4" r="8.5"/><circle cx="300" cy="-28" r="11"/></g></g></svg>`;
+<g class="c-zz k" opacity="0" style="font:700 44px Figtree,system-ui,sans-serif"><text x="262" y="70">z</text><text x="290" y="34" style="font-size:32px">z</text><text x="312" y="6" style="font-size:24px">z</text></g><g class="c-thk k" opacity="0"><circle cx="250" cy="16" r="6"/><circle cx="272" cy="-4" r="8.5"/><circle cx="300" cy="-28" r="11"/></g></g></svg>`;
 const cchHtml=(p,cls)=>`<span class="cch ${cls||''}" data-m="${CCP[p]||p}" aria-hidden="true">${CCH_SVG}</span>`;
 const CCH_KF={hop:[[{transform:'translateY(0) scale(1)'},{transform:'translateY(-14%) scale(.97,1.05)',offset:.38},{transform:'translateY(1.5%) scale(1.05,.95)',offset:.72},{transform:'translateY(0) scale(1)'}],560],
  tap:[[{transform:'translateY(0)'},{transform:'translateY(1.5%) scale(1.02,.98)'},{transform:'translateY(0)'}],170],
@@ -3286,8 +3286,9 @@ const CCH_KF={hop:[[{transform:'translateY(0) scale(1)'},{transform:'translateY(
 /* his rig: part → [selector, pivot x, pivot y]; state per part {x,y,r,sx,sy,o} */
 const CCH_PARTS={root:['.c-root',170,396],head:['.c-head',182,262],sway:['.c-sway',182,262],eyes:['.c-eyes',182,171],look:['.c-look',182,171],
  eL:['.c-e.l',149.5,171.3],eR:['.c-e.r',215.9,171.1],brL:['.c-br.l',149.5,126],brR:['.c-br.r',216,126],hap:['.c-hap',182,170],cls:['.c-cls',182,170],
- hat:['.c-hat',172,104],hatb:['.c-hatb',172,104],book:['.c-book',184,378],page:['.c-page',186,240],alr:['.c-alr',282,162],thk:['.c-thk',290,10]};
-const CCH_HIDDEN={brL:1,brR:1,hap:1,cls:1,alr:1,thk:1,page:1};
+ hat:['.c-hat',172,104],hatb:['.c-hatb',172,104],book:['.c-book',184,378],page:['.c-page',186,240],alr:['.c-alr',282,162],thk:['.c-thk',290,10],
+ dzL:['.c-dz.l',149.5,171.3],dzR:['.c-dz.r',215.9,171.1],zz:['.c-zz',280,60]};
+const CCH_HIDDEN={brL:1,brR:1,hap:1,cls:1,alr:1,thk:1,page:1,dzL:1,dzR:1,zz:1};
 /* expressions: only what differs from rest */
 const CCH_M={calm:{},
  curious:{head:{r:-5},eyes:{x:7,y:-3},eR:{sy:.8},brR:{o:1,y:-6,r:-12},hat:{r:-3}},
@@ -3297,7 +3298,13 @@ const CCH_M={calm:{},
  happy:{eL:{o:0,sy:.1},eR:{o:0,sy:.1},hap:{o:1},head:{y:-6,r:-3},hat:{y:-9,r:-5}},
  sad:{brL:{o:1,y:5,r:-17},brR:{o:1,y:5,r:17},eL:{sy:.8},eR:{sy:.8},eyes:{y:8},head:{y:11,r:4},hat:{y:11,r:4}},
  peek:{head:{y:30},eyes:{y:6},book:{y:-5}},
- read:{eL:{o:0,sy:.1},eR:{o:0,sy:.1},cls:{o:1},head:{y:6,r:-3},book:{r:-2}}};
+ read:{eL:{o:0,sy:.1},eR:{o:0,sy:.1},cls:{o:1},head:{y:6,r:-3},book:{r:-2}},
+ /* v70 (owner's picks) */
+ sleepy:{eL:{sy:.26,sx:1.12,y:22},eR:{sy:.26,sx:1.12,y:22},head:{y:8,r:-4},hat:{y:7,r:-3}},                    // half-closed lids, head drooping
+ dizzy:{eL:{o:0},eR:{o:0},dzL:{o:1},dzR:{o:1},head:{r:5}},                                   // swirly eyes
+ content:{eL:{o:0,sy:.1},eR:{o:0,sy:.1},hap:{o:1},head:{y:2,r:-2}},                        // soft smile (Shabbos)
+ brace:{head:{y:12},hat:{y:16,r:-7},eL:{sy:.6,y:-11},eR:{sy:.6,y:-11},book:{sy:.93,sx:1.03}}}; // bending into the wind, no hands
+let CCH_ACT=Date.now();const CCH_ALL=[];
 const cchS=(k,m)=>{const d=(CCH_M[m]||{})[k]||{};return{x:d.x||0,y:d.y||0,r:d.r||0,sx:d.sx??1,sy:d.sy??1,o:d.o??(CCH_HIDDEN[k]?0:1)}};
 const cchBack=t=>{const c1=1.9,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2)};
 /* a live character: set(mood, ms, anim) morphs to an expression (and back to the resting one after ms); setBase() = resting
@@ -3310,7 +3317,7 @@ function cchLive(el,base){if(!el)return{set(){},setBase(){},anim(){},nod(){},dar
  const mix=(a,b,e)=>({x:a.x+(b.x-a.x)*e,y:a.y+(b.y-a.y)*e,r:a.r+(b.r-a.r)*e,sx:a.sx+(b.sx-a.sx)*e,sy:a.sy+(b.sy-a.sy)*e,o:a.o+(b.o-a.o)*Math.min(1,Math.max(0,e))});
  const curOf=(p,t)=>{if(!p.dur||t>=p.t0+p.dur)return p.to;const u=(t-p.t0)/p.dur;return mix(p.from,p.to,cchBack(u))};
  const tween=(k,to,dur)=>{const p=P[k];if(!p)return;const t=now();p.from=curOf(p,t);p.to=to;p.t0=t;p.dur=RM?0:dur;kick()};
- const mood=m=>{m=CCP[m]||m;el.dataset.m=m;for(const k in P)if(k!=='look'&&k!=='sway'&&k!=='hatb'&&k!=='root'&&k!=='page')tween(k,cchS(k,m),440)};
+ const mood=(m,d)=>{m=CCP[m]||m;el.dataset.m=m;for(const k in P)if(k!=='look'&&k!=='sway'&&k!=='hatb'&&k!=='root'&&k!=='page'&&k!=='zz')tween(k,cchS(k,m),d||440)};
  /* one-shot moves: keyframes [{t,...state deltas}] added on top (x,y,r add; sx,sy multiply; o overrides) */
  const fx=(k,kf,dur)=>{if(RM||!P[k])return;L.fx.push({k,kf,t0:now(),dur});kick()};
  const fxAt=(f,t)=>{const u=Math.min(1,(t-f.t0)/f.dur),kf=f.kf;let i=0;while(i<kf.length-2&&u>kf[i+1].t)i++;const a=kf[i],b=kf[i+1],w=b.t>a.t?(u-a.t)/(b.t-a.t):1,e=w<.5?2*w*w:1-Math.pow(-2*w+2,2)/2,g=(q,d)=>(a[q]??d)+((b[q]??d)-(a[q]??d))*e;
@@ -3321,6 +3328,7 @@ function cchLive(el,base){if(!el)return{set(){},setBase(){},anim(){},nod(){},dar
    if(A){x+=A.x;y+=A.y;r+=A.r;sx*=A.sx;sy*=A.sy;if(A.o!=null)o=A.o}
    if(k==='eL'||k==='eR'){if(L.blinkT&&t<L.blinkT){sy*=.08;busy=true}}
    if(k==='thk'&&o>.01&&el.dataset.m==='think'){busy=true}
+   if((k==='dzL'||k==='dzR')&&o>.01){r+=(t*.33)%360;busy=true}
    const tr=`translate(${(x+p.px).toFixed(2)} ${(y+p.py).toFixed(2)}) rotate(${r.toFixed(2)}) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(${-p.px} ${-p.py})`,op=Math.max(0,Math.min(1,o)).toFixed(3),sig=tr+op;
    if(sig!==p.last){p.last=sig;p.n.setAttribute('transform',tr);p.n.setAttribute('opacity',op)}}
   if(el.dataset.m==='think'&&P.thk){const cs=P.thk.n.children;for(let i=0;i<cs.length;i++)cs[i].setAttribute('opacity',(.3+.7*(.5+.5*Math.sin(t/180-i*1.1))).toFixed(2))}
@@ -3341,14 +3349,51 @@ function cchLive(el,base){if(!el)return{set(){},setBase(){},anim(){},nod(){},dar
  L.breathe=()=>fx('root',[{t:0},{t:.5,sx:1.012,sy:1.03},{t:1}],2200);
  L.nod=()=>fx('sway',[{t:0},{t:.5,y:5,r:1},{t:1}],220);
  let dx=-9;L.dart=()=>{dx=dx>=9?-9:dx+3;L.look(dx,4)};
+ /* v70 moves (owner's picks) */
+ L.breathe=()=>{fx('book',[{t:0},{t:.5,sy:1.025,sx:1.008},{t:1}],2600);fx('head',[{t:0},{t:.5,y:-3},{t:1}],2600)};       // breathing with the book
+ L.blink2=()=>{if(RM)return;L.blinkT=now()+120;kick();setTimeout(()=>{L.blinkT=now()+110;kick()},230)};               // double blink
+ L.hatfix=()=>fx('hatb',[{t:0},{t:.3,y:-12,r:9},{t:.55,y:-12,r:-4},{t:.8,y:2,r:1},{t:1}],1300);                          // hat adjust
+ L.readln=()=>fx('look',[{t:0,x:-9,y:-6},{t:.22,x:9,y:-6},{t:.26,x:-9,y:0},{t:.48,x:9,y:0},{t:.52,x:-9,y:6},{t:.74,x:9,y:6},{t:.86,x:0,y:-8},{t:1}],3400); // reading line by line
+ L.stretch=()=>{fx('root',[{t:0},{t:.3,sy:1.12,sx:.94,y:-6},{t:.62,sy:1.12,sx:.94,y:-6},{t:.8,sy:.96,sx:1.03},{t:1}],2300);  // stretch; eyes squint from below
+  ['eL','eR'].forEach(k=>fx(k,[{t:0},{t:.3,sy:.62,y:-11},{t:.62,sy:.62,y:-11},{t:.82},{t:1}],2300));fx('hatb',[{t:0},{t:.35,y:-8},{t:.65,y:-8},{t:.85,y:3},{t:1}],2300)};
+ L.surprise=()=>{L.set('alert',650,'hop');L.hat();setTimeout(()=>{if(L.cur==='alert')L.set('happy',1200)},650)};          // tap him
+ L.dizzy=()=>{L.set('dizzy',2400);fx('sway',[{t:0},{t:.2,r:-7},{t:.4,r:6},{t:.6,r:-5},{t:.8,r:4},{t:1}],2400)};          // 3 quick taps
+ L.clap=()=>{fx('book',[{t:0},{t:.2,sx:.18},{t:.4,sx:1},{t:.6,sx:.18},{t:.8,sx:1},{t:1}],760);L.set('happy',1500,'hop')};     // shiur done
+ L.flip=()=>{for(let i=0;i<5;i++)setTimeout(()=>fx('page',[{t:0,o:1,y:60},{t:.3,o:1,y:24,sx:.6},{t:.5,o:1,y:20,sx:.02},{t:.7,o:1,y:24,sx:-.6},{t:1,o:1,y:60,sx:-1}],380),i*170);setTimeout(L.nod,1000)}; // flip through
+ L.yawn=()=>{['eL','eR'].forEach(k=>fx(k,[{t:0},{t:.25,sy:.22},{t:.7,sy:.22},{t:1}],2000));fx('head',[{t:0},{t:.3,y:-5,r:-5},{t:.7,y:-5,r:-5},{t:1}],2000);fx('root',[{t:0},{t:.3,sy:1.05,sx:.97},{t:.7,sy:1.05,sx:.97},{t:1}],2000)};
+ L.zz=()=>fx('zz',[{t:0,o:0,y:20},{t:.2,o:1},{t:.8,o:.9,y:-28,x:10},{t:1,o:0,y:-40,x:14}],2600);
+ L.brace=()=>{if(L.cur!=='brace'){clearTimeout(L.t);L.cur='brace';mood('brace',260)}clearTimeout(L.bt);L.bt=setTimeout(()=>{if(L.cur==='brace'){L.cur=null;mood(L.base,520)}},420)}; // scroll wind
+ L.wake=()=>{L.sleep=false;L.cur=null;L.set('alert',800,'tap')};
+ L.ambient=!!el.closest('.ai-fab');
+ /* tap him (anywhere but the + button, which opens the assistant): a surprised bounce; 3 quick taps make him dizzy */
+ let taps=[];if(!L.ambient)el.addEventListener('pointerdown',()=>{if(document.documentElement.classList.contains('tt-off-charlife'))return;const n=Date.now();taps=taps.filter(x=>n-x<1500);taps.push(n);if(taps.length>=3){taps=[];L.dizzy()}else L.surprise()});
+ const sabbath=()=>{try{const d=new Date(),wd=d.getDay();if((wd===5&&d.getHours()>=12)||wd===6)return'sh';return strictYT(hd(t0))?'yt':''}catch(e){return''}};
  mood(L.base);for(const k in P){P[k].dur=0}frame();
- if(!RM){const tick=()=>{if(!el.isConnected)return;setTimeout(tick,2200+Math.random()*3000);
-   if(L.cur||document.hidden||!el.offsetParent||(el.closest('.ai-fab')&&document.documentElement.classList.contains('cc-away')))return;
-   const r=Math.random(),m=CCP[L.base]||L.base;
-   if(r<.18)L.breathe();else if(r<.48)L.blink();else if(r<.64){L.look((Math.random()-.5)*20,(Math.random()-.5)*10,1300);setTimeout(L.blink,1500)}
-   else if(r<.77)L.sway();else if(r<.86)L.hat();else if(m==='read'||m==='peek'||r<.93)L.page();else L.blink()};setTimeout(tick,1500)}
+ if(!RM){const tick=()=>{if(!el.isConnected)return;const off=document.documentElement.classList.contains('tt-off-charlife'),sb=off?'':sabbath();setTimeout(tick,(2200+Math.random()*3000)*(sb==='sh'?1.5:1));
+   if(document.hidden||!el.offsetParent||(L.ambient&&document.documentElement.classList.contains('cc-away')))return;
+   const night=document.documentElement.dataset.night==='1',idle=Date.now()-CCH_ACT;
+   if(L.sleep&&(idle<45000||off))L.wake();
+   // the + button dozes off after 45 s untouched (slow nods); late at night the z's float up
+   if(!off&&L.ambient&&idle>45000){if(!L.sleep){L.sleep=true;clearTimeout(L.t);L.cur='sleepy';mood('sleepy',1400)}fx('sway',[{t:0},{t:.5,y:6,r:-2},{t:1}],2400);if(night&&idle>60000)L.zz();return}
+   if(L.cur)return;
+   const m=CCP[L.base]||L.base,A=off?[[3,L.blink],[2,()=>fx('root',[{t:0},{t:.5,sx:1.012,sy:1.03},{t:1}],2200)],[1.4,()=>{L.look((Math.random()-.5)*20,(Math.random()-.5)*10,1300);setTimeout(L.blink,1500)}],[1.1,L.sway],[.8,L.hat],[m==='read'||m==='peek'?1.6:.6,L.page]]:
+    [[3,L.blink],[1.2,L.blink2],[2,L.breathe],[1.4,()=>{L.look((Math.random()-.5)*20,(Math.random()-.5)*10,1300);setTimeout(L.blink,1500)}],
+    [1.1,L.sway],[.7,L.hat],[.7,L.hatfix],[m==='read'||m==='peek'?1.6:.6,L.page],[.8,L.readln],[.5,L.stretch],[.35,L.flip],
+    [night?.9:0,L.yawn],[sb==='sh'?1.2:0,()=>L.set('content',2400)],[sb==='yt'?1:0,()=>L.set('happy',1200,'hop')]];
+   let r=Math.random()*A.reduce((a,x)=>a+x[0],0);for(const x of A){if((r-=x[0])<=0){x[1]();break}}};setTimeout(tick,1500)}
+ CCH_ALL.push(L);
  return L}
 const FABC=cchLive(document.getElementById('fabCh'),'idle'),AIV=cchLive(document.getElementById('aiAv'),'idle');
+/* v70: he notices you. His eyes turn toward wherever you touch; any touch wakes him if he dozed off */
+addEventListener('pointerdown',e=>{CCH_ACT=Date.now();if(document.documentElement.classList.contains('tt-off-charlife'))return;for(const L of CCH_ALL){if(!L.el.isConnected||!L.el.offsetParent||L.el.contains(e.target))continue;
+ if(L.sleep){L.wake();continue}if(L.cur)continue;
+ const r=L.el.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height*.42),d=Math.hypot(dx,dy)||1;if(d<30)continue;L.look(dx/d*10,dy/d*7,1400)}},{passive:true,capture:true});
+addEventListener('keydown',()=>{CCH_ACT=Date.now()},{passive:true});
+/* scrolling fast = wind: he bends down, head and hat forward, eyes squinting */
+{let ly=scrollY,lt=performance.now();addEventListener('scroll',()=>{CCH_ACT=Date.now();const n=performance.now(),v=Math.abs(scrollY-ly)/Math.max(8,n-lt);ly=scrollY;lt=n;
+ if(v>1.6&&FABC.brace&&!FABC.sleep&&!document.documentElement.classList.contains('tt-off-charlife'))FABC.brace()},{passive:true})}
+/* finishing a shiur: a happy hop and his book claps shut and open */
+window.ccCharShiur=()=>{try{if(!document.documentElement.classList.contains('tt-off-charlife')&&FABC.clap)setTimeout(FABC.clap,250)}catch(e){}};
 /* opening: the sheet grows out of the character button, and the character pops in and says hello */
 aiEl('aiFab').addEventListener('click',()=>{const f=aiEl('aiFab').getBoundingClientRect(),c=document.querySelector('#aiBackdrop .ai-card');
  AIV.setBase(aiEl('aiInput').value.trim()?'read':'idle');AIV.set('alert',1100,'pop');FABC.set('happy',600);
@@ -3374,8 +3419,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=69;
+const CC_VER=70;
 const CC_LOG=[
+ {v:70,mid:1,new:['The assistant is more alive: he breathes with his book, double-blinks, fixes his hat, reads line by line, stretches, flips through pages, follows your finger with his eyes, gets surprised (or dizzy!) when you tap him, leans into the wind when you scroll fast, cheers when you finish a shiur, dozes off when left alone, yawns at night and is calm and content on Shabbos.']},
  {v:69,new:['The assistant’s eyes are longer ovals everywhere: in the app, the icon and the notification pictures.']},
  {v:68,new:['The assistant button is now just the character standing on a little shadow, without a circle around him.']},
  {v:67,new:['The unlit part of the moon is now a darker shade of the moon instead of black.']},
@@ -4788,7 +4834,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['char','The assistant character (instead of the + button)'],['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['reallight','Real light (sunrise/sunset colours on everything)'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll'],['siddur','Siddur button in the dock']];
+ const FLAGS=[['char','The assistant character (instead of the + button)'],['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['reallight','Real light (sunrise/sunset colours on everything)'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll'],['siddur','Siddur button in the dock'],['charlife','The assistant’s extra life (reacting to taps, wind, sleep, stretches…)']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id,,opt]of FLAGS){if(opt)document.documentElement.classList.toggle('tt-on-'+id,f[id]===true);else document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)}};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{const opt=(FLAGS.find(x=>x[0]===c.dataset.f)||[])[2];c.checked=opt?fl()[c.dataset.f]===true:fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
