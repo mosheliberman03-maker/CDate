@@ -389,7 +389,14 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
 #newsBar .nb-b{display:none;padding:0 16px 14px}#newsBar.open .nb-b{display:block}
 #newsBar ul{margin:0 0 10px;padding-left:18px;font-size:13.5px;line-height:1.6;color:var(--ink)}
 #newsBar .nb-x{border:1px solid var(--gx-bd,var(--line));background:var(--gx-gh,transparent);color:inherit;border-radius:12px;padding:8px 14px;font:600 13px Figtree,system-ui,sans-serif;cursor:pointer}
-@media(prefers-reduced-motion:reduce){#newsBar{transition:opacity .2s}}
+@media(prefers-reduced-motion:reduce){#newsBar{transition:opacity .2s}
+/* small updates: a little round ⓘ in the top-right corner (same as Keep in Touch) */
+#newsDot{position:fixed;z-index:60;right:16px;top:calc(env(safe-area-inset-top,0px) + 14px);width:26px;height:26px;border-radius:50%;border:1px solid var(--gx-bd,rgba(157,180,245,.5));background:var(--gx-sheet,rgba(36,48,94,.92));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--ink);font:italic 700 14px Georgia,serif;display:grid;place-items:center;padding:0;cursor:pointer;opacity:0;transform:scale(.6);transition:opacity .3s,transform .3s;box-shadow:0 0 0 0 rgba(140,148,239,.5);animation:ndot 2.4s ease-out 3}
+#newsDot.on{opacity:1;transform:none}
+@keyframes ndot{70%{box-shadow:0 0 0 9px rgba(140,148,239,0)}}
+#newsDotPop{position:fixed;z-index:61;right:14px;top:calc(env(safe-area-inset-top,0px) + 48px);width:min(300px,calc(100% - 28px));box-sizing:border-box;border-radius:18px;padding:13px 15px;background:var(--gx-sheet,rgba(36,48,94,.97));border:1px solid var(--gx-bd,rgba(255,255,255,.15));-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 10px 30px rgba(0,0,0,.3);font-size:13.5px;line-height:1.55;color:var(--ink)}
+#newsDotPop b{display:block;font-size:13px;margin-bottom:6px}#newsDotPop ul{margin:0 0 10px;padding-left:18px}#newsDotPop li{margin:3px 0}#newsDotPop .btn{width:100%;margin:0}
+@media(prefers-reduced-motion:reduce){#newsDot{animation:none;transition:none}}}
 .tdn{display:flex;align-items:center;gap:13px;padding:12px 2px;border-top:1px solid var(--line)}
 .ph+.tdn,.gt+.tdn{border-top:0}
 .tdn .ic{flex:none;width:26px;height:26px;display:grid;place-items:center;color:var(--mut)}
@@ -438,6 +445,7 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
 #sh .shl{border:1px solid var(--gx-bd,var(--line));border-radius:18px;overflow:hidden;margin-top:14px;background:color-mix(in srgb,var(--ink) 3%,transparent)}
 #sh .shl>*+*{border-top:1px solid var(--gx-bd,var(--line))}
 #sh .shr{display:flex;align-items:center;gap:13px;width:100%;margin:0;padding:12px 14px;border:0;border-radius:0;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#sh .shver{text-align:center;color:var(--mut);font-size:12px;margin:16px 0 2px;letter-spacing:.02em}
 #sh .shr:active{background:color-mix(in srgb,var(--ink) 7%,transparent)}
 #sh .shi{flex:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--acc,#8c94ef) 18%,transparent);color:var(--acc2,var(--acc,var(--ink)))}
 #sh .shi svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
@@ -825,7 +833,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
 <div class="sheet ms" id="ms" role="dialog" aria-label="Month"><div class="mh"><h2 id="t"></h2><div class="nav"><button id="pv" aria-label="Previous month">‹</button><button id="nx" aria-label="Next month">›</button></div></div><div class="sub" id="s"></div><section class="cal"><div class="dow"></div><div class="grid" id="g"></div></section></div>
 
 <div class="sheet" id="sh" role="dialog" aria-label="Settings"><section class="shp on" data-p="home"><div class="acct"><div><small>Signed in as</small><strong id="profileName"></strong></div><button class="btn gh" id="acctOut" type="button">Log out</button></div><div class="shq"><small>Go to date</small><div class="dfb" id="gb"><div class="rw" style="margin-top:0"><input type="date" id="jp" aria-label="Date"><div class="hp" hidden></div><button class="btn" id="go">Go</button></div></div>
-</div><div class="shl"><button class="shr" type="button" data-go="loc"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.4"/></svg></i><span><b>Location</b><small id="shsLoc"></small></span><i class="sha">›</i></button><button class="shr" type="button" id="rmOpen"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></i><span><b>Reminders</b><small id="rmSum">Off</small></span><i class="sha">›</i></button><button class="shr" type="button" data-go="cal"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></i><span><b>Calendar</b><small id="shsCal">What shows, and this month’s list</small></span><i class="sha">›</i></button><button class="shr" type="button" data-go="sched"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></i><span><b>My schedule</b><small id="shsSched"></small></span><i class="sha">›</i></button><button class="shr" type="button" data-go="app"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></i><span><b>App</b><small id="shsApp">Download and offline alarms</small></span><i class="sha">›</i></button><button class="shr" type="button" data-go="help"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6M12 17h.01"/></svg></i><span><b>Help</b><small id="shsHelp">Replay the tour</small></span><i class="sha">›</i></button></div><div class="shl"><button class="shr" type="button" data-go="adv"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></i><span><b>Advanced</b><small id="shsAdv">Sky, shiurim date, coordinates, built-in dates</small></span><i class="sha">›</i></button></div></section><section class="shp" data-p="loc"><div class="shh"><button class="shb" type="button" data-back aria-label="Back">‹</button><h2>Location</h2></div><p class="shx">Zmanim, sunrise and sunset are worked out for this place.</p><p id="locNow" style="margin:0 0 10px;font-size:14px"></p><button class="btn" id="ul" type="button" style="width:100%">Detect my location automatically</button><label for="cs" style="margin-top:14px">Or type a city</label><div class="rw" style="margin-top:0"><input id="cs" placeholder="e.g. Crown Heights, Jerusalem, Foshan" autocomplete="off" style="flex:1"><button class="btn gh" id="csb" type="button">Set</button></div><div id="locRes" style="display:grid;gap:6px;margin-top:8px"></div><p id="locMsg" role="status" style="margin:8px 0 0;font-size:13px;color:var(--mut)"></p>
+</div><div class="shl"><button class="shr" type="button" data-go="loc"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.4"/></svg></i><span><b>Location</b><small id="shsLoc"></small></span><i class="sha">›</i></button><button class="shr" type="button" id="rmOpen"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></i><span><b>Reminders</b><small id="rmSum">Off</small></span><i class="sha">›</i></button><button class="shr" type="button" data-go="cal"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></i><span><b>Calendar</b><small id="shsCal">What shows, and this month’s list</small></span><i class="sha">›</i></button><button class="shr" type="button" data-go="sched"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></i><span><b>My schedule</b><small id="shsSched"></small></span><i class="sha">›</i></button><button class="shr" type="button" data-go="app"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></i><span><b>App</b><small id="shsApp">Download and offline alarms</small></span><i class="sha">›</i></button><button class="shr" type="button" data-go="help"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6M12 17h.01"/></svg></i><span><b>Help</b><small id="shsHelp">Replay the tour</small></span><i class="sha">›</i></button></div><div class="shl"><button class="shr" type="button" data-go="adv"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></i><span><b>Advanced</b><small id="shsAdv">Sky, shiurim date, coordinates, built-in dates</small></span><i class="sha">›</i></button></div><p class="shver" id="ccVer"></p></section><section class="shp" data-p="loc"><div class="shh"><button class="shb" type="button" data-back aria-label="Back">‹</button><h2>Location</h2></div><p class="shx">Zmanim, sunrise and sunset are worked out for this place.</p><p id="locNow" style="margin:0 0 10px;font-size:14px"></p><button class="btn" id="ul" type="button" style="width:100%">Detect my location automatically</button><label for="cs" style="margin-top:14px">Or type a city</label><div class="rw" style="margin-top:0"><input id="cs" placeholder="e.g. Crown Heights, Jerusalem, Foshan" autocomplete="off" style="flex:1"><button class="btn gh" id="csb" type="button">Set</button></div><div id="locRes" style="display:grid;gap:6px;margin-top:8px"></div><p id="locMsg" role="status" style="margin:8px 0 0;font-size:13px;color:var(--mut)"></p>
 </section><section class="shp" data-p="cal"><div class="shh"><button class="shb" type="button" data-back aria-label="Back">‹</button><h2>Calendar</h2></div><h3 class="shs">Show on calendar</h3><div class="legend" id="lg"></div><h3 class="shs">This month</h3><div id="ag"></div></section><section class="shp" data-p="sched"><div class="shh"><button class="shb" type="button" data-back aria-label="Back">‹</button><h2>My schedule</h2></div><div id="fwrap" hidden><h2 id="fh" style="margin-top:24px">Edit event</h2><label for="ft">Title</label><input id="ft"><label for="fx">Notes</label><textarea id="fx" rows="3"></textarea>
 <div id="fd"><label for="fdt">Date</label><div class="dfb" id="fdb"><input type="date" id="fdt"><div class="hp" hidden></div></div><label for="fr">Repeats</label><select id="fr"><option value="once">Once</option><option value="greg">Every year (English date)</option><option value="heb">Every year (Hebrew date)</option></select></div>
 <div class="rw"><button class="btn" id="sv">Save event</button><button class="btn gh" id="dl" hidden>Delete</button></div></div>
@@ -1217,6 +1225,7 @@ function shGo(p,back,quiet){const sh=$('#sh');if(!sh)return;const cur=sh.querySe
  if(cur!==nx){if(cur)cur.classList.remove('on','bk');nx.classList.toggle('bk',!!back);nx.classList.add('on')}sh.scrollTop=0;if(!quiet)try{H.tap()}catch(e){}}
 function shSum(){const t=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
  t('shsLoc',LC.n);t('shsSched',my.length?my.length+(my.length==1?' plan':' plans')+' of your own':'Nothing added yet');
+ try{t('ccVer','Version '+ccVerStr(CC_VER)+(window.CC_NATIVE?' · Android app':''))}catch(e){}
  t('shsApp',window.CC_NATIVE?'You’re using the app':ccIOS&&ccIOS()?'Add to Home Screen':'Download and offline alarms')}
 document.addEventListener('click',e=>{const g=e.target.closest('#sh [data-go]');if(g){shGo(g.dataset.go);return}if(e.target.closest('#sh [data-back]'))shGo('home',1)});
 /* The manual "Add an event" form is gone (the assistant does that now); the form only appears to edit an existing event. */
@@ -2828,20 +2837,24 @@ function aiOpen(){aiEl('aiBackdrop').classList.add('on');aiEl('aiBackdrop').setA
 function aiClose(){try{aiCancelReset();aiEl('aiUndo').hidden=true;aiBatchReset()}catch(e){}aiEl('aiBackdrop').classList.remove('on');aiEl('aiBackdrop').setAttribute('aria-hidden','true')}
 aiEl('aiFab').addEventListener('click',aiOpen);aiEl('aiClose').addEventListener('click',aiClose);aiEl('aiBackdrop').addEventListener('click',e=>{if(e.target===aiEl('aiBackdrop'))aiClose()});
 function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
-/* ===== Updates: a "What's new" popup after small updates, a live tour for big ones =====
-   STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
-   (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
-   `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=34;
+/* ===== Updates (STANDING RULE, owner — same rules as the Keep in Touch app): every update bumps CC_VER and adds a CC_LOG entry with a SIZE:
+   big:1 = MAJOR (a real new feature that makes a practical difference) → full glass popup ccNewsPopup, version X.0.0
+   mid:1 = MEDIUM (practical change, not a whole feature) → slim banner ccNewsBar at the top, version X.Y.0
+   neither = SMALL (looks, tweaks, fixes) → no popup or banner, only a little round ⓘ in the top-right corner (ccNewsDot), version X.Y.Z
+   adm:1 = admin-only → counts as small in the version but is never announced.
+   The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
+   Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
+const CC_VER=35;
 const CC_LOG=[
+ {v:35,mid:1,new:['Clearer version numbers (big.medium.small, shown at the bottom of ⋯), and small updates now just show a little ⓘ in the corner, like Keep in Touch.']},
  {v:34,big:1,new:['Cancel a repeating plan on certain days from now on: “cancel all future Shabbos chavrusas”, “no more chavrusa on Fridays”, “cancel my chavrusa every Chof Ches Nissan”, “skip the shiur on Rosh Chodesh”, “…on Yom Tov”. Every other day stays as it was.']},
  {v:33,big:1,new:['The assistant understands you much better: times like “at 8” get the right AM/PM, “in 2 hours”, “next Friday”, “every other Tuesday”, “weeknights”, “Sunday nights 9 to 10”, “before Shabbos”, “every Motzei Shabbos”, several plans in one message, “remind me every day at 9pm to…”, and natural speech (“um, like…”). Titles read naturally (“Call my mother”, “Chavrusa with Adam”).','The Hebrew date at night is a softer, moonlit glass so it isn’t harsh against the sky.']},
- {v:32,new:['Smoother and faster: changing days, opening the app and scrolling take much less work, and the moving date no longer redraws nonstop while you hold the phone.']},
- {v:31,new:['The ⋯ menu is tidier: a short list of sections (Location, Reminders, Calendar, My schedule, App, Help). Tap one to open it. Rarely used settings moved to Advanced.']},
+ {v:32,mid:1,new:['Smoother and faster: changing days, opening the app and scrolling take much less work, and the moving date no longer redraws nonstop while you hold the phone.']},
+ {v:31,mid:1,new:['The ⋯ menu is tidier: a short list of sections (Location, Reminders, Calendar, My schedule, App, Help). Tap one to open it. Rarely used settings moved to Advanced.']},
  {v:30,new:['Reminders: the “Regularly” option for shiurim now just says what it does: smart reminders so you never miss a shiur.']},
  {v:29,big:1,new:['Shiurim reminders now have three levels in ⋯ → Reminders: Never, Rarely (once a day) or Regularly. Regularly learns when you usually do your shiurim, then reminds you a little before, again just after, and once more an hour later to keep your streak going.']},
- {v:28,new:['Your repeating plans (like a weekly chavrusa) now show on every day they happen when you open that day, not only on today. Weekly ones (up to 3 days a week) also get a dot on the calendar.']},
- {v:27,new:['Updates now install by themselves: right as you open the app, or when you leave it. No more tapping “Tap to update” (it only shows if an update arrives while you’re in the middle of something).']},
+ {v:28,mid:1,new:['Your repeating plans (like a weekly chavrusa) now show on every day they happen when you open that day, not only on today. Weekly ones (up to 3 days a week) also get a dot on the calendar.']},
+ {v:27,mid:1,new:['Updates now install by themselves: right as you open the app, or when you leave it. No more tapping “Tap to update” (it only shows if an update arrives while you’re in the middle of something).']},
  {v:26,big:1,new:['The English date now changes at midnight and the Hebrew date at sunset. Your own plans stay on their English date (“tomorrow at 8 PM” is really tomorrow), while holidays, Yom Tov and Hebrew-date plans follow the Hebrew date.','Shiurim follow the Hebrew date (the next day’s start at sunset). To keep them on the English date, use ⋯ → Shiurim.']},
  {v:25,new:['The bubbles in the water letters move freely again (no more pull toward the middle of each letter).']},
  {v:24,new:['Real light: sunrise and sunset now glow warm across the whole screen (sky, cards, buttons and the water letters), in the true colour of the sunlight for that hour, with a soft edge of light on the side facing the sun or moon.']},
@@ -2875,7 +2888,7 @@ function ccNewsPopup(items,tourWhich){
  const esc=t=>String(t).replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
  const li=items.map(t=>'<li>'+esc(t)+'</li>').join('');
  o.innerHTML='<div class="dmc" role="dialog" aria-modal="true" aria-label="What’s new" style="--c:#8c94ef">'+
-  '<h2 style="margin:0 0 6px">✨ What’s new</h2>'+
+  '<h2 style="margin:0 0 6px">✨ What’s new <small style="font:500 13px Figtree,system-ui;color:var(--mut)">v'+ccVerStr(CC_VER)+'</small></h2>'+
   '<ul style="margin:6px 0 16px;padding-left:20px;font-size:14px;line-height:1.7">'+li+'</ul>'+
   '<div class="rw">'+(tourWhich?'<button class="btn" type="button" data-tour>Show me</button>':'')+'<button class="btn '+(tourWhich?'gh':'')+'" type="button" data-ok>Got it</button></div></div>';
  document.body.appendChild(o);
@@ -2883,19 +2896,29 @@ function ccNewsPopup(items,tourWhich){
  o.addEventListener('click',e=>{if(e.target===o||e.target.closest('[data-ok]'))close();
   else if(e.target.closest('[data-tour]')){close();setTimeout(()=>{try{ccTourStart('cc_tour_feat_'+tourWhich,false,tourWhich)}catch(e){}},420)}});
  requestAnimationFrame(()=>o.classList.add('on'));try{H.tap&&H.tap()}catch(e){}}
+function ccVerStr(b){let M=0,m=0,p=0;const by={};CC_LOG.forEach(x=>{const l=x.big||x.tour?3:x.mid?2:1;by[x.v]=Math.max(by[x.v]||0,l)});
+ Object.keys(by).map(Number).sort((a,c)=>a-c).forEach(v=>{if(v>b)return;if(by[v]==3){M++;m=0;p=0}else if(by[v]==2){m++;p=0}else p++});return M+'.'+m+'.'+p}
 function ccWhatsNew(sv){let seen=0;try{seen=+localStorage.getItem(sv)||0}catch(e){}
  if(seen>=CC_VER)return;const fresh=CC_LOG.filter(e=>e.v>seen);
  try{localStorage.setItem(sv,String(CC_VER))}catch(e){}
  if(!fresh.length)return;
  const picked=seen===0?fresh.slice(-1):fresh;      /* first time tracking: show the latest only, not a backlog */
- const big=[],small=[];let tour=null;for(const e of picked){(e.new||[]).forEach(i=>(e.big||e.tour?big:small).push(i));if(e.tour)tour=e.tour}
+ const shown=picked.filter(e=>!e.adm),big=[],small=[];let tour=null;for(const e of shown){(e.new||[]).forEach(i=>(e.big||e.tour?big:small).push(i));if(e.tour)tour=e.tour}
  if(big.length||tour)setTimeout(()=>ccNewsPopup([...big,...small],tour),500);
- else if(small.length)setTimeout(()=>ccNewsBar(small),900);}
+ else if(shown.some(e=>e.mid))setTimeout(()=>ccNewsBar(small),900);
+ else if(small.length)setTimeout(()=>ccNewsDot(small),900);}
+/* small updates: only a little round "i" in the top-right corner; tap it to see what changed */
+function ccNewsDot(items){if(document.getElementById('newsDot'))return;const esc=t=>String(t).replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
+ const d=document.createElement('button');d.id='newsDot';d.type='button';d.setAttribute('aria-label','Small updates');d.textContent='i';document.body.appendChild(d);requestAnimationFrame(()=>d.classList.add('on'));
+ d.onclick=()=>{try{H.tap()}catch(e){}if(document.getElementById('newsDotPop'))return;const pop=document.createElement('div');pop.id='newsDotPop';pop.setAttribute('role','dialog');
+  pop.innerHTML='<b>Small updates · v'+ccVerStr(CC_VER)+'</b><ul>'+items.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul><button class="btn" type="button">Got it</button>';document.body.appendChild(pop);
+  const close=()=>{pop.remove();d.classList.remove('on');setTimeout(()=>d.remove(),300)};pop.querySelector('button').onclick=()=>{try{H.ok()}catch(e){}close()};
+  setTimeout(()=>document.addEventListener('pointerdown',function f(e){if(!pop.contains(e.target)&&e.target!==d){document.removeEventListener('pointerdown',f,true);close()}},true),50)}}
 /* small updates: a slim banner at the very top. Tap to open the list, swipe it away (left, right or up), or close it. */
 function ccNewsBar(items){let o=document.getElementById('newsBar');if(o)o.remove();
  const esc=t=>String(t).replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
  o=document.createElement('div');o.id='newsBar';o.setAttribute('role','status');
- o.innerHTML='<button class="nb-h" type="button" aria-expanded="false"><span class="nb-s">✨</span><span class="nb-t">What’s new <small>· '+(items.length==1?'1 small update':items.length+' small updates')+'</small></span><i aria-hidden="true">›</i></button><div class="nb-b"><ul>'+items.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul><button class="nb-x" type="button">Got it</button></div>';
+ o.innerHTML='<button class="nb-h" type="button" aria-expanded="false"><span class="nb-s">✨</span><span class="nb-t">What’s new <small>· v'+ccVerStr(CC_VER)+'</small></span><i aria-hidden="true">›</i></button><div class="nb-b"><ul>'+items.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul><button class="nb-x" type="button">Got it</button></div>';
  document.body.appendChild(o);requestAnimationFrame(()=>o.classList.add('on'));
  const bye=(dx,dy)=>{o.style.transition='transform .28s ease,opacity .28s';o.style.transform=`translate(${dx}px,${dy}px)`;o.style.opacity='0';setTimeout(()=>o.remove(),300)};
  const h=o.querySelector('.nb-h');h.addEventListener('click',()=>{if(o._sw)return;const on=!o.classList.contains('open');o.classList.toggle('open',on);h.setAttribute('aria-expanded',on);try{H.tap()}catch(e){}});
