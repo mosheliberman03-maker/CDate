@@ -783,7 +783,14 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 /* ===== Siddur (Tehillat Hashem pages; v37 = paged). Pages are alpha stencils (siddur/p/N.webp) painted in var(--ink) via mask. ===== */
 .dock #sd{display:inline-flex;align-items:center;gap:8px;height:50px;padding:0 16px;border-radius:26px;font:600 15.5px Figtree,system-ui,sans-serif;color:color-mix(in srgb,var(--gl-tx) 82%,transparent)}
 .dock #sd::before{content:'';display:block;flex:none;width:19px;height:19px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z'/%3E%3Cpath d='M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z'/%3E%3Cpath d='M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z'/%3E%3C/svg%3E") center/contain no-repeat}
-.dock #td,.dock #mo{padding:0 16px}
+/* dock with 4 items (owner, v39: Today overlapped the divider): tighter spacing so everything fits at phone width */
+.dock{width:min(94vw,400px)}
+.dock #td{padding:0 18px 0 16px;gap:8px;flex:none}
+.dock #mo,.dock #sd{padding:0 10px;gap:7px;flex:none}
+.dock #mo{margin-left:8px}.dock #mo::after{left:-5px}
+.dock #td::before,.dock #mo::before,.dock #sd::before{width:18px;height:18px}
+.dock #mn{padding:0 12px;flex:none}
+@media(max-width:370px){.dock #mo,.dock #sd{padding:0 7px;gap:5px}.dock #td{padding:0 13px}.dock #mn{padding:0 8px}.dock #td,.dock #mo,.dock #sd{font-size:14.5px}}
 :root.tt-off-siddur .dock #sd{display:none}
 #sdr{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;color:var(--ink);background:#0b1330;transform:translateY(100%);visibility:hidden;transition:transform .34s cubic-bezier(.2,.8,.2,1),visibility 0s .34s;contain:strict}
 #sdr.on{transform:none;visibility:visible;transition:transform .34s cubic-bezier(.2,.8,.2,1)}
@@ -3036,8 +3043,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=38;
+const CC_VER=39;
 const CC_LOG=[
+ {v:39,new:['The bottom bar is tidier: Today, Month, Siddur and ⋯ now fit without overlapping.']},
  {v:38,new:['Siddur: swiping right now turns to the next page, like a Hebrew book (left goes back).']},
  {v:37,mid:1,new:['Siddur: one page at a time (swipe up or right for the next page, down or left to go back), a line at the top that grows as you go, and it opens on the tefillah for now. Tapping Shacharis, Mincha or Maariv asks where to start (Korbanos, Hodu, Ashrei…). Hallel, the Omer, no Tachanun, Musaf and the rest now pop up right where they’re needed.']},
  {v:36,big:1,new:['New: the Siddur (Tehillat Hashem). Tap Siddur at the bottom: it opens on the right prayer for now (Shacharis, Mincha or Maariv, with the Shabbos and Yom Tov versions), shows what to add today (Rosh Chodesh, Chanukah, the Omer and more) with links to the right page, has full contents and Go to page, three text sizes, and remembers your place.']},
