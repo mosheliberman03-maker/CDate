@@ -1073,7 +1073,7 @@ sync()})();
 // ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
 // Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=18,KIT_APK=1;
+const KIT_VER=19,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1088,7 +1088,8 @@ const KIT_LOG=[
  {v:12,big:1,t:"New people and places",d:"New people and places were added from the official shlichus list, and some names were corrected. Your saved list updates by itself."},
  {v:15,t:"Shooting stars on the globe between friends who saved each other"},
  {v:17,t:"Softer, pastel shooting stars"},
- {v:18,t:"Shooting stars fly closer to the globe"}
+ {v:18,t:"Shooting stars fly closer to the globe"},
+ {v:19,t:"Shooting stars also show when you zoom in"}
 ];
 const kitIsApp=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const kitSeenKey=()=>"kit_seen_"+(me&&me.match?slug(pkey(me.match.name,me.match.city)):"x");
@@ -1199,13 +1200,16 @@ function arcPt(a,b,om,u,lift){const s=Math.sin(om),k1=Math.sin((1-u)*om)/s,k2=Ma
  const vis=zz>0||Math.hypot(X,yy)*h>1.002;return[cx+R*h*X,cy-R*h*yy,vis,zz]}
 function shootDraw(){const now=performance.now();
  // always running on the globe view (owner): at most 3 stars at once, unhurried, to anywhere in the world (behind the globe too)
- const canSpawn=view!="cards"&&!su&&zoom<2.2&&!document.hidden;
+ const canSpawn=view!="cards"&&!su&&!document.hidden;
  if(canSpawn&&now>=SHOOT.next&&SHOOT.arcs.length<3){
   if(!SHOOT.pairs.length||SHOOT.pairs.every(p=>p.used)){SHOOT.pairs=shootPairs();SHOOT.pairs.forEach(p=>p.used=0)}
-  let p=SHOOT.pairs.find(q=>!q.used);
+  // zoomed in: only links that touch what's on screen, so the stars are still seen (owner)
+  const onScr=c=>{const q=P(c[0],c[1]);return q[2]>.02&&q[0]>-20&&q[0]<W+20&&q[1]>-20&&q[1]<H+20};
+  let p=zoom>1.6?SHOOT.pairs.find(q=>!q.used&&(onScr(q[0])||onScr(q[1]))):SHOOT.pairs.find(q=>!q.used);
+  if(!p&&zoom>1.6){const vis=SHOOT.fill.filter(onScr),all=SHOOT.fill;if(vis.length&&all.length>1){const A=vis[Math.floor(Math.random()*vis.length)];let B=all.slice().sort((x,y)=>(Math.abs(x[0]-A[0])+Math.abs(x[1]-A[1]))-(Math.abs(y[0]-A[0])+Math.abs(y[1]-A[1])))[1+Math.floor(Math.random()*Math.min(6,all.length-1))];if(B&&B!=A)p=Math.random()<.5?[A,B]:[B,A]}}
   if(!p&&SHOOT.fill.length>1){const A=SHOOT.fill[Math.floor(Math.random()*SHOOT.fill.length)],B=SHOOT.fill[Math.floor(Math.random()*SHOOT.fill.length)];if(A!=B&&(Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1]))>4)p=[A,B]}
   if(p){p.used=1;const a=v3(p[0][0],p[0][1]),b=v3(p[1][0],p[1][1]),om=Math.acos(Math.max(-1,Math.min(1,a[0]*b[0]+a[1]*b[1]+a[2]*b[2])));
-   SHOOT.arcs.push({a,b,om,lift:Math.min(.09,.02+om*.055),t0:now,d:2600+om*800,dest:p[1]})}
+   SHOOT.arcs.push({a,b,om,lift:Math.min(.09,.02+om*.055)/Math.sqrt(Math.max(1,zoom)),t0:now,d:2600+om*800,dest:p[1]})}
   SHOOT.next=now+900+Math.random()*900}
  ctx.save();ctx.globalCompositeOperation="lighter";ctx.lineCap="round";ctx.lineJoin="round";
  const ease=x=>x<0?0:x>1?1:1-Math.pow(1-x,2.2);   // fast launch, gentle arrival
