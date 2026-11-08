@@ -801,35 +801,10 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .cch .k{stroke:var(--halo);stroke-width:5;paint-order:stroke;stroke-linejoin:round}.cch .c-halo{fill:none;stroke:var(--halo);stroke-width:13}
 .cch .k{fill:var(--ink)}.cch .w{fill:var(--fill)}.cch .ln{fill:none;stroke:var(--ink);stroke-width:8;stroke-linecap:round}
 .cch .c-face{fill:var(--fill);stroke:var(--ink);stroke-width:7}
-.cch g,.cch path,.cch ellipse{transform-box:view-box}
-.cch .c-head{transform-origin:182px 262px}.cch .c-sway{transform-origin:182px 262px}.cch .c-hat,.cch .c-hatb{transform-origin:172px 104px}
-.cch .c-book{transform-origin:184px 378px}.cch .c-root{transform-origin:170px 396px}
-.cch .c-e,.cch .c-br{transform-box:fill-box;transform-origin:50% 50%}.cch .c-e{stroke:none}
-.cch :is(.c-head,.c-hat,.c-eyes,.c-look,.c-e,.c-br,.c-book,.c-alr,.c-thk,.c-hap,.c-cls){transition:transform .42s cubic-bezier(.3,1.5,.5,1),opacity .22s}
-.cch .c-look{transition-duration:.28s}
-.cch :is(.c-br,.c-hap,.c-cls,.c-alr,.c-thk,.c-page){opacity:0}
-.cch .c-alr{transform:scale(.6);transform-origin:282px 162px}.cch .c-thk{transform:translateY(10px)}
-/* expressions */
-.cch[data-m="curious"] .c-head{transform:rotate(-5deg)}.cch[data-m="curious"] .c-eyes{transform:translate(7px,-3px)}
-.cch[data-m="curious"] .c-e.r{transform:scaleY(.8)}.cch[data-m="curious"] .c-br.r{opacity:1;transform:translateY(-6px) rotate(-12deg)}.cch[data-m="curious"] .c-hat{transform:rotate(-3deg)}
-.cch[data-m="alert"] .c-head{transform:translateY(-7px)}.cch[data-m="alert"] .c-e{transform:scale(1.16)}.cch[data-m="alert"] .c-hat{transform:translateY(-18px) rotate(6deg)}.cch[data-m="alert"] .c-alr{opacity:1;transform:none}
-.cch[data-m="think"] .c-head{transform:rotate(7deg)}.cch[data-m="think"] .c-eyes{transform:translate(11px,-13px)}.cch[data-m="think"] .c-e{transform:scaleY(.9)}
-.cch[data-m="think"] .c-br.r{opacity:1;transform:translateY(-9px) rotate(10deg)}.cch[data-m="think"] .c-thk{opacity:1;transform:none}.cch[data-m="think"] .c-hat{transform:rotate(5deg)}
-.cch[data-m="det"] .c-br.l{opacity:1;transform:translateY(9px) rotate(20deg)}.cch[data-m="det"] .c-br.r{opacity:1;transform:translateY(9px) rotate(-20deg)}
-.cch[data-m="det"] .c-e{transform:translateY(5px) scaleY(.74)}.cch[data-m="det"] .c-head{transform:translateY(5px)}.cch[data-m="det"] .c-hat{transform:translateY(7px) rotate(-3deg)}
-.cch[data-m="happy"] .c-e{opacity:0;transform:scaleY(.1)}.cch[data-m="happy"] .c-hap{opacity:1}.cch[data-m="happy"] .c-head{transform:translateY(-6px) rotate(-3deg)}.cch[data-m="happy"] .c-hat{transform:translateY(-9px) rotate(-5deg)}
-.cch[data-m="sad"] .c-br.l{opacity:1;transform:translateY(5px) rotate(-17deg)}.cch[data-m="sad"] .c-br.r{opacity:1;transform:translateY(5px) rotate(17deg)}
-.cch[data-m="sad"] .c-e{transform:scaleY(.8)}.cch[data-m="sad"] .c-eyes{transform:translateY(8px)}.cch[data-m="sad"] .c-head{transform:translateY(11px) rotate(4deg)}.cch[data-m="sad"] .c-hat{transform:translateY(11px) rotate(4deg)}
-.cch[data-m="peek"] .c-head{transform:translateY(30px)}.cch[data-m="peek"] .c-eyes{transform:translateY(6px)}.cch[data-m="peek"] .c-book{transform:translateY(-5px)}
-.cch[data-m="read"] .c-e{opacity:0;transform:scaleY(.1)}.cch[data-m="read"] .c-cls{opacity:1}.cch[data-m="read"] .c-head{transform:translateY(6px) rotate(-3deg)}.cch[data-m="read"] .c-book{transform:rotate(-2deg)}
-.cch.blink .c-e{transform:scaleY(.08)!important;transition-duration:.07s}
-@keyframes cThk{0%,100%{opacity:.25}50%{opacity:1}}
-.cch[data-m="think"] .c-thk circle{animation:cThk 1.1s ease-in-out infinite}.cch .c-thk circle:nth-child(2){animation-delay:.18s}.cch .c-thk circle:nth-child(3){animation-delay:.36s}
-/* breathing: the whole picture (an HTML element, so the compositor does it) */
-/* v52 (owner: "it still flashes" in the assistant, a blurred glass sheet): no endless animation on the picture any more (an
-   always-animating layer inside a blurred sheet flashed in Android's WebView). He sits on one steady layer of his own, and his
-   breathing is one of the small moves his idle loop plays. */
-.cch{will-change:transform;contain:layout paint;isolation:isolate}
+.cch .c-e{stroke:none}
+/* v53 (owner: "it still flashes when he changes expressions… just him"): no CSS transforms/transitions/animations on his parts
+   at all. Every move is computed in JS (cchLive's little engine) and written as plain SVG transform/opacity attributes, one
+   requestAnimationFrame loop that runs only while something moves. */
 /* the + button is the character */
 .ai-fab .fabplus{display:none}.ai-fab .fabc{--cw:42px;position:relative;z-index:3;margin-top:5px}
 :root.tt-off-char .ai-fab .fabplus{display:inline}:root.tt-off-char .ai-fab .fabc{display:none}
@@ -837,7 +812,6 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .smot{display:flex!important;align-items:center;gap:12px}.smot .smav{--cw:46px}.smot>div{display:grid;gap:2px;min-width:0}
 #stkToast{display:flex!important;align-items:center;gap:12px}#stkToast .smav{--cw:44px}#stkToast>div{display:grid;gap:2px}
 :root.tt-off-char :is(.smot,#stkToast) .smav{display:none}
-@media(prefers-reduced-motion:reduce){.cch .c-thk circle{animation:none}.cch *{transition:none!important}}
 </style>
 <style id="cc-siddur">
 /* ===== Siddur (Tehillat Hashem pages; v37 = paged). Pages are alpha stencils (siddur/p/N.webp) painted in var(--ink) via mask. ===== */
@@ -3212,12 +3186,12 @@ const CCH_HAT=`M46.0 162.6C29.3 157.8 26.4 146.9 38.2 133.5C44.3 126.5 61.0 116.
 const CCH_SVG=`<svg viewBox="0 0 340 400" aria-hidden="true"><g class="c-root"><g class="c-head"><g class="c-sway">
 <circle class="c-halo" cx="182.6" cy="171.8" r="83.5"/><circle class="c-face" cx="182.6" cy="171.8" r="83.5"/>
 <g class="c-eyes"><g class="c-look"><ellipse class="c-e l k" cx="149.5" cy="171.3" rx="15" ry="26.5"/><ellipse class="c-e r k" cx="215.9" cy="171.1" rx="15.5" ry="26.5"/>
-<path class="c-hap ln" d="M135 180Q149.5 152 164 180M201.5 180Q216 152 230.5 180"/><path class="c-cls ln" d="M135 166Q149.5 186 164 166M201.5 166Q216 186 230.5 166"/></g></g>
-<path class="c-br l ln" d="M133 131Q149.5 121 166 131"/><path class="c-br r ln" d="M199.5 131Q216 121 232.5 131"/>
+<path class="c-hap ln" opacity="0" d="M135 180Q149.5 152 164 180M201.5 180Q216 152 230.5 180"/><path class="c-cls ln" opacity="0" d="M135 166Q149.5 186 164 166M201.5 166Q216 186 230.5 166"/></g></g>
+<path class="c-br l ln" opacity="0" d="M133 131Q149.5 121 166 131"/><path class="c-br r ln" opacity="0" d="M199.5 131Q216 121 232.5 131"/>
 <g class="c-hat"><g class="c-hatb"><path class="k" fill-rule="evenodd" d="${CCH_HAT}"/></g></g>
-<g class="c-alr ln"><path style="stroke:var(--halo);stroke-width:15" d="M280 140L304 124M284 162L312 160M282 184L304 196"/><path d="M280 140L304 124M284 162L312 160M282 184L304 196"/></g></g></g>
-<g class="c-book"><path class="c-page" d="M186 240L186 172Q236 160 288 176L288 240Z" style="fill:var(--fill);stroke:var(--ink);stroke-width:6;stroke-linejoin:round;transform-origin:186px 238px"/><path class="w" d="${CCH_BOOKW}"/><path class="k" fill-rule="evenodd" d="${CCH_BOOK}"/></g>
-<g class="c-thk k"><circle cx="250" cy="16" r="6"/><circle cx="272" cy="-4" r="8.5"/><circle cx="300" cy="-28" r="11"/></g></g></svg>`;
+<g class="c-alr ln" opacity="0"><path style="stroke:var(--halo);stroke-width:15" d="M280 140L304 124M284 162L312 160M282 184L304 196"/><path d="M280 140L304 124M284 162L312 160M282 184L304 196"/></g></g></g>
+<g class="c-book"><path class="c-page" opacity="0" d="M186 240L186 172Q236 160 288 176L288 240Z" style="fill:var(--fill);stroke:var(--ink);stroke-width:6;stroke-linejoin:round"/><path class="w" d="${CCH_BOOKW}"/><path class="k" fill-rule="evenodd" d="${CCH_BOOK}"/></g>
+<g class="c-thk k" opacity="0"><circle cx="250" cy="16" r="6"/><circle cx="272" cy="-4" r="8.5"/><circle cx="300" cy="-28" r="11"/></g></g></svg>`;
 const cchHtml=(p,cls)=>`<span class="cch ${cls||''}" data-m="${CCP[p]||p}" aria-hidden="true">${CCH_SVG}</span>`;
 const CCH_KF={hop:[[{transform:'translateY(0) scale(1)'},{transform:'translateY(-14%) scale(.97,1.05)',offset:.38},{transform:'translateY(1.5%) scale(1.05,.95)',offset:.72},{transform:'translateY(0) scale(1)'}],560],
  tap:[[{transform:'translateY(0)'},{transform:'translateY(1.5%) scale(1.02,.98)'},{transform:'translateY(0)'}],170],
@@ -3226,24 +3200,70 @@ const CCH_KF={hop:[[{transform:'translateY(0) scale(1)'},{transform:'translateY(
  droop:[[{transform:'translateY(0)'},{transform:'translateY(4%) scale(1.02,.97)',offset:.5},{transform:'translateY(1%)'},{transform:'translateY(0)'}],900]};
 /* a live character. set(mood, ms, anim) shows an expression for a while (it morphs there smoothly); setBase() is his resting
    expression; on his own he blinks, glances around, sways, tips his hat and turns a page now and then. */
-function cchLive(el,base){if(!el)return{set(){},setBase(){},anim(){},nod(){},dart(){}};if(!el.querySelector('svg'))el.innerHTML=CCH_SVG;
- const q=c=>el.querySelector(c),L={el,base:base||'idle',t:0,cur:null},show=p=>{const v=CCP[p]||p;if(el.dataset.m!==v)el.dataset.m=v};
- const wa=(node,kf,o)=>{if(RM||!node||!node.animate)return;try{node.animate(kf,Object.assign({easing:'ease-in-out'},o))}catch(e){}};
- L.anim=k=>{if(k&&CCH_KF[k])wa(q('.c-root'),CCH_KF[k][0],{duration:CCH_KF[k][1],easing:'ease-out'})};
- L.set=(p,ms,k)=>{clearTimeout(L.t);L.cur=p;show(p);L.anim(k);if(p==='happy')L.hat();if(ms)L.t=setTimeout(()=>{L.cur=null;show(L.base)},ms)};
- L.setBase=p=>{L.base=p;if(!L.cur)show(p)};
- L.blink=()=>{if(RM)return;el.classList.add('blink');setTimeout(()=>el.classList.remove('blink'),130)};
- L.look=(x,y,ms)=>{const g=q('.c-look');if(!g)return;g.style.transform=`translate(${x}px,${y}px)`;clearTimeout(L.lt);if(ms)L.lt=setTimeout(()=>{g.style.transform=''},ms)};
- L.sway=()=>wa(q('.c-sway'),[{transform:'rotate(0)'},{transform:`rotate(${Math.random()<.5?-4:4}deg)`},{transform:'rotate(-1deg)'},{transform:'rotate(0)'}],{duration:1700});
- L.hat=()=>wa(q('.c-hatb'),[{transform:'translateY(0) rotate(0)'},{transform:'translateY(-16px) rotate(-7deg)',offset:.35},{transform:'translateY(2px) rotate(2deg)',offset:.7},{transform:'translateY(0) rotate(0)'}],{duration:800});
- L.page=()=>{const pg=q('.c-page');wa(pg,[{opacity:1,transform:'translateY(70px) scaleX(1)'},{opacity:1,transform:'translateY(22px) scaleX(.8)',offset:.25},{opacity:1,transform:'translateY(14px) scaleX(0)',offset:.5},{opacity:1,transform:'translateY(22px) scaleX(-.8)',offset:.75},{opacity:1,transform:'translateY(70px) scaleX(-1)'}],{duration:1000})};
- L.nod=()=>wa(q('.c-sway'),[{transform:'translateY(0)'},{transform:'translateY(5px) rotate(1deg)'},{transform:'translateY(0)'}],{duration:220});
+/* his rig: part → [selector, pivot x, pivot y]; state per part {x,y,r,sx,sy,o} */
+const CCH_PARTS={root:['.c-root',170,396],head:['.c-head',182,262],sway:['.c-sway',182,262],eyes:['.c-eyes',182,171],look:['.c-look',182,171],
+ eL:['.c-e.l',149.5,171.3],eR:['.c-e.r',215.9,171.1],brL:['.c-br.l',149.5,126],brR:['.c-br.r',216,126],hap:['.c-hap',182,170],cls:['.c-cls',182,170],
+ hat:['.c-hat',172,104],hatb:['.c-hatb',172,104],book:['.c-book',184,378],page:['.c-page',186,240],alr:['.c-alr',282,162],thk:['.c-thk',290,10]};
+const CCH_HIDDEN={brL:1,brR:1,hap:1,cls:1,alr:1,thk:1,page:1};
+/* expressions: only what differs from rest */
+const CCH_M={calm:{},
+ curious:{head:{r:-5},eyes:{x:7,y:-3},eR:{sy:.8},brR:{o:1,y:-6,r:-12},hat:{r:-3}},
+ alert:{head:{y:-7},eL:{sx:1.16,sy:1.16},eR:{sx:1.16,sy:1.16},hat:{y:-18,r:6},alr:{o:1}},
+ think:{head:{r:7},eyes:{x:11,y:-13},eL:{sy:.9},eR:{sy:.9},brR:{o:1,y:-9,r:10},thk:{o:1},hat:{r:5}},
+ det:{brL:{o:1,y:9,r:20},brR:{o:1,y:9,r:-20},eL:{y:5,sy:.74},eR:{y:5,sy:.74},head:{y:5},hat:{y:7,r:-3}},
+ happy:{eL:{o:0,sy:.1},eR:{o:0,sy:.1},hap:{o:1},head:{y:-6,r:-3},hat:{y:-9,r:-5}},
+ sad:{brL:{o:1,y:5,r:-17},brR:{o:1,y:5,r:17},eL:{sy:.8},eR:{sy:.8},eyes:{y:8},head:{y:11,r:4},hat:{y:11,r:4}},
+ peek:{head:{y:30},eyes:{y:6},book:{y:-5}},
+ read:{eL:{o:0,sy:.1},eR:{o:0,sy:.1},cls:{o:1},head:{y:6,r:-3},book:{r:-2}}};
+const cchS=(k,m)=>{const d=(CCH_M[m]||{})[k]||{};return{x:d.x||0,y:d.y||0,r:d.r||0,sx:d.sx??1,sy:d.sy??1,o:d.o??(CCH_HIDDEN[k]?0:1)}};
+const cchBack=t=>{const c1=1.9,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2)};
+/* a live character: set(mood, ms, anim) morphs to an expression (and back to the resting one after ms); setBase() = resting
+   expression; on his own he breathes, blinks, glances, sways, tips his hat and turns a page. All motion = JS → SVG attributes. */
+function cchLive(el,base){if(!el)return{set(){},setBase(){},anim(){},nod(){},dart(){},look(){}};if(!el.querySelector('svg'))el.innerHTML=CCH_SVG;
+ const P={};for(const k in CCH_PARTS){const d=CCH_PARTS[k],n=el.querySelector(d[0]);if(n)P[k]={n,px:d[1],py:d[2],from:cchS(k,'calm'),to:cchS(k,'calm'),t0:0,dur:0,last:''}}
+ const L={el,base:base||'idle',t:0,cur:null,fx:[],raf:0};
+ const now=()=>performance.now();
+ const kick=()=>{if(!L.raf)L.raf=requestAnimationFrame(frame)};
+ const mix=(a,b,e)=>({x:a.x+(b.x-a.x)*e,y:a.y+(b.y-a.y)*e,r:a.r+(b.r-a.r)*e,sx:a.sx+(b.sx-a.sx)*e,sy:a.sy+(b.sy-a.sy)*e,o:a.o+(b.o-a.o)*Math.min(1,Math.max(0,e))});
+ const curOf=(p,t)=>{if(!p.dur||t>=p.t0+p.dur)return p.to;const u=(t-p.t0)/p.dur;return mix(p.from,p.to,cchBack(u))};
+ const tween=(k,to,dur)=>{const p=P[k];if(!p)return;const t=now();p.from=curOf(p,t);p.to=to;p.t0=t;p.dur=RM?0:dur;kick()};
+ const mood=m=>{m=CCP[m]||m;el.dataset.m=m;for(const k in P)if(k!=='look'&&k!=='sway'&&k!=='hatb'&&k!=='root'&&k!=='page')tween(k,cchS(k,m),440)};
+ /* one-shot moves: keyframes [{t,...state deltas}] added on top (x,y,r add; sx,sy multiply; o overrides) */
+ const fx=(k,kf,dur)=>{if(RM||!P[k])return;L.fx.push({k,kf,t0:now(),dur});kick()};
+ const fxAt=(f,t)=>{const u=Math.min(1,(t-f.t0)/f.dur),kf=f.kf;let i=0;while(i<kf.length-2&&u>kf[i+1].t)i++;const a=kf[i],b=kf[i+1],w=b.t>a.t?(u-a.t)/(b.t-a.t):1,e=w<.5?2*w*w:1-Math.pow(-2*w+2,2)/2,g=(q,d)=>(a[q]??d)+((b[q]??d)-(a[q]??d))*e;
+  return{x:g('x',0),y:g('y',0),r:g('r',0),sx:g('sx',1),sy:g('sy',1),o:(a.o!=null||b.o!=null)?g('o',1):null}};
+ function frame(){L.raf=0;const t=now();let busy=false;const add={};
+  L.fx=L.fx.filter(f=>{if(t>=f.t0+f.dur)return false;busy=true;const d=fxAt(f,t),A=add[f.k]||(add[f.k]={x:0,y:0,r:0,sx:1,sy:1,o:null});A.x+=d.x;A.y+=d.y;A.r+=d.r;A.sx*=d.sx;A.sy*=d.sy;if(d.o!=null)A.o=d.o;return true});
+  for(const k in P){const p=P[k];if(p.dur&&t<p.t0+p.dur)busy=true;const c=curOf(p,t),A=add[k];let x=c.x,y=c.y,r=c.r,sx=c.sx,sy=c.sy,o=c.o;
+   if(A){x+=A.x;y+=A.y;r+=A.r;sx*=A.sx;sy*=A.sy;if(A.o!=null)o=A.o}
+   if(k==='eL'||k==='eR'){if(L.blinkT&&t<L.blinkT){sy*=.08;busy=true}}
+   if(k==='thk'&&o>.01&&el.dataset.m==='think'){busy=true}
+   const tr=`translate(${(x+p.px).toFixed(2)} ${(y+p.py).toFixed(2)}) rotate(${r.toFixed(2)}) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(${-p.px} ${-p.py})`,op=Math.max(0,Math.min(1,o)).toFixed(3),sig=tr+op;
+   if(sig!==p.last){p.last=sig;p.n.setAttribute('transform',tr);p.n.setAttribute('opacity',op)}}
+  if(el.dataset.m==='think'&&P.thk){const cs=P.thk.n.children;for(let i=0;i<cs.length;i++)cs[i].setAttribute('opacity',(.3+.7*(.5+.5*Math.sin(t/180-i*1.1))).toFixed(2))}
+  if(busy&&el.isConnected)L.raf=requestAnimationFrame(frame)}
+ const KF={hop:['root',[{t:0},{t:.38,y:-50,sx:.97,sy:1.05},{t:.72,y:6,sx:1.05,sy:.95},{t:1}],560],
+  tap:['root',[{t:0},{t:.5,y:5,sx:1.02,sy:.98},{t:1}],170],
+  wobble:['sway',[{t:0},{t:.25,r:-5},{t:.5,r:4},{t:.75,r:-2},{t:1}],1000],
+  pop:['root',[{t:0,sx:.3,sy:.3,y:40},{t:.6,sx:1.1,sy:1.1},{t:1}],520],
+  droop:['root',[{t:0},{t:.5,y:14,sx:1.02,sy:.97},{t:.8,y:4},{t:1}],900]};
+ L.anim=k=>{const d=KF[k];if(d)fx(d[0],d[1],d[2])};
+ L.set=(p,ms,k)=>{clearTimeout(L.t);L.cur=p;mood(p);L.anim(k);if((CCP[p]||p)==='happy')L.hat();if(ms)L.t=setTimeout(()=>{L.cur=null;mood(L.base)},ms)};
+ L.setBase=p=>{const was=CCP[L.base]||L.base;L.base=p;if(!L.cur&&(CCP[p]||p)!==was)mood(p)};
+ L.blink=()=>{if(RM)return;L.blinkT=now()+130;kick()};
+ L.look=(x,y,ms)=>{tween('look',{x,y,r:0,sx:1,sy:1,o:1},280);clearTimeout(L.lt);if(ms)L.lt=setTimeout(()=>tween('look',{x:0,y:0,r:0,sx:1,sy:1,o:1},320),ms)};
+ L.sway=()=>{const d=Math.random()<.5?-4:4;fx('sway',[{t:0},{t:.35,r:d},{t:.75,r:-d*.3},{t:1}],1700)};
+ L.hat=()=>fx('hatb',[{t:0},{t:.35,y:-16,r:-7},{t:.7,y:2,r:2},{t:1}],800);
+ L.page=()=>fx('page',[{t:0,o:1,y:70},{t:.25,o:1,y:22,sx:.8},{t:.5,o:1,y:14,sx:.02},{t:.75,o:1,y:22,sx:-.8},{t:1,o:1,y:70,sx:-1}],1000);
+ L.breathe=()=>fx('root',[{t:0},{t:.5,sx:1.012,sy:1.03},{t:1}],2200);
+ L.nod=()=>fx('sway',[{t:0},{t:.5,y:5,r:1},{t:1}],220);
  let dx=-9;L.dart=()=>{dx=dx>=9?-9:dx+3;L.look(dx,4)};
- if(!RM){el.classList.add('live');const tick=()=>{if(!el.isConnected)return;setTimeout(tick,2200+Math.random()*3000);
-   if(L.cur||document.hidden||!el.isConnected||!el.offsetParent||(el.closest('.ai-fab')&&document.documentElement.classList.contains('cc-away')))return;
+ mood(L.base);for(const k in P){P[k].dur=0}frame();
+ if(!RM){const tick=()=>{if(!el.isConnected)return;setTimeout(tick,2200+Math.random()*3000);
+   if(L.cur||document.hidden||!el.offsetParent||(el.closest('.ai-fab')&&document.documentElement.classList.contains('cc-away')))return;
    const r=Math.random(),m=CCP[L.base]||L.base;
-   if(r<.18)wa(q('.c-root'),[{transform:'scale(1,1)'},{transform:'scale(1.012,1.03)'},{transform:'scale(1,1)'}],{duration:2200});else if(r<.48)L.blink();else if(r<.62){L.look((Math.random()-.5)*20,(Math.random()-.5)*10,1300);setTimeout(L.blink,1500)}
-   else if(r<.76)L.sway();else if(r<.86)L.hat();else if(m==='read'||m==='peek'||r<.93)L.page();else L.blink()};setTimeout(tick,1500)}
+   if(r<.18)L.breathe();else if(r<.48)L.blink();else if(r<.64){L.look((Math.random()-.5)*20,(Math.random()-.5)*10,1300);setTimeout(L.blink,1500)}
+   else if(r<.77)L.sway();else if(r<.86)L.hat();else if(m==='read'||m==='peek'||r<.93)L.page();else L.blink()};setTimeout(tick,1500)}
  return L}
 const FABC=cchLive(document.getElementById('fabCh'),'idle'),AIV=cchLive(document.getElementById('aiAv'),'idle');
 /* opening: the sheet grows out of the character button, and the character pops in and says hello */
@@ -3271,8 +3291,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=52;
+const CC_VER=53;
 const CC_LOG=[
+ {v:53,new:['The assistant changes expression smoothly without flashing.']},
  {v:52,new:['The assistant no longer flashes in the Plan window, and his page turn now looks like a page turning inside his book.']},
  {v:51,new:['Fixed the assistant flashing between his animations.']},
  {v:50,new:['The assistant is alive: his head, eyes, eyebrows, hat and book all move, he blinks, looks around, turns pages, reads along as you type and reacts to what you ask.']},
