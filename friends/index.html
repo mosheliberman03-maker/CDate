@@ -1093,9 +1093,9 @@ sync()})();
 // ---------- What's new (STANDING RULE, owner): every update bumps KIT_VER (internal build number) and adds a KIT_LOG entry with a size:
 // big:1 = MAJOR (a real new feature) → full popup, version X.0.0 · mid:1 = MEDIUM → slim banner at the top, version X.Y.0 ·
 // neither = SMALL (looks, tweaks, fixes) → only a little round "i" in the corner, version X.Y.Z.
-// adm:1 = admin-only change → no notification at all and no change to the shown version (owner); still bump KIT_VER so phones reload. The shown version is worked out from these sizes.
+// adm:1 = admin-only change → counts as a small update in the version number, but NO notification at all (owner). The shown version is worked out from these sizes.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=26,KIT_APK=1;
+const KIT_VER=27,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,mid:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1117,10 +1117,9 @@ const KIT_LOG=[
  {v:22,t:"Shooting stars only show real connections between friends"},
  {v:23,mid:1,t:"Clearer version numbers (big.medium.small), and small updates now just show a little ⓘ in the corner"},
  {v:24,t:"Version numbers recounted with the new big / medium / small rule"},
- {v:25,adm:1,t:"Admin: Members list in the menu, with a count of everyone who has an account"},
- {v:26,adm:1,t:"Admin-only changes are no longer announced"}
+ {v:25,adm:1,t:"Admin: Members list in the menu, with a count of everyone who has an account"}
 ];
-function kitVerStr(b){let M=0,m=0,p=0;const by={};KIT_LOG.forEach(x=>{if(x.adm)return;const l=x.big?3:x.mid?2:1;by[x.v]=Math.max(by[x.v]||0,l)});
+function kitVerStr(b){let M=0,m=0,p=0;const by={};KIT_LOG.forEach(x=>{const l=x.big?3:x.mid?2:1;by[x.v]=Math.max(by[x.v]||0,l)});
  Object.keys(by).map(Number).sort((a,c)=>a-c).forEach(v=>{if(v>b)return;if(by[v]==3){M++;m=0;p=0}else if(by[v]==2){m++;p=0}else p++});return M+"."+m+"."+p}
 const kitIsApp=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const kitSeenKey=()=>"kit_seen_"+(me&&me.match?slug(pkey(me.match.name,me.match.city)):"x");
