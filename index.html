@@ -1134,9 +1134,10 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   function whoosh(t,d,f0,f1,v){var s2=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain();s2.buffer=noise();bp.type='bandpass';bp.Q.value=1.4;bp.frequency.setValueAtTime(f0,t);bp.frequency.exponentialRampToValueAtTime(f1,t+d);
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v||.22,t+d*.45);g.gain.linearRampToValueAtTime(0,t+d);s2.connect(bp);bp.connect(g);g.connect(mst);s2.start(t);s2.stop(t+d+.05)}
   function bellN(t,f,v){[[1,1],[2.76,.32],[5.4,.12]].forEach(function(p){tone('sine',f*p[0],0,t,.003,(v||.12)*p[1],1.4/p[0])})}
-  function build(t,d){tone('triangle',196,392,t,d*.9,.05,d*.25);whoosh(t,d,250,1200,.08)}
-  function finale(t){whoosh(t,.55,300,3200,.3);[1046.5,1318.5,1568,2093,2637].forEach(function(f,i){bellN(t+.06+i*.07,f,.1)});
-    [261.63,329.63,392,523.25].forEach(function(f,i){tone('triangle',f,0,t+.1,.03,.07,2.2-i*.2)})}
+  function build(t,d){tone('triangle',196,330,t,d*.9,.03,d*.25);whoosh(t,d,250,900,.04)}
+  /* v63 (owner: "the jump sound is too much"): a soft whoosh and a light three-note sparkle, much quieter */
+  function finale(t){whoosh(t,.45,400,1800,.09);[1318.5,1568,2093].forEach(function(f,i){bellN(t+.08+i*.08,f,.035)});
+    tone('sine',523.25,0,t+.12,.04,.025,1.4)}
   var SE=[
     [0,function(t){pad(t,7.4)}],
     [.4,function(t){pop(t,180,520,.34)}],
@@ -3366,8 +3367,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=62;
+const CC_VER=63;
 const CC_LOG=[
+ {v:63,new:['The jump sound in the opening is softer.']},
  {v:62,new:['The opening is smoother, with new sound effects.']},
  {v:61,new:['In the opening, the character now jumps off to the side.']},
  {v:60,new:['In the opening, the side-view book has its spine facing forward, and he winds up longer before his big jump.']},
