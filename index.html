@@ -1128,8 +1128,14 @@ function infoBase(dt){const key=dt.getFullYear()*10000+dt.getMonth()*100+dt.getD
  dynEv(dt,h,wd,ev);
  const r={h,rc,ev};if(IBC.size>3000)IBC.clear();IBC.set(key,r);return r}
 const PLAN_LEARN=/\b(?:chavrusa|chavrusas|kvius|seder|sedarim|shiur|shiurim|learn(?:ing)?|study(?:ing)?|class|lesson|farbrengen)\b/i;
+/* Recurring skips on your own plans (v34): "cancel all future Shabbos chavrusas" adds {dow:6,from}; "…chof ches Nissan…" {hk,hd,from};
+   also {rc:1} Rosh Chodesh, {yt:1} Yom Tov, {gm,gd} a yearly English date. h = the Hebrew date the plan list uses for that day. */
+function aiSkipHit(r,dt,h,s){if(r.from&&s<r.from)return false;
+ if(r.dow!=null)return dt.getDay()===r.dow;if(r.hk)return h.k===r.hk&&h.d===r.hd;if(r.rc)return h.d===1||h.d===30;
+ if(r.yt)return strictYT(h)||(h.k==='Ti'&&h.d===10);if(r.gm!=null)return dt.getMonth()===r.gm&&dt.getDate()===r.gd;return false}
+function aiSkipLabel(r){return r.dow!=null?(r.dow===6?'Shabbos':AI_DAY_LABEL[r.dow]):r.hk?r.hd+' '+((MN[r.hk]||[r.hk])[0]):r.rc?'Rosh Chodesh':r.yt?'Yom Tov':r.gm!=null?new Date(2000,r.gm,r.gd).toLocaleDateString(undefined,{month:'short',day:'numeric'}):''}
 function info(dt){const b=infoBase(hDay(dt)),h=b.h,rc=b.rc,ev=b.ev.slice(),wd=dt.getDay();
- const s=ds(dt),K=Object.keys(KN);for(const c of my)if(((c.from&&s<c.from)||(Array.isArray(c.skip)&&c.skip.some(r=>s>=r[0]&&s<=r[1])))?false:(c.r=='once'&&c.dt==s)||(c.r=='greg'&&c.dt.slice(5)==s.slice(5))||(c.r=='heb'&&c.hk==h.k&&c.hd==h.d)||(c.r=='weekly'&&(Array.isArray(c.dows)&&c.dows.length?c.dows.includes(dt.getDay()):dt.getDay()==c.dow))||(c.r=='every2'&&((Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)>=0)&&(Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)%2===0)))||(c.r=='hmonth'&&h.d==c.hd)||(c.r=='yomadpagra'&&Array.isArray(c.dates)&&c.dates.includes(h.k+'-'+h.d))||(c.r=='custom'&&((Array.isArray(c.dates)&&c.dates.includes(s))||(Number.isInteger(c.interval)&&c.interval>0&&Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)>=0&&Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)%c.interval===0))))ev.push({k:'my',t:c.t,h:'',x:c.x||'Your event.',id:c.id,isTask:c.kind==='task'&&!PLAN_LEARN.test(c.t+' '+(c.x||'')),done:!!taskDone()[c.id+'@'+s]});
+ const s=ds(dt),K=Object.keys(KN);for(const c of my)if(((c.from&&s<c.from)||(Array.isArray(c.skip)&&c.skip.some(r=>s>=r[0]&&s<=r[1]))||(Array.isArray(c.skipR)&&c.skipR.some(r=>aiSkipHit(r,dt,h,s))))?false:(c.r=='once'&&c.dt==s)||(c.r=='greg'&&c.dt.slice(5)==s.slice(5))||(c.r=='heb'&&c.hk==h.k&&c.hd==h.d)||(c.r=='weekly'&&(Array.isArray(c.dows)&&c.dows.length?c.dows.includes(dt.getDay()):dt.getDay()==c.dow))||(c.r=='every2'&&((Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)>=0)&&(Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)%2===0)))||(c.r=='hmonth'&&h.d==c.hd)||(c.r=='yomadpagra'&&Array.isArray(c.dates)&&c.dates.includes(h.k+'-'+h.d))||(c.r=='custom'&&((Array.isArray(c.dates)&&c.dates.includes(s))||(Number.isInteger(c.interval)&&c.interval>0&&Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)>=0&&Math.floor((new Date(s+'T12:00:00')-new Date(c.dt+'T12:00:00'))/86400000)%c.interval===0))))ev.push({k:'my',t:c.t,h:'',x:c.x||'Your event.',id:c.id,isTask:c.kind==='task'&&!PLAN_LEARN.test(c.t+' '+(c.x||'')),done:!!taskDone()[c.id+'@'+s]});
  return{h,rc,ev:ev.map(e=>ov[e.id]?{...e,...ov[e.id]}:e).sort((a,b)=>K.indexOf(a.k)-K.indexOf(b.k))}}
 let t0=ad(new Date(),0);
 /* Two "todays": t0 is the English date (it changes at midnight). After sunset the Hebrew date has already moved on, so anything
@@ -2826,8 +2832,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    STANDING RULE (owner): every feature update bumps CC_VER and adds a CC_LOG entry. Small change -> `new:[...]` items
    (shown in the What's-new popup after the user taps "Tap to update"). Whole new feature -> also set `feature` and
    `tour:'<id>'`, and add that id to SETS in ccTourStart so "Show me" runs a live tour. */
-const CC_VER=33;
+const CC_VER=34;
 const CC_LOG=[
+ {v:34,big:1,new:['Cancel a repeating plan on certain days from now on: “cancel all future Shabbos chavrusas”, “no more chavrusa on Fridays”, “cancel my chavrusa every Chof Ches Nissan”, “skip the shiur on Rosh Chodesh”, “…on Yom Tov”. Every other day stays as it was.']},
  {v:33,big:1,new:['The assistant understands you much better: times like “at 8” get the right AM/PM, “in 2 hours”, “next Friday”, “every other Tuesday”, “weeknights”, “Sunday nights 9 to 10”, “before Shabbos”, “every Motzei Shabbos”, several plans in one message, “remind me every day at 9pm to…”, and natural speech (“um, like…”). Titles read naturally (“Call my mother”, “Chavrusa with Adam”).','The Hebrew date at night is a softer, moonlit glass so it isn’t harsh against the sky.']},
  {v:32,new:['Smoother and faster: changing days, opening the app and scrolling take much less work, and the moving date no longer redraws nonstop while you hold the phone.']},
  {v:31,new:['The ⋯ menu is tidier: a short list of sections (Location, Reminders, Calendar, My schedule, App, Help). Tap one to open it. Rarely used settings moved to Advanced.']},
@@ -3647,7 +3654,7 @@ aiEl('aiMic').addEventListener('click',()=>{
  aiSetStatus('Starting the microphone…');
  try{r.start();aiMicWatch(r)}catch(e){aiMic.listening=false;aiMic.rec=null;aiMicUI(false);aiSetStatus('Could not start the microphone ('+(e&&e.name||'error')+'). Tap the mic again.')}});
 /* ===== Cancel / skip: only plans the person added (the `my` list), never built-in calendar dates ===== */
-const AI_CANCEL_RE=/^(?:(?:please|pls|can you|could you|would you|i want to|i need to|i'd like to|i would like to|go ahead and|just)\s+)*(?:cancel(?:\s+out)?|delete|remove|scrap|nix|skip|call\s+off|get\s+rid\s+of|take\s+off|unschedule|stop|i\s+can'?t\s+make|i\s+won'?t\s+(?:be\s+)?(?:make|making|at))\b/i;
+const AI_CANCEL_RE=/^(?:(?:please|pls|can you|could you|would you|i want to|i need to|i'd like to|i would like to|go ahead and|just)\s+)*(?:cancel(?:\s+out)?|delete|remove|scrap|nix|skip|call\s+off|get\s+rid\s+of|take\s+off|unschedule|stop|no\s+more|no\s+longer(?:\s+(?:have|do|want))?|drop|discontinue|i\s+(?:don'?t|do\s+not)\s+(?:have|want)|i\s+can'?t\s+make|i\s+won'?t\s+(?:be\s+)?(?:make|making|at))\b/i;
 const AI_FOREVER_VERB=/\b(?:delete|remove|scrap|unschedule|get\s+rid\s+of|take\s+off|stop)\b/i;
 const AI_Q_STOP=new Set('my the a an our for on at in with just only this that next coming upcoming and it them those these all both its me us from also then so but if when please pls session sessions plan plans event events one of to out off'.split(' '));
 let aiCancelCtx=null,aiUndo=null;
@@ -3678,7 +3685,7 @@ function aiEvSummary(c){
  else if(c.r==='greg')s='Yearly, '+aiFmt(new Date(c.dt+'T12:00:00')).replace(/^\w+, /,'');
  else if(c.r==='custom')s=Array.isArray(c.dates)&&c.dates.length?c.dates.length+' dates':(c.interval===1?'Every day':c.interval%7===0?'Every '+(c.interval/7===1?'week':c.interval/7+' weeks'):'Every '+c.interval+' days');
  else s='Repeats';
- const tm=/Time: ([^·]+)/.exec(c.x||'');return s+(tm?' · '+tm[1].trim():'')}
+ const tm=/Time: ([^·]+)/.exec(c.x||'');return s+(tm?' · '+tm[1].trim():'')+(Array.isArray(c.skipR)&&c.skipR.length?' · not on '+c.skipR.map(aiSkipLabel).join(', '):'')}
 const aiOccurs=(c,d)=>info(d).ev.some(e=>e.id===c.id);
 function aiOccurrences(c,a,b){const out=[];for(let i=0;i<=800;i++){const d=ad(a,i);if(d>b)break;if(aiOccurs(c,d))out.push(d)}return out}
 
@@ -3690,8 +3697,22 @@ function aiParseScope(str,today){
  const endWeek=d=>ad(d,6-d.getDay());
  // keep named days ("Yud Tes Kislev farbrengen") as part of the plan's name, not as a date to skip
  for(const[re]of AI_NAMED)W=W.replace(new RegExp('\\b(?:'+re+')\\b','gi'),m=>m.replace(/\s+/g,'_'));
- if(take(/\b(?:permanent(?:ly)?|forever|for\s+ever|for\s+good|completely|entirely|altogether|indefinitely|no\s+longer|any\s*more|from\s+now\s+on|(?:the\s+)?(?:whole|entire)\s+series|all\s+(?:of\s+)?(?:the\s+)?(?:future\s+)?(?:sessions|occurrences|times))\b/))forever=true;
- if(take(/\bevery\s+(?:day|week|month|year|sunday|monday|tuesday|wednesday|thursday|friday|saturday|shabbos)\b/))forever=true;
+ if(new RegExp('\\b(?:permanent(?:ly)?|forever|for\\s+ever|for\\s+good|completely|entirely|altogether|indefinitely|no\\s+longer|any\\s*more|from\\s+now\\s+on|(?:the\\s+)?(?:whole|entire)\\s+series|all\\s+(?:of\\s+)?(?:the\\s+)?(?:future\\s+)?(?:sessions|occurrences|times))\\b').test(W)&&!new RegExp('\\b(?:'+AI_DOW_TOK+'|shabbosim|shabbosos|rosh\\s*chodesh|yom\\s*tov|'+AI_HMONTH_RE+'|'+AI_MONTH_RE+')\\b','i').test(W)&&take(/\b(?:permanent(?:ly)?|forever|for\s+ever|for\s+good|completely|entirely|altogether|indefinitely|no\s+longer|any\s*more|from\s+now\s+on|(?:the\s+)?(?:whole|entire)\s+series|all\s+(?:of\s+)?(?:the\s+)?(?:future\s+)?(?:sessions|occurrences|times))\b/))forever=true;
+ const rules=[];
+ {const ALL=/\b(?:all|every|each|any)\b|\bfuture\b|\bfrom\s+now\s+on\b|\bgoing\s+forward\b|\bany\s*more\b|\bfrom\s+here\s+on\b|\balways\b|\bin\s+the\s+future\b/;
+  const plural=/\b(?:sundays|mondays|tuesdays|wednesdays|thursdays|fridays|saturdays|shabbosim|shabbosos|shabboses|shabbatot|weekends)\b/;
+  const rep=ALL.test(W)||plural.test(W)||/\bno\s+(?:more|longer)\b|\b(?:yom\s*tov(?:im)?|yamim\s+tovim|rosh\s*(?:chodesh|hodesh))\b/.test(W),eraseAll=()=>{W=W.replace(/\b(?:all|every|each|any)\s+(?:of\s+)?(?:the\s+|my\s+)?(?:future|upcoming|coming)?|\bfuture\b|\bfrom\s+(?:now|here)\s+on\b|\bgoing\s+forward\b|\bany\s*more\b|\balways\b|\bin\s+the\s+future\b|\bevery\s+(?:week|year)\b|\bon\b/g,' ').replace(/\s+/g,' ')};
+  if(rep){let m2;const dr=new RegExp('\\b('+AI_DOW_TOK+'|shabbosim|shabbosos|shabboses|weekends?)\\b','g');const dl=[];
+   while(m2=dr.exec(W)){const t=m2[1];if(/^weekend/.test(t)){dl.push(0,6);continue}const d=aiDow(t.replace(/(?:im|os|es|s)$/,'').replace(/^shabb.*/,'shabbos'));if(d>=0&&!dl.includes(d))dl.push(d)}
+   if(dl.length){W=W.replace(dr,' ');dl.forEach(d=>rules.push({dow:d}))}
+   if(/\brosh\s*(?:chodesh|hodesh)\b/.test(W)&&!my.some(c=>/rosh\s*chodesh/i.test(c.t))){W=W.replace(/\brosh\s*(?:chodesh|hodesh)\b/g,' ');rules.push({rc:1})}
+   if(/\b(?:yom\s*tov(?:im)?|yamim\s+tovim|holidays?)\b/.test(W)){W=W.replace(/\b(?:yom\s*tov(?:im)?|yamim\s+tovim|holidays?)\b/g,' ');rules.push({yt:1})}
+   const W0=W.replace(/_/g,' ');const r=aiParseDate(W0,today);
+   if(r&&r.info.date&&['heb','named','greg'].includes(r.info.kind)&&!(r.info.kind==='greg'&&r.info.explicitYear)){
+    const lbl=(r.info.label||'').toLowerCase(),inName=lbl&&my.some(c=>(c.t||'').toLowerCase().includes(lbl.split(' ').pop()));
+    if(!inName){if(r.info.kind==='greg')rules.push({gm:r.info.date.getMonth(),gd:r.info.date.getDate()});else{const h=hd(r.info.date);rules.push({hk:r.info.hk||h.k,hd:r.info.hdn||h.d})}W=' '+r.rest+' '}}
+   if(rules.length)eraseAll()}}
+ if(!rules.length&&take(/\bevery\s+(?:day|week|month|year)\b/))forever=true;
  if(take(/\b(?:just\s+)?(?:the\s+)?next\s+(?:one|session|time|occurrence)\b/))nextOne=true;
  let m;
  if(m=/\bfrom\s+(.+?)\s+(?:to|through|thru|until|till)\s+(.+?)\s*$/.exec(W)){const a=dt(m[1]),b=dt(m[2]);if(a&&b){ranges.push(a.info.date<=b.info.date?[a.info.date,b.info.date]:[b.info.date,a.info.date]);W=(W.slice(0,m.index)+' ').replace(/\s+/g,' ')}}
@@ -3703,7 +3724,7 @@ function aiParseScope(str,today){
  if(!ranges.length&&take(/\bthis\s+month\b/))ranges.push([today,new Date(today.getFullYear(),today.getMonth()+1,0,12)]);
  if(!ranges.length&&take(/\bnext\s+month\b/))ranges.push([new Date(today.getFullYear(),today.getMonth()+1,1,12),new Date(today.getFullYear(),today.getMonth()+2,0,12)]);
  while(!ranges.length||(ranges.length<6&&!nextOne)){const r=dt(W);if(!r)break;ranges.push([r.info.date,r.info.date]);W=r.rest.replace(/\s+/g,' ')}
- return{forever,nextOne,ranges,rest:W.replace(/_/g,' ').replace(/\s+/g,' ').trim()}}
+ return{forever:forever&&!rules.length,nextOne,ranges:rules.length?[]:ranges,rules,rest:W.replace(/_/g,' ').replace(/\s+/g,' ').trim()}}
 
 /* ---- finding the plan ---- */
 function aiCancelFind(tokens){
@@ -3729,7 +3750,7 @@ function aiCancelStart(raw){
  const today=ad(new Date(),0),W=aiNormalize(raw).toLowerCase();
  const sc=aiParseScope(W.replace(AI_CANCEL_RE,' '),today);
  const tokens=aiQTokens(sc.rest);
- const ctx={raw,tokens,forever:sc.forever||(AI_FOREVER_VERB.test(W)&&!sc.ranges.length&&!sc.nextOne),nextOne:sc.nextOne,ranges:sc.ranges,matches:[],choiceList:[],chosen:null,awaiting:null};
+ const ctx={raw,tokens,rules:sc.rules,forever:sc.forever||(AI_FOREVER_VERB.test(W)&&!sc.ranges.length&&!sc.nextOne&&!sc.rules.length),nextOne:sc.nextOne,ranges:sc.ranges,matches:[],choiceList:[],chosen:null,awaiting:null};
  if(!my.length){aiCancelCtx=null;aiEl('aiCancel').classList.remove('show');aiSetStatus('You have not added any plans yet, so there is nothing to cancel.');return true}
  const f=aiCancelFind(tokens);ctx.matches=f.matches;
  if(!f.matches.length){
@@ -3743,6 +3764,7 @@ function aiCancelAdvance(ctx){
  aiCancelCtx=ctx;aiSetStatus('');
  if(!ctx.chosen){
   /* "delete the shiur on Tuesday" / "…tonight": if the day named fits only some of the matching plans, keep just those */
+  if(ctx.matches.length>1&&ctx.rules&&ctx.rules.length){const t1=ad(new Date(),0),f=ctx.matches.filter(c=>aiRuleOcc(c,ctx.rules,t1).length);if(f.length&&f.length<ctx.matches.length){ctx.matches=f;ctx.choiceList=f}}
   if(ctx.matches.length>1&&ctx.ranges&&ctx.ranges.length){const f=ctx.matches.filter(c=>ctx.ranges.some(r=>aiOccurrences(c,r[0],r[1]).length));if(f.length&&f.length<ctx.matches.length){ctx.matches=f;ctx.choiceList=f}}
   if(ctx.matches.length===1){ctx.chosen=[ctx.matches[0]]}
   else{
@@ -3752,7 +3774,7 @@ function aiCancelAdvance(ctx){
    aiCancelShow(ctx.notFound?'I could not find that. Which of your plans do you mean?':'Which one?',ctx.notFound?'Only plans you added can be cancelled.':'More than one of your plans fits.',opts);
    aiCancelAskText('or type/say a number or name');return true}}
  const rec=ctx.chosen.filter(c=>c.r!=='once');
- if(rec.length&&!ctx.forever&&!ctx.nextOne&&!ctx.ranges.length){
+ if(rec.length&&!ctx.forever&&!ctx.nextOne&&!ctx.ranges.length&&!(ctx.rules&&ctx.rules.length)){
   const name=ctx.chosen.length===1?'“'+ctx.chosen[0].t+'”':ctx.chosen.length+' plans';
   const set=(patch)=>()=>{Object.assign(ctx,patch);aiCancelAdvance(ctx)};
   const today=ad(new Date(),0),tm=ad(today,1),ns=ad(today,7-today.getDay());
@@ -3766,8 +3788,13 @@ function aiCancelAdvance(ctx){
   aiCancelAskText('or type/say when: tomorrow, next week, until Nov 20, forever');return true}
  return aiCancelConfirm(ctx)}
 
+// the coming days (next year) on which plan c happens and one of the rules matches
+function aiRuleOcc(c,rules,today){const out=[];for(let i=0;i<=380;i++){const d=ad(today,i),h=hd(d),s=ds(d);if(rules.some(r=>aiSkipHit(r,d,h,s))&&aiOccurs(c,d))out.push(d)}return out}
 function aiCancelBuild(ctx){
  const today=ad(new Date(),0),items=[];
+ if(ctx.rules&&ctx.rules.length){for(const c of ctx.chosen){const occ=aiRuleOcc(c,ctx.rules,today);if(!occ.length)continue;
+   if(c.r==='once')items.push({c,act:'delete',occ});else items.push({c,act:'rule',rules:ctx.rules.map(r=>Object.assign({},r,{from:ds(today)})),occ})}
+  return items}
  for(const c of ctx.chosen){
   if(c.r==='once'){const d=new Date(c.dt+'T12:00:00');
    if(ctx.forever||ctx.nextOne||!ctx.ranges.length||ctx.ranges.some(r=>d>=r[0]&&d<=r[1]))items.push({c,act:'delete',occ:[d]});continue}
@@ -3786,9 +3813,10 @@ function aiCancelConfirm(ctx){
  const one=items.length===1?items[0]:null;
  if(one){const t='“'+one.c.t+'”';
   if(one.act==='delete'){title=one.c.r==='once'?'Delete '+t+' on '+aiFmtY(one.occ[0])+'?':'Cancel '+t+' permanently?';body=one.c.r==='once'?'':'This removes the whole series from your calendar.'}
-  else if(one.occ.length===1){title='Skip '+t+' on '+aiFmtY(one.occ[0])+'?';body='Everything else about it stays the same.'}
+  else if(one.act==='rule'){const L=one.rules.map(aiSkipLabel).join(' and ');title='Stop '+t+' on '+L+' from now on?';body='Next one skipped: '+aiFmtY(one.occ[0])+(one.occ.length>1?' ('+one.occ.length+' in the coming year)':'')+'. Every other day stays the same.'}
+  else if(one.occ.length===1){title='Skip '+t+' on '+aiFmtY(one.occ[0])+'?';const dn=one.occ[0].getDay()===6?'Shabbos':AI_DAY_LABEL[one.occ[0].getDay()];body='Everything else about it stays the same.'+(one.c.r!=='once'&&!/^(?:once|greg|heb)$/.test(one.c.r)?' To stop it on every '+dn+', just say “every '+dn+'”.':'')}
   else{title='Skip '+one.occ.length+' sessions of '+t+'?';body=aiFmt(one.occ[0])+' to '+aiFmt(one.occ[one.occ.length-1])+'. It carries on as usual afterward.'}}
- else{title='Cancel '+items.length+' plans?';body=items.map(i=>'• '+i.c.t+' — '+(i.act==='delete'?(i.c.r==='once'?'delete':'remove for good'):'skip '+i.occ.length+(i.occ.length===1?' session':' sessions'))).join('\n')}
+ else{title='Cancel '+items.length+' plans?';body=items.map(i=>'• '+i.c.t+' — '+(i.act==='delete'?(i.c.r==='once'?'delete':'remove for good'):i.act==='rule'?'not on '+i.rules.map(aiSkipLabel).join(' and ')+' from now on':'skip '+i.occ.length+(i.occ.length===1?' session':' sessions'))).join('\n')}
  const go=()=>aiCancelApply(ctx,items),no=()=>{aiCancelReset();aiEl('aiInput').value='';aiSetStatus('Okay, nothing was cancelled.')};
  ctx.awaiting='confirm';ctx.confirmFn=go;
  aiCancelShow(title,body,[{label:'Yes, cancel it',primary:true,fn:go},{label:'No, keep it',fn:no}]);
@@ -3798,9 +3826,10 @@ function aiCancelApply(ctx,items){
  const snap={my:JSON.stringify(my),ov:JSON.stringify(ov)};
  for(const it of items){
   if(it.act==='delete'){const i=my.findIndex(x=>x.id===it.c.id);if(i>=0)my.splice(i,1);delete ov[it.c.id]}
+  else if(it.act==='rule'){const c=my.find(x=>x.id===it.c.id);if(c)c.skipR=(c.skipR||[]).concat(it.rules)}
   else{const c=my.find(x=>x.id===it.c.id);if(c)c.skip=(c.skip||[]).concat(it.ranges.map(r=>[ds(r[0]),ds(r[1])]))}}
  SV();lg();render(0);pick(sel);
- const msg=items.length===1?(items[0].act==='delete'?'Cancelled “'+items[0].c.t+'”.':'Skipped '+items[0].occ.length+(items[0].occ.length===1?' session':' sessions')+' of “'+items[0].c.t+'”.'):'Cancelled '+items.length+' plans.';
+ const msg=items.length===1?(items[0].act==='delete'?'Cancelled “'+items[0].c.t+'”.':items[0].act==='rule'?'Done. “'+items[0].c.t+'” is off on '+items[0].rules.map(aiSkipLabel).join(' and ')+' from now on.':'Skipped '+items[0].occ.length+(items[0].occ.length===1?' session':' sessions')+' of “'+items[0].c.t+'”.'):'Cancelled '+items.length+' plans.';
  aiUndo={snap};aiCancelReset();aiEl('aiInput').value='';aiSetStatus(msg);aiEl('aiUndo').hidden=false}
 function aiCancelUndo(){
  if(!aiUndo)return;
@@ -3813,6 +3842,7 @@ function aiCancelAnswer(raw){
  if(ctx.awaiting==='confirm'){
   if(/^(?:yes|yeah|yep|yup|sure|ok|okay|confirm|do it|go ahead|please do|yes cancel)\b/.test(W)){ctx.confirmFn();return true}
   if(/^(?:no|nope|nah|don'?t|keep|never ?mind)\b/.test(W)){aiCancelReset();aiEl('aiInput').value='';aiSetStatus('Okay, nothing was cancelled.');return true}
+  {const sc=aiParseScope(W,today);if(sc.rules.length||sc.ranges.length||sc.forever||sc.nextOne){Object.assign(ctx,{rules:sc.rules,ranges:sc.ranges,forever:sc.forever,nextOne:sc.nextOne});return aiCancelConfirm(ctx)}}
   return aiCancelRetry('Please say yes or no.')}
  if(ctx.awaiting==='choice'){
   const list=ctx.choiceList;
@@ -3824,7 +3854,7 @@ function aiCancelAnswer(raw){
   return aiCancelRetry('I was not sure which one. Tap an option, or say its number.')}
  if(ctx.awaiting==='scope'){
   const sc=aiParseScope(W,today);
-  if(sc.forever||sc.nextOne||sc.ranges.length){ctx.forever=sc.forever;ctx.nextOne=sc.nextOne;ctx.ranges=sc.ranges;return aiCancelAdvance(ctx)}
+  if(sc.forever||sc.nextOne||sc.ranges.length||sc.rules.length){ctx.forever=sc.forever;ctx.nextOne=sc.nextOne;ctx.ranges=sc.ranges;ctx.rules=sc.rules;return aiCancelAdvance(ctx)}
   return aiCancelRetry('I did not catch when. Try “tomorrow”, “next Tuesday”, “until Nov 20”, or “forever”.')}
  return false}
 
