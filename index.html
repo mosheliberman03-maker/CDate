@@ -552,7 +552,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 @font-face{font-family:'FRL App';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/frank-ruhl-libre-hebrew-500-normal.woff2) format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
 @font-face{font-family:'FRL App';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/frank-ruhl-libre-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'FRL App';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/frank-ruhl-libre-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-:root{--dtc:var(--ink);--gl-bg:color-mix(in srgb,var(--card) 50%,transparent);--gl-bd:color-mix(in srgb,var(--ink) 13%,transparent);--gl-tx:var(--ink);--rbf:#9fb6ea;--rbe:#d6e4ff;--waveo:.72;--wo:1.22;--navy:#0a1131}
+:root{--dtc:var(--ink);--gl-bg:color-mix(in srgb,var(--card) 50%,transparent);--gl-bd:color-mix(in srgb,var(--ink) 13%,transparent);--gl-tx:var(--ink);--rbf:#9fb6ea;--rbe:#d6e4ff;--waveo:.8;--wo:1.22;--navy:#0a1131}
 :root{--wk:.45}
 :root[data-sky="dusk"]:not(.tt-off-duskglass){--rbf:#a993ea;--rbe:#ffd6c6;--wk:.8}
 :root.tt-off-duskglass{--wk:0}
@@ -2448,10 +2448,10 @@ function glassShine(){const H=innerHeight,W=innerWidth,rl=typeof SKL!=='undefine
  const fb=()=>{skyRibbonsSvg(host);GLS.still=true;const f=()=>{GLS.sc=scrollY||0;requestAnimationFrame(glassShine)};addEventListener('scroll',f,{passive:true});addEventListener('resize',f);f()};
  if(!gl){fb();return}
  const VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
- const SILK=`uniform float uT,uS;uniform vec3 uF,uE,uL;uniform float uO,uK;uniform vec4 uA[9],uB[9],uC[9];
+ const SILK=`uniform float uT,uS;uniform vec3 uF,uE,uL;uniform float uO,uK;uniform vec4 uA[11],uB[11],uC[11];
 vec4 silk(vec2 p,float px){
  vec3 acc=vec3(0.);float aa=0.;vec3 Hv=normalize(uL+vec3(0.,0.,1.));
- for(int i=0;i<9;i++){vec4 A=uA[i],B=uB[i],C=uC[i];float x=p.x,t=uT*C.w;
+ for(int i=0;i<11;i++){vec4 A=uA[i],B=uB[i],C=uC[i];if(i>8){C.z*=2.4*(1.-uK);if(C.z<.01)continue;}float x=p.x,t=uT*C.w;
   float a1=A.z*x+A.w+t,a2=B.y*x+1.7*A.w-.6*t;
   float c=A.x-uS*C.y+A.y*sin(a1)+B.x*sin(a2),dc=A.y*A.z*cos(a1)+B.x*B.y*cos(a2);
   float th=B.w*x+C.x+.35*t,ct=cos(th),st=sin(th);
@@ -2483,14 +2483,17 @@ vec4 silk(vec2 p,float px){
  const U={};for(const k of['uR','uT','uS','uF','uE','uL','uO','uK','uA','uB','uC'])U[k]=gl.getUniformLocation(pr,k);
  /* per ribbon: A=(height, sway, sway freq, phase)  B=(2nd sway, 2nd freq, half width, twist freq)  C=(twist phase, parallax, strength, drift speed) */
  const R=[[.62,.42,2.5,1.25, .06,5.2,.085,3.1, .4,.32,.95,.05],
-  [.18,.10,3.3,2.6, .04,6.,.05,4.2, 2.1,.22,.55,.04],
+  [.18,.10,3.3,2.6, .04,6.,.05,4.2, 2.1,.22,.68,.04],
   [1.30,.16,3.0,4.1, .05,5.5,.075,2.6, 1.3,.42,.55,.06],
   [1.66,.20,2.4,.35, .07,4.4,.11,2.2, 2.6,.55,.9,.05],
   [2.02,.16,2.9,5.2, .05,6.3,.08,3.4, .9,.68,.75,.045],
   [2.32,.22,2.1,2.0, .06,4.8,.12,2.0, 3.4,.8,.8,.04],
   [.9,.30,2.7,3.3, .05,5.8,.07,2.8, 1.8,.38,.6,.055],
   [1.48,.18,3.2,.9, .06,4.9,.09,3.0, .5,.5,.62,.048],
-  [1.9,.24,2.3,4.7, .05,5.1,.1,2.4, 2.9,.72,.68,.042]];
+  [1.9,.24,2.3,4.7, .05,5.1,.1,2.4, 2.9,.72,.68,.042],
+  /* v44 (owner: more silk by day, especially near the top): two extra ribbons high up, by day only (strength ×2.4·(1−uK): day ≈1.3, dusk ≈.5, night 0) */
+  [.34,.30,2.2,5.6, .07,4.6,.095,2.7, 1.1,.26,.62,.07],
+  [.98,.26,2.8,.7, .05,5.4,.08,3.6, 3.0,.36,.5,.065]];
  const fa=j=>new Float32Array(R.flatMap(r=>r.slice(j*4,j*4+4)));GLS.R=[fa(0),fa(1),fa(2)];
  gl.uniform4fv(U.uA,fa(0));gl.uniform4fv(U.uB,fa(1));gl.uniform4fv(U.uC,fa(2));
  gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
@@ -2506,7 +2509,7 @@ vec4 silk(vec2 p,float px){
  const draw=()=>{size();if(!W)return false;if(colT<0){colT=1;colors()}
   const y=scrollY||document.documentElement.scrollTop||0;if(y===sc&&!dirty)return true;sc=y;dirty=false;GLS.sc=y;GLS.t=0;
   GLS.ang=-2.25+y/innerHeight*.5;const ca=Math.cos(GLS.ang),sa=Math.sin(GLS.ang);GLS.L=[ca*.76,sa*.76,.65];
-  GLS.T=T0+y*.06;gl.uniform2f(U.uR,W,Hh);gl.uniform1f(U.uT,GLS.T);gl.uniform1f(U.uS,0.);gl.uniform3fv(U.uL,GLS.L);
+  GLS.T=T0+y*(.06+.05*(1-Math.min(1,GLS.K||0)));gl.uniform2f(U.uR,W,Hh);gl.uniform1f(U.uT,GLS.T);gl.uniform1f(U.uS,0.);gl.uniform3fv(U.uL,GLS.L);
   gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);if(GLS.lens&&!(GLS.scrolling&&((GLS.lf=(GLS.lf||0)+1)&1)))GLS.lens();GLS.ready=performance.now();const n=performance.now();if(n-lastG>30){lastG=n;glassShine()}else if(!gT)gT=setTimeout(()=>{gT=0;lastG=performance.now();glassShine()},34);return true};
  const loop=now=>{raf=0;if(document.hidden)return;if(document.getElementById('intro')){setTimeout(kick,300);return}
   if(now-lastD<15){raf=requestAnimationFrame(loop);return}lastD=now;if(!draw())raf=requestAnimationFrame(loop)};
@@ -3079,8 +3082,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=43;
+const CC_VER=44;
 const CC_LOG=[
+ {v:44,new:['More silk in the day sky, especially near the top, and it waves more as you scroll.']},
  {v:43,new:['Smoother animations everywhere: the logo intro, changing days, menus, the assistant and closing the siddur.']},
  {v:42,adm:1,new:['Admin turns on and off with 5 taps on the version line + the code.']},
  {v:41,adm:1,new:['Admin tools page (clock, siddur day tester, animations, feature switches).']},
