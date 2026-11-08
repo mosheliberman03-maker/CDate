@@ -1073,7 +1073,7 @@ sync()})();
 // ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
 // Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=16,KIT_APK=1;
+const KIT_VER=17,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1086,7 +1086,8 @@ const KIT_LOG=[
  {v:9,t:"Easier sign-up: name suggestions as you type, and your number fills in if we have it"},
  {v:10,t:"Some names now spelled the way people write them"},
  {v:12,big:1,t:"New people and places",d:"New people and places were added from the official shlichus list, and some names were corrected. Your saved list updates by itself."},
- {v:15,t:"Shooting stars on the globe between friends who saved each other"}
+ {v:15,t:"Shooting stars on the globe between friends who saved each other"},
+ {v:17,t:"Softer, pastel shooting stars"}
 ];
 const kitIsApp=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const kitSeenKey=()=>"kit_seen_"+(me&&me.match?slug(pkey(me.match.name,me.match.city)):"x");
@@ -1213,12 +1214,12 @@ function shootDraw(){const now=performance.now();
   const N=30,pts=[];for(let i=0;i<=N;i++)pts.push(arcPt(A.a,A.b,A.om,tail+(head-tail)*i/N,A.lift));
   const h=pts[N],t=pts[0];
   // one smooth streak in three passes (wide glow, body, bright core), each fading from the tail to the head
-  [[12,.13],[4.4,.4],[1.8,1]].forEach(([w,al],j)=>{const g=ctx.createLinearGradient(t[0],t[1],h[0],h[1]);
-   g.addColorStop(0,"rgba(140,210,255,0)");g.addColorStop(.6,"rgba(150,215,255,"+(al*.35).toFixed(3)+")");g.addColorStop(1,j==2?"rgba(240,252,255,"+al+")":"rgba(150,215,255,"+al+")");
+  [[12,.07],[4.4,.22],[1.8,.55]].forEach(([w,al],j)=>{const g=ctx.createLinearGradient(t[0],t[1],h[0],h[1]);
+   g.addColorStop(0,"rgba(178,198,250,0)");g.addColorStop(.6,"rgba(184,200,250,"+(al*.35).toFixed(3)+")");g.addColorStop(1,j==2?"rgba(236,238,255,"+al+")":"rgba(190,200,252,"+al+")");
    ctx.strokeStyle=g;ctx.lineWidth=w;ctx.beginPath();let pen=false;pts.forEach(q=>{if(!q[2]){pen=false;return}if(pen)ctx.lineTo(q[0],q[1]);else{ctx.moveTo(q[0],q[1]);pen=true}});ctx.stroke()});
-  if(k<1&&h[2]){const r=10,g=ctx.createRadialGradient(h[0],h[1],0,h[0],h[1],r);g.addColorStop(0,"rgba(245,253,255,1)");g.addColorStop(.3,"rgba(160,220,255,.6)");g.addColorStop(1,"rgba(150,215,255,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(h[0],h[1],r,0,7);ctx.fill()}
+  if(k<1&&h[2]){const r=10,g=ctx.createRadialGradient(h[0],h[1],0,h[0],h[1],r);g.addColorStop(0,"rgba(240,240,255,.62)");g.addColorStop(.3,"rgba(196,204,252,.32)");g.addColorStop(1,"rgba(190,200,252,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(h[0],h[1],r,0,7);ctx.fill()}
   // landing: a soft glow that sinks into the destination
-  if(k>.95){const q=Math.min(1,(k-.95)/.45),d=P(A.dest[0],A.dest[1]);if(d[2]>0){const r=4+q*14,g=ctx.createRadialGradient(d[0],d[1],0,d[0],d[1],r);g.addColorStop(0,"rgba(190,232,255,"+((1-q)*.55).toFixed(3)+")");g.addColorStop(1,"rgba(150,215,255,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(d[0],d[1],r,0,7);ctx.fill()}}
+  if(k>.95){const q=Math.min(1,(k-.95)/.45),d=P(A.dest[0],A.dest[1]);if(d[2]>0){const r=4+q*14,g=ctx.createRadialGradient(d[0],d[1],0,d[0],d[1],r);g.addColorStop(0,"rgba(206,212,255,"+((1-q)*.32).toFixed(3)+")");g.addColorStop(1,"rgba(190,200,252,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(d[0],d[1],r,0,7);ctx.fill()}}
   return true});
  ctx.restore();
 }
