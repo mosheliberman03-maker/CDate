@@ -789,31 +789,51 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
 </style>
 <style id="cc-char">
-/* ===== The assistant character (owner, v48): 9 poses in one sprite (3×3). Two masks so it follows the theme:
-   ink = the black lines (var(--cch-ink)), fill = the inside of the face (var(--cch-fill)). Pose = data-p 1..9:
-   1 calm, 2 alert, 3 curious (the default, 'idle'), 4 determined, 5 happy, 6 sad, 7 peeking over the book, 8 content/reading, 9 glance. ===== */
-.cch{--cw:44px;--cch-ink:#05060c;--cch-fill:#fff;display:inline-block;flex:none;width:var(--cw);aspect-ratio:300/353;position:relative;transform-origin:50% 100%}
- /* v49 (owner): he always stays black and white, like the drawing; on dark backgrounds a thin light outline keeps him visible */
-:root[data-night="1"] .cch,:root[data-theme="dark"] .cch,.ai-fab .cch{filter:drop-shadow(0 0 .7px rgba(255,255,255,.95)) drop-shadow(0 0 .7px rgba(255,255,255,.95))}
-.cch i{position:absolute;inset:0;background:var(--cch-ink);-webkit-mask:url(assets/char/ink.webp) 0 0/300% 300% no-repeat;mask:url(assets/char/ink.webp) 0 0/300% 300% no-repeat}
-.cch i.f{background:var(--cch-fill);-webkit-mask-image:url(assets/char/fill.webp);mask-image:url(assets/char/fill.webp)}
-.cch[data-p="2"] i{-webkit-mask-position:50% 0;mask-position:50% 0}.cch[data-p="3"] i{-webkit-mask-position:100% 0;mask-position:100% 0}
-.cch[data-p="4"] i{-webkit-mask-position:0 50%;mask-position:0 50%}.cch[data-p="5"] i{-webkit-mask-position:50% 50%;mask-position:50% 50%}.cch[data-p="6"] i{-webkit-mask-position:100% 50%;mask-position:100% 50%}
-.cch[data-p="7"] i{-webkit-mask-position:0 100%;mask-position:0 100%}.cch[data-p="8"] i{-webkit-mask-position:50% 100%;mask-position:50% 100%}.cch[data-p="9"] i{-webkit-mask-position:100% 100%;mask-position:100% 100%}
-@keyframes cchBob{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-3%) rotate(-1.2deg)}70%{transform:translateY(-1%) rotate(1deg)}}
-.cch.live{animation:cchBob 3.4s ease-in-out infinite}
-.cc-away .cch.live,body.op .cch.fabc{animation-play-state:paused}
-/* the + button is the character now */
-.ai-fab .fabplus{display:none}.ai-fab .fabc{--cw:41px;position:relative;z-index:3;margin-top:4px}
+/* ===== The assistant character (owner, v48; v50 = a live rig): his drawing traced into parts (hat, head, eyes, brows,
+   book) that move on their own, so he really animates instead of swapping pictures. Always black and white like the
+   drawing; on dark backgrounds a thin light outline keeps him visible. Expression = data-m on .cch:
+   curious (default), calm, alert, think, det, happy, sad, peek (over the book, while you type), read (eyes closed). ===== */
+.cch{--cw:44px;--ink:#05060c;--fill:#fff;display:inline-block;flex:none;width:var(--cw);aspect-ratio:340/400;position:relative}
+.cch>svg{display:block;width:100%;height:100%;overflow:visible;transform-origin:50% 100%}
+:root[data-night="1"] .cch,:root[data-theme="dark"] .cch,.ai-fab .cch{filter:drop-shadow(0 0 1px rgba(255,255,255,.95)) drop-shadow(0 0 .6px rgba(255,255,255,.95))}
+.cch .k{fill:var(--ink)}.cch .w{fill:var(--fill)}.cch .ln{fill:none;stroke:var(--ink);stroke-width:8;stroke-linecap:round}
+.cch .c-face{fill:var(--fill);stroke:var(--ink);stroke-width:7}
+.cch g,.cch path,.cch ellipse{transform-box:view-box}
+.cch .c-head{transform-origin:182px 262px}.cch .c-sway{transform-origin:182px 262px}.cch .c-hat,.cch .c-hatb{transform-origin:172px 104px}
+.cch .c-book{transform-origin:184px 378px}.cch .c-root{transform-origin:170px 396px}
+.cch .c-e,.cch .c-br{transform-box:fill-box;transform-origin:50% 50%}
+.cch :is(.c-head,.c-hat,.c-eyes,.c-look,.c-e,.c-br,.c-book,.c-alr,.c-thk,.c-hap,.c-cls){transition:transform .42s cubic-bezier(.3,1.5,.5,1),opacity .22s}
+.cch .c-look{transition-duration:.28s}
+.cch :is(.c-br,.c-hap,.c-cls,.c-alr,.c-thk,.c-page){opacity:0}
+.cch .c-alr{transform:scale(.6);transform-origin:282px 162px}.cch .c-thk{transform:translateY(10px)}
+/* expressions */
+.cch[data-m="curious"] .c-head{transform:rotate(-5deg)}.cch[data-m="curious"] .c-eyes{transform:translate(7px,-3px)}
+.cch[data-m="curious"] .c-e.r{transform:scaleY(.8)}.cch[data-m="curious"] .c-br.r{opacity:1;transform:translateY(-6px) rotate(-12deg)}.cch[data-m="curious"] .c-hat{transform:rotate(-3deg)}
+.cch[data-m="alert"] .c-head{transform:translateY(-7px)}.cch[data-m="alert"] .c-e{transform:scale(1.16)}.cch[data-m="alert"] .c-hat{transform:translateY(-18px) rotate(6deg)}.cch[data-m="alert"] .c-alr{opacity:1;transform:none}
+.cch[data-m="think"] .c-head{transform:rotate(7deg)}.cch[data-m="think"] .c-eyes{transform:translate(11px,-13px)}.cch[data-m="think"] .c-e{transform:scaleY(.9)}
+.cch[data-m="think"] .c-br.r{opacity:1;transform:translateY(-9px) rotate(10deg)}.cch[data-m="think"] .c-thk{opacity:1;transform:none}.cch[data-m="think"] .c-hat{transform:rotate(5deg)}
+.cch[data-m="det"] .c-br.l{opacity:1;transform:translateY(9px) rotate(20deg)}.cch[data-m="det"] .c-br.r{opacity:1;transform:translateY(9px) rotate(-20deg)}
+.cch[data-m="det"] .c-e{transform:translateY(5px) scaleY(.74)}.cch[data-m="det"] .c-head{transform:translateY(5px)}.cch[data-m="det"] .c-hat{transform:translateY(7px) rotate(-3deg)}
+.cch[data-m="happy"] .c-e{opacity:0;transform:scaleY(.1)}.cch[data-m="happy"] .c-hap{opacity:1}.cch[data-m="happy"] .c-head{transform:translateY(-6px) rotate(-3deg)}.cch[data-m="happy"] .c-hat{transform:translateY(-9px) rotate(-5deg)}
+.cch[data-m="sad"] .c-br.l{opacity:1;transform:translateY(5px) rotate(-17deg)}.cch[data-m="sad"] .c-br.r{opacity:1;transform:translateY(5px) rotate(17deg)}
+.cch[data-m="sad"] .c-e{transform:scaleY(.8)}.cch[data-m="sad"] .c-eyes{transform:translateY(8px)}.cch[data-m="sad"] .c-head{transform:translateY(11px) rotate(4deg)}.cch[data-m="sad"] .c-hat{transform:translateY(11px) rotate(4deg)}
+.cch[data-m="peek"] .c-head{transform:translateY(30px)}.cch[data-m="peek"] .c-eyes{transform:translateY(6px)}.cch[data-m="peek"] .c-book{transform:translateY(-5px)}
+.cch[data-m="read"] .c-e{opacity:0;transform:scaleY(.1)}.cch[data-m="read"] .c-cls{opacity:1}.cch[data-m="read"] .c-head{transform:translateY(6px) rotate(-3deg)}.cch[data-m="read"] .c-book{transform:rotate(-2deg)}
+.cch.blink .c-e{transform:scaleY(.08)!important;transition-duration:.07s}
+@keyframes cThk{0%,100%{opacity:.25}50%{opacity:1}}
+.cch[data-m="think"] .c-thk circle{animation:cThk 1.1s ease-in-out infinite}.cch .c-thk circle:nth-child(2){animation-delay:.18s}.cch .c-thk circle:nth-child(3){animation-delay:.36s}
+/* breathing: the whole picture (an HTML element, so the compositor does it) */
+@keyframes cchBr{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.028)}}
+.cch.live>svg{animation:cchBr 3.6s ease-in-out infinite}
+.cc-away .cch.live>svg,body.op .cch.fabc>svg{animation-play-state:paused}
+/* the + button is the character */
+.ai-fab .fabplus{display:none}.ai-fab .fabc{--cw:42px;position:relative;z-index:3;margin-top:5px}
 :root.tt-off-char .ai-fab .fabplus{display:inline}:root.tt-off-char .ai-fab .fabc{display:none}
-/* in the assistant */
-.ai-av{--cw:54px;margin:-6px 0 -4px -2px}.ai-head h2{flex:1}
-:root.tt-off-char .ai-av{display:none}
-/* in the stats message and the "today is done" toast */
+.ai-av{--cw:58px;margin:-8px 0 -4px -2px}.ai-head h2{flex:1}:root.tt-off-char .ai-av{display:none}
 .smot{display:flex!important;align-items:center;gap:12px}.smot .smav{--cw:46px}.smot>div{display:grid;gap:2px;min-width:0}
 #stkToast{display:flex!important;align-items:center;gap:12px}#stkToast .smav{--cw:44px}#stkToast>div{display:grid;gap:2px}
 :root.tt-off-char :is(.smot,#stkToast) .smav{display:none}
-@media(prefers-reduced-motion:reduce){.cch.live{animation:none}}
+@media(prefers-reduced-motion:reduce){.cch.live>svg,.cch .c-thk circle{animation:none}.cch *{transition:none!important}}
 </style>
 <style id="cc-siddur">
 /* ===== Siddur (Tehillat Hashem pages; v37 = paged). Pages are alpha stencils (siddur/p/N.webp) painted in var(--ink) via mask. ===== */
@@ -914,8 +934,8 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
 <button class="hint" id="hint" type="button" aria-label="See details"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg><b id="hintN" hidden></b></button>
 <div class="cb" id="cb" aria-hidden="true"><div class="cl" id="cbt"></div><div id="cbr"></div></div>
 <nav class="dock" aria-label="Day navigation"><button id="pd" aria-label="Previous day">‹</button><button id="td" class="tdb">Today</button><button id="nd" aria-label="Next day">›</button><button id="mo">Month</button><button id="sd" aria-label="Siddur">Siddur</button><button id="mn" aria-label="More: go to a date, add events, settings">⋯</button></nav>
-<button class="ai-fab" id="aiFab" aria-label="Add an event with the calendar assistant" title="Add with assistant"><b class="fabplus" aria-hidden="true">+</b><span class="cch fabc" id="fabCh" data-p="3" aria-hidden="true"><i class="f"></i><i class="k"></i></span></button>
-<div class="ai-backdrop" id="aiBackdrop" aria-hidden="true"><section class="ai-card" role="dialog" aria-modal="true" aria-labelledby="aiTitle"><div class="ai-head"><span class="cch ai-av" id="aiAv" data-p="3" aria-hidden="true"><i class="f"></i><i class="k"></i></span><h2 id="aiTitle">Plan something</h2><button class="ai-close" id="aiClose" aria-label="Close">×</button></div><p class="ai-hint">Describe it naturally, e.g. “Tanya chavrusa with Yossi every Sunday and Tuesday at 8pm” or “yahrzeit of my father 20 Av”. To remove one: “cancel my chavrusa with Yossi”. Hebrew dates and terms like kvius, chavrusa and seder are welcome.</p><textarea class="ai-input" id="aiInput" placeholder="e.g. Set a monthly kvius with my chavrusa on the 15th of every Hebrew month…"></textarea><div class="ai-actions"><button class="ai-mic" id="aiMic" aria-label="Speak your request" title="Speak" aria-pressed="false" type="button">🎙</button><select class="ai-lang" id="aiLang" aria-label="Voice language"><option value="en-US">English</option><option value="he-IL">עברית</option></select><button class="ai-primary" id="aiPlan" style="flex:1">Make a plan</button></div><div class="ai-status" id="aiStatus" aria-live="polite"></div><div class="ai-preview" id="aiPreview"><h3 id="aiPreviewTitle"></h3><p id="aiPreviewDate"></p><p id="aiPreviewRepeat"></p><p id="aiPreviewNotes"></p><div class="ai-confirm"><button id="aiNo">No, change it</button><button class="ai-yes" id="aiYes">Yes, add it</button></div></div><div class="ai-multi" id="aiMulti"></div><div class="ai-preview" id="aiCancel"><h3 id="aiCancelTitle"></h3><p id="aiCancelBody"></p><div class="ai-choices" id="aiChoices"></div></div><button type="button" class="ai-undo" id="aiUndo" hidden>↩ Undo</button><div class="ai-memory">Your approved arrangements and preferences can be remembered on this device. <button id="aiMemoryBtn">View saved preferences</button></div></section></div>
+<button class="ai-fab" id="aiFab" aria-label="Add an event with the calendar assistant" title="Add with assistant"><b class="fabplus" aria-hidden="true">+</b><span class="cch fabc" id="fabCh" data-m="curious" aria-hidden="true"></span></button>
+<div class="ai-backdrop" id="aiBackdrop" aria-hidden="true"><section class="ai-card" role="dialog" aria-modal="true" aria-labelledby="aiTitle"><div class="ai-head"><span class="cch ai-av" id="aiAv" data-m="curious" aria-hidden="true"></span><h2 id="aiTitle">Plan something</h2><button class="ai-close" id="aiClose" aria-label="Close">×</button></div><p class="ai-hint">Describe it naturally, e.g. “Tanya chavrusa with Yossi every Sunday and Tuesday at 8pm” or “yahrzeit of my father 20 Av”. To remove one: “cancel my chavrusa with Yossi”. Hebrew dates and terms like kvius, chavrusa and seder are welcome.</p><textarea class="ai-input" id="aiInput" placeholder="e.g. Set a monthly kvius with my chavrusa on the 15th of every Hebrew month…"></textarea><div class="ai-actions"><button class="ai-mic" id="aiMic" aria-label="Speak your request" title="Speak" aria-pressed="false" type="button">🎙</button><select class="ai-lang" id="aiLang" aria-label="Voice language"><option value="en-US">English</option><option value="he-IL">עברית</option></select><button class="ai-primary" id="aiPlan" style="flex:1">Make a plan</button></div><div class="ai-status" id="aiStatus" aria-live="polite"></div><div class="ai-preview" id="aiPreview"><h3 id="aiPreviewTitle"></h3><p id="aiPreviewDate"></p><p id="aiPreviewRepeat"></p><p id="aiPreviewNotes"></p><div class="ai-confirm"><button id="aiNo">No, change it</button><button class="ai-yes" id="aiYes">Yes, add it</button></div></div><div class="ai-multi" id="aiMulti"></div><div class="ai-preview" id="aiCancel"><h3 id="aiCancelTitle"></h3><p id="aiCancelBody"></p><div class="ai-choices" id="aiChoices"></div></div><button type="button" class="ai-undo" id="aiUndo" hidden>↩ Undo</button><div class="ai-memory">Your approved arrangements and preferences can be remembered on this device. <button id="aiMemoryBtn">View saved preferences</button></div></section></div>
 <div class="bd" id="bd"></div>
 <div class="sheet ms" id="ms" role="dialog" aria-label="Month"><div class="mh"><h2 id="t"></h2><div class="nav"><button id="pv" aria-label="Previous month">‹</button><button id="nx" aria-label="Next month">›</button></div></div><div class="sub" id="s"></div><section class="cal"><div class="dow"></div><div class="grid" id="g"></div></section></div>
 
@@ -2785,7 +2805,7 @@ function stkMood(){const S=stkState(),{s,tk,o}=S,sd=tk;
 function stkCelebrate(){const s=streakInfo();if(!s.todayDone)return;const ms=STK_MS.includes(s.cur),m=stkMood();
  if(ms&&typeof ccConfetti==='function')ccConfetti();try{H.ok()}catch(e){}
  let t=document.getElementById('stkToast');if(!t){t=document.createElement('div');t.id='stkToast';t.setAttribute('role','status');document.body.appendChild(t)}
- t.innerHTML=cchHtml('happy','smav')+'<div><b>'+m.h+'</b><span>'+m.t+'</span></div>';{const av=t.querySelector('.cch');if(av&&!RM&&av.animate)setTimeout(()=>av.animate(CCH_KF.hop[0],{duration:CCH_KF.hop[1],easing:'ease-out',iterations:ms?2:1}),300)}t.classList.remove('on');void t.offsetWidth;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),4200);t.onclick=()=>{t.classList.remove('on');stsOpen()}}
+ t.innerHTML=cchHtml('happy','smav')+'<div><b>'+m.h+'</b><span>'+m.t+'</span></div>';{const L=cchLive(t.querySelector('.cch'),'happy');setTimeout(()=>{L.set('happy',0,'hop');if(ms)setTimeout(()=>L.anim('hop'),600)},300)}t.classList.remove('on');void t.offsetWidth;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),4200);t.onclick=()=>{t.classList.remove('on');stsOpen()}}
 /* ---------- Stats sheet ---------- */
 const SHI=[['chumash','Chumash'],['tehillim','Tehillim'],['tanya','Tanya'],['rambam','Rambam']];
 const doneOf=(k,i)=>{const d=DN[k];if(!d)return false;return i==3?!!(d.rambam3||d.rambam1):!!d[SHI[i][0]]};
@@ -2863,7 +2883,7 @@ function stsOpen(){STS_F=undefined;let b=$('#sts');
    if(STS.tgt!=null){if(Math.abs(x-STS.tgt)>.03)return;STS.tgt=null;clearTimeout(STS.tt);STS.i=i;sel();stsAnim(pgr.children[i]);return}
    if(i!=STS.i){STS.i=i;sel();H.sel();stsAnim(pgr.children[i])}})},{passive:true})}
  STS_K.forEach(k=>{STS.o[k]=0;stsRenderPage(k)});
- {const m=stkMood(),e=b.querySelector('#stsMot');if(e){e.className='smot k-'+m.k;e.innerHTML=cchHtml(STK_POSE[m.k]||'idle','smav')+'<div><b>'+m.h+'</b><span>'+m.t+'</span></div>';const av=e.querySelector('.cch');if(av&&!RM&&av.animate&&(m.k==='ms'||m.k==='done'))setTimeout(()=>av.animate(CCH_KF.hop[0],{duration:CCH_KF.hop[1],easing:'ease-out'}),450)}}
+ {const m=stkMood(),e=b.querySelector('#stsMot');if(e){e.className='smot k-'+m.k;e.innerHTML=cchHtml(STK_POSE[m.k]||'idle','smav')+'<div><b>'+m.h+'</b><span>'+m.t+'</span></div>';const L=cchLive(e.querySelector('.cch'),STK_POSE[m.k]||'idle');if(m.k==='ms'||m.k==='done')setTimeout(()=>L.set('happy',0,'hop'),450);else if(m.k==='back'||m.k==='miss')setTimeout(()=>L.anim('droop'),450);else setTimeout(()=>L.anim('pop'),200)}}
  const pgr=b.querySelector('.stpg');b.classList.add('on');H.ok();
  requestAnimationFrame(()=>{pgr.scrollLeft=STS.i*pgr.clientWidth;b.querySelector('.sti').style.transform=`translateX(${STS.i*100}%)`;b.querySelectorAll('.stt button').forEach((t,j)=>t.setAttribute('aria-selected',j==STS.i));setTimeout(()=>stsAnim(pgr.children[STS.i]),180)})}
 document.addEventListener('click',e=>{if(e.target.closest('#stk')){H.tap();stsOpen()}});
@@ -3182,20 +3202,45 @@ function aiOpen(){aiEl('aiBackdrop').classList.add('on');aiEl('aiBackdrop').setA
 function aiClose(){try{aiCancelReset();aiEl('aiUndo').hidden=true;aiBatchReset()}catch(e){}aiEl('aiBackdrop').classList.remove('on');aiEl('aiBackdrop').setAttribute('aria-hidden','true')}
 aiEl('aiFab').addEventListener('click',aiOpen);aiEl('aiClose').addEventListener('click',aiClose);
 /* ===== The assistant character, alive (owner, v48) ===== */
-const CCP={idle:3,calm:1,alert:2,think:3,det:4,happy:5,sad:6,peek:7,read:8,look:9};
-const cchHtml=(p,cls)=>`<span class="cch ${cls||''}" data-p="${CCP[p]||p}" aria-hidden="true"><i class="f"></i><i class="k"></i></span>`;
-const CCH_KF={hop:[[{transform:'translateY(0) scale(1)'},{transform:'translateY(-16%) scale(1.05)',offset:.4},{transform:'translateY(2%) scale(1.03,.96)',offset:.75},{transform:'translateY(0) scale(1)'}],480],
- tap:[[{transform:'scale(1)'},{transform:'scale(1.05,.95)'},{transform:'scale(1)'}],170],
- wobble:[[{transform:'rotate(0)'},{transform:'rotate(-7deg)'},{transform:'rotate(6deg)'},{transform:'rotate(-4deg)'},{transform:'rotate(0)'}],900],
- pop:[[{transform:'scale(.2)',opacity:0},{transform:'scale(1.12)',opacity:1,offset:.6},{transform:'scale(1)'}],460],
- droop:[[{transform:'translateY(0)'},{transform:'translateY(6%) scale(1,.97)',offset:.5},{transform:'translateY(0)'}],700]};
-/* a live character: blinks and glances by itself; set(pose, ms, anim) shows a pose for a while, setBase() the resting pose */
-function cchLive(el,base){if(!el)return{set(){},setBase(){},anim(){}};const L={el,base:base||'idle',t:0,cur:null},show=p=>{const v=String(CCP[p]||p);if(el.dataset.p!==v)el.dataset.p=v};
- L.anim=k=>{if(RM||!k||!CCH_KF[k]||!el.animate)return;try{el.getAnimations&&el.getAnimations().forEach(a=>{if(a.id==='cch')a.cancel()});const a=el.animate(CCH_KF[k][0],{duration:CCH_KF[k][1],easing:'ease-out'});a.id='cch'}catch(e){}};
- L.set=(p,ms,k)=>{clearTimeout(L.t);L.cur=p;show(p);L.anim(k);if(ms)L.t=setTimeout(()=>{L.cur=null;show(L.base)},ms)};
+const CCP={idle:'curious',calm:'calm',alert:'alert',think:'think',det:'det',happy:'happy',sad:'sad',peek:'peek',read:'read',look:'curious'};
+/* his parts, traced from the owner's drawing (viewBox 340×400) */
+const CCH_HAT=`M46.0 162.6C29.3 157.8 26.4 146.9 38.2 133.5C44.3 126.5 61.0 116.4 77.9 109.5L83.3 107.2L83.1 100.9C82.8 91.3 86.5 71.7 90.1 64.0C95.6 52.2 107.8 43.8 134.2 33.6C169.9 19.9 198.2 18.5 210.4 29.8C213.8 33.0 226.0 51.3 229.7 58.8C231.8 63.2 232.7 64.1 234.4 63.6C251.0 59.6 284.3 58.3 294.1 61.3C305.0 64.6 310.3 72.0 308.6 81.4C306.9 90.3 291.3 104.7 272.8 114.5L263.7 119.3L260.6 115.4C258.9 113.3 255.3 109.1 252.6 106.2L247.7 101.0L232.9 101.0C224.8 101.0 217.9 101.4 217.6 101.9C217.3 102.4 219.1 104.0 221.6 105.5C226.9 108.6 226.9 109.2 221.5 108.0C196.1 102.5 151.7 111.5 124.9 127.6C121.8 129.5 118.9 131.0 118.6 131.0C118.2 131.0 119.4 128.9 121.2 126.4C125.8 119.9 135.6 111.0 142.9 106.6C146.3 104.5 148.8 102.4 148.5 101.9C148.1 101.4 141.2 101.0 133.0 101.0L118.2 101.0L112.8 106.8C105.9 114.3 100.8 122.0 96.0 132.3C92.2 140.4 88.0 154.2 88.0 158.6C88.0 160.5 87.2 161.0 82.8 162.0C74.9 163.8 51.4 164.2 46.0 162.6ZM93.0 104.5C93.0 104.9 93.7 104.7 94.5 104.0C95.3 103.3 96.0 103.0 96.0 103.3C96.0 103.6 103.3 101.4 112.2 98.4C132.8 91.4 171.8 79.5 192.0 74.0C200.5 71.7 207.9 69.4 208.4 69.0C208.9 68.5 209.8 68.4 210.5 68.6C212.1 69.3 213.4 67.4 212.0 66.5C211.5 66.2 210.5 66.2 209.8 66.6C209.1 67.0 207.2 67.5 205.4 67.7C193.2 69.0 116.3 92.6 98.0 100.8C96.1 101.6 94.2 102.4 93.8 102.5C93.3 102.7 92.8 102.9 92.5 103.0C92.0 103.2 91.0 103.5 89.4 103.9C89.1 103.9 89.2 104.5 89.5 105.0C90.0 105.8 90.6 105.7 91.6 104.9C92.4 104.3 93.0 104.1 93.0 104.5Z`,CCH_BOOK=`M175.4 378.3C174.6 377.7 174.2 363.4 173.9 330.0L173.5 282.5L176.0 283.0C179.2 283.6 188.6 283.6 192.5 283.0L195.5 282.5L195.2 330.0C195.0 356.1 194.6 377.7 194.3 378.0C193.5 378.9 176.6 379.1 175.4 378.3ZM156.5 373.4C141.2 367.6 115.1 359.3 103.1 356.6C96.8 355.2 91.1 353.5 90.3 352.8C89.2 351.6 71.0 246.1 71.0 240.6C71.0 237.2 72.5 235.8 76.6 235.1C80.2 234.5 80.5 234.2 80.8 231.0C81.3 223.9 81.8 223.0 85.2 223.0C86.9 223.0 91.8 223.9 96.1 225.1C103.7 227.2 103.9 227.3 110.5 235.1C114.2 239.4 117.5 243.0 117.8 243.0C118.2 243.1 120.3 244.7 122.5 246.7C124.7 248.7 125.6 250.0 124.5 249.5C123.4 249.1 117.5 246.9 111.4 244.5C97.8 239.3 83.7 235.5 81.4 236.4C78.6 237.5 80.7 238.6 93.5 243.1C108.9 248.4 126.2 255.9 137.0 261.7C146.6 266.9 163.7 277.5 166.1 279.9C167.6 281.3 167.8 286.9 168.4 329.2C169.1 374.9 169.0 377.0 167.3 377.0C166.3 376.9 161.4 375.3 156.5 373.4ZM200.9 376.6C200.7 376.4 200.7 354.7 201.0 328.4L201.5 280.7L210.0 274.8C228.0 262.3 248.1 252.2 274.5 242.6C282.2 239.8 288.4 237.0 288.2 236.5C287.4 233.6 269.5 238.4 250.1 246.7C244.4 249.1 239.6 251.0 239.4 250.8C239.3 250.6 241.8 248.2 245.1 245.6C248.4 242.9 253.6 237.7 256.7 234.0C262.1 227.4 262.4 227.2 270.8 224.7C287.2 219.9 287.6 220.0 288.8 228.7C289.5 233.1 289.8 233.5 292.5 233.8C296.7 234.3 298.0 235.7 298.0 239.8C298.0 245.7 279.9 351.4 278.6 352.6C278.0 353.3 273.0 354.8 267.5 356.0C256.3 358.5 226.2 368.1 212.5 373.5C203.7 376.9 201.8 377.4 200.9 376.6Z`,CCH_BOOKW=`M173.8 377.1C171.6 375.3 170.8 375.1 169.2 376.1C167.6 377.1 164.8 376.4 151.9 371.8C131.2 364.3 115.7 359.5 102.6 356.5C96.6 355.2 91.1 353.5 90.3 352.8C88.6 351.1 70.5 242.0 71.4 238.6C71.7 237.2 73.0 235.8 74.3 235.5C77.7 234.4 81.0 230.9 81.0 228.4C81.0 222.3 83.6 221.7 96.1 225.1C103.7 227.1 104.0 227.4 109.9 234.3C113.2 238.3 118.2 243.3 120.9 245.5C125.4 249.0 125.8 249.6 124.5 251.0C122.5 253.2 124.8 255.3 136.5 261.5C148.6 267.9 163.7 277.6 168.1 281.7C171.0 284.5 171.9 284.8 172.8 283.7C173.7 282.6 175.0 282.5 178.9 283.4C182.2 284.0 185.7 284.0 189.4 283.3C193.9 282.5 195.3 282.6 196.1 283.7C197.0 284.7 198.0 284.4 201.0 281.6C205.9 277.2 217.3 269.6 228.0 263.5C232.7 260.8 237.7 257.5 239.2 256.2C241.7 253.9 241.8 253.5 240.5 252.0C239.3 250.6 239.7 249.9 245.1 245.6C248.4 242.9 253.6 237.7 256.7 234.0C262.1 227.4 262.4 227.2 270.8 224.7C286.6 220.1 287.4 220.2 288.6 226.5C289.2 230.0 291.4 232.5 295.3 234.4C296.8 235.2 297.6 236.6 297.8 239.1C298.2 243.9 280.1 351.2 278.6 352.6C278.0 353.3 272.3 355.0 266.0 356.4C255.9 358.7 220.4 370.2 206.8 375.6C202.3 377.3 201.9 377.3 200.3 375.7C198.7 374.1 198.5 374.2 196.2 376.3C192.6 379.6 177.7 380.2 173.8 377.1Z`;
+const CCH_SVG=`<svg viewBox="0 0 340 400" aria-hidden="true"><g class="c-root"><g class="c-head"><g class="c-sway">
+<circle class="c-face" cx="182.6" cy="171.8" r="83.5"/>
+<g class="c-eyes"><g class="c-look"><ellipse class="c-e l k" cx="149.5" cy="171.3" rx="15" ry="26.5"/><ellipse class="c-e r k" cx="215.9" cy="171.1" rx="15.5" ry="26.5"/>
+<path class="c-hap ln" d="M135 180Q149.5 152 164 180M201.5 180Q216 152 230.5 180"/><path class="c-cls ln" d="M135 166Q149.5 186 164 166M201.5 166Q216 186 230.5 166"/></g></g>
+<path class="c-br l ln" d="M133 131Q149.5 121 166 131"/><path class="c-br r ln" d="M199.5 131Q216 121 232.5 131"/>
+<g class="c-hat"><g class="c-hatb"><path class="k" fill-rule="evenodd" d="${CCH_HAT}"/></g></g>
+<g class="c-alr ln"><path d="M280 140L304 124M284 162L312 160M282 184L304 196"/></g></g></g>
+<g class="c-book"><path class="w" d="${CCH_BOOKW}"/><path class="k" fill-rule="evenodd" d="${CCH_BOOK}"/>
+<path class="c-page k" d="M190 240L290 224L296 370L194 376Z" style="stroke:var(--fill);stroke-width:4;transform-origin:186px 300px"/></g>
+<g class="c-thk k"><circle cx="250" cy="16" r="6"/><circle cx="272" cy="-4" r="8.5"/><circle cx="300" cy="-28" r="11"/></g></g></svg>`;
+const cchHtml=(p,cls)=>`<span class="cch ${cls||''}" data-m="${CCP[p]||p}" aria-hidden="true">${CCH_SVG}</span>`;
+const CCH_KF={hop:[[{transform:'translateY(0) scale(1)'},{transform:'translateY(-14%) scale(.97,1.05)',offset:.38},{transform:'translateY(1.5%) scale(1.05,.95)',offset:.72},{transform:'translateY(0) scale(1)'}],560],
+ tap:[[{transform:'translateY(0)'},{transform:'translateY(1.5%) scale(1.02,.98)'},{transform:'translateY(0)'}],170],
+ wobble:[[{transform:'rotate(0)'},{transform:'rotate(-5deg)'},{transform:'rotate(4deg)'},{transform:'rotate(-2deg)'},{transform:'rotate(0)'}],1000],
+ pop:[[{transform:'scale(.2) translateY(30%)',opacity:0},{transform:'scale(1.1)',opacity:1,offset:.6},{transform:'scale(1)'}],520],
+ droop:[[{transform:'translateY(0)'},{transform:'translateY(4%) scale(1.02,.97)',offset:.5},{transform:'translateY(1%)'},{transform:'translateY(0)'}],900]};
+/* a live character. set(mood, ms, anim) shows an expression for a while (it morphs there smoothly); setBase() is his resting
+   expression; on his own he blinks, glances around, sways, tips his hat and turns a page now and then. */
+function cchLive(el,base){if(!el)return{set(){},setBase(){},anim(){},nod(){},dart(){}};if(!el.querySelector('svg'))el.innerHTML=CCH_SVG;
+ const q=c=>el.querySelector(c),L={el,base:base||'idle',t:0,cur:null},show=p=>{const v=CCP[p]||p;if(el.dataset.m!==v)el.dataset.m=v};
+ const wa=(node,kf,o)=>{if(RM||!node||!node.animate)return;try{node.animate(kf,Object.assign({easing:'ease-in-out'},o))}catch(e){}};
+ L.anim=k=>{if(k&&CCH_KF[k])wa(q('.c-root'),CCH_KF[k][0],{duration:CCH_KF[k][1],easing:'ease-out'})};
+ L.set=(p,ms,k)=>{clearTimeout(L.t);L.cur=p;show(p);L.anim(k);if(p==='happy')L.hat();if(ms)L.t=setTimeout(()=>{L.cur=null;show(L.base)},ms)};
  L.setBase=p=>{L.base=p;if(!L.cur)show(p)};
- if(!RM){el.classList.add('live');const tick=()=>{setTimeout(tick,2600+Math.random()*3200);if(L.cur||document.hidden||!el.isConnected||!el.offsetParent)return;
-   const b=L.base;if(b!=='idle'&&b!=='peek'&&b!=='read')return;if(Math.random()<.72){show('read');setTimeout(()=>{if(!L.cur)show(L.base)},150)}else{const g=b==='peek'?'read':Math.random()<.5?'look':'calm';show(g);setTimeout(()=>{if(!L.cur)show(L.base)},1100)}};setTimeout(tick,1800)}
+ L.blink=()=>{if(RM)return;el.classList.add('blink');setTimeout(()=>el.classList.remove('blink'),130)};
+ L.look=(x,y,ms)=>{const g=q('.c-look');if(!g)return;g.style.transform=`translate(${x}px,${y}px)`;clearTimeout(L.lt);if(ms)L.lt=setTimeout(()=>{g.style.transform=''},ms)};
+ L.sway=()=>wa(q('.c-sway'),[{transform:'rotate(0)'},{transform:`rotate(${Math.random()<.5?-4:4}deg)`},{transform:'rotate(-1deg)'},{transform:'rotate(0)'}],{duration:1700});
+ L.hat=()=>wa(q('.c-hatb'),[{transform:'translateY(0) rotate(0)'},{transform:'translateY(-16px) rotate(-7deg)',offset:.35},{transform:'translateY(2px) rotate(2deg)',offset:.7},{transform:'translateY(0) rotate(0)'}],{duration:800});
+ L.page=()=>{const pg=q('.c-page');wa(pg,[{opacity:1,transform:'scaleX(1)'},{opacity:1,transform:'scaleX(.15) skewY(-6deg)',offset:.5},{opacity:1,transform:'scaleX(-1)',offset:.95},{opacity:0,transform:'scaleX(-1)'}],{duration:700})};
+ L.nod=()=>wa(q('.c-sway'),[{transform:'translateY(0)'},{transform:'translateY(5px) rotate(1deg)'},{transform:'translateY(0)'}],{duration:220});
+ let dx=-9;L.dart=()=>{dx=dx>=9?-9:dx+3;L.look(dx,4)};
+ if(!RM){el.classList.add('live');const tick=()=>{setTimeout(tick,2200+Math.random()*3000);
+   if(L.cur||document.hidden||!el.isConnected||!el.offsetParent||(el.closest('.ai-fab')&&document.documentElement.classList.contains('cc-away')))return;
+   const r=Math.random(),m=CCP[L.base]||L.base;
+   if(r<.42)L.blink();else if(r<.62){L.look((Math.random()-.5)*20,(Math.random()-.5)*10,1300);setTimeout(L.blink,1500)}
+   else if(r<.76)L.sway();else if(r<.86)L.hat();else if(m==='read'||m==='peek'||r<.93)L.page();else L.blink()};setTimeout(tick,1500)}
  return L}
 const FABC=cchLive(document.getElementById('fabCh'),'idle'),AIV=cchLive(document.getElementById('aiAv'),'idle');
 /* opening: the sheet grows out of the character button, and the character pops in and says hello */
@@ -3204,8 +3249,8 @@ aiEl('aiFab').addEventListener('click',()=>{const f=aiEl('aiFab').getBoundingCli
  if(RM||!c||!c.animate)return;requestAnimationFrame(()=>{const r=c.getBoundingClientRect();const dx=f.left+f.width/2-(r.left+r.width/2),dy=f.top+f.height/2-(r.top+r.height/2);
   try{c.animate([{transform:`translate(${dx}px,${dy}px) scale(${(f.width/r.width).toFixed(3)},${(f.height/r.height).toFixed(3)})`,borderRadius:'50%',opacity:.4},{transform:'none',borderRadius:'25px',opacity:1}],{duration:380,easing:'cubic-bezier(.2,.85,.25,1)'})}catch(e){}})});
 /* typing: he peeks over his book and reacts to each key; when you stop he goes back to reading */
-{let kT=0,lastK=0;aiEl('aiInput').addEventListener('input',()=>{const v=aiEl('aiInput').value.trim(),n=performance.now();AIV.setBase(v?'peek':'idle');if(n-lastK>110){lastK=n;AIV.anim('tap')}
- clearTimeout(kT);kT=setTimeout(()=>AIV.setBase(aiEl('aiInput').value.trim()?'read':'idle'),1500)})}
+{let kT=0,lastK=0;aiEl('aiInput').addEventListener('input',()=>{const v=aiEl('aiInput').value.trim(),n=performance.now();AIV.setBase(v?'peek':'idle');if(n-lastK>110){lastK=n;AIV.nod();AIV.dart()}
+ clearTimeout(kT);kT=setTimeout(()=>{AIV.look(0,0);AIV.setBase(aiEl('aiInput').value.trim()?'read':'idle')},1500)})}
 /* what he says (the status line) sets his mood */
 {const _ss=aiSetStatus;aiSetStatus=function(t){_ss(t);const x=String(t||'');
  if(!x)return;if(/^(Understanding|Starting)/.test(x))AIV.set('think',0,'wobble');else if(/^Listening/.test(x))AIV.set('alert',0,'tap');
@@ -3223,8 +3268,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=49;
+const CC_VER=50;
 const CC_LOG=[
+ {v:50,new:['The assistant is alive: his head, eyes, eyebrows, hat and book all move, he blinks, looks around, turns pages, reads along as you type and reacts to what you ask.']},
  {v:49,new:['The assistant stays black and white like the drawing, with a curious look by default.']},
  {v:48,big:1,new:['Meet your assistant! The + button is now a little character. Tap him to plan something: he reads along while you type, thinks about your request and cheers when it’s added. He also shows up in your Chitas stats and on your reminders.']},
  {v:47,new:['Daily shiurim now follow the English date by default (they change at midnight). You can switch them to change at sunset in ⋯ → Advanced.']},
