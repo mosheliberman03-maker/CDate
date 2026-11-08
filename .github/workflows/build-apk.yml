@@ -41,9 +41,10 @@ jobs:
         run: npx cap add android
 
       - name: Generate the app icon (the web-app aleph logo)
+        # our own small script (Pillow); @capacitor/assets kept failing to download its image library on GitHub's servers
         run: |
-          npm i -D @capacitor/assets@3
-          npx capacitor-assets generate --android --iconBackgroundColor '#0a0b10' --iconBackgroundColorDark '#0a0b10' --splashBackgroundColor '#0a0b10' --splashBackgroundColorDark '#0a0b10'
+          python3 -m pip install --quiet pillow
+          python3 make-icons.py
 
       - name: Add permissions for exact alarms
         run: node patch-android.js
