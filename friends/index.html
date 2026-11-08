@@ -347,6 +347,13 @@ body.tour.tpass #top,body.tour.tpass #bar{z-index:41}
 .fbi p{margin:6px 0 8px!important;color:#e6ebfc!important;white-space:pre-wrap;font-size:14.5px!important}
 .fbi .a{display:flex;gap:8px}
 .fbi .a a,.fbi .a button{flex:1;text-align:center;text-decoration:none;padding:8px;border-radius:10px;font:inherit;font-size:13px;font-weight:700;border:0;cursor:pointer;background:rgba(255,255,255,.1);color:var(--tx)}
+
+#kitDot{position:fixed;z-index:45;right:16px;top:calc(env(safe-area-inset-top,0px) + 66px);width:26px;height:26px;border-radius:50%;border:1px solid rgba(157,180,245,.5);background:rgba(36,48,94,.92);color:#c9d6ff;font:italic 700 14px Georgia,serif;display:grid;place-items:center;padding:0;cursor:pointer;opacity:0;transform:scale(.6);transition:opacity .3s,transform .3s;box-shadow:0 0 0 0 rgba(157,180,245,.5);animation:kdot 2.4s ease-out 3}
+#kitDot.on{opacity:1;transform:none}
+@keyframes kdot{70%{box-shadow:0 0 0 9px rgba(157,180,245,0)}}
+#kitDotPop{position:fixed;z-index:46;right:14px;top:calc(env(safe-area-inset-top,0px) + 98px);width:min(290px,calc(100% - 28px));border-radius:16px;padding:12px 14px;background:rgba(36,48,94,.97);border:1px solid rgba(255,255,255,.15);box-shadow:0 10px 30px rgba(0,0,0,.45);font-size:13.5px;line-height:1.55;color:#dfe4f7}
+#kitDotPop b{display:block;margin-bottom:4px;color:#fff}
+#kitDotPop .btn{display:block;width:100%;margin-top:8px;padding:9px}
 </style></head><body>
 <canvas id="g"></canvas>
 <div id="su"><div class="sucard glass"><span class="lg lg-l" role="img" aria-label="Logo"></span><h1>Shluchim Keep in Touch <span class="beta">Beta</span></h1><p>This app is in beta, so things may change or break while we test it. Pick your name from the list. First time: add your number and choose a code. Already signed up: enter your code.</p><input id="suN" placeholder="Your name" autocomplete="off" autocapitalize="words"><div id="suH"></div><div id="suM"></div><div id="suPW" style="display:none"></div><div id="suPN"></div><div id="suCW" style="display:none"><input id="suC" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Code"><div class="phh" id="suCH"></div></div><button class="btn p" id="suB" style="width:100%" disabled>Continue</button></div></div>
@@ -791,7 +798,7 @@ $("imp").onclick=()=>{open(false);pick=null;sheet.innerHTML='<h3>Import people</
 let tab="all";
 const open=v=>document.body.classList.toggle("open",v);
 $("menu").onclick=()=>{render();drFill();open(true)};
-function drFill(){const m=me&&me.match,ph=m?(me.phone||phoneOf(m.name,m.city)):"";$("mav").textContent=m?m.name[0].toUpperCase():"?";$("mnm").textContent=m?m.name:"Your account";$("mph").textContent=m?(ph?fmtPhone(ph)+" · ":"")+m.city:"Not signed in";$("mver").textContent="Version "+KIT_VER+(kitIsApp()?" · Android app":"")}$("scrim").onclick=()=>open(false);
+function drFill(){const m=me&&me.match,ph=m?(me.phone||phoneOf(m.name,m.city)):"";$("mav").textContent=m?m.name[0].toUpperCase():"?";$("mnm").textContent=m?m.name:"Your account";$("mph").textContent=m?(ph?fmtPhone(ph)+" · ":"")+m.city:"Not signed in";$("mver").textContent="Version "+kitVerStr(KIT_VER)+(kitIsApp()?" · Android app":"")}$("scrim").onclick=()=>open(false);
 $("tabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;tab=b.dataset.t;[...$("tabs").children].forEach(x=>x.classList.toggle("on",x==b));render()};
 function render(){const ord={day:0,gray:1,night:2};
  const rows=saved.filter(v=>tab=="all"||(tab=="p")==!!v.name).map(v=>({v,s:status(v.tz),t:lt(v.tz).min}));
@@ -1070,30 +1077,34 @@ sync()})();
  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&sheet.style.display=="block"&&sheet.querySelector("[data-pin]"))show()});
 })();
 
-// ---------- What's new (STANDING RULE, owner — same as the calendar): every update bumps KIT_VER and adds a KIT_LOG entry.
-// Only a real feature that makes a practical difference gets big:1 → the full popup; everything else → the slim banner at the top.
+// ---------- What's new (STANDING RULE, owner): every update bumps KIT_VER (internal build number) and adds a KIT_LOG entry with a size:
+// big:1 = MAJOR (a real new feature) → full popup, version X.0.0 · mid:1 = MEDIUM → slim banner at the top, version X.Y.0 ·
+// neither = SMALL (looks, tweaks, fixes) → only a little round "i" in the corner, version X.Y.Z. The shown version is worked out from these sizes.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=22,KIT_APK=1;
+const KIT_VER=23,KIT_APK=1;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,big:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
  {v:2,t:"New globe app icon",apk:1},
  {v:3,big:1,t:"A hands-on tour",d:"Find a bochur, save him, and see your list, step by step. Replay it anytime from the menu.",go:"tour"},
- {v:4,t:"A tidier menu: your account on top, everything else grouped"},
- {v:5,t:"The app now updates itself when you come back to it"},
+ {v:4,mid:1,t:"A tidier menu: your account on top, everything else grouped"},
+ {v:5,mid:1,t:"The app now updates itself when you come back to it"},
  {v:6,t:"The version number is now at the bottom of the menu"},
  {v:7,big:1,t:"Send us a suggestion",d:"Have an idea, found a problem, or a question? Menu → Suggestions & contact. We read every message.",go:"feedback"},
- {v:9,t:"Easier sign-up: name suggestions as you type, and your number fills in if we have it"},
+ {v:9,mid:1,t:"Easier sign-up: name suggestions as you type, and your number fills in if we have it"},
  {v:10,t:"Some names now spelled the way people write them"},
  {v:12,big:1,t:"New people and places",d:"New people and places were added from the official shlichus list, and some names were corrected. Your saved list updates by itself."},
- {v:15,t:"Shooting stars on the globe between friends who saved each other"},
+ {v:15,mid:1,t:"Shooting stars on the globe between friends who saved each other"},
  {v:17,t:"Softer, pastel shooting stars"},
  {v:18,t:"Shooting stars fly closer to the globe"},
  {v:19,t:"Shooting stars also show when you zoom in"},
  {v:20,t:"Most shooting stars now fly to or from places you can see"},
  {v:21,t:"Smoother, slower shooting stars when zoomed in"},
- {v:22,t:"Shooting stars only show real connections between friends"}
+ {v:22,t:"Shooting stars only show real connections between friends"},
+ {v:23,mid:1,t:"Clearer version numbers (big.medium.small), and small updates now just show a little ⓘ in the corner"}
 ];
+function kitVerStr(b){let M=0,m=0,p=0;const by={};KIT_LOG.forEach(x=>{const l=x.big?3:x.mid?2:1;by[x.v]=Math.max(by[x.v]||0,l)});
+ Object.keys(by).map(Number).sort((a,c)=>a-c).forEach(v=>{if(v>b)return;if(by[v]==3){M++;m=0;p=0}else if(by[v]==2){m++;p=0}else p++});return M+"."+m+"."+p}
 const kitIsApp=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const kitSeenKey=()=>"kit_seen_"+(me&&me.match?slug(pkey(me.match.name,me.match.city)):"x");
 async function kitApkVer(){if(!kitIsApp())return 99;try{const P=Capacitor.Plugins.KitWidget;const r=await P.info();return r&&r.ver?r.ver:1}catch(e){return 0}}
@@ -1105,8 +1116,12 @@ async function kitNews(){if(!me||!me.match||su||document.body.classList.contains
  const av=await kitApkVer(),items=KIT_LOG.filter(x=>x.v>seen&&(!x.apk||kitIsApp()||!x.go));
  const needApk=kitIsApp()&&av<KIT_APK;
  if(!items.length){if(needApk&&!sessionStorage.getItem("kit_apk_later"))kitBar([{t:"A new version of the app is ready"}],true);return}
- if(items.some(x=>x.big))kitPopup(items,needApk);else kitBar(items,needApk)}
+ if(items.some(x=>x.big))kitPopup(items,needApk);else if(items.some(x=>x.mid)||needApk)kitBar(items,needApk);else kitDot(items)}
 function kitDone(){lsSet(kitSeenKey(),KIT_VER)}
+// small updates: just a little round "i" in the corner; tap it to see what changed
+function kitDot(items){if($("kitDot"))return;const d=document.createElement("button");d.id="kitDot";d.setAttribute("aria-label","Small updates");d.textContent="i";document.body.appendChild(d);requestAnimationFrame(()=>d.classList.add("on"));
+ d.onclick=()=>{hap(8);const pop=document.createElement("div");pop.id="kitDotPop";pop.innerHTML='<b>Small updates · v'+kitVerStr(KIT_VER)+'</b>'+items.map(x=>'<div>• '+esc(x.t)+'</div>').join("")+'<button class="btn">Got it</button>';document.body.appendChild(pop);
+  const close=()=>{kitDone();pop.remove();d.remove()};pop.querySelector("button").onclick=close;setTimeout(()=>document.addEventListener("pointerdown",function f(e){if(!pop.contains(e.target)){document.removeEventListener("pointerdown",f,true);close()}},true),50)}}
 function kitGo(g){if(g=="feedback"){fbOpen();return}if(g=="tour"){open(false);tour.show()}else if(g=="widgets"){const b=$("wgt");if(b&&b.style.display!="none")b.click();else toast("Widgets are in the Android app.")}}
 function kitPopup(items,needApk){const el=document.createElement("div");el.id="kitNew";
  el.innerHTML='<div class="kn-card"><div class="kn-tag">What’s new</div><h2>'+(items.filter(x=>x.big).length>1?"New in Keep in Touch":esc(items.find(x=>x.big).t))+'</h2><div class="kn-list">'+
