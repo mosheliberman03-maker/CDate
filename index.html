@@ -479,7 +479,15 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
 .sts.on{opacity:1;pointer-events:auto}
 .stsp{position:absolute;left:0;right:0;bottom:0;top:max(28px,env(safe-area-inset-top));max-width:560px;margin:0 auto;display:flex;flex-direction:column;background:var(--card);border-radius:26px 26px 0 0;box-shadow:0 -18px 60px rgba(0,0,0,.28);transform:translateY(46px);transition:transform .45s cubic-bezier(.2,.85,.2,1);overflow:hidden}
 .sts.on .stsp{transform:none}
-.sth{padding:16px 18px 10px;flex:none}.stl{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.sth{padding:16px 18px 10px;flex:none}
+/* v46 encouragement: a line on the stats sheet, and a toast when today's four are done */
+.smot{display:grid;gap:2px;margin:-2px 0 12px;padding:11px 14px;border-radius:16px;background:color-mix(in srgb,var(--acc,#8c94ef) 13%,transparent);border:1px solid color-mix(in srgb,var(--acc,#8c94ef) 30%,transparent)}
+.smot b{font:700 15px Figtree,system-ui,sans-serif;color:var(--ink)}.smot span{font-size:13.5px;line-height:1.4;color:var(--mut)}
+.smot.k-ms,.smot.k-done{background:color-mix(in srgb,#f2a541 15%,transparent);border-color:color-mix(in srgb,#f2a541 40%,transparent)}
+#stkToast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 14px);z-index:9000;width:min(88vw,360px);box-sizing:border-box;display:grid;gap:2px;padding:12px 16px;border-radius:18px;
+ background:var(--gx-bg,color-mix(in srgb,var(--card) 92%,transparent));border:1px solid var(--gx-bd,var(--line));box-shadow:0 14px 36px rgba(0,0,0,.25);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+ color:var(--ink);transform:translate(-50%,-140%);opacity:0;transition:transform .45s cubic-bezier(.2,.9,.25,1.15),opacity .3s;pointer-events:none;cursor:pointer}
+#stkToast.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}#stkToast b{font:700 16px Figtree,system-ui,sans-serif}#stkToast span{font-size:13.5px;color:var(--mut);line-height:1.4}.stl{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
 .stl small{color:var(--sg);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase}.stl h3{margin:2px 0 0;font:500 24px/1.15 'Frank Ruhl Libre',serif}
 .stl .x{width:34px;height:34px;border:0;border-radius:50%;background:var(--bg);color:var(--ink);font-size:20px;line-height:1;cursor:pointer}
 .stt{position:relative;display:grid;grid-template-columns:repeat(4,1fr);padding:3px;border-radius:14px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
@@ -2698,11 +2706,58 @@ const WL=['S','M','T','W','T','F','S'];
 function stkInner(){
  const s=streakInfo(),T0=shDay(t0),k0=ds(T0);
  const dots=Array.from({length:7},(_,i)=>{const d=ad(T0,i-6),k=ds(d),f=dayFull(k),p=!f&&dayPart(k);return `<span class="qdot${f?' f':p?' p':''}${i==6?' now':''}"><i></i>${WL[d.getDay()]}</span>`}).join('');
- const l=s.cur?`<b>${s.cur}-day streak</b><small>${s.todayDone?'Today is done':'Finish today to keep it'}</small>`:`<b>Start a streak</b><small>Finish all 4 shiurim in a day</small>`;
+ const lf=dayLeft(k0),l=s.cur?`<b>${s.cur}-day streak</b><small>${s.todayDone?'Today is done':lf<4?lf+' more to keep it':'Finish today to keep it'}</small>`:s.best>0?`<b>Fresh start</b><small>${s.todayDone?'Day 1 done!':'Your best is '+s.best+(s.best==1?' day':' days')}</small>`:`<b>Start a streak</b><small>Finish all 4 shiurim in a day</small>`;
  return `<span class="l">${l}</span><span class="qdots">${dots}</span><i class="qchev" aria-hidden="true">›</i>`}
 function stkHtml(){return `<button class="qstk rv" id="stk" type="button" aria-label="Streak history" style="--i:1">${stkInner()}</button>`}
 function stkRefresh(){const e=$('#stk');if(e)e.innerHTML=stkInner();}
 function stkFill(){}
+/* ===== Encouragement (owner, v46: "like Duolingo"): streak counts, milestones, gentle comebacks after a missed day,
+   "streak at risk" nudges. One phrase bank for the stats sheet, the streak chip, the celebration and the reminders.
+   Phrases rotate by date (stable within a day). ===== */
+const STK_MS=[3,7,10,14,18,21,30,40,50,60,70,80,90,100,120,150,180,200,250,300,365,400,500,613,700,800,900,1000];
+const stkPick=(arr,seed)=>{let h=7;for(const ch of String(seed))h=(h*31+ch.charCodeAt(0))|0;return arr[Math.abs(h)%arr.length]};
+const stkFmt=(t,o)=>t.replace(/\{(\w+)\}/g,(m,k)=>o[k]!=null?o[k]:m);
+const stkMsName=n=>n===18?'Chai':n===613?'613, like the mitzvos':n===365?'a whole year':n===30?'a whole month':n===7?'a full week':'';
+const STK_P={
+ start:['Today’s Chitas is ready: Chumash, Tehillim, Tanya and Rambam.','A few minutes of Chitas brightens the whole day.','The Rebbe asked every Jew to learn Chitas each day. Today’s portion is waiting.','Small steps every day add up. Start with Tehillim?','Start a streak today: all four shiurim, one day at a time.'],
+ keep:['🔥 {n}-day streak! Keep it going today.','{n} days strong. Today makes {n1}!','Don’t break the chain: {n} days and counting.','Your {n}-day streak is counting on you today.','Keep the fire lit 🔥 {n} days so far.'],
+ keepMs:['Finish today and reach {n1} days{msn}! 🎉','One more day to {n1}{msn}. You’ve got this!'],
+ left:['{left} to go to keep your {n}-day streak.','Almost there: {left} left today.','Just {left} more and today is done.'],
+ leftNew:['{left} more and your new streak begins today.','Nice start! {left} left to make today count.'],
+ late:['⏳ Last chance today to keep your {n}-day streak!','Your {n}-day streak ends soon unless you learn today. A few minutes is enough!','Quick! Save your {n}-day streak before the day ends.'],
+ lateStart:['There’s still time for today’s shiurim.','Even one shiur tonight counts. Tehillim takes a few minutes.'],
+ done:['Today is done ✓ See you tomorrow!','{n} days in a row. Beautiful!','Another day of Chitas complete. Keep it up!','Today’s shiurim are done. Yasher koach!'],
+ done1:['Day 1 done! Come back tomorrow to make it 2.','Great start! Tomorrow makes it a 2-day streak.'],
+ ms:['{msn}What a streak. Yasher koach!','{msn}Keep the fire burning 🔥','{msn}Beautiful consistency. Keep going!'],
+ back:['Everyone slips sometimes. Today is a fresh start.','“A tzaddik falls seven times and gets up” (Mishlei 24:16). Let’s get back up today.','We missed you! One shiur is a great way back.','New day, new streak. Start with just one shiur.'],
+ backBest:['Your best streak is {best} days. Let’s start building again.','You’ve done {best} days in a row before. You can do it again!'],
+ close:['So close yesterday ({y}/4)! Today let’s finish all four.'],
+ miss:['It’s been {d} days. Your shiurim miss you!','Just one shiur today? Tehillim takes about five minutes.','Come back to Chitas, even a little counts.','A few minutes of Torah today? We saved your place.'],
+ away:['Still here whenever you’re ready. Today’s Chitas is waiting.','One shiur is all it takes to start again.'],
+ pause:['These reminders don’t seem to be helping, so we’ll pause them. Open the app any time to start again.'],
+ slack:['This week is a little quieter than last week. A strong finish counts!','Last week {pw}%, this week {cw}% so far. Let’s get back to it, one shiur at a time.']};
+const stkP=(k,seed,o)=>stkFmt(stkPick(STK_P[k],k+seed),o||{});
+const stkDays=(a,b)=>Math.round((+pd(b)-+pd(a))/864e5);
+/* how things stand right now (by the shiur day) */
+function stkState(){const s=streakInfo(),T=shDay(t0),tk=ds(T),ks=Object.keys(DN).filter(k=>k<tk&&dayPart(k)).sort(),last=ks.length?ks[ks.length-1]:null,
+  gap=last?stkDays(last,tk)-1:null,y=DN[ds(ad(T,-1))]?4-dayLeft(ds(ad(T,-1))):0,wk=o=>{let c=0;for(let i=1+o;i<=7+o;i++)c+=4-dayLeft(ds(ad(T,-i)));return Math.round(c/28*100)};
+ const n1=s.cur+1,o={n:s.cur,n1,best:s.best,left:dayLeft(tk)==1?'1 shiur':dayLeft(tk)+' shiurim',y,cw:wk(0),pw:wk(7),msn:stkMsName(n1)?' ('+stkMsName(n1)+')':''};
+ return{s,tk,hist:!!last||dayPart(tk),gap,left:dayLeft(tk),o}}
+/* the line for the stats sheet / streak chip: {h: headline, t: text, k: kind} */
+function stkMood(){const S=stkState(),{s,tk,o}=S,sd=tk;
+ if(s.todayDone){if(STK_MS.includes(s.cur)){const ms=stkMsName(s.cur);return{k:'ms',h:'🎉 '+s.cur+'-day streak!',t:stkP('ms',sd,{...o,msn:ms?ms[0].toUpperCase()+ms.slice(1)+'! ':''})}}
+  return{k:'done',h:s.cur+'-day streak 🔥',t:s.cur==1?stkP('done1',sd,o):stkP('done',sd,o)}}
+ if(!S.hist)return{k:'start',h:'Start your streak',t:stkP('start',sd,o)};
+ if(s.cur>0){if(o.cw<50&&o.pw-o.cw>15)return{k:'slack',h:s.cur+'-day streak 🔥',t:stkP('slack',sd,o)};
+  return{k:'keep',h:s.cur+'-day streak 🔥',t:S.left<4?stkP('left',sd,o):STK_MS.includes(o.n1)?stkP('keepMs',sd,o):stkP('keep',sd,o)}}
+ if(S.left<4)return{k:'back',h:'Fresh start',t:stkP('leftNew',sd,o)};
+ if(S.gap===0||S.gap===1){if(o.y>0&&o.y<4)return{k:'back',h:'Fresh start',t:stkP('close',sd,o)};return{k:'back',h:'Fresh start',t:s.best>=3?stkP('backBest',sd,o):stkP('back',sd,o)}}
+ return{k:'miss',h:'Welcome back',t:stkP('miss',sd,{...o,d:S.gap+1})}}
+/* a little celebration when today's four shiurim are done */
+function stkCelebrate(){const s=streakInfo();if(!s.todayDone)return;const ms=STK_MS.includes(s.cur),m=stkMood();
+ if(ms&&typeof ccConfetti==='function')ccConfetti();try{H.ok()}catch(e){}
+ let t=document.getElementById('stkToast');if(!t){t=document.createElement('div');t.id='stkToast';t.setAttribute('role','status');document.body.appendChild(t)}
+ t.innerHTML='<b>'+m.h+'</b><span>'+m.t+'</span>';t.classList.remove('on');void t.offsetWidth;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),4200);t.onclick=()=>{t.classList.remove('on');stsOpen()}}
 /* ---------- Stats sheet ---------- */
 const SHI=[['chumash','Chumash'],['tehillim','Tehillim'],['tanya','Tanya'],['rambam','Rambam']];
 const doneOf=(k,i)=>{const d=DN[k];if(!d)return false;return i==3?!!(d.rambam3||d.rambam1):!!d[SHI[i][0]]};
@@ -2769,7 +2824,7 @@ function stsAnim(pg){const rm=matchMedia('(prefers-reduced-motion: reduce)').mat
 function stsRenderPage(k){const b=$('#sts');if(!b)return;const pg=b.querySelector(`.stpa[data-k="${k}"]`),top=pg.scrollTop;pg.innerHTML=stsPage(k);pg.scrollTop=top}
 function stsOpen(){STS_F=undefined;let b=$('#sts');
  if(!b){b=document.createElement('div');b.id='sts';b.className='sts';
-  b.innerHTML=`<div class="stsp" role="dialog" aria-modal="true" aria-label="Chitas stats"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="stsg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--sg2)"/><stop offset="1" stop-color="var(--sg)"/></linearGradient></defs></svg><div class="sth"><div class="stl"><div><small>Chitas</small><h3>Your stats</h3></div><button type="button" class="x" aria-label="Close">×</button></div><div class="stt" role="tablist"><span class="sti"></span>${STS_L.map((l,i)=>`<button type="button" role="tab" data-i="${i}">${l}</button>`).join('')}</div></div><div class="stpg">${STS_K.map(k=>`<section class="stpa" data-k="${k}"></section>`).join('')}</div></div>`;
+  b.innerHTML=`<div class="stsp" role="dialog" aria-modal="true" aria-label="Chitas stats"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="stsg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--sg2)"/><stop offset="1" stop-color="var(--sg)"/></linearGradient></defs></svg><div class="sth"><div class="stl"><div><small>Chitas</small><h3>Your stats</h3></div><button type="button" class="x" aria-label="Close">×</button></div><div class="smot" id="stsMot"></div><div class="stt" role="tablist"><span class="sti"></span>${STS_L.map((l,i)=>`<button type="button" role="tab" data-i="${i}">${l}</button>`).join('')}</div></div><div class="stpg">${STS_K.map(k=>`<section class="stpa" data-k="${k}"></section>`).join('')}</div></div>`;
   document.body.appendChild(b);
   b.addEventListener('click',e=>{if(e.target==b||e.target.closest('.x')){b.classList.remove('on');return}
    const t=e.target.closest('.stt button');if(t){const i=+t.dataset.i;H.tap();const pgr=b.querySelector('.stpg');if(i==STS.i)return;STS.tgt=i;clearTimeout(STS.tt);STS.tt=setTimeout(()=>{if(STS.tgt!=null){STS.tgt=null;pgr.dispatchEvent(new Event('scroll'))}},1200);pgr.scrollTo({left:i*pgr.clientWidth,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});return}
@@ -2780,6 +2835,7 @@ function stsOpen(){STS_F=undefined;let b=$('#sts');
    if(STS.tgt!=null){if(Math.abs(x-STS.tgt)>.03)return;STS.tgt=null;clearTimeout(STS.tt);STS.i=i;sel();stsAnim(pgr.children[i]);return}
    if(i!=STS.i){STS.i=i;sel();H.sel();stsAnim(pgr.children[i])}})},{passive:true})}
  STS_K.forEach(k=>{STS.o[k]=0;stsRenderPage(k)});
+ {const m=stkMood(),e=b.querySelector('#stsMot');if(e){e.className='smot k-'+m.k;e.innerHTML='<b>'+m.h+'</b><span>'+m.t+'</span>'}}
  const pgr=b.querySelector('.stpg');b.classList.add('on');H.ok();
  requestAnimationFrame(()=>{pgr.scrollLeft=STS.i*pgr.clientWidth;b.querySelector('.sti').style.transform=`translateX(${STS.i*100}%)`;b.querySelectorAll('.stt button').forEach((t,j)=>t.setAttribute('aria-selected',j==STS.i));setTimeout(()=>stsAnim(pgr.children[STS.i]),180)})}
 document.addEventListener('click',e=>{if(e.target.closest('#stk')){H.tap();stsOpen()}});
@@ -2794,7 +2850,7 @@ const nCfg=()=>{const c=Object.assign({},NDEF,ST('cc_notif',{}));if(!['never','r
    after that. Today's are skipped once its shiurim are done (tog/reader re-sync). Time is the English clock; after sunset the
    reminder checks the next day's shiurim (shDay rule). */
 const LT_GET=()=>ST('cc_learn_t',{});
-function ltRecord(key,finished){try{const L=LT_GET();if(L[key]&&L[key].f)return;const p={};new Intl.DateTimeFormat('en-US',{timeZone:LC.tz,hourCycle:'h23',hour:'numeric',minute:'numeric'}).formatToParts(new Date()).forEach(x=>p[x.type]=+x.value);
+function ltRecord(key,finished){try{const L=LT_GET();if(L[key]&&L[key].f)return;if(finished)setTimeout(()=>{try{stkCelebrate()}catch(e){}},350);const p={};new Intl.DateTimeFormat('en-US',{timeZone:LC.tz,hourCycle:'h23',hour:'numeric',minute:'numeric'}).formatToParts(new Date()).forEach(x=>p[x.type]=+x.value);
  let m=p.hour*60+p.minute;if(m<240)m+=1440;L[key]={m,f:finished?1:0};
  const ks=Object.keys(L).sort();while(ks.length>40)delete L[ks.shift()];localStorage.setItem(AK('cc_learn_t'),JSON.stringify(L))}catch(e){}}
 function ltUsual(){const L=LT_GET(),v=Object.keys(L).sort().map(k=>L[k]),fin=v.filter(x=>x.f),use=(fin.length>=4?fin:v).slice(-14).map(x=>x.m).sort((a,b)=>a-b);
@@ -2881,14 +2937,33 @@ function notifPlan(c,days=30,opt){
    const th=T('learn',k,'Daily shiurim'),eng=shEng(),skey=at=>(!eng&&at>=sk)?k1:k,
     left=at=>i==0?dayLeft(skey(at)):4,lt=n=>n+(n==1?' shiur':' shiurim')+' left',stx=st.cur?st.cur+'-day streak':'';
    const put=(id,at,tx)=>{if(i==0&&left(at)<=0)return;add(th,id,at,tx,'learn')};
-   if(c.learnLvl=='rarely'){const at=wallMs(d,lh,lm);put('learn:'+k,at,i==0?lt(left(at))+' today'+(stx?' · '+stx:''):stx?'Keep your streak going':'Time for today’s shiurim')}
-   else if(c.learnLvl=='regular'){const U=ltUsual().m;
-    if(U==null){[[600,'Good morning! Today’s shiurim are waiting: Chumash, Tehillim, Tanya and Rambam'],[900,'A good moment for some of today’s shiurim?'],[lh*60+lm,'Don’t forget your daily shiurim'+(stx?' · keep your '+stx+' going':'')]]
-      .forEach(([m,tx],j)=>{const at=wallMs(d,0,m),n=left(at);put('learnr:'+k+':'+j,at,i==0&&n<4?lt(n)+' · '+(j==0?'Good morning!':tx):tx)})}
-    else{const a0=wallMs(d,0,U-30),a1=wallMs(d,0,U+5),a2=wallMs(d,0,U+65),n1_=left(a1);
-     put('learnr:'+k+':0',a0,'Your shiurim time is coming up, around '+ltFmt(U));
-     put('learnr:'+k+':1',a1,'Hey, don’t forget your daily shiurim!'+(i==0&&n1_<4?' '+lt(n1_)+'.':''));
-     put('learnr:'+k+':2',a2,stx?'Are we doing this? Let’s keep up your '+stx+'!':'Are we doing this? There’s still time for today’s shiurim.')}}}
+   /* v46 (owner: "like Duolingo"): what to say on day i. Reminders for later days only arrive if the app wasn't opened in between
+      (opening it, or checking a shiur off, plans everything again), so for them we assume nothing was learned: the streak is at
+      risk, then lost, then gentle comebacks that get fewer, and after a week one "we'll pause" and then silence. */
+   /* Every reminder belongs to a shiur day (after sunset that's the next one); rel = how many shiur days after the current one.
+      Assuming nothing is learned from now on: the streak is alive on rel 0 (if today isn't done yet) or rel 1 (if today is done);
+      after that, missed = shiur days skipped since the last day anything was learned. */
+   const S0=stkState(),done0=S0.s.todayDone,cur0=S0.s.cur,ck=ds(shDay(t0)),ks0=Object.keys(DN).filter(x=>x<=ck&&dayPart(x)).sort(),
+    lastAct=ks0.length?-stkDays(ks0[ks0.length-1],ck):null,
+    ctx=at=>{const rel=stkDays(ck,skey(at)),alive=cur0>0&&((rel==0&&!done0)||(rel==1&&done0)),miss=lastAct==null?(rel>=7?8:rel>=3?4:0):Math.max(0,rel-lastAct-1),
+      late=alive&&(eng||at<sk),o={...S0.o,n:cur0,n1:cur0+1,msn:stkMsName(cur0+1)?' ('+stkMsName(cur0+1)+')':'',d:lastAct==null?0:rel-lastAct};return{rel,alive,miss,late,o}},
+    say=(slot,at)=>{const x=ctx(at),o=x.o,sd=k+slot;if(x.rel<0)return null;
+     if(x.alive){if(slot==2&&x.late)return stkP('late',sd,o);if(slot==1&&STK_MS.includes(cur0+1))return stkP('keepMs',sd,o);return stkP('keep',sd,o)}
+     if(x.miss>=8)return null;if(x.miss==7)return slot==1?stkP('pause',sd,o):null;if(x.miss>=4)return slot==1?(lastAct!=null?stkP('away',sd,o):stkP('start',sd,o)):null;
+     if(x.miss>=2)return stkP('miss',sd,o);if(x.miss==1)return S0.s.best>=3&&slot==1?stkP('backBest',sd,o):stkP('back',sd,o);
+     if(lastAct==null)return slot==2?stkP('lateStart',sd,o):stkP('start',sd,o);
+     return x.rel==0&&!done0&&dayPart(ck)?stkP('leftNew',sd,o):stkP('back',sd,o)},
+    pre=at=>{const n_=left(at);return i==0&&n_>0&&n_<4?lt(n_)+' · ':''},
+    say2=(id,at,slot)=>{const tx=say(slot,at);if(tx)put(id,at,pre(at)+tx)},n=cur0,miss=0;
+   /* rarely = one a day at learnAt; but if that is after the shiur day ends (sunset) while a streak is still alive, send it before sunset instead, as a streak saver */
+   if(c.learnLvl=='rarely'){const la=wallMs(d,lh,lm),sv=eng?null:sk-50*6e4,x=sv?ctx(sv):null;if(sv&&la>=sv&&cur0>=2&&x.alive)put('learn:'+k,sv,pre(sv)+stkP('late',k+'r',x.o));else say2('learn:'+k,la,1)}
+   else if(c.learnLvl=='regular'){const U=ltUsual().m;let lastT=0;
+    if(U==null){[600,900,lh*60+lm].forEach((m,j)=>{const at=wallMs(d,0,m);lastT=Math.max(lastT,at);say2('learnr:'+k+':'+j,at,j)})}
+    else{const a0=wallMs(d,0,U-30),a1=wallMs(d,0,U+5),a2=wallMs(d,0,U+65);lastT=a2;
+     {const x=ctx(a0);if(x.rel>=0&&(x.alive||(x.miss==0&&lastAct!=null)))put('learnr:'+k+':0',a0,pre(a0)+'Your shiurim time is coming up, around '+ltFmt(U)+(x.alive?' · '+cur0+'-day streak 🔥':''));else say2('learnr:'+k+':0',a0,0)}
+     say2('learnr:'+k+':1',a1,1);say2('learnr:'+k+':2',a2,2)}
+    /* the streak saver: late in the shiur day, if a streak of 2+ is still at risk */
+    {const la=eng?wallMs(d,22,30):sk-50*6e4,x=ctx(la);if(cur0>=2&&x.alive&&la>lastT+20*6e4)put('learnr:'+k+':s',la,pre(la)+stkP('late',k+'s',x.o))}}}
  }
  /* your own plans: the reminders you asked for ("2 hours before", "the night before", ...) */
  if(c.mine!==false){const R=my.filter(p=>Array.isArray(p.rem)&&p.rem.length);
@@ -3083,8 +3158,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=45;
+const CC_VER=46;
 const CC_LOG=[
+ {v:46,mid:1,new:['Encouragement for your Chitas streak: a message on your stats, a little celebration when you finish all four shiurim (confetti on milestones), and friendlier shiurim reminders that cheer you on, warn when a streak is at risk, and welcome you back after a missed day.']},
  {v:45,new:['The silk is a little stronger behind the date by day.']},
  {v:44,new:['More silk in the day sky, especially near the top, and it waves more as you scroll.']},
  {v:43,new:['Smoother animations everywhere: the logo intro, changing days, menus, the assistant and closing the siddur.']},
