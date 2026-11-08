@@ -804,7 +804,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .cch>svg{display:block;width:100%;height:100%;overflow:visible;transform-origin:50% 100%}
 /* v51: the light outline on dark backgrounds is a stroke drawn under each black part (paint-order), not a CSS filter:
    a filtered layer with moving parts inside flashed between animations in Android's WebView */
-.cch{--halo:transparent}:root[data-night="1"] .cch,:root[data-theme="dark"] .cch,.ai-fab .cch{--halo:rgba(255,255,255,.92)}
+.cch{--halo:transparent}:root[data-night="1"] .cch,:root[data-theme="dark"] .cch{--halo:rgba(255,255,255,.92)}
 :is(.cch,.cchI) .k{stroke:var(--halo);stroke-width:5;paint-order:stroke;stroke-linejoin:round}:is(.cch,.cchI) .c-halo{fill:none;stroke:var(--halo);stroke-width:13}
 :is(.cch,.cchI) .k{fill:var(--ink)}:is(.cch,.cchI) .w{fill:var(--fill)}:is(.cch,.cchI) .ln{fill:none;stroke:var(--ink);stroke-width:8;stroke-linecap:round}
 :is(.cch,.cchI) .c-face{fill:var(--fill);stroke:var(--ink);stroke-width:7}
@@ -814,6 +814,12 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
    requestAnimationFrame loop that runs only while something moves. */
 /* the + button is the character */
 .ai-fab .fabplus{display:none}.ai-fab .fabc{--cw:42px;position:relative;z-index:3;margin-top:5px}
+/* v68 (owner): no round button: just him standing there, with a small soft shadow under him like a bit of floor */
+:root:not(.tt-off-char) .ai-fab{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;width:66px;height:76px;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;animation:none!important;place-items:end center;overflow:visible}
+:root:not(.tt-off-char) .ai-fab::before{display:none!important}
+:root:not(.tt-off-char) .ai-fab::after{content:''!important;position:absolute!important;inset:auto!important;left:50%!important;bottom:3px!important;width:46px!important;height:11px!important;margin-left:-23px;padding:0!important;border-radius:50%!important;background:radial-gradient(closest-side,rgba(10,14,34,.42),rgba(10,14,34,.14) 60%,rgba(10,14,34,0))!important;-webkit-mask:none!important;mask:none!important;z-index:1!important;opacity:1!important;animation:none!important}
+:root:not(.tt-off-char)[data-night="1"] .ai-fab::after{background:radial-gradient(closest-side,rgba(0,0,0,.6),rgba(0,0,0,.2) 60%,rgba(0,0,0,0))!important}
+:root:not(.tt-off-char) .ai-fab .fabc{--cw:56px;margin:0 0 8px}
 :root.tt-off-char .ai-fab .fabplus{display:inline}:root.tt-off-char .ai-fab .fabc{display:none}
 .ai-av{--cw:58px;margin:-8px 0 -4px -2px}.ai-head h2{flex:1}:root.tt-off-char .ai-av{display:none}
 .smot{display:flex!important;align-items:center;gap:12px}.smot .smav{--cw:46px}.smot>div{display:grid;gap:2px;min-width:0}
@@ -3368,8 +3374,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=67;
+const CC_VER=68;
 const CC_LOG=[
+ {v:68,new:['The assistant button is now just the character standing on a little shadow, without a circle around him.']},
  {v:67,new:['The unlit part of the moon is now a darker shade of the moon instead of black.']},
  {v:66,new:['The blink sound in the opening is softer.']},
  {v:65,new:['The opening’s sounds are softer.']},
