@@ -1146,7 +1146,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     [1.36,function(t){pop(t,320,900,.26)}],
     [1.72,function(t){tap(t,520,.18)}],
     [2.08,function(t){tap(t,880,.06)}],[2.63,function(t){tap(t,780,.06)}],[3.18,function(t){tap(t,840,.06)}],
-    [3.62,function(t){bellN(t,1975.5,.08)}],
+    [3.62,function(t){tone('sine',560,500,t,.025,.05,.22)}],   // v66 (owner): the blink is a soft, rounded 'blip' (no bright bell)
     [4.17,function(t){whoosh(t,.5,400,1800,.16)}],
     [4.72,function(t){tap(t,470,.18)}],
     [5.0,function(t){build(t,.95)}],
@@ -3368,8 +3368,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=65;
+const CC_VER=66;
 const CC_LOG=[
+ {v:66,new:['The blink sound in the opening is softer.']},
  {v:65,new:['The opening’s sounds are softer.']},
  {v:64,new:['The jump sound in the opening is now a soft “zip”.']},
  {v:63,new:['The jump sound in the opening is softer.']},
