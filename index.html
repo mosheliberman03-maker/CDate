@@ -1210,8 +1210,8 @@ function info(dt){const b=infoBase(hDay(dt)),h=b.h,rc=b.rc,ev=b.ev.slice(),wd=dt
 let t0=ad(new Date(),0);
 /* Two "todays": t0 is the English date (it changes at midnight). After sunset the Hebrew date has already moved on, so anything
    linked to the Hebrew date (holidays, Yom Tov, Hebrew-date plans, shiurim) reads the next day: hDay(dt). Your own plans stay on
-   the English date. Shiurim can be set to follow the English date instead (setting "cc_sh_eng"). */
-var HSH=0;const hDay=dt=>HSH&&+dt===+t0?ad(dt,1):dt,shEng=()=>{try{return localStorage.getItem(AK('cc_sh_eng'))==='1'}catch(e){return false}},shDay=dt=>shEng()?dt:hDay(dt);
+   the English date. Shiurim follow the English date by default since v47 (owner); ⋯ → Advanced can switch them to the Hebrew day (setting "cc_sh_eng" = '0'). */
+var HSH=0;const hDay=dt=>HSH&&+dt===+t0?ad(dt,1):dt,shEng=()=>{try{return localStorage.getItem(AK('cc_sh_eng'))!=='0'}catch(e){return true}},shDay=dt=>shEng()?dt:hDay(dt);
 const hm1=dt=>ad(dt,1-hd(dt).d),hlen=f=>hd(ad(f,29)).d==30?30:29;let V=hm1(t0),sel=t0;const on={yt:1,ct:1,yb:1,ys:1,fs:1,my:1};
 const g=$('#g');
 const ds=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -3158,8 +3158,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=46;
+const CC_VER=47;
 const CC_LOG=[
+ {v:47,new:['Daily shiurim now follow the English date by default (they change at midnight). You can switch them to change at sunset in ⋯ → Advanced.']},
  {v:46,mid:1,new:['Encouragement for your Chitas streak: a message on your stats, a little celebration when you finish all four shiurim (confetti on milestones), and friendlier shiurim reminders that cheer you on, warn when a streak is at risk, and welcome you back after a missed day.']},
  {v:45,new:['The silk is a little stronger behind the date by day.']},
  {v:44,new:['More silk in the day sky, especially near the top, and it waves more as you scroll.']},
