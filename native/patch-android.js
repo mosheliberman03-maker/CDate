@@ -50,3 +50,14 @@ android.signingConfigs.debug.keyPassword = "android"
   console.log('patch-android: signing not set (' + e.message + ')');
   process.exit(1);
 }
+
+/* The assistant character on notifications (owner, v48): native/assets/char/*.png → res/drawable, used as
+   largeIcon 'cc_char1'…'cc_char9' (the face changes with the message) and smallIcon 'ic_stat' (white silhouette). */
+try {
+  const src = 'assets/char', dst = 'android/app/src/main/res/drawable';
+  fs.mkdirSync(dst, { recursive: true });
+  for (const f of fs.readdirSync(src)) if (f.endsWith('.png')) fs.copyFileSync(src + '/' + f, dst + '/' + f);
+  console.log('patch-android: character pictures copied');
+} catch (e) {
+  console.log('patch-android: character pictures skipped (' + e.message + ')');
+}

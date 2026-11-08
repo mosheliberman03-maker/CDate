@@ -788,6 +788,32 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 @media(prefers-reduced-motion:reduce){.yzc b{animation:none}}
 @media(prefers-reduced-motion:reduce){.wv{will-change:auto}#skyNight,#skyWaves{transition:none}}
 </style>
+<style id="cc-char">
+/* ===== The assistant character (owner, v48): 9 poses in one sprite (3×3). Two masks so it follows the theme:
+   ink = the black lines (var(--cch-ink)), fill = the inside of the face (var(--cch-fill)). Pose = data-p 1..9:
+   1 idle, 2 alert, 3 thinking, 4 determined, 5 happy, 6 sad, 7 peeking over the book, 8 content/reading, 9 glance. ===== */
+.cch{--cw:44px;--cch-ink:var(--ink);--cch-fill:#fff;display:inline-block;flex:none;width:var(--cw);aspect-ratio:300/353;position:relative;transform-origin:50% 100%}
+:root[data-night="1"] .cch,:root[data-theme="dark"] .cch{--cch-fill:#121a3d}
+.cch i{position:absolute;inset:0;background:var(--cch-ink);-webkit-mask:url(assets/char/ink.webp) 0 0/300% 300% no-repeat;mask:url(assets/char/ink.webp) 0 0/300% 300% no-repeat}
+.cch i.f{background:var(--cch-fill);-webkit-mask-image:url(assets/char/fill.webp);mask-image:url(assets/char/fill.webp)}
+.cch[data-p="2"] i{-webkit-mask-position:50% 0;mask-position:50% 0}.cch[data-p="3"] i{-webkit-mask-position:100% 0;mask-position:100% 0}
+.cch[data-p="4"] i{-webkit-mask-position:0 50%;mask-position:0 50%}.cch[data-p="5"] i{-webkit-mask-position:50% 50%;mask-position:50% 50%}.cch[data-p="6"] i{-webkit-mask-position:100% 50%;mask-position:100% 50%}
+.cch[data-p="7"] i{-webkit-mask-position:0 100%;mask-position:0 100%}.cch[data-p="8"] i{-webkit-mask-position:50% 100%;mask-position:50% 100%}.cch[data-p="9"] i{-webkit-mask-position:100% 100%;mask-position:100% 100%}
+@keyframes cchBob{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-3%) rotate(-1.2deg)}70%{transform:translateY(-1%) rotate(1deg)}}
+.cch.live{animation:cchBob 3.4s ease-in-out infinite}
+.cc-away .cch.live,body.op .cch.fabc{animation-play-state:paused}
+/* the + button is the character now */
+.ai-fab .fabplus{display:none}.ai-fab .fabc{--cw:41px;--cch-ink:#fff;--cch-fill:transparent;position:relative;z-index:3;margin-top:4px}
+:root.tt-off-char .ai-fab .fabplus{display:inline}:root.tt-off-char .ai-fab .fabc{display:none}
+/* in the assistant */
+.ai-av{--cw:54px;margin:-6px 0 -4px -2px}.ai-head h2{flex:1}
+:root.tt-off-char .ai-av{display:none}
+/* in the stats message and the "today is done" toast */
+.smot{display:flex!important;align-items:center;gap:12px}.smot .smav{--cw:46px}.smot>div{display:grid;gap:2px;min-width:0}
+#stkToast{display:flex!important;align-items:center;gap:12px}#stkToast .smav{--cw:44px}#stkToast>div{display:grid;gap:2px}
+:root.tt-off-char :is(.smot,#stkToast) .smav{display:none}
+@media(prefers-reduced-motion:reduce){.cch.live{animation:none}}
+</style>
 <style id="cc-siddur">
 /* ===== Siddur (Tehillat Hashem pages; v37 = paged). Pages are alpha stencils (siddur/p/N.webp) painted in var(--ink) via mask. ===== */
 .dock #sd{display:inline-flex;align-items:center;gap:8px;height:50px;padding:0 16px;border-radius:26px;font:600 15.5px Figtree,system-ui,sans-serif;color:color-mix(in srgb,var(--gl-tx) 82%,transparent)}
@@ -887,8 +913,8 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
 <button class="hint" id="hint" type="button" aria-label="See details"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg><b id="hintN" hidden></b></button>
 <div class="cb" id="cb" aria-hidden="true"><div class="cl" id="cbt"></div><div id="cbr"></div></div>
 <nav class="dock" aria-label="Day navigation"><button id="pd" aria-label="Previous day">‹</button><button id="td" class="tdb">Today</button><button id="nd" aria-label="Next day">›</button><button id="mo">Month</button><button id="sd" aria-label="Siddur">Siddur</button><button id="mn" aria-label="More: go to a date, add events, settings">⋯</button></nav>
-<button class="ai-fab" id="aiFab" aria-label="Add an event with the calendar assistant" title="Add with assistant">+</button>
-<div class="ai-backdrop" id="aiBackdrop" aria-hidden="true"><section class="ai-card" role="dialog" aria-modal="true" aria-labelledby="aiTitle"><div class="ai-head"><h2 id="aiTitle">Plan something</h2><button class="ai-close" id="aiClose" aria-label="Close">×</button></div><p class="ai-hint">Describe it naturally, e.g. “Tanya chavrusa with Yossi every Sunday and Tuesday at 8pm” or “yahrzeit of my father 20 Av”. To remove one: “cancel my chavrusa with Yossi”. Hebrew dates and terms like kvius, chavrusa and seder are welcome.</p><textarea class="ai-input" id="aiInput" placeholder="e.g. Set a monthly kvius with my chavrusa on the 15th of every Hebrew month…"></textarea><div class="ai-actions"><button class="ai-mic" id="aiMic" aria-label="Speak your request" title="Speak" aria-pressed="false" type="button">🎙</button><select class="ai-lang" id="aiLang" aria-label="Voice language"><option value="en-US">English</option><option value="he-IL">עברית</option></select><button class="ai-primary" id="aiPlan" style="flex:1">Make a plan</button></div><div class="ai-status" id="aiStatus" aria-live="polite"></div><div class="ai-preview" id="aiPreview"><h3 id="aiPreviewTitle"></h3><p id="aiPreviewDate"></p><p id="aiPreviewRepeat"></p><p id="aiPreviewNotes"></p><div class="ai-confirm"><button id="aiNo">No, change it</button><button class="ai-yes" id="aiYes">Yes, add it</button></div></div><div class="ai-multi" id="aiMulti"></div><div class="ai-preview" id="aiCancel"><h3 id="aiCancelTitle"></h3><p id="aiCancelBody"></p><div class="ai-choices" id="aiChoices"></div></div><button type="button" class="ai-undo" id="aiUndo" hidden>↩ Undo</button><div class="ai-memory">Your approved arrangements and preferences can be remembered on this device. <button id="aiMemoryBtn">View saved preferences</button></div></section></div>
+<button class="ai-fab" id="aiFab" aria-label="Add an event with the calendar assistant" title="Add with assistant"><b class="fabplus" aria-hidden="true">+</b><span class="cch fabc" id="fabCh" data-p="1" aria-hidden="true"><i class="f"></i><i class="k"></i></span></button>
+<div class="ai-backdrop" id="aiBackdrop" aria-hidden="true"><section class="ai-card" role="dialog" aria-modal="true" aria-labelledby="aiTitle"><div class="ai-head"><span class="cch ai-av" id="aiAv" data-p="1" aria-hidden="true"><i class="f"></i><i class="k"></i></span><h2 id="aiTitle">Plan something</h2><button class="ai-close" id="aiClose" aria-label="Close">×</button></div><p class="ai-hint">Describe it naturally, e.g. “Tanya chavrusa with Yossi every Sunday and Tuesday at 8pm” or “yahrzeit of my father 20 Av”. To remove one: “cancel my chavrusa with Yossi”. Hebrew dates and terms like kvius, chavrusa and seder are welcome.</p><textarea class="ai-input" id="aiInput" placeholder="e.g. Set a monthly kvius with my chavrusa on the 15th of every Hebrew month…"></textarea><div class="ai-actions"><button class="ai-mic" id="aiMic" aria-label="Speak your request" title="Speak" aria-pressed="false" type="button">🎙</button><select class="ai-lang" id="aiLang" aria-label="Voice language"><option value="en-US">English</option><option value="he-IL">עברית</option></select><button class="ai-primary" id="aiPlan" style="flex:1">Make a plan</button></div><div class="ai-status" id="aiStatus" aria-live="polite"></div><div class="ai-preview" id="aiPreview"><h3 id="aiPreviewTitle"></h3><p id="aiPreviewDate"></p><p id="aiPreviewRepeat"></p><p id="aiPreviewNotes"></p><div class="ai-confirm"><button id="aiNo">No, change it</button><button class="ai-yes" id="aiYes">Yes, add it</button></div></div><div class="ai-multi" id="aiMulti"></div><div class="ai-preview" id="aiCancel"><h3 id="aiCancelTitle"></h3><p id="aiCancelBody"></p><div class="ai-choices" id="aiChoices"></div></div><button type="button" class="ai-undo" id="aiUndo" hidden>↩ Undo</button><div class="ai-memory">Your approved arrangements and preferences can be remembered on this device. <button id="aiMemoryBtn">View saved preferences</button></div></section></div>
 <div class="bd" id="bd"></div>
 <div class="sheet ms" id="ms" role="dialog" aria-label="Month"><div class="mh"><h2 id="t"></h2><div class="nav"><button id="pv" aria-label="Previous month">‹</button><button id="nx" aria-label="Next month">›</button></div></div><div class="sub" id="s"></div><section class="cal"><div class="dow"></div><div class="grid" id="g"></div></section></div>
 
@@ -2736,6 +2762,7 @@ const STK_P={
  away:['Still here whenever you’re ready. Today’s Chitas is waiting.','One shiur is all it takes to start again.'],
  pause:['These reminders don’t seem to be helping, so we’ll pause them. Open the app any time to start again.'],
  slack:['This week is a little quieter than last week. A strong finish counts!','Last week {pw}%, this week {cw}% so far. Let’s get back to it, one shiur at a time.']};
+const STK_POSE={start:'idle',keep:'det',slack:'think',back:'sad',miss:'sad',done:'happy',ms:'happy'};
 const stkP=(k,seed,o)=>stkFmt(stkPick(STK_P[k],k+seed),o||{});
 const stkDays=(a,b)=>Math.round((+pd(b)-+pd(a))/864e5);
 /* how things stand right now (by the shiur day) */
@@ -2757,7 +2784,7 @@ function stkMood(){const S=stkState(),{s,tk,o}=S,sd=tk;
 function stkCelebrate(){const s=streakInfo();if(!s.todayDone)return;const ms=STK_MS.includes(s.cur),m=stkMood();
  if(ms&&typeof ccConfetti==='function')ccConfetti();try{H.ok()}catch(e){}
  let t=document.getElementById('stkToast');if(!t){t=document.createElement('div');t.id='stkToast';t.setAttribute('role','status');document.body.appendChild(t)}
- t.innerHTML='<b>'+m.h+'</b><span>'+m.t+'</span>';t.classList.remove('on');void t.offsetWidth;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),4200);t.onclick=()=>{t.classList.remove('on');stsOpen()}}
+ t.innerHTML=cchHtml('happy','smav')+'<div><b>'+m.h+'</b><span>'+m.t+'</span></div>';{const av=t.querySelector('.cch');if(av&&!RM&&av.animate)setTimeout(()=>av.animate(CCH_KF.hop[0],{duration:CCH_KF.hop[1],easing:'ease-out',iterations:ms?2:1}),300)}t.classList.remove('on');void t.offsetWidth;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),4200);t.onclick=()=>{t.classList.remove('on');stsOpen()}}
 /* ---------- Stats sheet ---------- */
 const SHI=[['chumash','Chumash'],['tehillim','Tehillim'],['tanya','Tanya'],['rambam','Rambam']];
 const doneOf=(k,i)=>{const d=DN[k];if(!d)return false;return i==3?!!(d.rambam3||d.rambam1):!!d[SHI[i][0]]};
@@ -2835,7 +2862,7 @@ function stsOpen(){STS_F=undefined;let b=$('#sts');
    if(STS.tgt!=null){if(Math.abs(x-STS.tgt)>.03)return;STS.tgt=null;clearTimeout(STS.tt);STS.i=i;sel();stsAnim(pgr.children[i]);return}
    if(i!=STS.i){STS.i=i;sel();H.sel();stsAnim(pgr.children[i])}})},{passive:true})}
  STS_K.forEach(k=>{STS.o[k]=0;stsRenderPage(k)});
- {const m=stkMood(),e=b.querySelector('#stsMot');if(e){e.className='smot k-'+m.k;e.innerHTML='<b>'+m.h+'</b><span>'+m.t+'</span>'}}
+ {const m=stkMood(),e=b.querySelector('#stsMot');if(e){e.className='smot k-'+m.k;e.innerHTML=cchHtml(STK_POSE[m.k]||'idle','smav')+'<div><b>'+m.h+'</b><span>'+m.t+'</span></div>';const av=e.querySelector('.cch');if(av&&!RM&&av.animate&&(m.k==='ms'||m.k==='done'))setTimeout(()=>av.animate(CCH_KF.hop[0],{duration:CCH_KF.hop[1],easing:'ease-out'}),450)}}
  const pgr=b.querySelector('.stpg');b.classList.add('on');H.ok();
  requestAnimationFrame(()=>{pgr.scrollLeft=STS.i*pgr.clientWidth;b.querySelector('.sti').style.transform=`translateX(${STS.i*100}%)`;b.querySelectorAll('.stt button').forEach((t,j)=>t.setAttribute('aria-selected',j==STS.i));setTimeout(()=>stsAnim(pgr.children[STS.i]),180)})}
 document.addEventListener('click',e=>{if(e.target.closest('#stk')){H.tap();stsOpen()}});
@@ -2857,6 +2884,9 @@ function ltUsual(){const L=LT_GET(),v=Object.keys(L).sort().map(k=>L[k]),fin=v.f
  if(v.length<5)return{n:v.length,m:null};return{n:v.length,m:use[Math.floor(use.length/2)]}}
 const ltFmt=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mn=m%60;return (h%12||12)+':'+String(mn).padStart(2,'0')+(h<12?' AM':' PM')};
 const nSave=c=>{try{localStorage.setItem(AK('cc_notif'),JSON.stringify(c))}catch(e){}};
+/* the character's face for a notification (owner, v48): by what it says. sw.js has the same rules for web push. */
+const ccNPose=(t,g)=>{t=String(t||'');if(/🎉|Yasher|Beautiful|What a streak|done ✓/.test(t))return 5;if(/⏳|Last chance|Quick!|ends soon/.test(t))return 2;if(/pause|miss you|missed you|been \d+ days|whenever you’re ready/i.test(t))return 6;
+ if(/streak|tzaddik|Fresh|start again|do it again|building/i.test(t))return 4;if(g==='learn')return 8;if(g==='prep')return 2;return 1};
 let _lnp;const NP=()=>{try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;return _lnp||(_lnp=(C.Plugins&&C.Plugins.LocalNotifications)||C.registerPlugin('LocalNotifications'))}catch(e){return null}};
 const nid=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return Math.abs(h)%2147480000+10};
 function wallMs(dt,hh,mm){const y=dt.getFullYear(),mo=dt.getMonth(),d=dt.getDate(),want=Date.UTC(y,mo,d,hh,mm);let g=want;
@@ -3070,7 +3100,7 @@ async function notifSync(){const c=nCfg(),pl=NP();
   const plan=notifPlan(c);NLAST=plan;ccBridgeSoon(200);
   if(pl){if(!(await nPerm()))return;
    try{await pl.createChannel({id:'ccal',name:'Calendar reminders',description:'Candle lighting, Omer, fasts and special days',importance:3,visibility:1})}catch(e){}
-   if(plan.length)await pl.schedule({notifications:plan.map(n=>({id:nid(n.id),title:n.th.title,body:n.text,group:n.th.key,smallIcon:'ic_stat',channelId:'ccal',schedule:{at:new Date(n.at),allowWhileIdle:true}}))})}
+   if(plan.length)await pl.schedule({notifications:plan.map(n=>({id:nid(n.id),title:n.th.title,body:n.text,group:n.th.key,smallIcon:'ic_stat',largeIcon:'cc_char'+ccNPose(n.text,n.g),channelId:'ccal',schedule:{at:new Date(n.at),allowWhileIdle:true}}))})}
   else if(pushActive())await pushSync(c);
   else webSchedule(plan)
  }catch(e){}}
@@ -3136,7 +3166,7 @@ function rmOpen(){let b=$('#rmb');
 async function nTest(){const n0=NLAST[0],n=n0?{th:n0.th,title:n0.th.title,body:n0.text}:{title:'Reminders are on',body:'This is how they will look.'},pl=NP();
  if(pl){if(!(await nPerm())){rmStat();return}
   try{await pl.createChannel({id:'ccal',name:'Calendar reminders',importance:3,visibility:1})}catch(e){}
-  await pl.schedule({notifications:[{id:1,title:n.title,body:n.body,smallIcon:'ic_stat',channelId:'ccal',schedule:{at:new Date(Date.now()+2500)}}]})}
+  await pl.schedule({notifications:[{id:1,title:n.title,body:n.body,smallIcon:'ic_stat',largeIcon:'cc_char5',channelId:'ccal',schedule:{at:new Date(Date.now()+2500)}}]})}
  else if(pushActive()){try{const r=await pushPost('/test',{sub:PSUB.toJSON(),title:n.title,body:n.body});if(!r.ok){PERR='The server could not reach your phone.';rmPush()}}catch(e){PERR='Could not reach the server.';rmPush()}}
  else nFire(n0||n)}
 document.addEventListener('click',e=>{if(e.target.closest('#rmOpen')){H.tap();op(false);rmOpen()}});
@@ -3149,7 +3179,41 @@ const AI_PREF_KEY='cc_ai_preferences_v1';
 const aiEl=id=>document.getElementById(id);let aiProposal=null,aiRecognition=null;
 function aiOpen(){aiEl('aiBackdrop').classList.add('on');aiEl('aiBackdrop').setAttribute('aria-hidden','false');setTimeout(()=>aiEl('aiInput').focus(),120)}
 function aiClose(){try{aiCancelReset();aiEl('aiUndo').hidden=true;aiBatchReset()}catch(e){}aiEl('aiBackdrop').classList.remove('on');aiEl('aiBackdrop').setAttribute('aria-hidden','true')}
-aiEl('aiFab').addEventListener('click',aiOpen);aiEl('aiClose').addEventListener('click',aiClose);aiEl('aiBackdrop').addEventListener('click',e=>{if(e.target===aiEl('aiBackdrop'))aiClose()});
+aiEl('aiFab').addEventListener('click',aiOpen);aiEl('aiClose').addEventListener('click',aiClose);
+/* ===== The assistant character, alive (owner, v48) ===== */
+const CCP={idle:1,alert:2,think:3,det:4,happy:5,sad:6,peek:7,read:8,look:9};
+const cchHtml=(p,cls)=>`<span class="cch ${cls||''}" data-p="${CCP[p]||p}" aria-hidden="true"><i class="f"></i><i class="k"></i></span>`;
+const CCH_KF={hop:[[{transform:'translateY(0) scale(1)'},{transform:'translateY(-16%) scale(1.05)',offset:.4},{transform:'translateY(2%) scale(1.03,.96)',offset:.75},{transform:'translateY(0) scale(1)'}],480],
+ tap:[[{transform:'scale(1)'},{transform:'scale(1.05,.95)'},{transform:'scale(1)'}],170],
+ wobble:[[{transform:'rotate(0)'},{transform:'rotate(-7deg)'},{transform:'rotate(6deg)'},{transform:'rotate(-4deg)'},{transform:'rotate(0)'}],900],
+ pop:[[{transform:'scale(.2)',opacity:0},{transform:'scale(1.12)',opacity:1,offset:.6},{transform:'scale(1)'}],460],
+ droop:[[{transform:'translateY(0)'},{transform:'translateY(6%) scale(1,.97)',offset:.5},{transform:'translateY(0)'}],700]};
+/* a live character: blinks and glances by itself; set(pose, ms, anim) shows a pose for a while, setBase() the resting pose */
+function cchLive(el,base){if(!el)return{set(){},setBase(){},anim(){}};const L={el,base:base||'idle',t:0,cur:null},show=p=>{const v=String(CCP[p]||p);if(el.dataset.p!==v)el.dataset.p=v};
+ L.anim=k=>{if(RM||!k||!CCH_KF[k]||!el.animate)return;try{el.getAnimations&&el.getAnimations().forEach(a=>{if(a.id==='cch')a.cancel()});const a=el.animate(CCH_KF[k][0],{duration:CCH_KF[k][1],easing:'ease-out'});a.id='cch'}catch(e){}};
+ L.set=(p,ms,k)=>{clearTimeout(L.t);L.cur=p;show(p);L.anim(k);if(ms)L.t=setTimeout(()=>{L.cur=null;show(L.base)},ms)};
+ L.setBase=p=>{L.base=p;if(!L.cur)show(p)};
+ if(!RM){el.classList.add('live');const tick=()=>{setTimeout(tick,2600+Math.random()*3200);if(L.cur||document.hidden||!el.isConnected||!el.offsetParent)return;
+   const b=L.base;if(b!=='idle'&&b!=='peek'&&b!=='read')return;if(Math.random()<.72){show('read');setTimeout(()=>{if(!L.cur)show(L.base)},150)}else{const g=b==='peek'?'read':Math.random()<.5?'look':'think';show(g);setTimeout(()=>{if(!L.cur)show(L.base)},1100)}};setTimeout(tick,1800)}
+ return L}
+const FABC=cchLive(document.getElementById('fabCh'),'idle'),AIV=cchLive(document.getElementById('aiAv'),'idle');
+/* opening: the sheet grows out of the character button, and the character pops in and says hello */
+aiEl('aiFab').addEventListener('click',()=>{const f=aiEl('aiFab').getBoundingClientRect(),c=document.querySelector('#aiBackdrop .ai-card');
+ AIV.setBase(aiEl('aiInput').value.trim()?'read':'idle');AIV.set('alert',1100,'pop');FABC.set('happy',600);
+ if(RM||!c||!c.animate)return;requestAnimationFrame(()=>{const r=c.getBoundingClientRect();const dx=f.left+f.width/2-(r.left+r.width/2),dy=f.top+f.height/2-(r.top+r.height/2);
+  try{c.animate([{transform:`translate(${dx}px,${dy}px) scale(${(f.width/r.width).toFixed(3)},${(f.height/r.height).toFixed(3)})`,borderRadius:'50%',opacity:.4},{transform:'none',borderRadius:'25px',opacity:1}],{duration:380,easing:'cubic-bezier(.2,.85,.25,1)'})}catch(e){}})});
+/* typing: he peeks over his book and reacts to each key; when you stop he goes back to reading */
+{let kT=0,lastK=0;aiEl('aiInput').addEventListener('input',()=>{const v=aiEl('aiInput').value.trim(),n=performance.now();AIV.setBase(v?'peek':'idle');if(n-lastK>110){lastK=n;AIV.anim('tap')}
+ clearTimeout(kT);kT=setTimeout(()=>AIV.setBase(aiEl('aiInput').value.trim()?'read':'idle'),1500)})}
+/* what he says (the status line) sets his mood */
+{const _ss=aiSetStatus;aiSetStatus=function(t){_ss(t);const x=String(t||'');
+ if(!x)return;if(/^(Understanding|Starting)/.test(x))AIV.set('think',0,'wobble');else if(/^Listening/.test(x))AIV.set('alert',0,'tap');
+ else if(/Sorry|could not|Could not|not added any|needs a valid|nothing was cancelled/i.test(x))AIV.set('sad',3200,'droop');
+ else if(/^(Added|Undone|Removed|Cancelled|Done|Saved|Stopped)|added to your calendar/i.test(x))AIV.set('happy',3200,'hop');
+ else if(/^(Review|Fix|Edit)/.test(x))AIV.set('look',2600);else AIV.set('read',2200)}}
+aiEl('aiPlan').addEventListener('click',()=>{if(aiEl('aiInput').value.trim())AIV.set('think',0,'wobble')},true);
+aiEl('aiYes').addEventListener('click',()=>AIV.set('happy',3000,'hop'));
+aiEl('aiBackdrop').addEventListener('click',e=>{if(e.target===aiEl('aiBackdrop'))aiClose()});
 function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
 /* ===== Updates (STANDING RULE, owner — same rules as the Keep in Touch app): every update bumps CC_VER and adds a CC_LOG entry with a SIZE:
    big:1 = MAJOR (a real new feature that makes a practical difference) → full glass popup ccNewsPopup, version X.0.0
@@ -3158,8 +3222,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=47;
+const CC_VER=48;
 const CC_LOG=[
+ {v:48,big:1,new:['Meet your assistant! The + button is now a little character. Tap him to plan something: he reads along while you type, thinks about your request and cheers when it’s added. He also shows up in your Chitas stats and on your reminders.']},
  {v:47,new:['Daily shiurim now follow the English date by default (they change at midnight). You can switch them to change at sunset in ⋯ → Advanced.']},
  {v:46,mid:1,new:['Encouragement for your Chitas streak: a message on your stats, a little celebration when you finish all four shiurim (confetti on milestones), and friendlier shiurim reminders that cheer you on, warn when a streak is at risk, and welcome you back after a missed day.']},
  {v:45,new:['The silk is a little stronger behind the date by day.']},
@@ -4535,7 +4600,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['reallight','Real light (sunrise/sunset colours on everything)'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll'],['siddur','Siddur button in the dock']];
+ const FLAGS=[['char','The assistant character (instead of the + button)'],['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['reallight','Real light (sunrise/sunset colours on everything)'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll'],['siddur','Siddur button in the dock']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id,,opt]of FLAGS){if(opt)document.documentElement.classList.toggle('tt-on-'+id,f[id]===true);else document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)}};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{const opt=(FLAGS.find(x=>x[0]===c.dataset.f)||[])[2];c.checked=opt?fl()[c.dataset.f]===true:fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
