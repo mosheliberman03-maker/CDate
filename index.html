@@ -3343,26 +3343,35 @@ function cchLive(el,base){if(!el)return{set(){},setBase(){},anim(){},nod(){},dar
  L.setBase=p=>{const was=CCP[L.base]||L.base;L.base=p;if(!L.cur&&(CCP[p]||p)!==was)mood(p)};
  L.blink=()=>{if(RM)return;L.blinkT=now()+130;kick()};
  L.look=(x,y,ms)=>{tween('look',{x,y,r:0,sx:1,sy:1,o:1},280);clearTimeout(L.lt);if(ms)L.lt=setTimeout(()=>tween('look',{x:0,y:0,r:0,sx:1,sy:1,o:1},320),ms)};
- L.sway=()=>{const d=Math.random()<.5?-4:4;fx('sway',[{t:0},{t:.35,r:d},{t:.75,r:-d*.3},{t:1}],1700)};
- L.hat=()=>fx('hatb',[{t:0},{t:.35,y:-16,r:-7},{t:.7,y:2,r:2},{t:1}],800);
+ const VAR=()=>!document.documentElement.classList.contains('tt-off-charlife'),sd=()=>VAR()&&Math.random()<.5?-1:1,rn=(a,b)=>VAR()?a+Math.random()*(b-a):(a+b)/2;
+ L.sway=()=>{const d=sd()*rn(2.5,6),q=VAR()&&Math.random()<.3;fx('sway',q?[{t:0},{t:.2,r:d},{t:.45,r:-d*.8},{t:.7,r:d*.4},{t:1}]:[{t:0},{t:.35,r:d},{t:.75,r:-d*.3},{t:1}],q?2200:rn(1300,2100))};
+ L.hat=()=>{const s=sd(),v=VAR()?Math.random():0;
+  if(v<.55)fx('hatb',[{t:0},{t:.35,y:-16,r:-7*s},{t:.7,y:2,r:2*s},{t:1}],800);                                  // tip (left or right)
+  else if(v<.8)fx('hatb',[{t:0},{t:.3,y:-6,r:-3*s},{t:.6,y:1},{t:1}],560);                                       // small nudge
+  else fx('hatb',[{t:0},{t:.25,y:-28,r:-13*s},{t:.55,y:-28,r:-13*s},{t:.8,y:3,r:2*s},{t:1}],1400)};            // big lift, held
  L.page=()=>fx('page',[{t:0,o:1,y:70},{t:.25,o:1,y:22,sx:.8},{t:.5,o:1,y:14,sx:.02},{t:.75,o:1,y:22,sx:-.8},{t:1,o:1,y:70,sx:-1}],1000);
  L.breathe=()=>fx('root',[{t:0},{t:.5,sx:1.012,sy:1.03},{t:1}],2200);
  L.nod=()=>fx('sway',[{t:0},{t:.5,y:5,r:1},{t:1}],220);
  let dx=-9;L.dart=()=>{dx=dx>=9?-9:dx+3;L.look(dx,4)};
  /* v70 moves (owner's picks) */
- L.breathe=()=>{fx('book',[{t:0},{t:.5,sy:1.025,sx:1.008},{t:1}],2600);fx('head',[{t:0},{t:.5,y:-3},{t:1}],2600)};       // breathing with the book
+ L.breathe=()=>{const a=rn(.6,1.5),d=rn(2000,3400);fx('book',[{t:0},{t:.5,sy:1+.025*a,sx:1+.008*a},{t:1}],d);fx('head',[{t:0},{t:.5,y:-3*a},{t:1}],d)};       // breathing with the book
  L.blink2=()=>{if(RM)return;L.blinkT=now()+120;kick();setTimeout(()=>{L.blinkT=now()+110;kick()},230)};               // double blink
- L.hatfix=()=>fx('hatb',[{t:0},{t:.3,y:-12,r:9},{t:.55,y:-12,r:-4},{t:.8,y:2,r:1},{t:1}],1300);                          // hat adjust
+ L.hatfix=()=>{const s=sd();fx('hatb',[{t:0},{t:.3,y:-12,r:9*s},{t:.55,y:-12,r:-4*s},{t:.8,y:2,r:s},{t:1}],rn(1100,1500))};                          // hat adjust
  L.readln=()=>fx('look',[{t:0,x:-9,y:-6},{t:.22,x:9,y:-6},{t:.26,x:-9,y:0},{t:.48,x:9,y:0},{t:.52,x:-9,y:6},{t:.74,x:9,y:6},{t:.86,x:0,y:-8},{t:1}],3400); // reading line by line
- L.stretch=()=>{fx('root',[{t:0},{t:.3,sy:1.12,sx:.94,y:-6},{t:.62,sy:1.12,sx:.94,y:-6},{t:.8,sy:.96,sx:1.03},{t:1}],2300);  // stretch; eyes squint from below
+ L.stretch=()=>{const s=VAR()&&Math.random()<.6?sd()*rn(3,6):0;fx('root',[{t:0},{t:.3,sy:1.12,sx:.94,y:-6,r:s},{t:.62,sy:1.12,sx:.94,y:-6,r:s},{t:.8,sy:.96,sx:1.03,r:-s*.3},{t:1}],2300);  // straight up, or leaning to one side  // stretch; eyes squint from below
   ['eL','eR'].forEach(k=>fx(k,[{t:0},{t:.3,sy:.62,y:-11},{t:.62,sy:.62,y:-11},{t:.82},{t:1}],2300));fx('hatb',[{t:0},{t:.35,y:-8},{t:.65,y:-8},{t:.85,y:3},{t:1}],2300)};
- L.surprise=()=>{L.set('alert',650,'hop');L.hat();setTimeout(()=>{if(L.cur==='alert')L.set('happy',1200)},650)};          // tap him
- L.dizzy=()=>{L.set('dizzy',2400);fx('sway',[{t:0},{t:.2,r:-7},{t:.4,r:6},{t:.6,r:-5},{t:.8,r:4},{t:1}],2400)};          // 3 quick taps
- L.clap=()=>{fx('book',[{t:0},{t:.2,sx:.18},{t:.4,sx:1},{t:.6,sx:.18},{t:.8,sx:1},{t:1}],760);L.set('happy',1500,'hop')};     // shiur done
+ L.surprise=()=>{L.set('alert',650,'hop');L.hat();fx('sway',[{t:0},{t:.35,r:5*sd()},{t:1}],700);setTimeout(()=>{if(L.cur==='alert')L.set('happy',1200)},650)};          // tap him
+ L.dizzy=()=>{L.set('dizzy',2400);{const s=sd();fx('sway',[{t:0},{t:.2,r:-7*s},{t:.4,r:6*s},{t:.6,r:-5*s},{t:.8,r:4*s},{t:1}],2400)}};          // 3 quick taps
+ L.clap=()=>{fx('book',VAR()&&Math.random()<.35?[{t:0},{t:.4,sx:.18},{t:.8,sx:1.05},{t:1}]:[{t:0},{t:.2,sx:.18},{t:.4,sx:1},{t:.6,sx:.18},{t:.8,sx:1},{t:1}],760);L.set('happy',1500,'hop')};     // shiur done
  L.flip=()=>{for(let i=0;i<5;i++)setTimeout(()=>fx('page',[{t:0,o:1,y:60},{t:.3,o:1,y:24,sx:.6},{t:.5,o:1,y:20,sx:.02},{t:.7,o:1,y:24,sx:-.6},{t:1,o:1,y:60,sx:-1}],380),i*170);setTimeout(L.nod,1000)}; // flip through
- L.yawn=()=>{['eL','eR'].forEach(k=>fx(k,[{t:0},{t:.25,sy:.22},{t:.7,sy:.22},{t:1}],2000));fx('head',[{t:0},{t:.3,y:-5,r:-5},{t:.7,y:-5,r:-5},{t:1}],2000);fx('root',[{t:0},{t:.3,sy:1.05,sx:.97},{t:.7,sy:1.05,sx:.97},{t:1}],2000)};
+ L.yawn=()=>{['eL','eR'].forEach(k=>fx(k,[{t:0},{t:.25,sy:.22},{t:.7,sy:.22},{t:1}],2000));{const s=sd();fx('head',[{t:0},{t:.3,y:-5,r:-5*s},{t:.7,y:-5,r:-5*s},{t:1}],2000)}fx('root',[{t:0},{t:.3,sy:1.05,sx:.97},{t:.7,sy:1.05,sx:.97},{t:1}],2000)};
  L.zz=()=>fx('zz',[{t:0,o:0,y:20},{t:.2,o:1},{t:.8,o:.9,y:-28,x:10},{t:1,o:0,y:-40,x:14}],2600);
- L.brace=()=>{if(L.cur!=='brace'){clearTimeout(L.t);L.cur='brace';mood('brace',260)}clearTimeout(L.bt);L.bt=setTimeout(()=>{if(L.cur==='brace'){L.cur=null;mood(L.base,520)}},420)}; // scroll wind
+ L.brace=dir=>{const r=VAR()?(dir<0?-4:4):0;if(L.cur!=='brace'||L.bd!==r){L.bd=r;tween('sway',{x:0,y:0,r,sx:1,sy:1,o:1},300)}if(L.cur!=='brace'){clearTimeout(L.t);L.cur='brace';mood('brace',260)}clearTimeout(L.bt);L.bt=setTimeout(()=>{if(L.cur==='brace'){L.cur=null;L.bd=0;tween('sway',{x:0,y:0,r:0,sx:1,sy:1,o:1},520);mood(L.base,520)}},420)}; // leans with the wind's side (scrolling down / up) // scroll wind
+ L.wink=()=>{const k=Math.random()<.5?'eL':'eR';fx(k,[{t:0},{t:.3,sy:.08},{t:.7,sy:.08},{t:1}],560);fx('head',[{t:0},{t:.4,r:k==='eL'?-3:3},{t:1}],700)}; // wink (either eye)
+ L.slowblink=()=>{if(RM)return;['eL','eR'].forEach(k=>fx(k,[{t:0},{t:.4,sy:.08},{t:.6,sy:.08},{t:1}],620))};  // slow, sleepy-soft blink
+ L.glance=()=>{const s=sd(),up=Math.random()<.35;L.look(s*10,up?-11:rn(-3,4),1500);fx('head',[{t:0},{t:.25,r:4*s},{t:.8,r:4*s},{t:1}],1900);setTimeout(L.blink,1700)}; // look to a side with the head
+ L.tilt=()=>{fx('head',[{t:0},{t:.25,r:10},{t:.78,r:10},{t:1}],2800);fx('eyes',[{t:0},{t:.25,x:-14},{t:.78,x:-14},{t:1}],2800);fx('hat',[{t:0},{t:.25,r:6},{t:.78,r:6},{t:1}],2800)}; // curious tilt to the other side
+ L.hop2=()=>{const h=rn(25,65);fx('root',[{t:0},{t:.38,y:-h,sx:.97,sy:1.05},{t:.72,y:h*.1,sx:1.05,sy:.95},{t:1}],380+h*3)};
  L.wake=()=>{L.sleep=false;L.cur=null;L.set('alert',800,'tap')};
  L.ambient=!!el.closest('.ai-fab');
  /* tap him (anywhere but the + button, which opens the assistant): a surprised bounce; 3 quick taps make him dizzy */
@@ -3374,12 +3383,12 @@ function cchLive(el,base){if(!el)return{set(){},setBase(){},anim(){},nod(){},dar
    const night=document.documentElement.dataset.night==='1',idle=Date.now()-CCH_ACT;
    if(L.sleep&&(idle<45000||off))L.wake();
    // the + button dozes off after 45 s untouched (slow nods); late at night the z's float up
-   if(!off&&L.ambient&&idle>45000){if(!L.sleep){L.sleep=true;clearTimeout(L.t);L.cur='sleepy';mood('sleepy',1400)}fx('sway',[{t:0},{t:.5,y:6,r:-2},{t:1}],2400);if(night&&idle>60000)L.zz();return}
+   if(!off&&L.ambient&&idle>45000){if(!L.sleep){L.sleep=true;L.ss=sd();clearTimeout(L.t);L.cur='sleepy';mood('sleepy',1400)}fx('sway',[{t:0},{t:.5,y:6,r:-3*L.ss},{t:1}],rn(2000,3000));if(night&&idle>60000)L.zz();return}
    if(L.cur)return;
    const m=CCP[L.base]||L.base,A=off?[[3,L.blink],[2,()=>fx('root',[{t:0},{t:.5,sx:1.012,sy:1.03},{t:1}],2200)],[1.4,()=>{L.look((Math.random()-.5)*20,(Math.random()-.5)*10,1300);setTimeout(L.blink,1500)}],[1.1,L.sway],[.8,L.hat],[m==='read'||m==='peek'?1.6:.6,L.page]]:
     [[3,L.blink],[1.2,L.blink2],[2,L.breathe],[1.4,()=>{L.look((Math.random()-.5)*20,(Math.random()-.5)*10,1300);setTimeout(L.blink,1500)}],
     [1.1,L.sway],[.7,L.hat],[.7,L.hatfix],[m==='read'||m==='peek'?1.6:.6,L.page],[.8,L.readln],[.5,L.stretch],[.35,L.flip],
-    [night?.9:0,L.yawn],[sb==='sh'?1.2:0,()=>L.set('content',2400)],[sb==='yt'?1:0,()=>L.set('happy',1200,'hop')]];
+    [night?.9:0,L.yawn],[sb==='sh'?1.2:0,()=>L.set('content',2400)],[sb==='yt'?1:0,()=>{L.set('happy',1200);L.hop2()}],[.6,L.wink],[.6,L.slowblink],[1,L.glance],[.7,L.tilt]];
    let r=Math.random()*A.reduce((a,x)=>a+x[0],0);for(const x of A){if((r-=x[0])<=0){x[1]();break}}};setTimeout(tick,1500)}
  CCH_ALL.push(L);
  return L}
@@ -3390,8 +3399,8 @@ addEventListener('pointerdown',e=>{CCH_ACT=Date.now();if(document.documentElemen
  const r=L.el.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height*.42),d=Math.hypot(dx,dy)||1;if(d<30)continue;L.look(dx/d*10,dy/d*7,1400)}},{passive:true,capture:true});
 addEventListener('keydown',()=>{CCH_ACT=Date.now()},{passive:true});
 /* scrolling fast = wind: he bends down, head and hat forward, eyes squinting */
-{let ly=scrollY,lt=performance.now();addEventListener('scroll',()=>{CCH_ACT=Date.now();const n=performance.now(),v=Math.abs(scrollY-ly)/Math.max(8,n-lt);ly=scrollY;lt=n;
- if(v>1.6&&FABC.brace&&!FABC.sleep&&!document.documentElement.classList.contains('tt-off-charlife'))FABC.brace()},{passive:true})}
+{let ly=scrollY,lt=performance.now();addEventListener('scroll',()=>{CCH_ACT=Date.now();const n=performance.now(),dy=scrollY-ly,v=Math.abs(dy)/Math.max(8,n-lt);ly=scrollY;lt=n;
+ if(v>1.6&&FABC.brace&&!FABC.sleep&&!document.documentElement.classList.contains('tt-off-charlife'))FABC.brace(dy<0?-1:1)},{passive:true})}
 /* finishing a shiur: a happy hop and his book claps shut and open */
 window.ccCharShiur=()=>{try{if(!document.documentElement.classList.contains('tt-off-charlife')&&FABC.clap)setTimeout(FABC.clap,250)}catch(e){}};
 /* opening: the sheet grows out of the character button, and the character pops in and says hello */
@@ -3419,8 +3428,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=70;
+const CC_VER=71;
 const CC_LOG=[
+ {v:71,new:['The assistant’s moves now come in different versions: he tips his hat left or right (or lifts it high), sways and tilts to either side, winks with either eye, blinks slowly, glances around with his head, stretches leaning to a side, and leans the way the wind blows when you scroll up or down.']},
  {v:70,mid:1,new:['The assistant is more alive: he breathes with his book, double-blinks, fixes his hat, reads line by line, stretches, flips through pages, follows your finger with his eyes, gets surprised (or dizzy!) when you tap him, leans into the wind when you scroll fast, cheers when you finish a shiur, dozes off when left alone, yawns at night and is calm and content on Shabbos.']},
  {v:69,new:['The assistant’s eyes are longer ovals everywhere: in the app, the icon and the notification pictures.']},
  {v:68,new:['The assistant button is now just the character standing on a little shadow, without a circle around him.']},
