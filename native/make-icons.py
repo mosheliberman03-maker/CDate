@@ -5,7 +5,7 @@ from PIL import Image
 RES = 'android/app/src/main/res'
 icon = Image.open('assets/icon.png').convert('RGBA')
 splash = Image.open('assets/splash.png').convert('RGBA')
-BG = (10, 11, 16, 255)
+BG = (10, 17, 49, 255)  # navy, like the character icon (v55)
 def fit(src, w, h, scale=1.0, bg=BG):
     out = Image.new('RGBA', (w, h), bg)
     s = min(w, h) * scale
@@ -37,6 +37,6 @@ for root, _, files in os.walk(RES):
     for f in files:
         if f == 'ic_launcher_background.xml':
             p = os.path.join(root, f)
-            open(p, 'w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#0A0B10</color>\n</resources>\n')
+            open(p, 'w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#0A1131</color>\n</resources>\n')
 print('make-icons: redrew', n, 'files')
 if n == 0: sys.exit('make-icons: no icon files found')
