@@ -2451,7 +2451,7 @@ function glassShine(){const H=innerHeight,W=innerWidth,rl=typeof SKL!=='undefine
  const SILK=`uniform float uT,uS;uniform vec3 uF,uE,uL;uniform float uO,uK;uniform vec4 uA[11],uB[11],uC[11];
 vec4 silk(vec2 p,float px){
  vec3 acc=vec3(0.);float aa=0.;vec3 Hv=normalize(uL+vec3(0.,0.,1.));
- for(int i=0;i<11;i++){vec4 A=uA[i],B=uB[i],C=uC[i];if(i>8){C.z*=2.4*(1.-uK);if(C.z<.01)continue;}float x=p.x,t=uT*C.w;
+ for(int i=0;i<11;i++){vec4 A=uA[i],B=uB[i],C=uC[i];if(i>8){C.z*=2.4*(1.-uK);if(C.z<.01)continue;}if(A.x>.5&&A.x<1.15)C.z*=1.+(1.-uK);float x=p.x,t=uT*C.w;
   float a1=A.z*x+A.w+t,a2=B.y*x+1.7*A.w-.6*t;
   float c=A.x-uS*C.y+A.y*sin(a1)+B.x*sin(a2),dc=A.y*A.z*cos(a1)+B.x*B.y*cos(a2);
   float th=B.w*x+C.x+.35*t,ct=cos(th),st=sin(th);
@@ -2493,7 +2493,8 @@ vec4 silk(vec2 p,float px){
   [1.9,.24,2.3,4.7, .05,5.1,.1,2.4, 2.9,.72,.68,.042],
   /* v44 (owner: more silk by day, especially near the top): two extra ribbons high up, by day only (strength ×2.4·(1−uK): day ≈1.3, dusk ≈.5, night 0) */
   [.34,.30,2.2,5.6, .07,4.6,.095,2.7, 1.1,.26,.62,.07],
-  [.98,.26,2.8,.7, .05,5.4,.08,3.6, 3.0,.36,.5,.065]];
+  [.98,.26,2.8,.7, .05,5.4,.08,3.6, 3.0,.36,.62,.065]];
+  /* v45 (owner: stronger where the date is): ribbons resting at heights .5–1.15 (behind the date) get ×(2−uK): day ≈1.55, night 1 */
  const fa=j=>new Float32Array(R.flatMap(r=>r.slice(j*4,j*4+4)));GLS.R=[fa(0),fa(1),fa(2)];
  gl.uniform4fv(U.uA,fa(0));gl.uniform4fv(U.uB,fa(1));gl.uniform4fv(U.uC,fa(2));
  gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
@@ -3082,8 +3083,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=44;
+const CC_VER=45;
 const CC_LOG=[
+ {v:45,new:['The silk is a little stronger behind the date by day.']},
  {v:44,new:['More silk in the day sky, especially near the top, and it waves more as you scroll.']},
  {v:43,new:['Smoother animations everywhere: the logo intro, changing days, menus, the assistant and closing the siddur.']},
  {v:42,adm:1,new:['Admin turns on and off with 5 taps on the version line + the code.']},
