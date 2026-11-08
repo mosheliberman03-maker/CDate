@@ -33,8 +33,20 @@ self.addEventListener('fetch', (e) => {
   const scope = new URL(self.registration.scope);
   const isApp = r.mode === 'navigate' || u.pathname === scope.pathname || u.pathname === scope.pathname + 'index.html';
   const isHy = u.pathname === scope.pathname + 'hayomyom-en.json'; // the English Hayom Yom text: same treatment, so it works offline
+  // Siddur pages (siddur/p/N.webp) never change: once a page was seen it is kept on the phone and answered from there (works offline).
+  if (/\/siddur\/p\/\d+\.webp$/.test(u.pathname) && u.pathname.startsWith(scope.pathname)) {
+    e.respondWith((async () => {
+      const cache = await caches.open('cdate-siddur-v1');
+      const saved = await cache.match(r.url, { ignoreSearch: true });
+      if (saved) return saved;
+      const res = await fetch(r);
+      if (res.ok) e.waitUntil(cache.put(r.url, res.clone()));
+      return res;
+    })());
+    return;
+  }
   // Fonts, the moon picture and icons rarely change: answer from the phone at once (and offline), refresh quietly in the background.
-  if (/\/(fonts|assets)\/|\/icon-\d+\.png$/.test(u.pathname) && u.pathname.startsWith(scope.pathname)) {
+  if (/\/(fonts|assets)\/|\/icon-\d+\.png$|\/siddur\/pages\.json$/.test(u.pathname) && u.pathname.startsWith(scope.pathname)) {
     e.respondWith((async () => {
       const cache = await caches.open(STATIC_CACHE);
       const saved = await cache.match(r.url, { ignoreSearch: true });
