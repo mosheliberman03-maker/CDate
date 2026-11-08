@@ -1093,7 +1093,8 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     try{
       var C=window.AudioContext||window.webkitAudioContext;if(!C)return;
       AC=new C();
-      mst=AC.createGain();mst.gain.value=.5;
+      mst=AC.createGain();mst.gain.value=.27;   // v65 (owner: "more subtle"): everything quieter
+      
       var len=Math.floor(AC.sampleRate*2.4),ir=AC.createBuffer(2,len,AC.sampleRate),ch,d,i;
       for(ch=0;ch<2;ch++){d=ir.getChannelData(ch);for(i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3.4)}
       var cv=AC.createConvolver();cv.buffer=ir;
@@ -1128,7 +1129,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   function tone(type,f0,f1,t,a,p,d,dest){var o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);if(f1)o.frequency.exponentialRampToValueAtTime(f1,t+a+d*.6);env(g,t,a,p,d);o.connect(g);g.connect(dest||mst);o.start(t);o.stop(t+a+d+.05)}
   function pad(t,dur){var lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(300,t);lp.frequency.linearRampToValueAtTime(1600,t+dur*.8);lp.Q.value=.5;lp.connect(mst);
     [[130.81,.07],[196,.055],[329.63,.05],[493.88,.035],[587.33,.03]].forEach(function(n,i){[-4,4].forEach(function(dt){var o=AC.createOscillator(),g=AC.createGain();o.type='sawtooth';o.frequency.value=n[0];o.detune.value=dt;
-      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(n[1]*.5,t+1.2+i*.1);g.gain.setValueAtTime(n[1]*.5,t+dur-1.2);g.gain.linearRampToValueAtTime(0,t+dur);o.connect(g);g.connect(lp);o.start(t);o.stop(t+dur+.1)})})}
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(n[1]*.35,t+1.2+i*.1);g.gain.setValueAtTime(n[1]*.35,t+dur-1.2);g.gain.linearRampToValueAtTime(0,t+dur);o.connect(g);g.connect(lp);o.start(t);o.stop(t+dur+.1)})})}
   function pop(t,lo,hi,v){tone('sine',lo,hi,t,.006,v||.32,.16);tone('triangle',lo*2,hi*2,t,.004,(v||.32)*.25,.08)}
   function tap(t,f,v){tone('sine',f,f*.92,t,.002,v||.16,.09);var s2=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain();s2.buffer=noise();bp.type='bandpass';bp.frequency.value=f*2.2;bp.Q.value=6;env(g,t,.001,(v||.16)*.6,.04);s2.connect(bp);bp.connect(g);g.connect(mst);s2.start(t);s2.stop(t+.08)}
   function whoosh(t,d,f0,f1,v){var s2=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain();s2.buffer=noise();bp.type='bandpass';bp.Q.value=1.4;bp.frequency.setValueAtTime(f0,t);bp.frequency.exponentialRampToValueAtTime(f1,t+d);
@@ -3367,8 +3368,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=64;
+const CC_VER=65;
 const CC_LOG=[
+ {v:65,new:['The opening’s sounds are softer.']},
  {v:64,new:['The jump sound in the opening is now a soft “zip”.']},
  {v:63,new:['The jump sound in the opening is softer.']},
  {v:62,new:['The opening is smoother, with new sound effects.']},
