@@ -2216,14 +2216,25 @@ function skyTrailBuild(frac,kind,W,H){
   const gr=g.createRadialGradient(x,y,0,x,y,sz*4);gr.addColorStop(0,`rgba(235,242,255,${a*.35})`);gr.addColorStop(1,'rgba(235,242,255,0)');g.fillStyle=gr;g.beginPath();g.arc(x,y,sz*4,0,6.2832);g.fill();
   g.fillStyle=`rgba(245,248,255,${a})`;g.beginPath();g.arc(x,y,sz,0,6.2832);g.fill()}
  SKT.key=key;SKT.off=o;return o}
+/* Smoothness (owner, v40: "the opening sun/moon is very glitchy"): this ran every frame of the opening and cleared/redrew the whole
+   canvas even for the sun (nothing to draw) and read the scene's size (a layout) each time. Every redraw re-uploads the canvas while
+   it floats, which stalled frames for whole seconds. Now: size read once per run, an empty canvas is not cleared again, and the
+   moon's trail is drawn ONCE per run and revealed with a clip (no canvas redraws while it moves). */
 function skyTrail(head,final,kind){
- const c=document.getElementById('skyTrailC');if(!c)return;const sc=c.parentNode,W=sc.clientWidth||360,H=sc.clientHeight||140,dpr=skyDpr(),pw=W+SK_PAD*2,ph=H+SK_PAD*2;
- if(c._pw!==pw||c._ph!==ph||c._dpr!==dpr){c.width=Math.round(pw*dpr);c.height=Math.round(ph*dpr);c.style.width=pw+'px';c.style.height=ph+'px';c._pw=pw;c._ph=ph;c._dpr=dpr}
- const g=c.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,c.width,c.height);
- if(kind!=='moon'||!(head>.004)||!(final>.004))return;final=Math.min(1,final);head=Math.min(head,final);
- const off=skyTrailBuild(final,'moon',W,H),px=Math.max(1,Math.min(off.width,Math.ceil(skyPath(head,W,H)[0]*dpr)));g.drawImage(off,0,0,px,off.height,0,0,px,off.height);
+ const c=document.getElementById('skyTrailC');if(!c)return;const sc=c.parentNode;
+ if(!SKYA.run||!c._W){c._W=sc.clientWidth||360;c._H=sc.clientHeight||140}
+ const W=c._W,H=c._H,dpr=skyDpr(),pw=W+SK_PAD*2,ph=H+SK_PAD*2;
+ if(c._pw!==pw||c._ph!==ph||c._dpr!==dpr){c.width=Math.round(pw*dpr);c.height=Math.round(ph*dpr);c.style.width=pw+'px';c.style.height=ph+'px';c._pw=pw;c._ph=ph;c._dpr=dpr;c._sig=null}
+ const none=kind!=='moon'||!(head>.004)||!(final>.004);
+ if(none){if(c._sig!=='0'){c.getContext('2d').clearRect(0,0,c.width,c.height);c._sig='0'}if(c.style.clipPath)c.style.clipPath='';return}
+ final=Math.min(1,final);head=Math.min(head,final);
+ const off=skyTrailBuild(final,'moon',W,H),px=Math.max(1,Math.min(off.width,Math.ceil(skyPath(head,W,H)[0]*dpr))),fk=SKT.key;
+ if(SKYA.run){if(c._sig!=='run'+fk){c._sig='run'+fk;const g=c.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,c.width,c.height);g.drawImage(off,0,0)}
+  c.style.clipPath='inset(0 '+Math.max(0,pw-px/dpr).toFixed(1)+'px 0 0)';return}
+ if(c.style.clipPath)c.style.clipPath='';c._sig='m';
+ const g=c.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,c.width,c.height);g.drawImage(off,0,0,px,off.height,0,0,px,off.height);
  /* clear the dust under the moon itself (its dark side is see-through by day), with a soft edge so the cut never shows */
- const bd=document.getElementById('skyBody'),mr=Math.max(50,(bd&&bd.clientWidth||158)*.478),p=skyPath(head,W,H);g.setTransform(dpr,0,0,dpr,0,0);g.globalCompositeOperation='destination-out';
+ const bd=document.getElementById('skyBody');if(!SKYA.run||!c._mr)c._mr=Math.max(50,(bd&&bd.clientWidth||158)*.478);const mr=c._mr,p=skyPath(head,W,H);g.setTransform(dpr,0,0,dpr,0,0);g.globalCompositeOperation='destination-out';
  const er=g.createRadialGradient(p[0],p[1],mr*.92,p[0],p[1],mr*1.3);er.addColorStop(0,'rgba(0,0,0,1)');er.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=er;g.beginPath();g.arc(p[0],p[1],mr*1.3,0,6.2832);g.fill();g.globalCompositeOperation='source-over';g.setTransform(1,0,0,1,0,0)}
 function skyRedrawTrail(){if(SKYA.run)return;const st=SKY.last;if(!st)return;skyTrail(st.frac,st.frac,st.kind)}
 function skyArcSvg(st){return `<canvas class="sky-trailc" id="skyTrailC" aria-hidden="true"></canvas>`}
@@ -2236,11 +2247,13 @@ function capSync(){const c=document.getElementById('skyCap'),c2=document.getElem
 function skyDomeAim(st){const sc=document.getElementById('skyScene');if(!sc)return;const ss=sc.style,set=(k,v)=>{if(ss.getPropertyValue(k)!==v)ss.setProperty(k,v)};
  /* The dome stays put and never aim-rotates; only the LIGHT on it moves. --lx/--ly are a point on the dome's rim
     beneath the sun/moon (percent of the dome box), --li brighter near the horizon, --lc warm(sun)/cool(moon). */
- const W=sc.offsetWidth||360,D=Math.min(innerWidth*.9,400),R=D/2,cx=W/2;
+ /* v40: during the opening run the scene's size is read once (each read here forced a full layout every other frame) */
+ if(!SKYA.run||!sc._dW){sc._dW=sc.offsetWidth||360;sc._dH=sc.offsetHeight||140;sc._iW=innerWidth}
+ const W=sc._dW,D=Math.min(sc._iW*.9,400),R=D/2,cx=W/2;
  let Xp=50,Yp=3,li=.5,lc='#cfe0ff';
  if(st){const aim=!document.documentElement.classList.contains('tt-off-aim');
   /* the point on the arch nearest the body: along the line from the dome's centre to the sun/moon (kept on the visible top arc) */
-  const Hs=sc.offsetHeight||140,oy=Hs-62+R,bx=st.x/100*W-cx,by=st.y/100*Hs-oy;
+  const Hs=sc._dH,oy=Hs-62+R,bx=st.x/100*W-cx,by=st.y/100*Hs-oy;
   let an=aim?Math.atan2(bx,-by):0;an=Math.max(-1.35,Math.min(1.35,an));
   Xp=50+Math.sin(an)*50;Yp=50-Math.cos(an)*50;
   const low=Math.max(0,Math.min(1,(st.y-6)/52));
@@ -2278,7 +2291,7 @@ function skyWarm(){
  jobs.push(()=>{const sc=document.getElementById('skyScene');if(sc)skyTrailBuild(Math.max(.01,Math.min(1,pl.fin)),pl.mode==='up'||pl.mode==='set'?'sun':'moon',sc.clientWidth||360,sc.clientHeight||140)});
  const next=()=>{const j=jobs.shift();if(!j)return;try{j()}catch(e){}setTimeout(next,40)};setTimeout(next,250)}
 function skyRun(plan,done){
- SKYA.run=true;SKYA.arm=false;const t0=performance.now();let curB=null,cv=null,cg=null,lastKey='',W=360,H=140,fc=0;
+ SKYA.run=true;SKYA.arm=false;SKYA.runDark=undefined;const t0=performance.now();let curB=null,cv=null,cg=null,lastKey='',W=360,H=140,fc=0;
  const ease3=u=>1-Math.pow(1-u,3),inout=u=>u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2;
  const stop=()=>{SKYA.run=false;SKYA.arm=false;const b=document.getElementById('skyBody');
   if(b){const st=skyCompute(Date.now());if(cv&&cv.parentNode)cv.remove();const im=b.querySelector('img');if(im)im.style.visibility='';
@@ -2299,7 +2312,7 @@ function skyRun(plan,done){
    cv=b.querySelector('canvas.skycv');if(!cv){cv=document.createElement('canvas');cv.width=cv.height=ART_N;cv.className='skyimg skycv';cv.style.cssText='position:absolute;left:0;top:0';b.appendChild(cv)}cg=cv.getContext('2d')}
   const fr=Math.min(1,frac),x=skyArcX(frac)/100*W,y=skyArcY(frac)/100*H+dy;
   const key=sun?'s'+artSunKey(alt):'m'+(MOON_PX?'p':'');if(key!==lastKey){lastKey=key;const src=sun?artSunCanvasKey(artSunKey(alt)):artMoonCanvas(Math.min(.999,Math.max(0,st.phase)));if(cv.width!==src.width){cv.width=cv.height=src.width}cg.clearRect(0,0,cv.width,cv.height);cg.drawImage(src,0,0)}
-  b.style.transform=`translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;if((fc&1)===0)skyDomeAim({x:skyArcX(frac),y:skyArcY(frac)});b.style.opacity=Math.max(0,op).toFixed(3);
+  b.style.transform=`translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;if((fc&3)===1)skyDomeAim({x:skyArcX(frac),y:skyArcY(frac)});b.style.opacity=Math.max(0,op).toFixed(3);
   if((fc++)%4===0||u>=1)skyApply({pal,anim:1});
   skyTrail(fr,plan.fin,sun?'sun':'moon');
   const tc=document.getElementById('skyTrailC');if(tc)tc.style.opacity=(plan.mode==='set'||plan.mode==='moonpass')?(1-skySm(.8,1,u)).toFixed(3):'';
@@ -2308,8 +2321,10 @@ function skyRun(plan,done){
 function skyIntroInit(){
  if(!SKY.on||window.CC_QUIET)return;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;if(reduced)return;
  const b=document.getElementById('skyBody');if(!b)return;SKYA.arm=true;b.style.opacity='0';b.classList.add('anim');skyWarm();
- const t00=Date.now(),go=()=>{const ov=document.getElementById('intro');
+ const t00=Date.now();let t1=0;const go=()=>{const ov=document.getElementById('intro');
   if(ov&&Date.now()-t00<40000){setTimeout(go,80);return}
+  /* v40: let the background's first draw (shader start-up, a heavy frame) happen BEFORE the sun/moon starts moving, not in the middle of it */
+  if(!t1)t1=Date.now();if((!GLS.ready||performance.now()-GLS.ready<180)&&Date.now()-t1<1500){setTimeout(go,60);return}
   const pl=skyPlan(Date.now());if(!pl||!document.getElementById('skyBody')){SKYA.arm=false;skyTick();return}skyRun(pl)};
  go()}
 (function(){const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;if(reduce)return;
@@ -2327,7 +2342,10 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)SKYA.hidden
 addEventListener('resize',()=>{skyRedrawTrail()});
 function skyApply(st){
  if(SKYA.run&&!st.anim)return;
- const p=st.pal,r=document.documentElement;if(st.anim){document.getElementById('sky').hidden=false;document.getElementById('skyGrad').style.background=skyBgCss(p);document.getElementById('stars').style.opacity=p.stars.toFixed(2);skyNightAmt(p);const n=performance.now();if(p.dark===SKYA.lastDark&&n-SKYA.rootT<1500)return;SKYA.rootT=n}SKYA.lastDark=p.dark;const nt=skyNightAmt(p),sv=(k,v)=>{if(r.style.getPropertyValue(k)!==v)r.style.setProperty(k,v)},sd=(k,v)=>{if(r.dataset[k]!==v)r.dataset[k]=v};
+ const p=st.pal,r=document.documentElement;if(st.anim){document.getElementById('sky').hidden=false;document.getElementById('skyGrad').style.background=skyBgCss(p);document.getElementById('stars').style.opacity=p.stars.toFixed(2);skyNightAmt(p);
+  /* v40: during the opening run the page itself (theme, night/day flags, colour variables) is restyled only when the sky crosses
+     between light and dark (at most twice per run), not every 1.5 s: each restyle repaints every card and redraws the silk. */
+  if(p.dark===SKYA.runDark)return;SKYA.runDark=p.dark}SKYA.lastDark=p.dark;const nt=skyNightAmt(p),sv=(k,v)=>{if(r.style.getPropertyValue(k)!==v)r.style.setProperty(k,v)},sd=(k,v)=>{if(r.dataset[k]!==v)r.dataset[k]=v};
  {const th=p.dark?'dark':'light';if(r.dataset.theme!==th){r.dataset.theme=th;if(MOON_PX)document.querySelectorAll('img.mimg').forEach(i=>{i.src=artMoonUrl(+i.dataset.f)})}}sv('--bg',nt>.5?'#0b1330':p.mid);sv('--card',nt>.5?'#121a3d':`color-mix(in srgb,${p.dark?'#161a30':'#ffffff'} 90%,${p.mid})`);sd('night',nt>.5?'1':'0');sd('sky',nt>.5?'night':st.alt<9?'dusk':'day');
  skyLightCalc(st);
  /* the silk picks up the warm light around sunrise and sunset */
@@ -2486,7 +2504,7 @@ vec4 silk(vec2 p,float px){
   const y=scrollY||document.documentElement.scrollTop||0;if(y===sc&&!dirty)return true;sc=y;dirty=false;GLS.sc=y;GLS.t=0;
   GLS.ang=-2.25+y/innerHeight*.5;const ca=Math.cos(GLS.ang),sa=Math.sin(GLS.ang);GLS.L=[ca*.76,sa*.76,.65];
   GLS.T=T0+y*.06;gl.uniform2f(U.uR,W,Hh);gl.uniform1f(U.uT,GLS.T);gl.uniform1f(U.uS,0.);gl.uniform3fv(U.uL,GLS.L);
-  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);if(GLS.lens)GLS.lens();const n=performance.now();if(n-lastG>30){lastG=n;glassShine()}else if(!gT)gT=setTimeout(()=>{gT=0;lastG=performance.now();glassShine()},34);return true};
+  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);if(GLS.lens)GLS.lens();GLS.ready=performance.now();const n=performance.now();if(n-lastG>30){lastG=n;glassShine()}else if(!gT)gT=setTimeout(()=>{gT=0;lastG=performance.now();glassShine()},34);return true};
  const loop=now=>{raf=0;if(document.hidden)return;if(document.getElementById('intro')){setTimeout(kick,300);return}
   if(now-lastD<15){raf=requestAnimationFrame(loop);return}lastD=now;if(!draw())raf=requestAnimationFrame(loop)};
  const kick=()=>{if(!raf)raf=requestAnimationFrame(loop)};
@@ -2591,7 +2609,12 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
     if(dep(nx,ny,g)<lim*.7){nx=p.x;ny=p.y;p.vx=p.vy=0}
     if(Math.abs(nx-p.x)+Math.abs(ny-p.y)>.12)mv=true;p.x=nx;p.y=ny}}
   pack();return mv}
- function draw(){if(!ok||!cv.isConnected||R.classList.contains('cc-away'))return;const r=cv.getBoundingClientRect();if(!r.width||r.bottom<0||r.top>innerHeight)return;
+ /* v40: while the opening sun/moon animation runs the letters are not redrawn (each draw of this shader, plus measuring the
+    letters, cost a big part of a frame: the opening stuttered); they draw once as soon as it ends */
+ let dlRunP=0;
+ function draw(){if(!ok||!cv.isConnected||R.classList.contains('cc-away'))return;
+  if(typeof SKYA!=='undefined'&&SKYA.run){if(!dlRunP)dlRunP=setTimeout(function w(){if(SKYA.run){dlRunP=setTimeout(w,150);return}dlRunP=0;draw()},150);return}
+  const r=cv.getBoundingClientRect();if(!r.width||r.bottom<0||r.top>innerHeight)return;
   const st=SKY.last,pal=st&&st.pal,dk=R.dataset.theme==='dark',night=R.dataset.night==='1',lp=typeof skyLightPos==='function'?skyLightPos():[0,0];
   let lx=lp[0]-(r.left+r.width/2),ly=lp[1]-(r.top+r.height/2);const ln=Math.hypot(lx,ly)||1;lx=lx/ln*.95;ly=ly/ln*.95;const ld=[lx+tl[0]*.6,ly-tl[1]*.45];
   const L=typeof SKL!=='undefined'?SKL:null,lc=L?L.col.map(v=>v*(.55+.45*L.I)*(night?.9:1.05)):[1,.95,.82];
@@ -3043,8 +3066,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=39;
+const CC_VER=40;
 const CC_LOG=[
+ {v:40,new:['The opening sun and moon animation is smooth now (it used to stutter).']},
  {v:39,new:['The bottom bar is tidier: Today, Month, Siddur and ⋯ now fit without overlapping.']},
  {v:38,new:['Siddur: swiping right now turns to the next page, like a Hebrew book (left goes back).']},
  {v:37,mid:1,new:['Siddur: one page at a time (swipe up or right for the next page, down or left to go back), a line at the top that grows as you go, and it opens on the tefillah for now. Tapping Shacharis, Mincha or Maariv asks where to start (Korbanos, Hodu, Ashrei…). Hallel, the Omer, no Tachanun, Musaf and the rest now pop up right where they’re needed.']},
