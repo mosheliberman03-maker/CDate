@@ -909,8 +909,10 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
       return (i?'L':'M')+(p[0]+(B[i][0]-p[0])*k).toFixed(2)+' '+(p[1]+(B[i][1]-p[1])*k).toFixed(2);
     }).join(' ');
   }
+  var KP=0;addEventListener('resize',function(){KP=0});
   function K(){
-    var ppu=svg.getBoundingClientRect().width/770/(window.__zk||1);
+    /* v43: measured once (it was a forced layout on every frame of the intro) */
+    var ppu=KP||(KP=svg.getBoundingClientRect().width/770/(window.__zk||1));
     return Math.min(innerWidth,innerHeight)*.86/(385*ppu);
   }
 
@@ -964,12 +966,12 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     af.style.opacity=t>=7.3?1:0;
     af.setAttribute('transform','translate(480 422) scale('+(.611*ag).toFixed(4)+' -'+(.611*ag).toFixed(4)+') translate(-257.5 -289.5)');
     // 8. the Aleph zooms past the screen
-    var zk=Math.exp(Math.log(K()*50)*io(P(t,8.3,10.5)));
+    var zq=io(P(t,8.3,10.5)),zk=zq>0?Math.exp(Math.log(K()*50)*zq):1;
     all.setAttribute('transform','translate(480 422) scale('+zk+') translate(-480 -422)');
     ov.style.background='rgba(10,11,16,'+(1-sm(P(t,9.3,10.3))).toFixed(3)+')';
     all.style.opacity=1-P(t,10.1,10.6);
-    app.style.transformOrigin='50% 40vh';
-    app.style.transform='scale('+(1+.1*(1-sm(P(t,9.4,10.7)))).toFixed(4)+')';
+    if(app.style.transformOrigin!=='50% 40vh'){app.style.transformOrigin='50% 40vh';app.style.willChange='transform'}
+    var asc='scale('+(1+.1*(1-sm(P(t,9.4,10.7)))).toFixed(4)+')';if(app.style.transform!==asc)app.style.transform=asc;
   }
 
   // vibration feedback that follows how hard the animation is moving
@@ -1048,7 +1050,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   var raf=0,t0=0,lastNow=0,done=false;
   function finish(){
     if(done)return;done=true;cancelAnimationFrame(raf);
-    app.style.transform='';app.style.transformOrigin='';
+    app.style.transform='';app.style.transformOrigin='';app.style.willChange='';
     hstop();ov.remove();hl.remove();document.documentElement.classList.remove('cc-boot');
     try{var tc=document.querySelector('meta[name=theme-color]');if(tc)tc.content=getComputedStyle(document.body).backgroundColor}catch(e){}
     setTimeout(function(){try{AC&&AC.close()}catch(e){}},4500);
@@ -2505,12 +2507,12 @@ vec4 silk(vec2 p,float px){
   const y=scrollY||document.documentElement.scrollTop||0;if(y===sc&&!dirty)return true;sc=y;dirty=false;GLS.sc=y;GLS.t=0;
   GLS.ang=-2.25+y/innerHeight*.5;const ca=Math.cos(GLS.ang),sa=Math.sin(GLS.ang);GLS.L=[ca*.76,sa*.76,.65];
   GLS.T=T0+y*.06;gl.uniform2f(U.uR,W,Hh);gl.uniform1f(U.uT,GLS.T);gl.uniform1f(U.uS,0.);gl.uniform3fv(U.uL,GLS.L);
-  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);if(GLS.lens)GLS.lens();GLS.ready=performance.now();const n=performance.now();if(n-lastG>30){lastG=n;glassShine()}else if(!gT)gT=setTimeout(()=>{gT=0;lastG=performance.now();glassShine()},34);return true};
+  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);if(GLS.lens&&!(GLS.scrolling&&((GLS.lf=(GLS.lf||0)+1)&1)))GLS.lens();GLS.ready=performance.now();const n=performance.now();if(n-lastG>30){lastG=n;glassShine()}else if(!gT)gT=setTimeout(()=>{gT=0;lastG=performance.now();glassShine()},34);return true};
  const loop=now=>{raf=0;if(document.hidden)return;if(document.getElementById('intro')){setTimeout(kick,300);return}
   if(now-lastD<15){raf=requestAnimationFrame(loop);return}lastD=now;if(!draw())raf=requestAnimationFrame(loop)};
  const kick=()=>{if(!raf)raf=requestAnimationFrame(loop)};
  const scrollKick=kick;
- let scT0=0;addEventListener('scroll',()=>{GLS.scrolling=true;clearTimeout(scT0);scT0=setTimeout(()=>{GLS.scrolling=false},180);scrollKick()},{passive:true});
+ let scT0=0;addEventListener('scroll',()=>{GLS.scrolling=true;clearTimeout(scT0);scT0=setTimeout(()=>{GLS.scrolling=false;if(GLS.lens)GLS.lens()},180);scrollKick()},{passive:true});
  addEventListener('resize',()=>{colT=-1;dirty=true;kick()},{passive:true});document.addEventListener('visibilitychange',()=>{colT=-1;dirty=true;kick()});
  new MutationObserver(()=>{colT=-1;dirty=true;kick()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-night','data-theme','data-sky','class']});
  GLS.kick=()=>{GLS.szDirty=true;dirty=true;colT=-1;kick()};kick()})();
@@ -2593,7 +2595,11 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
    if(bv<40||!sn)continue;let bx=0,by=0,bd=1e18;sx/=sn;sy/=sn;for(let yy=0;yy<bh;yy+=2)for(let xx=0;xx<bw;xx+=2){const pi=(y0+yy)*W+x0+xx;if(GID[pi]!==gid||DEP[pi]<bv*.8)continue;const dd=(x0+xx-sx)**2+(y0+yy-sy)**2;if(dd<bd){bd=dd;bx=x0+xx;by=y0+yy}}const r0=fs*dpr*.12,P=[];for(let q=0;q<NP;q++){const an=q/NP*6.283;P.push({x:bx+Math.cos(an)*r0,y:by+Math.sin(an)*r0*.7,vx:0,vy:0})}
    BBL[gid]={rx:bx,ry:by,mx:bv,P,r0}}
   gl.bindTexture(gl.TEXTURE_2D,tex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,W,H,0,gl.RGBA,gl.UNSIGNED_BYTE,o);gl.uniform1f(U.uNk,fs*dpr*.09);dlFs=fs;ok=true;
-  const sg=fs*dpr*.15;gl.uniform1f(U.uSg,sg*sg);pack();if(!R.classList.contains('cc-wl'))R.classList.add('cc-wl');draw();kick()}
+  const sg=fs*dpr*.15;gl.uniform1f(U.uSg,sg*sg);
+  /* v43: settle the new bubbles right here (a few dozen cheap physics steps) and draw once, instead of animating ~3.5 s of
+     full redraws after every layout — that ran on each day change, scroll threshold and sheet, and made them stutter */
+  for(let i=0;i<70;i++)if(!sim(.016)&&i>10)break;
+  pack();if(!R.classList.contains('cc-wl'))R.classList.add('cc-wl');draw()}
  function pack(){PB.fill(-1e4);CN.fill(0);for(let g=1;g<=NG;g++){const b=BBL[g];if(!b)continue;let cx=0,cy=0;b.P.forEach((p,q)=>{PB[((g-1)*NP+q)*2]=p.x;PB[((g-1)*NP+q)*2+1]=p.y;cx+=p.x;cy+=p.y});CN[g*2]=cx/NP;CN[g*2+1]=cy/NP}
   gl.uniform4fv(U.uP,PB);gl.uniform2fv(U.uCn,CN)}
  /* the bubble's physics: buoyancy toward the higher side, a soft pull back to its resting place, surface tension keeping it one blob,
@@ -2614,6 +2620,9 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
     letters, cost a big part of a frame: the opening stuttered); they draw once as soon as it ends */
  let dlRunP=0;
  function draw(){if(!ok||!cv.isConnected||R.classList.contains('cc-away'))return;
+  /* v43: while scrolling the letters follow the background at half rate (see the silk's draw), and once the header has faded
+     away they aren't drawn at all (they redraw when it comes back) */
+  if(scrollY>innerHeight*.45)return;
   if(typeof SKYA!=='undefined'&&SKYA.run){if(!dlRunP)dlRunP=setTimeout(function w(){if(SKYA.run){dlRunP=setTimeout(w,150);return}dlRunP=0;draw()},150);return}
   const r=cv.getBoundingClientRect();if(!r.width||r.bottom<0||r.top>innerHeight)return;
   const st=SKY.last,pal=st&&st.pal,dk=R.dataset.theme==='dark',night=R.dataset.night==='1',lp=typeof skyLightPos==='function'?skyLightPos():[0,0];
@@ -2638,7 +2647,10 @@ void main(){vec2 cuv=vec2(gl_FragCoord.x/uCR.x,1.-gl_FragCoord.y/uCR.y);vec4 m=t
  /* iPhone: Safari needs a tap before a website may read the tilt sensor; ask once, on the first tap */
  if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function'){const ask=()=>{removeEventListener('touchend',ask,true);removeEventListener('click',ask,true);try{DeviceOrientationEvent.requestPermission().catch(()=>{})}catch(e){}};addEventListener('touchend',ask,true);addEventListener('click',ask,true)}
  GLS.lens=draw;window.dlLayout=layout;
- new MutationObserver(()=>{layout();draw();if(ok)kick()}).observe(R,{attributes:true,attributeFilter:['class','data-theme','data-night']});
+ /* v43: react only when something that changes the letters changed (not every class on <html>, e.g. cc-away while scrolling),
+    and only redraw once — the bubble animates only when the phone is tilted */
+ let moSig='';new MutationObserver(()=>{const g=[R.classList.contains('tt-off-waterdate'),R.classList.contains('cc-away'),R.dataset.theme,R.dataset.night].join();if(g===moSig)return;moSig=g;
+  if(R.classList.contains('cc-away'))return;layout();draw()}).observe(R,{attributes:true,attributeFilter:['class','data-theme','data-night']});
  layout()})();
 if(SKY.on){const st0=skyCompute(Date.now());SKY.last=st0;SKY.shift=st0.shift;HSH=st0.shift;t0=new Date(st0.ymd[0],st0.ymd[1]-1,st0.ymd[2],12);sel=t0;V=hm1(t0);skyApply(st0)}else skyOff();
 setInterval(skyTick,30000);
@@ -3067,8 +3079,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=42;
+const CC_VER=43;
 const CC_LOG=[
+ {v:43,new:['Smoother animations everywhere: the logo intro, changing days, menus, the assistant and closing the siddur.']},
  {v:42,adm:1,new:['Admin turns on and off with 5 taps on the version line + the code.']},
  {v:41,adm:1,new:['Admin tools page (clock, siddur day tester, animations, feature switches).']},
  {v:40,new:['The opening sun and moon animation is smooth now (it used to stutter).']},
