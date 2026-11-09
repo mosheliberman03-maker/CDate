@@ -993,7 +993,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
 'vec3 aces(vec3 x){return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}',
 'void main(){vec2 uv=(2.*gl_FragCoord.xy-uRes)/uRes.y;',
 ' vec3 ta=vec3(0.,1.1,0.),ro=vec3(.0,3.0,7.3/uZoom);vec3 ww=normalize(ta-ro),uu=normalize(cross(ww,vec3(0.,1.,0.))),vv=cross(uu,ww);',
-' vec3 rd=normalize(uv.x*uu+uv.y*vv+1.6*ww);',
+' vec3 rd=normalize(uv.x*uu+uv.y*vv+1.4*ww);',
 ' vec3 L=normalize(vec3(-.42,.95,.95)),KC=vec3(1.,.93,.84)*2.3*uStage,FL=normalize(vec3(.8,.25,.9)),FC=vec3(.75,.8,1.)*.32*uStage,RL=normalize(vec3(.75,.55,-.7)),RC=vec3(.55,.68,1.)*1.1*uStage;',
 ' float g=length(uv-vec2(0.,.2));vec3 col=mix(vec3(.035,.042,.085),vec3(.004,.005,.012),smoothstep(0.,1.4,g))*(.35+.65*uStage);',
 ' float bx=abs(uv.x+.18*(uv.y-1.2)),bw=.18+.42*clamp(1.2-uv.y,0.,2.4)/2.4;col+=vec3(.75,.8,1.)*.028*uStage*smoothstep(bw,0.,bx)*smoothstep(-1.2,.9,uv.y);',
@@ -3771,8 +3771,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=100;
+const CC_VER=101;
 const CC_LOG=[
+ {v:101,new:['The character in the opening animation is a little smaller.']},
  {v:100,new:['The character in the opening animation is sharper (less pixelated).']},
  {v:99,new:['Opening animation: all the creaks are quieter.']},
  {v:98,new:['Opening animation: no sound when the character turns his head; his blinks make the soft blip instead.']},
