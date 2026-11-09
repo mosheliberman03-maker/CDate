@@ -993,7 +993,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
 'vec3 aces(vec3 x){return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}',
 'void main(){vec2 uv=(2.*gl_FragCoord.xy-uRes)/uRes.y;',
 ' vec3 ta=vec3(0.,1.1,0.),ro=vec3(.0,3.0,7.3/uZoom);vec3 ww=normalize(ta-ro),uu=normalize(cross(ww,vec3(0.,1.,0.))),vv=cross(uu,ww);',
-' vec3 rd=normalize(uv.x*uu+uv.y*vv+2.75*ww);',
+' vec3 rd=normalize(uv.x*uu+uv.y*vv+1.6*ww);',
 ' vec3 L=normalize(vec3(-.42,.95,.95)),KC=vec3(1.,.93,.84)*2.3*uStage,FL=normalize(vec3(.8,.25,.9)),FC=vec3(.75,.8,1.)*.32*uStage,RL=normalize(vec3(.75,.55,-.7)),RC=vec3(.55,.68,1.)*1.1*uStage;',
 ' float g=length(uv-vec2(0.,.2));vec3 col=mix(vec3(.035,.042,.085),vec3(.004,.005,.012),smoothstep(0.,1.4,g))*(.35+.65*uStage);',
 ' float bx=abs(uv.x+.18*(uv.y-1.2)),bw=.18+.42*clamp(1.2-uv.y,0.,2.4)/2.4;col+=vec3(.75,.8,1.)*.028*uStage*smoothstep(bw,0.,bx)*smoothstep(-1.2,.9,uv.y);',
@@ -3726,8 +3726,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=91;
+const CC_VER=92;
 const CC_LOG=[
+ {v:92,new:['The character in the opening animation is smaller.']},
  {v:91,new:['Creating an account now asks you to type the password twice, so you know it’s right.']},
  {v:90,new:['Account saving now says clearly when the server still needs its update.']},
  {v:89,big:1,feature:'Your account is saved',new:['Your account is now saved online: your shiurim and streak, plans, reminders and settings.','Sign in on another phone, or after reinstalling the app, and everything comes back.','If you were already signed in, the app asks for your password once to turn this on.']},
