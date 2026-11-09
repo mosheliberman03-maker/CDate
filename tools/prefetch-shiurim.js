@@ -1,7 +1,8 @@
 /* Nightly (GitHub Actions): save the next days' shiur texts from Sefaria into sefaria/, so the app can read them from
    its own site. Sefaria's Cloudflare protection blocks requests from phones-in-apps and from Cloudflare Workers, but
    answered GitHub's servers. Runs the app's own reader code (rdBuild) in a headless browser, so exactly the texts the
-   reader asks for get saved, under the file names the reader looks for (rdLocal).
+   reader asks for get saved, under the file names the reader looks for (rdLocal). Builds in 'both' mode, so the
+   English translations are saved too (v76).
    Usage: node tools/prefetch-shiurim.js [days ahead, default 8] [--fake samples.json for testing] */
 const {chromium}=require('playwright');const fs=require('fs');const path=require('path');
 const ROOT=path.join(__dirname,'..'),OUT=path.join(ROOT,'sefaria'),days=+(process.argv[2]||8);
@@ -23,7 +24,7 @@ async function getJSON(u){if(FAKE){const k=Object.keys(FAKE).find(x=>decodeURI(x
  await pg.goto('file://'+path.join(ROOT,'index.html'));await pg.waitForFunction(()=>typeof rdBuild==='function');
  const today=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Shanghai'}));
  for(let i=-1;i<=days;i++){const d=new Date(today.getFullYear(),today.getMonth(),today.getDate()+i,12);
-  for(const k of KEYS){const res=await pg.evaluate(async([k,t])=>{try{await rdBuild(k,new Date(t));return 'ok'}catch(e){return 'ERR '+e.message}},[k,+d]);
+  for(const k of KEYS){const res=await pg.evaluate(async([k,t])=>{try{await rdBuild(k,new Date(t),'both');return 'ok'}catch(e){return 'ERR '+e.message}},[k,+d]);
    console.log(d.toISOString().slice(0,10),k,res)}}
  // tidy: day schedules older than 3 days are no longer needed (texts are kept; they repeat in later years)
  const cut=new Date(today.getFullYear(),today.getMonth(),today.getDate()-3);
