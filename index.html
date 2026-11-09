@@ -947,7 +947,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   var P=function(t,a,b){return clamp((t-a)/(b-a))};
   var sm=function(x){return x*x*(3-2*x)};
   if(/[?&]introshot/.test(location.search))window.__INTRO_T=0;
-  var END=8.7,SPEED=1,ov=document.getElementById('intro'),app=document.querySelector('main');
+  var END=9.65,SPEED=1,ov=document.getElementById('intro'),app=document.querySelector('main');
   /* v74 (owner: "the character in the intro should be an actual 3D character, it looks very cheap"): a real 3D render.
      One WebGL fragment shader ray-marches him (signed distance fields): a white vinyl head with glossy painted eyes (decals on
      the sphere, so head turns are real), a felt fedora with a band, an open book with leather covers, a spine and page edges,
@@ -1063,8 +1063,9 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   function bodyY(t){var y=0,x=0,st=0,arc=function(a,b,h){var u=P(t,a,b);if(u<=0||u>=1)return;y-=h*4*u*(1-u);var v=Math.abs(1-2*u);st+=.15*v*Math.min(1,u/.12)*Math.min(1,(1-u)/.12+.35)*h/70}; 
     arc(1.2,1.72,72);arc(4.17,4.72,58);
     // v93 (owner): after the turn two small hops toward that side (hop, pause, hop, pause), then the crouch and the big jump
-    arc(5.1,5.42,26);arc(5.85,6.17,21);x=38*sm(P(t,5.1,5.42))+38*sm(P(t,5.85,6.17));
-    var j=P(t,7.35,7.95);if(j>0){x+=1500*Math.pow(j,1.5);y-=190*Math.sin(Math.PI*Math.min(1,j*.85));st+=.18*Math.min(1,j*3)}
+    // v94 (owner): the small hops are failed tries at jumping off (crouch, push off hard, but only a low short hop), then a long wind-up
+    arc(5.25,5.55,30);arc(6.25,6.57,36);x=45*sm(P(t,5.25,5.55))+45*sm(P(t,6.25,6.57));
+    var j=P(t,8.3,8.9);if(j>0){x+=1500*Math.pow(j,1.5);y-=190*Math.sin(Math.PI*Math.min(1,j*.85));st+=.18*Math.min(1,j*3)}
     return{y:y,x:x,st:st}}
   var FS={t:-1,h:0,hv:0,k:0,kv:0};
   /* follow-through: two damped springs (head, hat) pushed by the body's vertical acceleration */
@@ -1080,19 +1081,19 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     var th=.42*soft(P(t,2.05,2.45))-.84*soft(P(t,2.6,3.05))+.42*soft(P(t,3.15,3.5)),bl=1-.92*bell(t,3.6,3.84);
     // 4. turns toward the right during the second hop; 5. long wind-up with the book shut; 6. jumps off to the side
     var tu=.5-.5*Math.cos(Math.PI*P(t,4.18,4.68));th+=1.5708*tu;
-    var j3=P(t,7.35,7.95),c3=sm(P(t,6.4,7.15))*(1-sm(P(t,7.3,7.4))),cl=c3*(1-sm(P(t,7.35,7.52)));
+    var j3=P(t,8.3,8.9),c3=sm(P(t,6.95,7.75))*(1-sm(P(t,8.2,8.32))),cl=c3*(1-sm(P(t,8.3,8.47))),att=Math.sin(Math.PI*P(t,5.25,5.55))*.35+Math.sin(Math.PI*P(t,6.25,6.57))*.42,trem=sm(P(t,7.5,8.15))*(1-sm(P(t,8.2,8.3)));
     // squash & stretch: anticipation bells + landing springs + stretch from speed; head/hat follow-through springs
-    var sq=.16*bell(t,.93,1.22)+.12*bell(t,3.96,4.17)+.27*c3+land(t,1.72,.13)+land(t,4.72,.12)+.08*bell(t,4.95,5.1)+.07*bell(t,5.7,5.85)+land(t,5.42,.07)+land(t,6.17,.06),st=sY.st,sx=1+sq*.7-st*.45,sy=1-sq+st,F=follow(t,sY);
-    var lean=8*Math.sin(Math.PI*Math.min(1,j3*1.2))+2.5*bell(t,4.15,4.72);
+    var sq=.16*bell(t,.93,1.22)+.12*bell(t,3.96,4.17)+.32*c3+.02*trem*Math.sin(t*47)+land(t,1.72,.13)+land(t,4.72,.12)+.17*bell(t,4.95,5.27)+.2*bell(t,5.92,6.27)+land(t,5.55,.15)+land(t,6.57,.16),st=sY.st,sx=1+sq*.7-st*.45,sy=1-sq+st,F=follow(t,sY);
+    var lean=8*Math.sin(Math.PI*Math.min(1,j3*1.2))+2.5*bell(t,4.15,4.72)+4*bell(t,4.95,5.27)+9*bell(t,5.2,5.6)+5*bell(t,5.92,6.27)+10*bell(t,6.2,6.62)+5*c3*(1-j3);
     var s3=.62/83,wing3=Math.sin(Math.PI*Math.min(1,j3*1.4)),yb=1.2*tu,hl3=Math.sin(Math.PI*P(t,1.5,2.0));
-    return !!G3&&G3.draw({t:t,zoom:1+.06*sm(P(t,0,7.0)),stage:sm(P(t,0,.45)),yawB:yb,bookS:bp,bookY:-46*(1-Math.min(1,bp))*s3,bookA:Math.max(.07,(1.0-.68*tu)*(1-cl)+.07*cl+.85*wing3),blink:bl,
-      rx:jx*s3,ry:-y*s3,lean:-lean*Math.PI/180,sx:1+(sx-1)*.7,sy:1+(sy-1)*.7,headY:-(215*(1-hp)+F.h)*s3,headYaw:th-1.5708*tu,headRoll:-(th*5*(1-tu)+2*Math.sin(th)+F.h*.08)*Math.PI/180,
+    return !!G3&&G3.draw({t:t,zoom:1+.06*sm(P(t,0,8.0)),stage:sm(P(t,0,.45)),yawB:yb,bookS:bp,bookY:-46*(1-Math.min(1,bp))*s3,bookA:Math.max(.07,(1.0-.68*tu)*(1-cl)+.07*cl+.85*wing3+.85*att),blink:bl,
+      rx:(jx+2.6*trem*Math.sin(t*61))*s3,ry:-y*s3,lean:-lean*Math.PI/180,sx:1+(sx-1)*.7,sy:1+(sy-1)*.7,headY:-(215*(1-hp)+F.h)*s3,headYaw:th-1.5708*tu,headRoll:-(th*5*(1-tu)+2*Math.sin(th)+F.h*.08)*Math.PI/180,
       hy:-(F.k-14*hl3)*s3,hr:(F.k*.25+6*hl3+3*Math.sin(th))*Math.PI/180,hx:6*Math.sin(th)*s3})}
   function render(t){
     if(!chRender(t))return false;
-    ov.style.opacity=(1-sm(P(t,8.02,8.5))).toFixed(3);
+    ov.style.opacity=(1-sm(P(t,8.97,9.45))).toFixed(3);
     if(app.style.transformOrigin!=='50% 40vh'){app.style.transformOrigin='50% 40vh';app.style.willChange='transform'}
-    var asc='scale('+(1+.08*(1-sm(P(t,7.9,8.7)))).toFixed(4)+')';if(app.style.transform!==asc)app.style.transform=asc;
+    var asc='scale('+(1+.08*(1-sm(P(t,8.85,9.65)))).toFixed(4)+')';if(app.style.transform!==asc)app.style.transform=asc;
     return true;
   }
 
@@ -1117,7 +1118,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     if(!h1&&t>=.4){h1=true;buzz(false)}
     if(!h2&&t>=1.34){h2=true;buzz(false)}
     if(!h3&&t>=4.7){h3=true;buzz(false)}
-    if(!h4&&t>=7.35){h4=true;buzz(true)}
+    if(!h4&&t>=8.3){h4=true;buzz(true)}
   }
   function hstop(){try{if(navigator.vibrate)navigator.vibrate(0)}catch(e){}}
   // soft synthesized piano: a broken C-major chord that builds with the animation
@@ -1172,7 +1173,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
      slide whistle, very quiet) over a short airy whoosh */
   function finale(t){whoosh(t,.4,500,2000,.08);tone('sine',330,1100,t,.02,.05,.32);tone('triangle',330,1100,t,.02,.012,.3)}
   var SE=[
-    [0,function(t){pad(t,8.8)}],
+    [0,function(t){pad(t,9.8)}],
     [.4,function(t){pop(t,180,520,.34)}],
     [1.2,function(t){whoosh(t,.35,500,1500,.12)}],
     [1.36,function(t){pop(t,320,900,.26)}],
@@ -1181,10 +1182,10 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     [3.62,function(t){tone('sine',560,500,t,.025,.05,.22)}],   // v66 (owner): the blink is a soft, rounded 'blip' (no bright bell)
     [4.17,function(t){whoosh(t,.5,400,1800,.16)}],
     [4.72,function(t){tap(t,470,.18)}],
-    [5.1,function(t){whoosh(t,.28,600,1400,.06)}],[5.42,function(t){tap(t,600,.12)}],
-    [5.85,function(t){whoosh(t,.28,650,1500,.05)}],[6.17,function(t){tap(t,640,.1)}],
-    [6.4,function(t){build(t,.95)}],
-    [7.35,function(t){finale(t)}]
+    [5.25,function(t){whoosh(t,.3,500,1300,.09)}],[5.55,function(t){tap(t,430,.16)}],
+    [6.25,function(t){whoosh(t,.32,520,1400,.1)}],[6.57,function(t){tap(t,420,.17)}],
+    [6.95,function(t){build(t,1.3)}],
+    [8.3,function(t){finale(t)}]
   ],sn=0;
   function sound(t){
     if(!AC||AC.state!=='running')return;
@@ -3730,8 +3731,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=93;
+const CC_VER=94;
 const CC_LOG=[
+ {v:94,new:['Opening animation: the little hops now look like tries at the big jump, and the wind-up before it is longer.']},
  {v:93,new:['In the opening animation the character now takes two little hops before his big jump.']},
  {v:92,new:['The character in the opening animation is smaller.']},
  {v:91,new:['Creating an account now asks you to type the password twice, so you know it’s right.']},
