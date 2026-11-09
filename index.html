@@ -859,7 +859,8 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #sdr .sd-tabs button{flex:none;padding:7px 13px;border-radius:99px;border:1px solid var(--gx-bd,var(--line));background:var(--gx-in,transparent);color:var(--ink);font:500 13px Figtree,system-ui;cursor:pointer}
 #sdr .sd-tabs button[aria-pressed=true]{background:var(--acc,#8c94ef);border-color:var(--acc,#8c94ef);color:#fff}
 #sdr .sd-st{position:relative;flex:1;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
-#sdr .sd-pg{position:absolute;left:0;top:0;background:var(--ink);-webkit-mask:var(--m) center/100% 100% no-repeat;mask:var(--m) center/100% 100% no-repeat;will-change:transform}
+#sdr .sd-pg{position:absolute;left:0;top:0;overflow:hidden;will-change:transform}
+#sdr .sd-pg i{display:block;background:var(--ink);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
 #sdr .sd-pg.an{transition:transform .24s cubic-bezier(.25,.8,.3,1)}
 #sdr .sd-cue{position:absolute;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:3;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-radius:18px;background:var(--gx-sheet,var(--card));border:1px solid color-mix(in srgb,var(--acc,#8c94ef) 55%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(3,6,26,.3);font:500 13.5px/1.35 Figtree,system-ui;transform:translateY(140%);opacity:0;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .2s}
 #sdr .sd-cue.on{transform:none;opacity:1}
@@ -1985,9 +1986,9 @@ const SD_TOC=[['Weekday','Prayers for young children',4],['Weekday','Upon arisin
  ['Life events','Bris Milah',458],['Life events','Pidyon HaBen',460],['Life events','Learning for a mourner · Yahrzeit',461],['Life events','Kaddish D’Rabbanan',465],['Life events','Keil Malei Rachamim',466],
  ['Torah readings','Torah readings for the year',467],['Torah readings','Weekly Torah readings',529],
  ['More','Before Shabbos',564],['More','Letter of the Alter Rebbe',567],['More','Rulings of the Alter Rebbe',570],['More','Verses for people’s names',582],['More','Laws and customs',586],['More','Order of prayers for special days',618]];
-const SD={n:null,i:0,open:false,ins:null,fk:null,cueOff:{},drag:null,W:0,H:0,pw:0,ph:0,busy:false,lastCue:''};
+const SD={n:null,G:null,m:'book',k:0,scr:null,fk:null,fkey:'',ins:null,cueOff:{},drag:null,W:0,H:0,busy:false,lastCue:''};
 const sdK=()=>AK('cc_sd_pos');
-function sdLoad(){if(SD.n)return Promise.resolve();return fetch('siddur/pages.json').then(r=>r.json()).then(j=>{SD.n=j.n})}
+function sdLoad(){if(SD.n&&SD.G)return Promise.resolve();return Promise.all([fetch('siddur/pages.json').then(r=>r.json()),fetch('siddur/gaps.json').then(r=>r.json())]).then(([j,g])=>{SD.n=j.n;SD.G=g.p})}
 const sdIdx=p=>{const n=SD.n;let i=n.findIndex(x=>x>=p);return i<0?n.length-1:i};
 const sdSec=p=>{let s=SD_TOC[0];for(const t of SD_TOC)if(t[2]<=p)s=t;return s};
 const sdYT=d=>{const h=hd(d);return d.getDay()===6||strictYT(h)||(h.k==='Ti'&&h.d===10)};
@@ -1997,49 +1998,144 @@ function sdDays(){const hr=new Date().getHours(),now=Date.now(),d=t0,sk=zAt(d,90
 // each tefillah's pages for today (weekday / Erev Shabbos / Shabbos-Yom Tov), and where it can start
 function sdFlows(){const {day,eve}=sdDays(),yt=sdYT(day),fri=day.getDay()===5,eY=sdYT(eve),eSh=eve.getDay()===6;
  return{sh:yt?{t:'Shacharis',seg:[[5,26],[181,247]],opt:[['Morning blessings',5],['Korbanos',12],['Hodu',181],['Pesukei D’zimra',191],['Shemoneh Esrei',211],['Reading of the Torah',222],['Musaf',234]]}
-   :{t:'Shacharis',seg:[[5,84]],opt:[['Morning blessings',5],['Korbanos',12],['Hodu',27],['Pesukei D’zimra',30],['Shemoneh Esrei',45]]},
+   :{t:'Shacharis',seg:[[5,84]],wk:1,opt:[['Morning blessings',5],['Korbanos',12],['Hodu',27],['Pesukei D’zimra',30],['Shemoneh Esrei',45]]},
   mi:yt?{t:'Mincha',seg:[[250,269]],opt:[['Korbanos',250],['Ashrei',253],['Reading of the Torah',256],['Shemoneh Esrei',260]]}
-   :fri?{t:'Mincha',seg:[[148,151]],opt:[]}:{t:'Mincha',seg:[[99,117]],opt:[['Korbanos',99],['Ashrei',101],['Shemoneh Esrei',103]]},
+   :fri?{t:'Mincha',seg:[[148,151]],opt:[]}:{t:'Mincha',seg:[[99,117]],wk:1,opt:[['Korbanos',99],['Ashrei',101],['Shemoneh Esrei',103]]},
   ma:eSh?{t:'Kabbalas Shabbos',seg:[[154,180]],opt:[['Kabbalas Shabbos',154],['Maariv',161],['Shemoneh Esrei',166],['Kiddush',178]]}
-   :eY?{t:'Maariv',seg:[[161,175]],opt:[]}:{t:'Maariv',seg:[[118,135]],opt:[['Maariv',118],['Shema',120],['Shemoneh Esrei',123]]},
+   :eY?{t:'Maariv',seg:[[161,175]],opt:[]}:{t:'Maariv',seg:[[118,135]],wk:1,opt:[['Maariv',118],['Shema',120],['Shemoneh Esrei',123]]},
   be:{t:'Bentching',seg:[[88,95]],opt:[]},bs:{t:'Shema at bedtime',seg:[[141,147]],opt:[]}}}
 const sdAuto=()=>{const s=sdDays();return s.night?'ma':s.pm?'mi':'sh'};
-const sdInFlow=(f,p)=>f&&f.seg.some(s=>p>=s[0]&&p<=s[1]);
 // Days with no Tachanun (Chabad custom), from the siddur's laws: Rosh Chodesh, all of Nissan, 14 & 18 Iyar, 1–12 Sivan, 9 & 15 Av,
 // Erev Yom Kippur to the end of Tishrei, 19–20 Kislev, Chanukah, 15 Shevat, 14–15 Adar (also Adar I), 12–13 Tammuz
 function sdNoTach(d){const h=hd(d),k=h.k,x=h.d;return x===30||(x===1&&k!=='Ti')||k==='N'||(k==='I'&&(x===14||x===18))||(k==='Si'&&x<=12)||(k==='Av'&&(x===9||x===15))||(k==='Ti'&&x>=9)||(k==='Ki'&&(x===19||x===20||x>=25))||(k==='Te'&&chIdx({h,dt:d})>0)||(k==='Sh'&&x===15)||((k==='A'||k==='AI')&&(x===14||x===15))||(k==='Ta'&&(x===12||x===13))}
-// what today needs, and where in the siddur it pops up (cue cards)
-function sdCues(p){if(!SD.fk)return null;const s=sdDays(),day=SD.fk==='ma'?s.eve:s.day,h=hd(day),ev=infoBase(day).ev,wd=day.getDay(),yt=strictYT(h),shab=wd===6,
-  rc=(h.d===30||h.d===1)&&!(h.k==='Ti'&&h.d===1),ch=chIdx({h,dt:day}),chm=ev.some(e=>/Chol Hamoed/.test(e.t)),pur=ev.some(e=>e.t==='Purim'),fast=ev.some(e=>e.k==='fs')&&!(h.k==='Ti'&&h.d===10)&&!(h.k==='Av'),
-  mevar=ev.some(e=>e.id==='sp-mev'),noT=sdNoTach(day)||yt||chm,hal=rc||ch||chm,C=[],add=(a,b,o)=>{if(p>=a&&p<=b)C.push(o)};
+// what the day needs (the Hebrew day of that tefillah)
+function sdCx(fk){const s=sdDays(),day=fk==='ma'?s.eve:s.day,h=hd(day),ev=infoBase(day).ev,wd=day.getDay(),yt=strictYT(h),
+  rc=(h.d===30||h.d===1)&&!(h.k==='Ti'&&h.d===1),ch=chIdx({h,dt:day}),chm=ev.some(e=>/Chol Hamoed/.test(e.t)),pur=ev.some(e=>e.t==='Purim'),
+  tb=h.k==='Av'&&(h.d===9||(h.d===10&&wd===0)),fast=ev.some(e=>e.k==='fs')&&!(h.k==='Ti'&&h.d===10);
+ return{s,day,h,ev,wd,yt,rc,ch,chm,pur,tb,fast,noT:sdNoTach(day)||yt||chm,mt:wd===1||wd===4,td:h.k==='Ti'&&h.d<=10,
+  ld:h.k==='E'||(h.k==='Av'&&h.d===30)||(h.k==='Ti'&&h.d<=21),mevar:ev.some(e=>e.id==='sp-mev'),om:omerIdx(h),ms:wd===0}}
+/* ===== v87 (owner): the siddur "cut to today". A tefillah is a list of pieces {i:image, a,b: rows} cut out of the page images;
+   paragraphs that don't apply today are cut out and today's additions (Hallel, the Torah reading, Musaf, Sefirah, the Nasi…) are
+   cut in from their own pages. siddur/gaps.json = per page [body top, body bottom, blank line gaps (start,len; len<0 inside a grey box)],
+   so every cut lands on a blank line. Positions below = [book page, % of the page height]. Then the pieces are laid out on screens. ===== */
+function sdY(i,pct){const P=SD.G[i];if(pct==null||pct<=0)return P[0];if(pct>=100)return P[1];const y=pct*18.61,g=P[2];let best=null,bd=29;
+ for(const box of [0,1])for(const mn of [4,1])if(best==null)for(let j=0;j<g.length;j+=2){if((g[j+1]<0)!==!!box||Math.abs(g[j+1])<mn)continue;const c=g[j]+Math.abs(g[j+1])/2,d=Math.abs(c-y);if(d<bd){bd=d;best=c}}
+ return Math.max(P[0],Math.min(P[1],Math.round(best==null?y:best)))}
+function sdR(b0,p0,b1,p1){const i0=sdIdx(b0),i1=sdIdx(b1),o=[];for(let i=i0;i<=i1;i++){const a=i===i0?sdY(i,p0):SD.G[i][0],b=i===i1&&p1!=null?sdY(i,p1):SD.G[i][1];if(b-a>8)o.push({i,a,b})}return o}
+function sdCut(L,b0,p0,b1,p1){const i0=sdIdx(b0),i1=sdIdx(b1),y0=sdY(i0,p0),y1=sdY(i1,p1),o=[];
+ for(const q of L){if(q.x||q.i<i0||q.i>i1){o.push(q);continue}const cs=q.i===i0?y0:-1,ce=q.i===i1?y1:1e9;
+  if(q.a<cs)o.push({...q,b:Math.min(q.b,cs)});if(q.b>ce)o.push({...q,a:Math.max(q.a,ce)})}
+ return o.filter(q=>q.b-q.a>8)}
+function sdIns(L,bp,pct,add){if(!add||!add.length)return L;const i=sdIdx(bp),y=sdY(i,pct),A=add.map(q=>({...q,x:1}));
+ const k=L.findIndex(q=>!q.x&&q.i===i&&q.a<y-8&&q.b>y+8);if(k>=0){const q=L[k];return[...L.slice(0,k),{...q,b:y},...A,{...q,a:y},...L.slice(k+1)]}
+ let j=-1;L.forEach((q,x)=>{if(!q.x&&(q.i<i||(q.i===i&&q.b<=y+8)))j=x});while(j+1<L.length&&L[j+1].x)j++;return[...L.slice(0,j+1),...A,...L.slice(j+1)]}
+// Monday/Thursday reading for each parsha (the weekly readings, pp. 528–563): [page, %, page, %]
+const SD_WK=[[528,13.4,528,59.3],[528,62.9,529,22],[529,26.5,529,78.5],[529,83.3,530,39.3],[530,45.6,531,13.3],[531,18.3,531,90.5],[532,5,532,56.7],[532,61.2,533,10.4],[533,15.8,533,64.7],[533,70.1,534,30.6],[534,35.3,534,78.4],[534,83.1,535,45.1],[535,51.3,536,10.4],[536,15.1,536,66.8],[536,71.5,537,33.6],[537,38.4,537,93.3],[538,5,538,56.7],[538,62.9,539,24.9],[539,29.5,539,72.6],[539,77.3,540,42.2],[540,47.9,540,91.3],[541,4.8,541,65.9],[541,72,542,36.4],[542,41.6,542,93.3],[543,5,543,53.9],[543,60,544,24.8],[544,29.7,544,84.2],[544,89.1,545,48],[545,54.2,546,33.5],[546,38.3,546,81.3],[546,86,547,45.1],[547,51.3,548,10.4],[548,15.1,548,55.2],[548,60,549,19.1],[549,23.8,549,78.4],[549,82.8,550,38.9],[550,43.2,550,95.1],[551,5,551,56.8],[551,61.8,552,30.6],[552,35.9,552,85],[552,90.6,553,42.2],[553,47.2,554,19.1],[554,24.4,555,42.2],[555,46.5,555,95.4],[556,5.2,556,68.7],[556,75.3,557,91.4],[558,5,558,79.9],[558,84.4,559,68.3],[559,72.9,560,30.6],[560,36.8,561,16.2],[561,22.3,562,16.2],[562,20.5,562,84.1],[562,88.7,563,33.6],[563,38.5,563,93.2]];
+const SD_CH=[[490,21.25,490,83.75],[490,86.55,491,36.55],[491,39.3,491,79.55],[491,82.3,492,30.9],[492,34.15,492,74.95],[492,78.25,493,63.25],[493,66.4,494,16.4],[494,19.4,495,59.65]];
+const SD_NASI=[[391,53.6,392,39.7],[392,39.7,392,83.3],[392,83.3,393,34.25],[393,34.25,393,77.7],[393,77.7,394,28.05],[394,28.05,394,72.15],[394,72.15,395,22.35],[395,22.35,395,65.85],[395,65.85,396,16.75],[396,16.75,396,60.3],[396,60.3,397,11.25],[397,11.25,397,55.75],[397,55.75,397,100]];
+// the 49 Omer counts: lines between them, per page (pp. 136–139)
+const SD_OM=[[136,[54.6,60.6,66.7,72.8,78.85,84.9,90.9,97.2]],[137,[4.2,10.25,16.45,22.6,28.75,34.85,41.05,47.15,53.35,59.5,65.65,71.8,77.95,84.1,90.25,96.4]],[138,[4.2,10.25,16.4,22.45,28.55,34.65,40.75,46.85,52.95,59.05,64.9,73.1,79.2,85.3,91.4,98]],[139,[4.2,10.3,16.6,22.75,28.9,35.2,41.6,47.8,53.95,60.3,66.5,72.8,79.5]]];
+function sdOmer(n){for(const[p,b]of SD_OM){if(n<b.length)return sdR(p,b[n-1],p,b[n]);n-=b.length-1}return[]}
+// Song of the Day: heading + today's psalm + Hoshienu
+const SD_SONG=[[71,70.9,72,24.95],[72,27.6,72,74.5],[72,77.1,73,19],[73,22.7,74,11.75],[74,15,74,71.3],[74,75.5,75,12]];
+function sdSong(wd,ho){const d=SD_SONG[Math.min(wd,5)],a=wd===0?sdR(71,67.1,72,24.95):[...sdR(71,67.1,71,70.9),...sdR(d[0],d[1],d[2],d[3])];return ho?[...a,...sdR(75,12,75,34.25)]:a}
+// Hallel; on Chanukah it ends with Half Kaddish and the Torah reading follows, on Rosh Chodesh / Chol Hamoed with the full Kaddish
+const sdHal=c=>[...sdR(307,null,311,null),...(c.rc?sdR(312,8.45,312,20.8):[]),...sdR(312,20.8,312,56.25),...(c.rc||c.chm?sdR(312,60.9,312,86.25):[])];
+const sdRd=r=>r?sdR(r[0],r[1],r[2],r[3]):null;
+function sdWeekly(day){const p=parsha(day);if(!p||!p.p||!p.p[0])return null;const nm=p.p[0][0];let k=PN.findIndex(x=>x[0]===nm);if(nm===VZ[0])k=53;return k>=0?SD_WK[k]:null}
+function sdPieces(fk){const f=sdFlows()[fk];if(!f.wk){let L=f.seg.flatMap(s=>sdR(s[0],null,s[1],null));
+  // Shabbos & Yom Tov: "Hashem Hashem… Ribono shel olam" when the Ark is opened only on a Yom Tov that falls on a weekday (owner)
+  if(fk==='sh'&&f.seg.some(s=>s[0]===181)){const c=sdCx(fk);if(!(c.yt&&c.wd!==6))L=sdCut(L,222,47.65,223,14.3)}return L}const c=sdCx(fk);let L,I=[];const cut=(...a)=>{L=sdCut(L,...a)},ins=(...a)=>I.push(a);
+ const TD=a=>{if(!c.td)for(const r of a)cut(...r)};
+ if(fk==='sh'){L=sdR(5,null,84,null);
+  // Amidah: the Ten Days, Aneinu (fasts), Yaaleh V'yavo (Rosh Chodesh, Chol Hamoed), Al HaNissim (Chanukah, Purim)
+  TD([[46,5.6,46,17.9],[46,72.3,46,81.6],[47,44,47,49],[49,16.4,49,21.4],[52,52.1,52,62.7],[53,29.4,53,45.7],[54,9.3,54,12.6]]);
+  if(!c.fast)cut(48,23.3,48,49.9);if(!(c.rc||c.chm))cut(50,55.7,50,96.5);if(!(c.ch||c.pur))cut(51,73.4,52,43.6);
+  // Tachanun (with the Monday/Thursday additions) or Hallel
+  if(c.noT)cut(54,43.2,60,37.5);else{cut(54,43.2,54,50);cut(56,4.3,56,12.3);if(!(c.mt||c.fast))cut(56,12.3,59,73.55);cut(59,45.6,59,49.65);cut(59,73.55,59,77.6)}
+  const hal=c.rc||c.ch||c.chm,rd=c.mt||c.rc||c.fast||c.ch||c.chm||c.pur;
+  cut(60,74.8,60,78.9);if(!(c.mt&&!c.noT))cut(60,78.9,60,92.5);
+  // the reading of the Torah: only on reading days, with today's reading cut in after the blessing
+  if(!rd){cut(60,74.8,66,14.3);cut(69,76.9,70,18.55)}
+  else{cut(61,12.2,61,16.2);cut(62,84.4,62,100);cut(63,56,63,64.2);cut(64,0,65,61.5);if(!(c.pur||c.tb))cut(66,8.4,66,14.25);
+   const r=c.ch?SD_CH[c.ch-1]:c.rc?[468,13.6,468,74.2]:c.fast&&!c.tb?[468,78.9,469,69.7]:c.mt&&!c.chm&&!c.pur?sdWeekly(c.day):null;if(r)ins(63,37.3,sdRd(r))}
+  if(!c.td)cut(69,65.3,69,68.45);cut(68,87.3,68,91.2);cut(70,18.55,70,27.15);
+  if(c.noT){cut(67,4.5,67,34.1);cut(70,27.15,70,92)}
+  // Song of the Day (today's only), Borchi Nafshi (Rosh Chodesh), L'Dovid (Elul to Hoshana Rabbah)
+  cut(71,67.1,75,12);cut(75,34.25,75,41.15);if(!c.rc)cut(75,41.15,76,37.2);if(!c.ld)cut(76,37.2,76,93.4);cut(77,75.3,77,100);
+  if(c.rc||c.chm){// Rosh Chodesh / Chol Hamoed: after Hallel the Song of the Day … Kaddish, then the Torah reading; Musaf after the Torah returns
+   const tail=[...sdR(71,null,71,67.1),...sdSong(c.wd,1),...(c.rc?sdR(75,41.15,76,37.2):[]),...(c.ld?sdR(76,37.2,76,93.4):[]),...sdR(77,null,77,75.3)];
+   cut(71,0,77,75.3);cut(60,37.5,60,74.8);ins(54,43.2,[...sdHal(c),...tail]);ins(70,18.55,[...(c.rc?sdR(313,null,318,null):sdR(339,null,350,71.85)),...sdR(312,20.8,312,56.25),...sdR(312,60.9,312,86.25)])}
+  else{if(hal){ins(54,43.2,sdHal(c));cut(60,37.5,60,74.8)}ins(71,67.1,sdSong(c.wd))}
+  // the Nasi (1–13 Nissan) at the end
+  if(c.h.k==='N'&&c.h.d<=13){const n=SD_NASI[c.h.d-1];L.push(...sdRd(n).map(q=>({...q,x:1})))}}
+ if(fk==='mi'){L=sdR(99,null,117,null);
+  TD([[103,47.1,103,58.6],[104,13,104,22],[104,69.1,104,74.2],[106,50,106,54.9],[110,52.1,110,62.7],[111,27.1,111,43.2],[112,9.3,112,12.6],[115,24.3,115,27.45]]);
+  if(!c.fast){cut(105,53.6,105,80.7);cut(108,19.3,108,39.4);cut(110,77,110,94.7)}if(!c.tb){cut(107,38.5,107,40.35);cut(107,45.25,107,80.15)}
+  if(!(c.rc||c.chm))cut(108,62,108,96.3);if(!(c.ch||c.pur))cut(109,73.4,110,43.5);
+  if(c.noT)cut(112,42.7,114,51.75);else cut(112,42.7,112,48.4);
+  if(!c.ld)cut(115,35.85,115,92.2);if(!c.ch)cut(116,4.3,116,8)}
+ if(fk==='ma'){L=sdR(118,null,135,null);
+  TD([[124,5.6,124,17.9],[124,67.6,124,76.9],[124,85.2,124,90.2],[126,50.3,126,55.4],[129,77.6,129,86.1],[130,35.6,130,50.7],[131,8.9,131,12.2],[134,10,134,13.2],[135,61.7,135,64.85]]);
+  if(!c.ms)cut(125,9.3,125,32.4);if(!(c.rc||c.chm))cut(128,5.6,128,49.5);if(!(c.ch||c.pur))cut(129,5.4,129,70);
+  cut(131,29.8,c.ms?131:133,c.ms?31.85:40.4);if(!c.pur)cut(134,19.9,134,24.45);cut(134,24.45,134,26.5);
+  if(c.om)ins(134,26.5,[...sdR(136,44.05,136,52.2),...sdOmer(c.om),...sdR(139,79.5,140,92.75)])}
+ for(const a of I)L=sdIns(L,...a);return L}
+// lay the pieces out on screens (split only on blank lines)
+const sdBlank=q=>{const g=SD.G[q.i][2];for(let j=0;j<g.length;j+=2)if(g[j]<=q.a+2&&g[j]+Math.abs(g[j+1])>=q.b-2)return true;return q.b>=SD.G[q.i][1]&&q.a>=SD.G[q.i][1]-30};
+function sdLay(L0){const cap=SD.cap,sp=14,S=[],L=[];let cur=[],used=0;
+ for(const q of L0){const p=L[L.length-1];if(p&&p.i===q.i&&Math.abs(p.b-q.a)<=2)p.b=q.b;else L.push({...q})}
+ for(let q of L){if(sdBlank(q))continue;q={...q};while(q){const h=q.b-q.a,rem=cap-used-(cur.length?sp:0);
+   if(h<=rem){cur.push(q);used+=h+(cur.length>1?sp:0);q=null;break}
+   const g=SD.G[q.i][2];let y=null;for(let j=0;j<g.length;j+=2){const c=g[j]+Math.abs(g[j+1])/2;if(c>q.a+60&&c<=q.a+rem&&c<q.b-30)y=c}
+   if(y==null&&cur.length&&rem<cap*.6){S.push(cur);cur=[];used=0;continue}
+   if(y==null)y=q.a+Math.max(60,rem);y=Math.round(y);cur.push({...q,b:y});S.push(cur);cur=[];used=0;q={...q,a:y}}}
+ if(cur.length)S.push(cur);return S}
+function sdGeo(){const st=$('#sdSt'),W=st.clientWidth,H2=st.clientHeight;SD.W=W;SD.H=H2;SD.fw=Math.min(W-8,H2*.72);SD.cap=Math.floor((H2-10)*1077/SD.fw);
+ SD.bw=Math.min(W-6,(H2-6)*1077/1861)}
+function sdFlowSet(fk){const key=fk+'|'+ds(sdCx(fk).day)+'|'+SD.cap;if(SD.fkey!==key||!SD.scr){SD.scr=sdLay(sdPieces(fk));SD.fkey=key}SD.fk=fk}
+const sdScr=t=>t.m==='flow'?SD.scr[t.k]||[]:[{i:t.k,a:0,b:1861}];
+const sdPg=t=>{const s=sdScr(t);return s.length?SD.n[s[0].i]:0};
+const sdPgs=t=>[...new Set(sdScr(t).map(q=>SD.n[q.i]))];
+// where a book page is: in the open tefillah if it is there, else the book
+function sdAt(p){if(SD.scr&&SD.fk){const k=SD.scr.findIndex(s=>s.some(q=>SD.n[q.i]>=p));if(k>=0&&SD.scr[k].some(q=>SD.n[q.i]===p||SD.n[q.i]>p))return{m:'flow',k}}return{m:'book',k:sdIdx(p)}}
+function sdPaint(el,t){const fl=t.m==='flow',w=fl?SD.fw:SD.bw,s=w/1077,P=sdScr(t),tot=P.reduce((a,q)=>a+(q.b-q.a)*s,0)+(fl?(P.length-1)*14*s:0);
+ el.style.width=w+'px';el.style.height=SD.H+'px';el.style.left=(SD.W-w)/2+'px';el.style.top='0px';
+ el.innerHTML=P.map((q,j)=>{const u='url(siddur/p/'+(q.i+1)+'.webp)',ms=w+'px '+(1861*s)+'px',mp='0 '+(-q.a*s)+'px';
+  return`<i style="height:${((q.b-q.a)*s).toFixed(1)}px;margin-top:${j?(14*s).toFixed(1):fl?5:Math.max(0,(SD.H-tot)/2).toFixed(1)}px;-webkit-mask-image:${u};mask-image:${u};-webkit-mask-size:${ms};mask-size:${ms};-webkit-mask-position:${mp};mask-position:${mp}"></i>`}).join('')}
+const SD_PRE=new Map();function sdPre(t){if(!t)return;for(const q of sdScr(t)){const i=q.i;if(SD_PRE.has(i))continue;const im=new Image();im.src='siddur/p/'+(i+1)+'.webp';SD_PRE.set(i,im);if(SD_PRE.size>18){const k=SD_PRE.keys().next().value;SD_PRE.delete(k)}}}
+const sdCur=()=>({m:SD.m,k:SD.k});
+// next/previous screen: inside an insert, at its end go back; in a tefillah the next screen (after its end, the book goes on); else the book order
+function sdStep(dir){const t=sdCur();
+ if(SD.ins&&t.m==='book'){if(dir>0&&t.k>=SD.ins.end)return{...SD.ins.ret,back:true};if(dir<0&&t.k<=SD.ins.go)return{...SD.ins.ret0,back:true}}
+ if(t.m==='flow'){const k=t.k+dir;if(k>=0&&k<SD.scr.length)return{m:'flow',k};if(dir>0){const s=SD.scr[t.k],q=s[s.length-1];return q.i+1<SD.n.length?{m:'book',k:q.i+1}:null}return null}
+ const j=t.k+dir;return j>=0&&j<SD.n.length?{m:'book',k:j}:null}
+function sdShow(t,quiet){SD.m=t.m;SD.k=t.k;const A=$('#sdA');sdPaint(A,t);A.style.transform='';A.classList.remove('an');
+ sdPre(sdStep(1));sdPre(sdStep(-1));
+ if(!quiet){const q=sdScr(t)[0]||{i:0,a:0};try{localStorage.setItem(sdK(),JSON.stringify({m:t.m,i:q.i,a:q.a,fk:SD.fk,at:Date.now()}))}catch(e){}}
+ sdHead()}
+function sdHead(){const t=sdCur(),p=sdPg(t),s=sdSec(p),fl=sdFlows(),f=SD.fk&&fl[SD.fk];let prog=0,ttl=s[1];
+ if(t.m==='flow'){prog=t.k/Math.max(1,SD.scr.length-1);ttl=f.t}
+ else if(SD.ins)prog=(t.k-SD.ins.go)/Math.max(1,SD.ins.end-SD.ins.go);
+ else{const k=SD_TOC.indexOf(s),nx=SD_TOC.slice(k+1).find(x=>x[2]>s[2]),e=nx?nx[2]-1:SD.n[SD.n.length-1];prog=(p-s[2])/Math.max(1,e-s[2])}
+ $('#sdT').textContent=ttl;$('#sdS').textContent=(ttl===s[1]?'':s[1]+' · ')+'Page '+p;$('#sdBar').style.width=(Math.max(0,Math.min(1,prog))*100).toFixed(1)+'%';
+ $('#sdTabs').querySelectorAll('[data-f]').forEach(b=>b.setAttribute('aria-pressed',String(t.m==='flow'&&b.dataset.f===SD.fk)));
+ sdCueShow(sdPgs(t))}
+// cue cards: what the cut-to-today siddur can't do by itself (Shabbos & Yom Tov additions, Havdalah, the Megillah, Chol Hamoed readings)
+function sdCues(P){if(!SD.fk)return null;const c=sdCx(SD.fk),{h,s,rc,ch,chm,pur,yt,mevar}=c,shab=c.wd===6,C=[],add=(a,b,o)=>{if(P.some(p=>p>=a&&p<=b))C.push(o)};
  if(SD.fk==='sh'){
-  if(!sdYT(day)){
-   if(hal)add(54,54,{t:'<b>'+(ch?'Chanukah':chm?'Chol Hamoed':'Rosh Chodesh')+'</b> · no Tachanun. Say '+(ch||(chm&&h.k==='Ti')?'the full':'half')+' Hallel now.',b:'Hallel',go:307,end:312,ret:ch?61:71});
-   else if(fast)add(54,54,{t:'<b>Fast day</b> · Avinu Malkeinu after the Amidah.',b:'Avinu Malkeinu',go:454,end:456,ret:54});
-   else if(noT)add(54,54,{t:'<b>No Tachanun today.</b> Continue with Half Kaddish (p. 60).',b:'Skip',go:60});
-   if(!(wd===1||wd===4||rc||fast||ch||chm||pur))add(60,60,{t:'<b>No Torah reading today.</b> Continue with Ashrei (p. 66).',b:'Ashrei',go:66});
-   if(rc)add(76,77,{t:'<b>Rosh Chodesh</b> · now the reading of the Torah (the Rosh Chodesh section is on p. 468).',b:'Torah',go:61});
-   if(rc||fast)add(61,65,{t:'<b>'+(rc?'Rosh Chodesh':'Fast day')+'</b> · today’s Torah reading.',b:'Reading',go:468,end:468,ret:null});
-   if(ch&&!rc)add(61,65,{t:'<b>Chanukah</b> · today’s Torah reading.',b:'Reading',go:490,end:495,ret:null});
-   if(rc||chm)add(70,70,{t:'<b>'+(rc?'Rosh Chodesh':'Chol Hamoed')+'</b> · Musaf now.',b:'Musaf',go:rc?313:339,end:rc?318:350,ret:77});
-   if(rc||chm)add(45,53,{t:'<b>'+(rc?'Rosh Chodesh':'Chol Hamoed')+'</b> · add Yaaleh V’yavo.'});
-   if(ch||pur)add(45,53,{t:'<b>'+(ch?'Chanukah':'Purim')+'</b> · add Al HaNissim.'});
-  }else{
+  if(!sdYT(c.day)){if(chm||pur||c.tb)add(61,63,{t:'<b>'+(chm?'Chol Hamoed':pur?'Purim':'Tisha B’Av')+'</b> · today’s Torah reading is in the readings for the year.',b:'Readings',go:467})}
+  else{
    if(yt)add(211,211,{t:'<b>Yom Tov</b> · say the Amidah for Yom Tov.',b:'Amidah',go:332,end:336,ret:217});
    if(yt||rc||ch||chm)add(217,218,{t:'<b>'+(yt?'Yom Tov':ch?'Chanukah':chm?'Chol Hamoed':'Rosh Chodesh')+'</b> · Hallel now.',b:'Hallel',go:307,end:312,ret:yt?222:218});
    if(mevar)add(230,231,{t:'<b>Shabbos Mevarchim</b> · bless the new month.',b:'Go',go:231});
    if(rc&&shab&&!yt)add(233,234,{t:'<b>Shabbos Rosh Chodesh</b> · say this Musaf instead.',b:'Musaf',go:319,end:326,ret:245});
    if(yt||chm)add(233,234,{t:'<b>'+(yt?'Yom Tov':'Chol Hamoed')+'</b> · Musaf for Yom Tov.',b:'Musaf',go:339,end:350,ret:245});
   }}
- if(SD.fk==='mi'){if(noT&&!sdYT(day))add(112,114,{t:'<b>No Tachanun today.</b>',b:'Skip',go:115});
-  if(fast)add(103,108,{t:'<b>Fast day</b> · add Aneinu.'});
-  if(rc||chm)add(103,111,{t:'<b>'+(rc?'Rosh Chodesh':'Chol Hamoed')+'</b> · add Yaaleh V’yavo.'});if(ch||pur)add(103,111,{t:'<b>'+(ch?'Chanukah':'Purim')+'</b> · add Al HaNissim.'})}
- if(SD.fk==='ma'){const om=omerIdx(h);if(om)add(133,134,{t:'<b>Count the Omer</b> · tonight is day '+om+'.',b:'Omer',go:136,end:140,ret:null});
-  if(pur)add(133,134,{t:'<b>Purim</b> · the Megillah after the Amidah.',b:'Megillah',go:390,end:390,ret:null});
-  if(s.day.getDay()===6&&s.night)add(133,135,{t:'<b>Motzei Shabbos</b> · Havdalah.',b:'Havdalah',go:296,end:299,ret:null});
-  if(rc||chm)add(123,131,{t:'<b>'+(rc?'Rosh Chodesh':'Chol Hamoed')+'</b> · add Yaaleh V’yavo.'});if(ch||pur)add(123,131,{t:'<b>'+(ch?'Chanukah':'Purim')+'</b> · add Al HaNissim.'})}
+ if(SD.fk==='ma'){if(c.om&&!sdFlows().ma.wk)add(161,175,{t:'<b>Count the Omer</b> · tonight is day '+c.om+'.',b:'Omer',go:136,end:140,ret:null});if(pur)add(133,134,{t:'<b>Purim</b> · the Megillah after the Amidah.',b:'Megillah',go:390,end:390,ret:null});
+  if(s.day.getDay()===6&&s.night)add(133,135,{t:'<b>Motzei Shabbos</b> · Havdalah.',b:'Havdalah',go:296,end:299,ret:null})}
  if(SD.fk==='be'){if(rc||chm)add(88,95,{t:'<b>'+(rc?'Rosh Chodesh':'Chol Hamoed')+'</b> · add Yaaleh V’yavo.'});if(ch||pur)add(88,95,{t:'<b>'+(ch?'Chanukah':'Purim')+'</b> · add Al HaNissim.'})}
- return C.find(c=>!SD.cueOff[c.t])||null}
+ return C.find(x=>!SD.cueOff[x.t])||null}
 function sdBuild(){let b=$('#sdr');if(b)return b;b=document.createElement('div');b.id='sdr';b.setAttribute('role','dialog');b.setAttribute('aria-label','Siddur');
  b.innerHTML='<div class="sd-top"><button type="button" class="sd-x" aria-label="Back">‹</button><div class="sd-tt"><b id="sdT">Siddur</b><small id="sdS"></small></div><button type="button" class="sd-m" aria-label="Contents">☰</button></div>'+
   '<div class="sd-bar"><i id="sdBar"></i></div><div class="sd-tabs" id="sdTabs"></div><div class="sd-st" id="sdSt"><div class="sd-pg" id="sdA"></div><div class="sd-pg" id="sdB" style="visibility:hidden"></div>'+
@@ -2049,69 +2145,48 @@ function sdBuild(){let b=$('#sdr');if(b)return b;b=document.createElement('div')
  b.querySelector('.sd-x').onclick=()=>{H.tap();history.back()};
  b.querySelector('.sd-m').onclick=()=>{H.tap();sdToc()};
  b.addEventListener('click',e=>{const sh=e.target.closest('.sd-sheet');if(sh&&e.target===sh){sdSheet(false);return}
-  const o=e.target.closest('[data-p]');if(o&&sh){H.sel();sdSheet(false);if(o.dataset.f)SD.fk=o.dataset.f;SD.ins=null;sdShow(sdIdx(+o.dataset.p));return}
+  const o=e.target.closest('[data-p]');if(o&&sh){H.sel();sdSheet(false);SD.ins=null;if(o.dataset.f){sdFlowSet(o.dataset.f);sdShow(sdAt(+o.dataset.p))}else sdShow({m:'book',k:sdIdx(+o.dataset.p)});return}
   const t=e.target.closest('#sdTabs [data-f]');if(t){H.tap();sdPick(t.dataset.f)}});
  const st=b.querySelector('#sdSt');st.addEventListener('pointerdown',sdDown);st.addEventListener('pointermove',sdMove);st.addEventListener('pointerup',sdUp);st.addEventListener('pointercancel',sdUp);
- addEventListener('resize',()=>{if(SD.open){sdSize();sdShow(SD.i,true)}});
+ addEventListener('resize',()=>{if(!SD.open||!SD.G)return;const q=sdScr(sdCur())[0];sdGeo();if(SD.m==='flow'&&SD.fk){SD.fkey='';sdFlowSet(SD.fk);const k=q?SD.scr.findIndex(s=>s.some(x=>x.i===q.i&&x.b>q.a)):0;sdShow({m:'flow',k:Math.max(0,k)},true)}else sdShow(sdCur(),true)});
  return b}
-function sdSize(){const st=$('#sdSt'),W=st.clientWidth,H2=st.clientHeight;SD.W=W;SD.H=H2;SD.pw=Math.min(W-6,(H2-6)*1077/1861);SD.ph=SD.pw*1861/1077;
- for(const el of [$('#sdA'),$('#sdB')]){el.style.width=SD.pw+'px';el.style.height=SD.ph+'px';el.style.left=(W-SD.pw)/2+'px';el.style.top=Math.max(0,(H2-SD.ph)/2)+'px'}}
-const sdUrl=i=>'url(siddur/p/'+(i+1)+'.webp)';
-const SD_PRE=new Map();function sdPre(i){if(i<0||!SD.n||i>=SD.n.length||SD_PRE.has(i))return;const im=new Image();im.src='siddur/p/'+(i+1)+'.webp';SD_PRE.set(i,im);if(SD_PRE.size>14){const k=SD_PRE.keys().next().value;SD_PRE.delete(k)}}
-// next/previous page: inside an insert, at its end go back; inside a tefillah, jump between its parts; otherwise the book order
-function sdStep(dir){const p=SD.n[SD.i];
- if(SD.ins){if(dir>0&&p>=SD.ins.end)return{i:SD.ins.ret,back:true};if(dir<0&&p<=SD.ins.go)return{i:SD.ins.ret0,back:true}}
- const f=SD.fk&&sdFlows()[SD.fk];if(!SD.ins&&sdInFlow(f,p)){const k=f.seg.findIndex(s=>p>=s[0]&&p<=s[1]);
-  if(dir>0&&p===f.seg[k][1]&&f.seg[k+1])return{i:sdIdx(f.seg[k+1][0])};if(dir<0&&p===f.seg[k][0]&&k>0)return{i:sdIdx(f.seg[k-1][1])}}
- const j=SD.i+dir;return j>=0&&j<SD.n.length?{i:j}:null}
-function sdShow(i,quiet){SD.i=i;const A=$('#sdA');A.style.setProperty('--m',sdUrl(i));A.style.transform='';A.classList.remove('an');
- for(const k of [1,-1,2])sdPre(i+k);
- if(!quiet){try{localStorage.setItem(sdK(),JSON.stringify({i,fk:SD.fk,at:Date.now()}))}catch(e){}}
- sdHead()}
-function sdHead(){const p=SD.n[SD.i],s=sdSec(p),fl=sdFlows(),f=SD.fk&&fl[SD.fk];let prog=null,ttl=s[1];
- if(SD.ins){prog=(p-SD.ins.go)/Math.max(1,SD.ins.end-SD.ins.go);ttl=s[1]}
- else if(sdInFlow(f,p)){let tot=0,pos=0;for(const g of f.seg){if(p>=g[0]&&p<=g[1])pos=tot+(p-g[0]);tot+=g[1]-g[0]+1}prog=pos/Math.max(1,tot-1);ttl=f.t}
- else{const k=SD_TOC.indexOf(s),nx=SD_TOC.slice(k+1).find(t=>t[2]>s[2]),e=nx?nx[2]-1:SD.n[SD.n.length-1];prog=(p-s[2])/Math.max(1,e-s[2])}
- $('#sdT').textContent=ttl;$('#sdS').textContent=(ttl===s[1]?'':s[1]+' · ')+'Page '+p;$('#sdBar').style.width=(Math.max(0,Math.min(1,prog))*100).toFixed(1)+'%';
- $('#sdTabs').querySelectorAll('[data-f]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.f===SD.fk&&sdInFlow(fl[SD.fk],p))));
- sdCueShow(p)}
-function sdCueShow(p){const el=$('#sdCue'),c=SD.ins?{t:'<b>'+SD.ins.lbl+'</b> · when you finish, the next page takes you back.',b:'Back now',back:1}:sdCues(p);
+function sdCueShow(P){const el=$('#sdCue'),c=SD.ins&&SD.m==='book'?{t:'<b>'+SD.ins.lbl+'</b> · when you finish, the next page takes you back.',b:'Back now',back:1}:sdCues(P);
  const key=c?c.t:'';if(key===SD.lastCue)return;SD.lastCue=key;
  if(!c){el.classList.remove('on');return}
  el.innerHTML='<span>'+c.t+'</span>'+(c.b?'<button type="button" class="go">'+c.b+'</button>':'')+'<button type="button" class="x" aria-label="Hide">×</button>';
  el.querySelector('.x').onclick=()=>{H.tap();if(!c.back)SD.cueOff[c.t]=1;else SD.ins=null;SD.lastCue='';el.classList.remove('on');setTimeout(()=>sdHead(),300)};
  const g=el.querySelector('.go');if(g)g.onclick=()=>{H.sel();if(c.back){const r=SD.ins.ret;SD.ins=null;sdTurn(r,-1);return}
-  if(c.end){SD.ins={go:c.go,end:c.end,ret:c.ret!=null?sdIdx(c.ret):SD.i,ret0:SD.i,lbl:sdSec(c.go)[1]}}sdTurn(sdIdx(c.go),1)};
+  const cur=sdCur();if(c.end)SD.ins={go:sdIdx(c.go),end:sdIdx(c.end),ret:c.ret!=null?sdAt(c.ret):cur,ret0:cur,lbl:sdSec(c.go)[1]};sdTurn({m:'book',k:sdIdx(c.go)},1)};
  requestAnimationFrame(()=>{el.classList.add('on');try{H.sel()}catch(e){}})}
-// page turn animation to page j (dir 1 = forward: the new page comes from below)
-function sdTurn(j,dir){if(SD.busy||j==null)return;const A=$('#sdA'),B=$('#sdB');SD.busy=true;B.style.setProperty('--m',sdUrl(j));B.classList.remove('an');B.style.visibility='visible';B.style.transform='translateY('+(dir*SD.H)+'px)';
- requestAnimationFrame(()=>requestAnimationFrame(()=>{A.classList.add('an');B.classList.add('an');A.style.transform='translateY('+(-dir*SD.H)+'px)';B.style.transform='';setTimeout(()=>sdDone(j),250)}))}
-function sdDone(j){const B=$('#sdB');sdShow(j);B.classList.remove('an');B.style.visibility='hidden';B.style.transform='';SD.busy=false;H.tap&&0}
-// swipe: up or RIGHT = next page (a Hebrew book turns that way; owner), down or left = previous; the page follows the finger, then snaps (never rests between pages)
+// turn to screen t (dir 1 = forward: the new screen comes from below)
+function sdTurn(t,dir){if(SD.busy||!t)return;const A=$('#sdA'),B=$('#sdB');SD.busy=true;sdPaint(B,t);B.classList.remove('an');B.style.visibility='visible';B.style.transform='translateY('+(dir*SD.H)+'px)';
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{A.classList.add('an');B.classList.add('an');A.style.transform='translateY('+(-dir*SD.H)+'px)';B.style.transform='';setTimeout(()=>sdDone(t),250)}))}
+function sdDone(t){const B=$('#sdB');if(t.back)SD.ins=null;sdShow(t);B.classList.remove('an');B.style.visibility='hidden';B.style.transform='';SD.busy=false}
+// swipe: up or RIGHT = next (a Hebrew book turns that way; owner), down or left = previous; the page follows the finger, then snaps
 function sdDown(e){if(SD.busy||e.button>0)return;SD.drag={x:e.clientX,y:e.clientY,t:performance.now(),ax:null,d:0,tg:null,dir:0,id:e.pointerId}}
 function sdMove(e){const g=SD.drag;if(!g||e.pointerId!==g.id)return;const dx=e.clientX-g.x,dy=e.clientY-g.y;
  if(!g.ax){if(Math.hypot(dx,dy)<9)return;g.ax=Math.abs(dx)>Math.abs(dy)?'x':'y';try{$('#sdSt').setPointerCapture(g.id)}catch(x){}}
- const d=g.ax==='x'?dx:dy,sg=g.ax==='x'?-1:1,dir=d*sg<0?1:-1;if(dir!==g.dir){g.dir=dir;const s=sdStep(dir);g.tg=s;const B=$('#sdB');if(s){B.style.setProperty('--m',sdUrl(s.i));B.style.visibility='visible'}else B.style.visibility='hidden'}
+ const d=g.ax==='x'?dx:dy,sg=g.ax==='x'?-1:1,dir=d*sg<0?1:-1;if(dir!==g.dir){g.dir=dir;const s=sdStep(dir);g.tg=s;const B=$('#sdB');if(s){sdPaint(B,s);B.style.visibility='visible'}else B.style.visibility='hidden'}
  const size=g.ax==='x'?SD.W:SD.H,dd=g.tg?d:d*.25;g.d=dd;const tr=v=>g.ax==='x'?'translateX('+v+'px)':'translateY('+v+'px)';
  $('#sdA').style.transform=tr(dd);if(g.tg)$('#sdB').style.transform=tr(dd+dir*sg*size)}
 function sdUp(e){const g=SD.drag;if(!g||e.pointerId!==g.id)return;SD.drag=null;if(!g.ax)return;const A=$('#sdA'),B=$('#sdB'),size=g.ax==='x'?SD.W:SD.H,v=Math.abs(g.d)/Math.max(1,performance.now()-g.t),tr=x=>g.ax==='x'?'translateX('+x+'px)':'translateY('+x+'px)',sg=g.ax==='x'?-1:1;
  A.classList.add('an');B.classList.add('an');
- if(g.tg&&(Math.abs(g.d)>Math.min(90,size*.16)||v>.5)){SD.busy=true;if(g.tg.back)SD.ins=null;A.style.transform=tr(-g.dir*sg*size);B.style.transform=tr(0);try{H.tap()}catch(x){}setTimeout(()=>sdDone(g.tg.i),250)}
+ if(g.tg&&(Math.abs(g.d)>Math.min(90,size*.16)||v>.5)){SD.busy=true;A.style.transform=tr(-g.dir*sg*size);B.style.transform=tr(0);try{H.tap()}catch(x){}setTimeout(()=>sdDone(g.tg),250)}
  else{A.style.transform='';B.style.transform=g.tg?tr(g.dir*sg*size):'';setTimeout(()=>{if(!SD.busy){A.classList.remove('an');B.classList.remove('an');B.style.visibility='hidden'}},260)}}
 function sdTabs(){const f=sdFlows();$('#sdTabs').innerHTML=['sh','mi','ma','be','bs'].map(k=>`<button type="button" data-f="${k}" aria-pressed="false">${f[k].t}</button>`).join('')+'<button type="button" class="sd-more">Contents</button>';
  $('#sdTabs .sd-more').onclick=()=>{H.tap();sdToc()}}
 // a tefillah tab: ask where to start (Korbanos / Hodu / Ashrei / Shemoneh Esrei …)
-function sdPick(k){const f=sdFlows()[k];if(!f.opt.length){SD.fk=k;SD.ins=null;sdTurn(sdIdx(f.seg[0][0]),1);return}
+function sdPick(k){const f=sdFlows()[k];if(!f.opt.length){sdFlowSet(k);SD.ins=null;sdTurn({m:'flow',k:0},1);return}
  sdSheet(true,'<h3>'+f.t+'</h3><p>Where would you like to start?</p><div class="sd-l">'+f.opt.map(o=>`<button type="button" data-f="${k}" data-p="${o[1]}">${o[0]}<span>p. ${o[1]}</span></button>`).join('')+'</div>')}
-function sdToc(){const p=SD.n?SD.n[SD.i]:0,cur=sdSec(p);let g='',h='<h3>Contents</h3><div class="sd-row" style="margin-top:8px"><input id="sdPgIn" type="number" inputmode="numeric" min="4" max="621" placeholder="Page"><button type="button" id="sdPgGo">Go to page</button></div>';
+function sdToc(){const p=SD.n?sdPg(sdCur()):0,cur=sdSec(p);let g='',h='<h3>Contents</h3><div class="sd-row" style="margin-top:8px"><input id="sdPgIn" type="number" inputmode="numeric" min="4" max="621" placeholder="Page"><button type="button" id="sdPgGo">Go to page</button></div>';
  for(const s of SD_TOC){if(s[0]!==g){h+=(g?'</div>':'')+'<span class="sd-g">'+s[0]+'</span><div class="sd-l">';g=s[0]}h+=`<button type="button" data-p="${s[2]}"${s===cur?' class="cur"':''}>${s[1]}<span>${s[2]}</span></button>`}
- sdSheet(true,h+'</div>');const sh=$('#sdSh');sh.querySelector('#sdPgGo').onclick=()=>{const v=+sh.querySelector('#sdPgIn').value;if(v){H.sel();sdSheet(false);SD.ins=null;sdShow(sdIdx(v))}};
+ sdSheet(true,h+'</div>');const sh=$('#sdSh');sh.querySelector('#sdPgGo').onclick=()=>{const v=+sh.querySelector('#sdPgIn').value;if(v){H.sel();sdSheet(false);SD.ins=null;sdShow({m:'book',k:sdIdx(v)})}};
  const cb=sh.querySelector('.cur');if(cb)requestAnimationFrame(()=>cb.scrollIntoView({block:'center'}))}
 function sdSheet(on,html){const sh=$('#sdSh');if(on){sh.firstChild.innerHTML=html;sh.firstChild.scrollTop=0;sh.classList.add('on')}else sh.classList.remove('on')}
 function sdOpen(){const b=sdBuild();SD.open=true;SD.ins=null;SD.cueOff={};SD.lastCue='';b.classList.add('on');document.body.classList.add('sdo');H.tap();history.pushState({sd:1},'');
  clearTimeout(SD.hT);SD.hT=setTimeout(()=>{if(SD.open){document.body.classList.add('sd-hide');document.documentElement.classList.add('cc-away')}},360);
- sdLoad().then(()=>{sdSize();sdTabs();const fk=sdAuto(),f=sdFlows()[fk];let sv=null;try{sv=JSON.parse(localStorage.getItem(sdK()))}catch(e){}
-  SD.fk=fk;if(sv&&sv.fk===fk&&Date.now()-sv.at<2*36e5&&sv.i>=0&&sv.i<SD.n.length&&sdInFlow(f,SD.n[sv.i]))sdShow(sv.i,true);else sdShow(sdIdx(f.seg[0][0]),true)})
+ sdLoad().then(()=>{sdGeo();sdTabs();const fk=sdAuto();let sv=null;try{sv=JSON.parse(localStorage.getItem(sdK()))}catch(e){}
+  SD.fkey='';sdFlowSet(fk);let k=-1;if(sv&&sv.fk===fk&&sv.m==='flow'&&Date.now()-sv.at<2*36e5)k=SD.scr.findIndex(s=>s.some(q=>q.i===sv.i&&q.a<=sv.a+2&&q.b>sv.a));sdShow({m:'flow',k:Math.max(0,k)},true)})
  .catch(()=>{$('#sdSt').insertAdjacentHTML('beforeend','<p style="position:absolute;inset:40% 20px auto;text-align:center;color:var(--mut)">The siddur could not be loaded. Check the internet connection and try again.</p>')})}
 function sdClose(){const b=$('#sdr');if(!b||!SD.open)return;SD.open=false;clearTimeout(SD.hT);document.body.classList.remove('sd-hide');document.documentElement.classList.remove('cc-away');b.classList.remove('on');document.body.classList.remove('sdo');sdSheet(false);try{sc()}catch(e){}}
 addEventListener('popstate',()=>{if(SD.open)sdClose()});
@@ -3572,8 +3647,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=86;
+const CC_VER=87;
 const CC_LOG=[
+ {v:87,big:1,feature:'A siddur made for today',new:['The siddur now shows only what you say today: Tachanun, the Monday & Thursday prayers, the Torah reading, the Ten Days lines, Yaaleh V’yavo, Al HaNissim, Aneinu and the rest disappear on days they aren’t said.','What today adds is put right in its place: this week’s Torah reading on Monday and Thursday, Hallel and Musaf on Rosh Chodesh, the Chanukah reading, only today’s Song of the Day, tonight’s Omer count, and the Nasi in Nissan.','Instructions that only say where to skip are gone too.']},
  {v:86,new:['Tehillim stays in Hebrew (no English switch there).']},
  {v:85,adm:1,new:['Admin: Chabad.org English gets past the security check page.']},
  {v:84,new:['Chabad.org’s English for Chumash with Rashi now shows in the app’s reader.']},

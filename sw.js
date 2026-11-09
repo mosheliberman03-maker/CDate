@@ -51,7 +51,7 @@ self.addEventListener('fetch', (e) => {
     return;
   }
   // Fonts, the moon picture and icons rarely change: answer from the phone at once (and offline), refresh quietly in the background.
-  if (/\/(fonts|assets)\/|\/icon-\d+\.png$|\/siddur\/pages\.json$/.test(u.pathname) && u.pathname.startsWith(scope.pathname)) {
+  if (/\/(fonts|assets)\/|\/icon-\d+\.png$|\/siddur\/(pages|gaps)\.json$/.test(u.pathname) && u.pathname.startsWith(scope.pathname)) {
     e.respondWith((async () => {
       const cache = await caches.open(STATIC_CACHE);
       const saved = await cache.match(r.url, { ignoreSearch: true });
