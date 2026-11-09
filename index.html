@@ -1798,7 +1798,7 @@ const chUrl=(k,d)=>`https://www.chabad.org/dailystudy/${CH_URL[k]}.asp?tdate=${d
 /* the page fills in its text after it opens: wait until there's a whole day's worth of English (the menu alone has ~1500 letters) */
 async function chGet(url){const P=chGrab();if(!P)throw new Error('only in the app');let r;
  try{r=await P.get({url,timeout:28000,need:/tehillim/.test(url)?5000:9000})}catch(e){const m=String(e&&e.message||e);throw new Error(/not implemented|UNIMPLEMENTED|not available/i.test(m)?'update the app (version 5 needed)':m)}
- if(!r||!r.html)throw new Error('empty page');if(!r.complete)throw new Error('page did not finish loading ('+(r.title||'no title')+')');return r.html}
+ if(!r||!r.html)throw new Error('empty page');window.CH_LAST={letters:r.letters,complete:r.complete,title:r.title};return r.html}   // an "incomplete" page is still used: the count may miss hidden text
 const chIn=el=>{const c=el.cloneNode(true);c.querySelectorAll('script,style,sup,.footnote,[class*=footnote],[class*=Footnote],a[class*=note]').forEach(x=>x.remove());
  return c.innerHTML.replace(/<(?!\/?(?:b|i|em|strong|br)\b)[^>]*>/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim()};
 /* rows with an English cell → verses [{n, en, r:[rashi…]}] */
@@ -4957,7 +4957,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
    if(!chGrab()){M.textContent='Only works inside the Android app.';return}
    try{raw=await chGet(chUrl(k,d));const V=chParse(raw);let F=[];try{const P=await rdRefs(k,d);if(P.length===1)F=rdFlat(await rdText(P[0].url))}catch(e){}
     const rs=V.reduce((a,v)=>a+v.r.length,0);
-    M.textContent=`Page: ${raw.length.toLocaleString()} characters\nVerses found: ${V.length}${F.length?' · Hebrew has '+F.length:''}${k==='chumash'?' · Rashi comments: '+rs:''}\n${chFits(V,F)?'✅ Lines up: the reader will use Chabad.org English.':'⚠️ Does not line up yet: the reader uses Sefaria English. Tap “Copy page outline” and paste it in the chat.'}\n${V[0]?'First: '+V[0].en.replace(/<[^>]+>/g,'').slice(0,120):''}`}
+    const LS=window.CH_LAST||{};M.textContent=`Page: ${raw.length.toLocaleString()} characters · visible English letters ${LS.letters||'?'}${LS.complete===false?' (waited the full time)':''}\nVerses found: ${V.length}${F.length?' · Hebrew has '+F.length:''}${k==='chumash'?' · Rashi comments: '+rs:''}\n${chFits(V,F)?'✅ Lines up: the reader will use Chabad.org English.':'⚠️ Does not line up yet: the reader uses Sefaria English. Tap “Copy page outline” and paste it in the chat.'}\n${V[0]?'First: '+V[0].en.replace(/<[^>]+>/g,'').slice(0,120):''}`}
    catch(e){M.textContent='Could not download: '+(e&&e.message||e)}
    X.hidden=!raw};
   box.querySelector('#ttChC').onclick=()=>run('chumash');box.querySelector('#ttChT').onclick=()=>run('tehillim');
