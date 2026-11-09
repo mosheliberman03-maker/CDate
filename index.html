@@ -1813,6 +1813,18 @@ const chIn=el=>{const c=el.cloneNode(true);c.querySelectorAll('script,style,sup,
  return c.innerHTML.replace(/<(?!\/?(?:b|i|em|strong|br)\b)[^>]*>/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim()};
 /* rows with an English cell → verses [{n, en, r:[rashi…]}] */
 function chParse(html){const doc=new DOMParser().parseFromString(html,'text/html'),out=[];
+ /* Chabad.org's real layout (owner's page outline, 9 Nov 2026): .Co_Verse rows, each with a Hebrew half (inside .hebrew) and an
+    English half, both with .co_VerseNum + .co_VerseText; .Co_Rashi rows after their verse, each with a Hebrew and an English
+    .Co_RashiContainer holding .co_RashiTitle (the opening words) + .co_RashiText. */
+ const heb=el=>!!el.closest('.hebrew')||(el.textContent.match(/[֐-׿]/g)||[]).length>(el.textContent.match(/[A-Za-z]/g)||[]).length;
+ const rows=[...doc.querySelectorAll('.Co_Verse,.Co_Rashi')];
+ if(rows.length){for(const row of rows){
+   if(row.classList.contains('Co_Rashi')){if(!out.length)continue;const c=[...row.querySelectorAll('.Co_RashiContainer')].find(x=>!heb(x));if(!c)continue;
+    const t=c.querySelector('.co_RashiTitle'),b=c.querySelector('.co_RashiText'),tt=t?chIn(t):'',bb=b?chIn(b):(t?'':chIn(c));if(tt||bb)out[out.length-1].r.push((tt?`<b>${tt}</b> `:'')+bb);continue}
+   const T=[...row.querySelectorAll('.co_VerseText')].find(x=>!heb(x));if(!T)continue;
+   const N=[...row.querySelectorAll('.co_VerseNum')].map(x=>parseInt(x.textContent,10)).find(n=>!isNaN(n));out.push({n:N==null?NaN:N,en:chIn(T),r:[]})}
+  return out}
+ // older guess (td.english cells), kept as a fallback for other page layouts
  const cells=[...doc.querySelectorAll('td.english,td.English,div.english,.co_english,[class~="english"]')];
  for(const en of cells){const row=en.closest('tr')||en.parentElement,rc=((row&&row.className)||'')+' '+en.className;
   const rT=en.querySelector('[class*=RashiTitle],[class*=rashititle],[class*=rashi_title]'),rB=en.querySelector('[class*=RashiBody],[class*=rashibody],[class*=rashi_body]');
@@ -3554,8 +3566,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=83;
+const CC_VER=84;
 const CC_LOG=[
+ {v:84,new:['Chabad.org’s English for Chumash with Rashi now shows in the app’s reader.']},
  {v:83,adm:1,new:['Admin: Chabad.org English now opens the text page the daily page points to.']},
  {v:82,adm:1,new:['Admin: Chabad.org page test waits for the full text; better page outline.']},
  {v:81,mid:1,new:['English Chumash with Rashi and Tehillim from Chabad.org. Update the app (the button at the top) to get it.']},
