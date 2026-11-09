@@ -77,6 +77,14 @@ const originOf = (req) => { const o = req.headers.get('Origin'); if (o) return o
 const corsFor = (req) => { const o = originOf(req), a = ALLOW.includes(o) ? o : ALLOW[0]; return { 'Access-Control-Allow-Origin': a, 'Vary': 'Origin', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'content-type', 'Access-Control-Max-Age': '86400' }; };
 const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { ...CORS, 'content-type': 'application/json' } });
 
+const fnv = (v) => { let h = 2166136261; for (let i = 0; i < v.length; i++) { h ^= v.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(16); };
+const rnd = (n) => { const a = new Uint8Array(n); crypto.getRandomValues(a); return [...a].map((x) => x.toString(16).padStart(2, '0')).join(''); };
+async function pwHash(salt, pw) { // salted PBKDF2-SHA256 (kept small: the free plan allows ~10 ms of work per request)
+  const te = new TextEncoder(), k = await crypto.subtle.importKey('raw', te.encode(pw), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: te.encode(salt), iterations: 10000 }, k, 256);
+  return [...new Uint8Array(bits)].map((x) => x.toString(16).padStart(2, '0')).join('');
+}
+
 async function handle(req, env) {
   const url = new URL(req.url), p = url.pathname;
   const H = corsFor(req);                       // CORS reflecting the owner's own origin only
@@ -121,6 +129,54 @@ async function handle(req, env) {
     }
     await env.KV.put(key, JSON.stringify(all));
     return j({ ok: true });
+  }
+  // Chabad Calendar accounts (owner, v89): each account's saved data lives here, so signing in on a new phone or after
+  // reinstalling brings everything back. KV 'acct:<user>' = { s: salt, h: PBKDF2(password), tk: [session tokens],
+  // d: { key: [value, time] }, r: revision, f/ft: failed sign-ins }. Writes happen only when something changed.
+  // A change is [value, time, base hash]; if the server's copy moved on since that base, it is refused and the phone merges.
+  if (p.startsWith('/acct/')) {
+    if (!ALLOW.includes(originOf(req))) return j({ error: 'This request did not come from the Chabad Calendar app.' }, 403);
+    if (req.method !== 'POST') return j({ error: 'not found' }, 404);
+    let b; try { b = await req.json(); } catch (e) { return j({ error: 'bad json' }, 400); }
+    const op = p.slice(6), u = String((b && b.u) || '').toLowerCase(), now = Date.now();
+    if (!/^[a-z0-9_.-]{3,32}$/.test(u) || u === 'test') return j({ error: 'bad user' }, 400);
+    const key = 'acct:' + u;
+    let a = await env.KV.get(key, 'json');
+    if (op === 'new' || op === 'login') {
+      const pw = String(b.p || '');
+      if (pw.length < 4 || pw.length > 200) return j({ error: 'bad password' }, 400);
+      if (a && (a.f || 0) >= 8 && now - (a.ft || 0) < 10 * 60e3) return j({ error: 'locked' }, 429);
+      if (!a) {
+        if (op === 'login') return j({ error: 'no account' }, 404);
+        const s = rnd(16); a = { s, h: await pwHash(s, pw), tk: [], d: {}, r: 0, c: now };
+      } else if ((await pwHash(a.s, pw)) !== a.h) {
+        a.f = (a.f || 0) + 1; a.ft = now; await env.KV.put(key, JSON.stringify(a));
+        return op === 'new' ? j({ error: 'taken' }, 409) : j({ error: 'wrong password' }, 401);
+      }
+      a.f = 0; const t = rnd(24); a.tk = [t, ...(a.tk || [])].slice(0, 12);
+      await env.KV.put(key, JSON.stringify(a));
+      return j({ ok: true, t, d: a.d, r: a.r });
+    }
+    if (op === 'sync') {
+      if (!a || !(a.tk || []).includes(String(b.t || ''))) return j({ error: 'signed out' }, 401);
+      const ch = b.ch && typeof b.ch === 'object' ? b.ch : {}; let n = 0;
+      for (const k of Object.keys(ch).slice(0, 500)) {
+        const v = ch[k]; if (k.length > 80 || !Array.isArray(v)) continue;
+        const val = v[0] == null ? null : String(v[0]), ts = Math.min(Number(v[1]) || 0, now);
+        if (val && val.length > 500000) continue;
+        // only if this phone saw the latest copy (its base = the hash of what it last synced); otherwise it merges and sends again
+        const cur = a.d[k], curH = cur ? (cur[0] == null ? '-' : fnv(cur[0])) : '';
+        if (curH !== String(v[2] || '') && curH !== (val == null ? '-' : fnv(val))) continue;
+        a.d[k] = [val, ts]; n++;
+      }
+      if (n) {
+        if (JSON.stringify(a.d).length > 5e6) return j({ error: 'too big' }, 413);
+        a.r = (a.r || 0) + 1; await env.KV.put(key, JSON.stringify(a));
+      }
+      if (!n && Number(b.r) === a.r) return j({ ok: true, r: a.r, same: 1 });
+      return j({ ok: true, r: a.r, d: a.d });
+    }
+    return j({ error: 'not found' }, 404);
   }
   if (req.method !== 'POST') return j({ error: 'not found' }, 404);
   let b; try { b = await req.json(); } catch (e) { return j({ error: 'bad json' }, 400); }

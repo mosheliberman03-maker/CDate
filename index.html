@@ -833,6 +833,17 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .smot{display:flex!important;align-items:center;gap:12px}.smot .smav{--cw:46px}.smot>div{display:grid;gap:2px;min-width:0}
 #stkToast{display:flex!important;align-items:center;gap:12px}#stkToast .smav{--cw:44px}#stkToast>div{display:grid;gap:2px}
 </style>
+<style id="cc-acct">#acctBk{display:block;margin-top:3px;font-size:12px;color:var(--mut)}#acctBk.off{color:#e8a23a;cursor:pointer;text-decoration:underline}
+.bk-shade{position:fixed;inset:0;z-index:95;display:flex;align-items:flex-end;justify-content:center;background:rgba(3,6,26,.45);opacity:0;transition:opacity .25s}
+.bk-shade.on{opacity:1}
+.bk-card{width:min(100%,460px);margin:0 10px calc(10px + env(safe-area-inset-bottom,0px));padding:18px 18px 16px;border-radius:26px;background:var(--gx-sheet,var(--card));border:1px solid var(--gx-bd,var(--line));color:var(--ink);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:0 20px 50px rgba(3,6,26,.35);font:400 14.5px/1.45 Figtree,system-ui,sans-serif}
+.bk-card .bk-ch{width:64px;height:76px;display:block;margin:-4px auto 6px}
+.bk-card b{display:block;font:500 21px 'Frank Ruhl Libre',serif;text-align:center;margin-bottom:6px}
+.bk-card p{margin:0 0 12px;color:var(--mut)}.bk-card #bkN p{color:var(--ink)}
+.bk-card input{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:14px;border:1px solid var(--gx-bd,var(--line));background:var(--gx-in,transparent);color:var(--ink);font:500 16px Figtree,system-ui;margin-bottom:10px}
+.bk-e{min-height:18px;font-size:13px;color:#e8a23a;margin-bottom:6px}
+.bk-b{display:flex;gap:10px}.bk-b .btn{flex:1}
+</style>
 <style id="cc-siddur">
 /* ===== Siddur (Tehillat Hashem pages; v37 = paged). Pages are alpha stencils (siddur/p/N.webp) painted in var(--ink) via mask. ===== */
 .dock #sd{display:inline-flex;align-items:center;gap:8px;height:50px;padding:0 16px;border-radius:26px;font:600 15.5px Figtree,system-ui,sans-serif;color:color-mix(in srgb,var(--gl-tx) 82%,transparent)}
@@ -908,7 +919,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   try{var m=await navigator.mediaDevices.getUserMedia({audio:true});m.getTracks().forEach(function(t){t.stop()})}catch(e){}
   await new Promise(function(r){try{navigator.geolocation.getCurrentPosition(function(){r()},function(){r()},{timeout:15000,maximumAge:600000})}catch(e){r()}});
   done()})})();</script>
-<div class="account-shade" id="accountGate" role="dialog" aria-modal="true" aria-labelledby="accountTitle"><form class="account-card" id="accountForm"><h1 id="accountTitle">Chabad Calendar</h1><p id="accountBeta" style="color:#8c94ef;font-weight:500;margin-bottom:8px;text-align:center">✓ Beta Program</p><p id="accountSub">Sign in or create a private profile for this device.</p><label for="accountUser">Username</label><input id="accountUser" autocomplete="username" minlength="3" maxlength="32" required placeholder="Choose a username"><label for="accountPass">Password</label><input id="accountPass" type="password" autocomplete="current-password" minlength="4" required placeholder="At least 4 characters"><div class="account-buttons"><button id="accountSubmit" type="submit">Log in</button><button id="accountMode" class="alt" type="button">Create account</button></div><div class="account-error" id="accountError" role="status"></div><p class="account-note">Your profile and schedule stay in this browser on this device. This is not a cloud account: another person or device has separate data, and your schedule will not sync between devices. This simple offline lock is not suitable for sensitive information.</p></form></div>
+<div class="account-shade" id="accountGate" role="dialog" aria-modal="true" aria-labelledby="accountTitle"><form class="account-card" id="accountForm"><h1 id="accountTitle">Chabad Calendar</h1><p id="accountBeta" style="color:#8c94ef;font-weight:500;margin-bottom:8px;text-align:center">✓ Beta Program</p><p id="accountSub">Sign in or create an account.</p><label for="accountUser">Username</label><input id="accountUser" autocomplete="username" minlength="3" maxlength="32" required placeholder="Choose a username"><label for="accountPass">Password</label><input id="accountPass" type="password" autocomplete="current-password" minlength="4" required placeholder="At least 4 characters"><div class="account-buttons"><button id="accountSubmit" type="submit">Log in</button><button id="accountMode" class="alt" type="button">Create account</button></div><div class="account-error" id="accountError" role="status"></div><p class="account-note">Your account is saved safely online, so if you sign in on another phone or reinstall the app, all your shiurim, plans and settings come back.</p></form></div>
 <div id="intro"></div><main>
 <section class="hero" id="hero"><header id="hdr"></header></section>
 <section class="top" id="top"><div class="ghost" id="gh" aria-hidden="true"></div>
@@ -925,7 +936,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
 <div class="bd" id="bd"></div>
 <div class="sheet ms" id="ms" role="dialog" aria-label="Month"><div class="mh"><h2 id="t"></h2><div class="nav"><button id="pv" aria-label="Previous month">‹</button><button id="nx" aria-label="Next month">›</button></div></div><div class="sub" id="s"></div><section class="cal"><div class="dow"></div><div class="grid" id="g"></div></section></div>
 
-<div class="sheet" id="sh" role="dialog" aria-label="Settings"><section class="shp on" data-p="home"><div class="acct"><div><small>Signed in as</small><strong id="profileName"></strong></div><button class="btn gh" id="acctOut" type="button">Log out</button></div><div class="shq"><small>Go to date</small><div class="dfb" id="gb"><div class="rw" style="margin-top:0"><input type="date" id="jp" aria-label="Date"><div class="hp" hidden></div><button class="btn" id="go">Go</button></div></div>
+<div class="sheet" id="sh" role="dialog" aria-label="Settings"><section class="shp on" data-p="home"><div class="acct"><div><small>Signed in as</small><strong id="profileName"></strong><small id="acctBk" class="acct-bk"></small></div><button class="btn gh" id="acctOut" type="button">Log out</button></div><div class="shq"><small>Go to date</small><div class="dfb" id="gb"><div class="rw" style="margin-top:0"><input type="date" id="jp" aria-label="Date"><div class="hp" hidden></div><button class="btn" id="go">Go</button></div></div>
 </div><div class="shl"><button class="shr" type="button" data-go="loc"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.4"/></svg></i><span><b>Location</b><small id="shsLoc"></small></span><i class="sha">›</i></button><button class="shr" type="button" id="rmOpen"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></i><span><b>Reminders</b><small id="rmSum">Off</small></span><i class="sha">›</i></button><button class="shr" type="button" data-go="cal"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></i><span><b>Calendar</b><small id="shsCal">What shows, and this month’s list</small></span><i class="sha">›</i></button><button class="shr" type="button" data-go="sched"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></i><span><b>My schedule</b><small id="shsSched"></small></span><i class="sha">›</i></button><button class="shr" type="button" data-go="app"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></i><span><b>App</b><small id="shsApp">Download and offline alarms</small></span><i class="sha">›</i></button><button class="shr" type="button" data-go="help"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6M12 17h.01"/></svg></i><span><b>Help</b><small id="shsHelp">Replay the tour</small></span><i class="sha">›</i></button></div><div class="shl"><button class="shr" type="button" data-go="adv"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></i><span><b>Advanced</b><small id="shsAdv">Sky, shiurim date, coordinates, built-in dates</small></span><i class="sha">›</i></button></div><div class="shl" id="shlAdm" hidden><button class="shr" type="button" data-go="adm"><i class="shi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5.5c0 4.3-3 7.9-7 9.5-4-1.6-7-5.2-7-9.5V6z"/><path d="M9 12l2 2 4-4"/></svg></i><span><b>Admin tools</b><small id="shsAdm">Off</small></span><i class="sha">›</i></button></div><p class="shver" id="ccVer"></p></section><section class="shp" data-p="adm" id="shpAdm"><div class="shh"><button class="shb" type="button" data-back aria-label="Back">‹</button><h2>Admin tools</h2></div><p class="shx" id="admNote">Only on this account. To turn admin off, tap “Version …” at the bottom of ⋯ five times again (the clock goes back to the real time).</p><div id="admBody"></div></section><section class="shp" data-p="loc"><div class="shh"><button class="shb" type="button" data-back aria-label="Back">‹</button><h2>Location</h2></div><p class="shx">Zmanim, sunrise and sunset are worked out for this place.</p><p id="locNow" style="margin:0 0 10px;font-size:14px"></p><button class="btn" id="ul" type="button" style="width:100%">Detect my location automatically</button><label for="cs" style="margin-top:14px">Or type a city</label><div class="rw" style="margin-top:0"><input id="cs" placeholder="e.g. Crown Heights, Jerusalem, Foshan" autocomplete="off" style="flex:1"><button class="btn gh" id="csb" type="button">Set</button></div><div id="locRes" style="display:grid;gap:6px;margin-top:8px"></div><p id="locMsg" role="status" style="margin:8px 0 0;font-size:13px;color:var(--mut)"></p>
 </section><section class="shp" data-p="cal"><div class="shh"><button class="shb" type="button" data-back aria-label="Back">‹</button><h2>Calendar</h2></div><h3 class="shs">Show on calendar</h3><div class="legend" id="lg"></div><h3 class="shs">This month</h3><div id="ag"></div></section><section class="shp" data-p="sched"><div class="shh"><button class="shb" type="button" data-back aria-label="Back">‹</button><h2>My schedule</h2></div><div id="fwrap" hidden><h2 id="fh" style="margin-top:24px">Edit event</h2><label for="ft">Title</label><input id="ft"><label for="fx">Notes</label><textarea id="fx" rows="3"></textarea>
 <div id="fd"><label for="fdt">Date</label><div class="dfb" id="fdb"><input type="date" id="fdt"><div class="hp" hidden></div></div><label for="fr">Repeats</label><select id="fr"><option value="once">Once</option><option value="greg">Every year (English date)</option><option value="heb">Every year (Hebrew date)</option></select></div>
@@ -1224,15 +1235,70 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
  function hash(v){let h=2166136261;for(let i=0;i<v.length;i++){h^=v.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16)}
  function users(){try{return JSON.parse(localStorage.getItem(USERS_KEY)||'{}')}catch(e){return {}}}
  function msg(t){$('accountError').textContent=t}
- let creating=false;
- function mode(v){creating=v;$('accountSubmit').textContent=v?'Create account':'Log in';$('accountMode').textContent=v?'Back to login':'Create account';$('accountTitle').textContent=v?'Create your calendar profile':'Your Chabad Calendar';$('accountSub').textContent=v?'Choose a username and password for this device.':'Sign in or create a private profile for this device.';$('accountPass').autocomplete=v?'new-password':'current-password';msg('')}
+ /* ===== Accounts saved on the push server (owner, v89: "if someone logs in on a different phone or uninstalls and reinstalls,
+    it still has all his stuff"). The password goes to the server only over HTTPS and is stored there as a salted PBKDF2 hash;
+    this phone keeps a session token (cc_sync_<user>). Everything stored under the account (cc_profile_<user>_*, plus the
+    tour/what's-new marks) is synced key by key: newest wins, and if both sides changed the same key since the last sync,
+    JSON objects (shiurim history, ticks…) are merged so nothing learned on either phone is lost. ===== */
+ const ACCT='https://cdate-push.mosheliberman03.workers.dev/acct/',SKIP={cc_sd_pos:1,cc_test_seeded:1,cc_test_demo:1};
+ const SK=u=>'cc_sync_'+u,stGet=u=>{try{return JSON.parse(localStorage.getItem(SK(u)))||{}}catch(e){return{}}},stSet=(u,s)=>{try{localStorage.setItem(SK(u),JSON.stringify(s))}catch(e){}};
+ const lsKey=(u,k)=>k==='@seen'?'cc_seen_ver_'+u:k==='@tour'?'cc_local_tour_done_'+u:'cc_profile_'+u+'_'+k;
+ function collect(u){const o={},pre='cc_profile_'+u+'_';for(let i=0;i<localStorage.length;i++){const K=localStorage.key(i);if(K&&K.startsWith(pre)){const k=K.slice(pre.length);if(!SKIP[k])o[k]=localStorage.getItem(K)}}
+  for(const k of ['@seen','@tour']){const v=localStorage.getItem(lsKey(u,k));if(v!=null)o[k]=v}return o}
+ async function post(op,body,ms){const c=new AbortController(),tm=setTimeout(()=>c.abort(),ms||12000);
+  try{const r=await fetch(ACCT+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:c.signal});let j={};try{j=await r.json()}catch(e){}return{s:r.status,j}}
+  catch(e){return{s:0,j:{}}}finally{clearTimeout(tm)}}
+ const isObj=x=>x&&typeof x==='object'&&!Array.isArray(x);
+ function merge(a,b){let A,B;try{A=JSON.parse(a);B=JSON.parse(b)}catch(e){return b}if(!isObj(A)||!isObj(B))return b;const o={...A};for(const k in B)o[k]=isObj(A[k])&&isObj(B[k])?{...A[k],...B[k]}:B[k];return JSON.stringify(o)}
+ // put the server's copy on this phone (first sign-in on a phone, or after a reinstall)
+ function applyAll(u,d){const h={};for(const k in d){const[v]=d[k];try{if(v==null)localStorage.removeItem(lsKey(u,k));else localStorage.setItem(lsKey(u,k),v)}catch(e){}h[k]=v==null?'-':hash(v)}return h}
+ async function sync(u){const st=stGet(u);if(!st.t||u==='test')return{ok:false};const now=Date.now(),cur=collect(u),h=st.h||{},ch={};
+  for(const k in cur){const hv=hash(cur[k]);if(h[k]!==hv)ch[k]=[cur[k],now,h[k]||'']}
+  for(const k in h)if(!(k in cur)&&h[k]!=='-')ch[k]=[null,now,h[k]];
+  const r=await post('sync',{u,t:st.t,r:st.r||0,ch});
+  if(r.s===401){delete st.t;stSet(u,st);return{ok:false,out:true}}
+  if(r.s!==200||!r.j.ok)return{ok:false};
+  let changed=false,again=false;
+  if(r.j.same)for(const k in ch)h[k]=ch[k][0]==null?'-':hash(ch[k][0]);
+  if(!r.j.same&&r.j.d){const d=r.j.d;for(const k in d){if(SKIP[k])continue;const[v]=d[k],K=lsKey(u,k),loc=localStorage.getItem(K);
+    if(v===loc||(v==null&&loc==null)){h[k]=v==null?'-':hash(v);continue}
+    if(k in ch&&ch[k][0]!=null&&v!=null){const m=merge(loc,v);try{localStorage.setItem(K,m)}catch(e){}h[k]=hash(v);if(m!==loc)changed=true;again=true;continue}
+    try{if(v==null)localStorage.removeItem(K);else localStorage.setItem(K,v)}catch(e){}h[k]=v==null?'-':hash(v);changed=true}}
+  st.h=h;st.r=r.j.r;st.at=now;stSet(u,st);
+  if(again&&!(arguments[1]>2)){const r2=await sync(u,(arguments[1]||0)+1);changed=changed||!!r2.changed}   // send the merged copy back
+  return{ok:true,changed}}
+ // register (or join) the account on the server with the password just typed; false = the name belongs to someone else
+ async function link(u,p){const r=await post('new',{u,p});if(r.s===200&&r.j.t){const st=stGet(u);st.t=r.j.t;st.r=0;st.h={};stSet(u,st);return true}return r.s===409?'taken':false}
+ window.ccAcct={sync,link,stGet,hash,users,post,applyAll,
+  // move a local profile to a new name (when the old name is already someone else's account on the server)
+  rename(o,n){const db=users();if(!db[o]||db[n])return false;const pre='cc_profile_'+o+'_',K=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(pre))K.push(k)}
+   for(const k of K){localStorage.setItem('cc_profile_'+n+'_'+k.slice(pre.length),localStorage.getItem(k));localStorage.removeItem(k)}
+   for(const k of ['cc_seen_ver_','cc_local_tour_done_']){const v=localStorage.getItem(k+o);if(v!=null){localStorage.setItem(k+n,v);localStorage.removeItem(k+o)}}
+   db[n]=db[o];delete db[o];localStorage.setItem(USERS_KEY,JSON.stringify(db));localStorage.setItem(ACTIVE_KEY,n);return true}};
+ let creating=false,busy=false;
+ function mode(v){creating=v;$('accountSubmit').textContent=v?'Create account':'Log in';$('accountMode').textContent=v?'Back to login':'Create account';$('accountTitle').textContent=v?'Create your calendar account':'Your Chabad Calendar';$('accountSub').textContent=v?'Choose a username and password. Everything you save is kept in your account.':'Sign in or create an account.';$('accountPass').autocomplete=v?'new-password':'current-password';msg('')}
  $('accountMode').addEventListener('click',()=>mode(!creating));
- $('accountForm').addEventListener('submit',e=>{e.preventDefault();const u=clean($('accountUser').value),p=$('accountPass').value;if(!/^[a-z0-9_.-]{3,32}$/.test(u)){msg('Use 3–32 characters: letters, numbers, dot, dash, or underscore.');return}if(p.length<4){msg('Choose a password with at least 4 characters.');return}const db=users();if(creating){if(db[u]){msg('That username already exists on this device.');return}db[u]={passwordHash:hash(u+'|'+p),created:Date.now()};localStorage.setItem(USERS_KEY,JSON.stringify(db));localStorage.setItem(ACTIVE_KEY,u);location.reload();return}if(u==='test'&&p==='test'&&!db[u]){db[u]={passwordHash:hash('test|test'),created:Date.now()};localStorage.setItem(USERS_KEY,JSON.stringify(db));localStorage.setItem('cc_local_tour_done_test','1')}if(!db[u]||db[u].passwordHash!==hash(u+'|'+p)){msg('Username or password is incorrect on this device.');return}localStorage.setItem(ACTIVE_KEY,u);location.reload()});
+ function enter(u){localStorage.setItem(ACTIVE_KEY,u);location.reload()}
+ $('accountForm').addEventListener('submit',async e=>{e.preventDefault();if(busy)return;const u=clean($('accountUser').value),p=$('accountPass').value;
+  if(!/^[a-z0-9_.-]{3,32}$/.test(u)){msg('Use 3–32 characters: letters, numbers, dot, dash, or underscore.');return}if(p.length<4){msg('Choose a password with at least 4 characters.');return}
+  const db=users(),wait=t=>{busy=true;$('accountSubmit').disabled=true;msg(t)},done=()=>{busy=false;$('accountSubmit').disabled=false};
+  if(u==='test'){if(p!=='test'){msg('Username or password is incorrect.');return}if(!db[u]){db[u]={passwordHash:hash('test|test'),created:Date.now()};localStorage.setItem(USERS_KEY,JSON.stringify(db));localStorage.setItem('cc_local_tour_done_test','1')}enter(u);return}
+  if(creating){if(db[u]){msg('That username already exists on this phone. Log in instead.');return}
+   wait('Creating your account…');const r=await post('new',{u,p});done();
+   if(r.s===409){msg('That username is already taken. Please choose another one.');return}
+   db[u]={passwordHash:hash(u+'|'+p),created:Date.now()};localStorage.setItem(USERS_KEY,JSON.stringify(db));
+   if(r.s===200&&r.j.t)stSet(u,{t:r.j.t,r:r.j.r||0,h:applyAll(u,r.j.d||{})});   // no internet: a phone-only account for now; it is backed up later
+   enter(u);return}
+  if(db[u]&&db[u].passwordHash===hash(u+'|'+p)){   // known on this phone: works offline; joins the server account if it isn't yet
+   if(!stGet(u).t){wait('Signing in…');await link(u,p);done()}enter(u);return}
+  wait('Signing in…');const r=await post('login',{u,p});done();
+  if(r.s===200&&r.j.t){db[u]={passwordHash:hash(u+'|'+p),created:(db[u]&&db[u].created)||Date.now()};localStorage.setItem(USERS_KEY,JSON.stringify(db));
+   stSet(u,{t:r.j.t,r:r.j.r||0,h:applyAll(u,r.j.d||{})});enter(u);return}
+  msg(r.s===404?'There is no account with that username.':r.s===401?'Username or password is incorrect.':r.s===429?'Too many tries. Please wait 10 minutes and try again.':'Couldn’t reach the server. Check the internet connection and try again.')});
  // Account-specific key names mean test entries from the old shared schedule are not imported.
  window.ccProfileKey=function(k){const u=localStorage.getItem(ACTIVE_KEY);return u?'cc_profile_'+u+'_'+k:k};
  const active=localStorage.getItem(ACTIVE_KEY),db=users();if(active&&db[active]){$('accountGate').style.display='none';}
  else {localStorage.removeItem(ACTIVE_KEY);$('accountGate').style.display='flex'}
- window.addEventListener('DOMContentLoaded',()=>{});
 })();
 </script>
 <script>
@@ -3659,8 +3725,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=88;
+const CC_VER=89;
 const CC_LOG=[
+ {v:89,big:1,feature:'Your account is saved',new:['Your account is now saved online: your shiurim and streak, plans, reminders and settings.','Sign in on another phone, or after reinstalling the app, and everything comes back.','If you were already signed in, the app asks for your password once to turn this on.']},
  {v:88,new:['Siddur pages load faster: the next pages are ready before you turn to them.']},
  {v:87,big:1,feature:'A siddur made for today',new:['The siddur now shows only what you say today: Tachanun, the Monday & Thursday prayers, the Torah reading, the Ten Days lines, Yaaleh V’yavo, Al HaNissim, Aneinu and the rest disappear on days they aren’t said.','What today adds is put right in its place: this week’s Torah reading on Monday and Thursday, Hallel and Musaf on Rosh Chodesh, the Chanukah reading, only today’s Song of the Day, tonight’s Omer count, and the Nasi in Nissan.','Instructions that only say where to skip are gone too.']},
  {v:86,new:['Tehillim stays in Hebrew (no English switch there).']},
@@ -3849,6 +3916,40 @@ appSync();appFirstRun();
 const lo=document.createElement('div');lo.id='loBox';lo.setAttribute('aria-hidden','true');lo.innerHTML='<div class="lo-card" role="alertdialog" aria-modal="true" aria-labelledby="loT"><h2 id="loT">Log out?</h2><p>Your schedule stays saved on this device. Log back in with your password to see it again.</p><div class="lo-b"><button type="button" id="loNo">Stay signed in</button><button type="button" id="loYes">Log out</button></div></div>';document.body.appendChild(lo);
 const loShow=v=>{lo.classList.toggle('on',v);lo.setAttribute('aria-hidden',v?'false':'true');if(v)setTimeout(()=>document.getElementById('loNo').focus(),50)};
 document.getElementById('acctOut')?.addEventListener('click',()=>loShow(true));document.getElementById('loNo').addEventListener('click',()=>loShow(false));lo.addEventListener('click',e=>{if(e.target===lo)loShow(false)});
+/* ===== v89: account backup — sync now and then, and ask people signed in from before to save their account once ===== */
+(function(){const A=window.ccAcct,u=localStorage.getItem('cc_local_active_profile_v1');if(!A||!u||u==='test')return;
+ let last=0,pend=false,touched=false,inF=false;const born=Date.now();
+ addEventListener('pointerdown',()=>{touched=true},{capture:true,passive:true});
+ const busy=()=>!!document.querySelector('#tg,.ai-backdrop.on,#rdr.on,#sdr.on,.sheet.on,#bkCard,#intro,#newsBox')||document.body.classList.contains('rdo');
+ const reloadNow=()=>{try{sessionStorage.setItem('cc_quiet','1')}catch(e){}location.reload()};
+ const ago=t=>{const m=Math.round((Date.now()-t)/6e4);return m<1?'just now':m<60?m+' min ago':m<1440?Math.round(m/60)+' h ago':Math.round(m/1440)+' d ago'};
+ function stat(){const el=document.getElementById('acctBk');if(!el)return;const st=A.stGet(u);
+  el.textContent=st.t?'☁︎ Saved to your account'+(st.at?' · '+ago(st.at):''):'Not saved to your account yet · Tap to fix';el.classList.toggle('off',!st.t);el.onclick=st.t?null:()=>{try{op(false)}catch(e){}setTimeout(card,350)}}
+ async function run(){if(inF||!A.stGet(u).t)return;inF=true;let r;try{r=await A.sync(u)}finally{inF=false}last=Date.now();stat();
+  if(r&&r.out)card();
+  // something new from another phone: show it (reload quietly) when that won't interrupt
+  if(r&&r.changed){if(document.hidden)reloadNow();else if(!touched&&Date.now()-born<20000&&!busy())reloadNow();else pend=true}}
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(pend)return reloadNow();run()}else if(Date.now()-last>60000)run()});
+ setInterval(()=>{if(!document.hidden&&Date.now()-last>120000)run()},30000);
+ setTimeout(run,1500);
+ document.addEventListener('click',e=>{if(e.target.closest('#mn'))setTimeout(stat,50)});
+ function card(){if(document.getElementById('bkCard')||document.documentElement.classList.contains('cc-shab'))return;
+  const el=document.createElement('div');el.id='bkCard';el.className='bk-shade';el.setAttribute('role','dialog');
+  el.innerHTML='<form class="bk-card">'+cchHtml('curious','bk-ch')+'<b>Keep your account safe</b><p>Type your password once. Your shiurim, plans and settings will be saved to your account, so they come back if you change phones or reinstall the app.</p><input type="password" id="bkP" autocomplete="current-password" placeholder="Your password" required><div id="bkN" hidden><p>Someone else already uses the name <b>'+u+'</b>. Choose a new username:</p><input id="bkU" autocomplete="username" placeholder="New username"></div><div class="bk-e" id="bkE" role="status"></div><div class="bk-b"><button type="button" class="btn gh" id="bkL">Later</button><button type="submit" class="btn" id="bkS">Save my account</button></div></form>';
+  document.body.appendChild(el);requestAnimationFrame(()=>el.classList.add('on'));
+  const E=el.querySelector('#bkE'),nb=el.querySelector('#bkN');
+  el.querySelector('#bkL').onclick=()=>{el.remove();try{sessionStorage.setItem('cc_bk_later','1')}catch(e){}};
+  el.querySelector('form').onsubmit=async e=>{e.preventDefault();const p=el.querySelector('#bkP').value,db=A.users();let nu=u;
+   if(!db[u]||db[u].passwordHash!==A.hash(u+'|'+p)){E.textContent='That password isn’t right.';return}
+   if(!nb.hidden){nu=el.querySelector('#bkU').value.trim().toLowerCase();if(!/^[a-z0-9_.-]{3,32}$/.test(nu)||nu==='test'){E.textContent='Use 3–32 characters: letters, numbers, dot, dash, or underscore.';return}if(db[nu]&&nu!==u){E.textContent='That name is already used on this phone.';return}}
+   E.textContent='Saving…';const ok=await A.link(nu,p);
+   if(ok==='taken'){nb.hidden=false;E.textContent=nu===u?'':'That name is taken too. Try another.';return}
+   if(!ok){E.textContent='Couldn’t reach the server. Check the internet and try again.';return}
+   if(nu!==u){A.rename(u,nu);const d2=A.users();d2[nu].passwordHash=A.hash(nu+'|'+p);localStorage.setItem('cc_local_profiles_v1',JSON.stringify(d2));await A.sync(nu);reloadNow();return}
+   E.textContent='';el.remove();try{H.ok()}catch(x){}run()}}
+ // signed in from before v89 (or made offline): ask once per opening, when nothing else is on screen
+ (function ask(n){if(A.stGet(u).t)return stat();if(sessionStorage.getItem('cc_bk_later'))return stat();if(busy()||document.querySelector('.cc-gate:not([hidden])')&&getComputedStyle(document.querySelector('.cc-gate:not([hidden])')).display!=='none'||n<4){setTimeout(()=>ask(n+1),2500);return}card()})(0);
+})();
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&lo.classList.contains('on')){e.stopPropagation();loShow(false)}},true);
 document.getElementById('loYes').addEventListener('click',()=>{try{localStorage.removeItem('cc_local_active_profile_v1')}catch(e){}location.reload()})})();
 /* ===== Guided tour: a moving spotlight over the real app, with short live demos ===== */
