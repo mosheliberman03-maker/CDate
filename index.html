@@ -1183,7 +1183,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   function tone(type,f0,f1,t,a,p,d,dest){var o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);if(f1)o.frequency.exponentialRampToValueAtTime(f1,t+a+d*.6);env(g,t,a,p,d);o.connect(g);g.connect(dest||mst);o.start(t);o.stop(t+a+d+.05)}
   function pad(t,dur){var lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(300,t);lp.frequency.linearRampToValueAtTime(1600,t+dur*.8);lp.Q.value=.5;lp.connect(mst);
     [[130.81,.07],[196,.055],[329.63,.05],[493.88,.035],[587.33,.03]].forEach(function(n,i){[-4,4].forEach(function(dt){var o=AC.createOscillator(),g=AC.createGain();o.type='sawtooth';o.frequency.value=n[0];o.detune.value=dt;
-      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(n[1]*.35,t+1.2+i*.1);g.gain.setValueAtTime(n[1]*.35,t+dur-1.2);g.gain.linearRampToValueAtTime(0,t+dur);o.connect(g);g.connect(lp);o.start(t);o.stop(t+dur+.1)})})}
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(n[1]*.14,t+1.2+i*.1);g.gain.setValueAtTime(n[1]*.14,t+dur-1.2);g.gain.linearRampToValueAtTime(0,t+dur);o.connect(g);g.connect(lp);o.start(t);o.stop(t+dur+.1)})})}
   function pop(t,lo,hi,v){tone('sine',lo,hi,t,.006,v||.32,.16);tone('triangle',lo*2,hi*2,t,.004,(v||.32)*.25,.08)}
   function tap(t,f,v){tone('sine',f,f*.92,t,.002,v||.16,.09);var s2=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain();s2.buffer=noise();bp.type='bandpass';bp.frequency.value=f*2.2;bp.Q.value=6;env(g,t,.001,(v||.16)*.6,.04);s2.connect(bp);bp.connect(g);g.connect(mst);s2.start(t);s2.stop(t+.08)}
   function whoosh(t,d,f0,f1,v){var s2=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain();s2.buffer=noise();bp.type='bandpass';bp.Q.value=1.4;bp.frequency.setValueAtTime(f0,t);bp.frequency.exponentialRampToValueAtTime(f1,t+d);
@@ -1192,20 +1192,41 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   /* v64 (owner: "no sparkle, do something else"): a soft cartoon "zip" as he springs away: a quick rising slide (like a
      slide whistle, very quiet) over a short airy whoosh */
   function finale(t){whoosh(t,.4,500,2000,.08);tone('sine',330,1100,t,.02,.05,.32);tone('triangle',330,1100,t,.02,.012,.3)}
+  /* v96 (owner: "more like animation sounds, not like a movie sound"): cartoon sound effects.
+     creak = a wooden "stick-slip" creak, like a present box's lid before it opens: a train of tiny clicks whose rate wavers,
+     rung through wood resonances; used whenever he bends down (longer and tighter for the big wind-up).
+     boing = a springy cartoon leap (pitch shoots up with a spring wobble); fall=1 = a weak "bwoop" that drops back (a try that
+     didn't make it). thud = a soft cartoon landing. */
+  function creak(t,d,v,r0,r1){var sr=AC.sampleRate,n=Math.floor(sr*d),b=AC.createBuffer(1,n,sr),x=b.getChannelData(0),ph=0,L=Math.floor(sr*.0024),i,k;
+    for(i=0;i<n;i++){var u=i/n,r=r0+(r1-r0)*u+7*Math.sin(u*19)+5*Math.sin(u*53+1);ph+=r/sr;if(ph>=1){ph-=1;var a=(.45+.55*Math.random())*Math.min(1,u*7)*Math.min(1,(1-u)*7);
+      for(k=0;k<L&&i+k<n;k++)x[i+k]+=a*(Math.random()*2-1)*Math.exp(-k/(L*.22))}}
+    var src=AC.createBufferSource(),g=AC.createGain();src.buffer=b;g.gain.value=v*7;
+    [[620,9,1],[1350,8,.7],[2500,6,.35]].forEach(function(f){var bp=AC.createBiquadFilter(),gg=AC.createGain();bp.type='bandpass';bp.frequency.value=f[0];bp.Q.value=f[1];gg.gain.value=f[2];src.connect(bp);bp.connect(gg);gg.connect(g)});
+    g.connect(mst);src.start(t);src.stop(t+d+.05)}
+  function boing(t,f0,f1,d,v,fall){[['triangle',1,1],['sine',.5,.6]].forEach(function(w){var o=AC.createOscillator(),g=AC.createGain(),lf=AC.createOscillator(),lg=AC.createGain();o.type=w[0];
+      o.frequency.setValueAtTime(f0*w[1],t);o.frequency.exponentialRampToValueAtTime(f1*w[1],t+d*.38);o.frequency.exponentialRampToValueAtTime((fall?f0*1.15:f1*.93)*w[1],t+d);
+      lf.frequency.value=fall?18:26;lg.gain.setValueAtTime(f1*w[1]*.11,t);lg.gain.exponentialRampToValueAtTime(1,t+d);lf.connect(lg);lg.connect(o.frequency);
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*w[2],t+.008);g.gain.exponentialRampToValueAtTime(.0005,t+d);o.connect(g);g.connect(mst);o.start(t);lf.start(t);o.stop(t+d+.02);lf.stop(t+d+.02)})}
+  function thud(t,v){tone('sine',170,70,t,.003,v,.18);tap(t,320,v*.45)}
+  function leap(t){boing(t,150,860,.6,.2);tone('sine',420,1500,t+.06,.02,.035,.36)}
   var SE=[
     [0,function(t){pad(t,9.8)}],
     [.4,function(t){pop(t,180,520,.34)}],
-    [1.2,function(t){whoosh(t,.35,500,1500,.12)}],
+    [.93,function(t){creak(t,.3,.5,38,70)}],
+    [1.2,function(t){boing(t,200,620,.38,.17)}],
     [1.36,function(t){pop(t,320,900,.26)}],
-    [1.72,function(t){tap(t,520,.18)}],
+    [1.72,function(t){thud(t,.2)}],
     [2.08,function(t){tap(t,880,.06)}],[2.63,function(t){tap(t,780,.06)}],[3.18,function(t){tap(t,840,.06)}],
     [3.62,function(t){tone('sine',560,500,t,.025,.05,.22)}],   // v66 (owner): the blink is a soft, rounded 'blip' (no bright bell)
-    [4.17,function(t){whoosh(t,.5,400,1800,.16)}],
-    [4.72,function(t){tap(t,470,.18)}],
-    [5.22,function(t){whoosh(t,.3,500,1300,.09)}],[5.55,function(t){tap(t,430,.16)}],[5.72,function(t){tone('sine',440,330,t,.03,.035,.22)}],
-    [6.36,function(t){whoosh(t,.34,520,1400,.1)}],[6.73,function(t){tap(t,420,.17)}],[6.9,function(t){tone('sine',400,300,t,.03,.03,.2)}],
-    [7.2,function(t){build(t,1.25)}],
-    [8.45,function(t){finale(t)}]
+    [3.95,function(t){creak(t,.22,.45,45,75)}],
+    [4.17,function(t){boing(t,220,560,.42,.15)}],
+    [4.72,function(t){thud(t,.18)}],
+    // the two tries: creak down, a weak 'bwoop' that falls back, a thud, a little 'oh'
+    [5.0,function(t){creak(t,.24,.55,40,72)}],[5.22,function(t){boing(t,230,520,.34,.14,1)}],[5.55,function(t){thud(t,.2)}],[5.72,function(t){tone('sine',440,330,t,.03,.035,.22)}],
+    [6.1,function(t){creak(t,.28,.62,36,80)}],[6.36,function(t){boing(t,220,600,.38,.16,1)}],[6.73,function(t){thud(t,.22)}],[6.9,function(t){tone('sine',400,300,t,.03,.03,.2)}],
+    // the big wind-up: one long tightening creak, then the leap
+    [7.2,function(t){creak(t,1.25,.45,26,95)}],
+    [8.45,function(t){leap(t)}]
   ],sn=0;
   function sound(t){
     if(!AC||AC.state!=='running')return;
@@ -3751,8 +3772,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=95;
+const CC_VER=96;
 const CC_LOG=[
+ {v:96,new:['The opening animation has cartoon sounds now: a wooden creak when the character bends down and springy boings when he jumps.']},
  {v:95,new:['Opening animation: the character’s tries at the big jump now move like a real jump — crouch, push off, fall short, a disappointed beat — before the deep wind-up and the leap.']},
  {v:94,new:['Opening animation: the little hops now look like tries at the big jump, and the wind-up before it is longer.']},
  {v:93,new:['In the opening animation the character now takes two little hops before his big jump.']},
