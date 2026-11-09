@@ -1795,8 +1795,9 @@ const rdMapF=F=>{const M=new Map();for(const x of F)M.set(x.p.join(':'),x.t);ret
 const chGrab=()=>{try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;return(C.Plugins&&C.Plugins.PageGrab)||(C.registerPlugin&&C.registerPlugin('PageGrab'))||null}catch(e){return null}};
 const CH_URL={chumash:'torahreading',tehillim:'tehillim'};
 const chUrl=(k,d)=>`https://www.chabad.org/dailystudy/${CH_URL[k]}.asp?tdate=${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+/* the page fills in its text after it opens: wait until there's a whole day's worth of English (the menu alone has ~1500 letters) */
 async function chGet(url){const P=chGrab();if(!P)throw new Error('only in the app');let r;
- try{r=await P.get({url,timeout:25000})}catch(e){const m=String(e&&e.message||e);throw new Error(/not implemented|UNIMPLEMENTED|not available/i.test(m)?'update the app (version 5 needed)':m)}
+ try{r=await P.get({url,timeout:28000,need:/tehillim/.test(url)?5000:9000})}catch(e){const m=String(e&&e.message||e);throw new Error(/not implemented|UNIMPLEMENTED|not available/i.test(m)?'update the app (version 5 needed)':m)}
  if(!r||!r.html)throw new Error('empty page');if(!r.complete)throw new Error('page did not finish loading ('+(r.title||'no title')+')');return r.html}
 const chIn=el=>{const c=el.cloneNode(true);c.querySelectorAll('script,style,sup,.footnote,[class*=footnote],[class*=Footnote],a[class*=note]').forEach(x=>x.remove());
  return c.innerHTML.replace(/<(?!\/?(?:b|i|em|strong|br)\b)[^>]*>/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim()};
@@ -1820,7 +1821,7 @@ async function chFetch(k,d){const id=k+'|'+ds(d);if(!CH_URL[k]||!chGrab()||CH_DO
 /* in the background, a while after opening: today's and tomorrow's pages (only for people who read English) */
 setTimeout(async()=>{if(RD_LG()==='he'||!chGrab())return;const d0=new Date(shDay(t0));for(const d of[d0,ad(d0,1)])for(const k of['chumash','tehillim'])await chFetch(k,d)},9000);
 /* use it only if the verse numbers line up with the Hebrew */
-const chFits=(V,F)=>V&&V.length===F.length&&F.every((x,i)=>isNaN(V[i].n)||V[i].n===x.p[x.p.length-1]);
+const chFits=(V,F)=>V&&V.length>0&&V.length===F.length&&F.every((x,i)=>isNaN(V[i].n)||V[i].n===x.p[x.p.length-1]);
 const rdEnT=async(url,ttl)=>{try{const pf=RD_PREF(url);let j=pf?await rdText(url,1,pf).catch(()=>({})):{};const ok=x=>{const v=(x.versions||[])[0];return v&&v.text&&(typeof v.text==='string'||JSON.stringify(v.text).length>40)};if(!ok(j))j=await rdText(url,1);const v=(j.versions||[])[0];if(v&&v.versionTitle)ttl.add(v.versionTitle);return{j,F:rdFlat(j)}}catch(e){return{j:{},F:[]}}};
 const rdClean=s=>String(s||'').replace(/<sup[^>]*>.*?<\/sup>/gs,'').replace(/<i[^>]*class="footnote"[^>]*>.*?<\/i>/gs,'').replace(/<(?!\/?(?:b|i|small|big|br|strong|em)\b)[^>]*>/g,'').replace(/\{[פס]\}/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
 // Sefaria text (nested arrays) -> [{p:[chapter,verse,...], t}] with real chapter/verse numbers
@@ -3543,8 +3544,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=81;
+const CC_VER=82;
 const CC_LOG=[
+ {v:82,adm:1,new:['Admin: Chabad.org page test waits for the full text; better page outline.']},
  {v:81,mid:1,new:['English Chumash with Rashi and Tehillim from Chabad.org. Update the app (the button at the top) to get it.']},
  {v:80,adm:1,new:['Admin: new admin code.']},
  {v:79,new:['In the app, English Chumash with Rashi and Tehillim now come from Chabad.org (with permission) when available.']},
@@ -4960,9 +4962,18 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
    X.hidden=!raw};
   box.querySelector('#ttChC').onclick=()=>run('chumash');box.querySelector('#ttChT').onclick=()=>run('tehillim');
   // a compact outline of the page (tags + classes around the English text) so the reader can be adjusted
-  X.onclick=()=>{try{const doc=new DOMParser().parseFromString(raw,'text/html');const L=[];const walk=(el,dp)=>{if(L.length>260||dp>14)return;for(const c of el.children){if(/^(SCRIPT|STYLE|SVG|NOSCRIPT|LINK|META|IFRAME)$/.test(c.tagName))continue;const tx=[...c.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent.trim()).join(' ').slice(0,40);L.push(' '.repeat(dp)+c.tagName.toLowerCase()+(c.id?'#'+c.id:'')+(c.className&&typeof c.className==='string'?'.'+c.className.trim().replace(/\s+/g,'.'):'')+(tx?' “'+tx+'”':''));walk(c,dp+1)}};
-    const main=[...doc.querySelectorAll('[class*=english],[class*=English]')][0];let root=main||doc.body;for(let i=0;i<5&&root.parentElement&&root!==doc.body;i++)root=root.parentElement;walk(root,0);
-    const txt='CHABAD PAGE OUTLINE\n'+L.join('\n');navigator.clipboard.writeText(txt).then(()=>{M.textContent+='\n\nCopied ('+L.length+' lines). Paste it in the chat.'},()=>{M.textContent+='\n\nCould not copy.'})}catch(e){M.textContent+='\n\n'+e.message}}}
+  X.onclick=()=>{try{const doc=new DOMParser().parseFromString(raw,'text/html');
+    doc.querySelectorAll('script,style,noscript,svg,iframe,form,header,footer,nav,[id*=Navigation],[class*=navigation],[class*=menu],[class*=mobile_wrapper],[class*=footer],[class*=sidebar],[class*=related]').forEach(x=>x.remove());
+    const Lc=e=>(e.textContent.match(/[A-Za-z]/g)||[]).length,tot=Lc(doc.body);let R=doc.body;
+    doc.body.querySelectorAll('div,section,article,main,table,tbody').forEach(e=>{if(Lc(e)>=tot*.8&&e.textContent.length<R.textContent.length)R=e});
+    const L=[];const lab=c=>c.tagName.toLowerCase()+(c.id?'#'+c.id:'')+(typeof c.className==='string'&&c.className.trim()?'.'+c.className.trim().replace(/\s+/g,'.'):'');
+    const walk=(el,dp)=>{if(L.length>420||dp>16)return;const kids=[...el.children],cnt={};
+     kids.forEach((c,ix)=>{if(L.length>420)return;const lb=lab(c);cnt[lb]=(cnt[lb]||0)+1;if(cnt[lb]>3){if(cnt[lb]===4)L.push(' '.repeat(dp)+'… more '+lb+' (×'+kids.filter(k=>lab(k)===lb).length+')');return}
+      const tx=[...c.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent.trim()).join(' ').replace(/\s+/g,' ').slice(0,60);L.push(' '.repeat(dp)+lb+(tx?' “'+tx+'”':''));walk(c,dp+1)})};
+    walk(R,0);
+    const sample=R.innerHTML.replace(/\s(?!class=|id=)[\w-:]+="[^"]*"/g,'').replace(/\s+/g,' ').slice(0,3500);
+    const txt='CHABAD PAGE OUTLINE v2 · text area: '+lab(R)+' · letters '+tot+'\n'+L.join('\n')+'\n\nHTML SAMPLE\n'+sample;
+    navigator.clipboard.writeText(txt).then(()=>{M.textContent+='\n\nCopied ('+L.length+' lines). Paste it in the chat.'},()=>{M.textContent+='\n\nCould not copy.'})}catch(e){M.textContent+='\n\n'+e.message}}}
  const $d=box.querySelector('#ttD'),$t=box.querySelector('#ttT'),$v=box.querySelector('#ttV');
  /* Always-visible reminder that the test account runs on a simulated clock, not the phone's time (prevents the
     "sunrise looks wrong" confusion). Tap it to jump to real now. */
