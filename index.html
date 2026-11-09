@@ -1756,14 +1756,16 @@ const LOAD='<div class="cload" role="status" aria-label="Loading"><svg viewBox="
 const RD_KEYS=['chumash','tehillim','tanya','rambam3','rambam1'];
 const RD_TITLE={chumash:'חומש עם פירוש רש״י',tehillim:'תהלים',tanya:'תניא',rambam3:'רמב״ם · שלושה פרקים',rambam1:'רמב״ם · פרק אחד'};
 const RD_TITLE_EN={chumash:'Chumash with Rashi',tehillim:'Tehillim',tanya:'Tanya',rambam3:'Rambam · 3 chapters',rambam1:'Rambam · 1 chapter'};
-const rdDir=m=>{const en=RD_LG()==='en';m.dir=en?'ltr':'rtl';m.lang=en?'en':'he';m.classList.toggle('rd-en',en);m.classList.toggle('rd-both',RD_LG()==='both')};
+const RD_NOEN={tehillim:1};   // v86 (owner): no English for Tehillim
+const rdMode=k=>RD_NOEN[k]?'he':RD_LG();
+const rdDir=m=>{const L=RDS?rdMode(RDS.k):RD_LG(),en=L==='en';m.dir=en?'ltr':'rtl';m.lang=en?'en':'he';m.classList.toggle('rd-en',en);m.classList.toggle('rd-both',L==='both')};
 const rdLgUI=b=>{const L=RD_LG();b.querySelectorAll('.rdlg button').forEach(x=>{const on=x.dataset.l===L;x.classList.toggle('on',on);x.setAttribute('aria-checked',on)})};
 /* switch language: rebuild the text (the Hebrew is already loaded; English is fetched once) and keep the reading place */
 function rdLang(L){const st=RDS,b=$('#rdr');if(!st||!b||L===RD_LG())return;try{localStorage.setItem('cc_rd_lang',L)}catch(e){}H.sel();rdLgUI(b);
  b.querySelector('.rdt b').textContent=L==='en'?RD_TITLE_EN[st.k]:RD_TITLE[st.k];rdRe()}
-function rdRe(){const st=RDS,b=$('#rdr'),L=RD_LG();if(!st||!b||!st.ok||st.mode===L)return;st.mode=L;
+function rdRe(){const st=RDS,b=$('#rdr'),L=st?rdMode(st.k):RD_LG();if(!st||!b||!st.ok||st.mode===L)return;st.mode=L;
  const m=b.querySelector('.rdm'),mx0=m.scrollHeight-m.clientHeight,f=mx0>0?m.scrollTop/mx0:0,lg=b.querySelector('.rdlg');lg.classList.add('busy');
- rdBuild(st.k,st.d,L).then(html=>{if(RDS!==st||RD_LG()!==L){if(RDS===st)rdRe();return}const keep=m.querySelector('.rdfoot');m.innerHTML=html+(keep?keep.outerHTML:'');rdDir(m);
+ rdBuild(st.k,st.d,L).then(html=>{if(RDS!==st||rdMode(st.k)!==L){if(RDS===st)rdRe();return}const keep=m.querySelector('.rdfoot');m.innerHTML=html+(keep?keep.outerHTML:'');rdDir(m);
   requestAnimationFrame(()=>{const mx=m.scrollHeight-m.clientHeight;if(mx>0)m.scrollTop=f*mx;b._rdUpd&&b._rdUpd()})}).catch(()=>{}).finally(()=>lg.classList.remove('busy'))}
 const SEF='https://www.sefaria.org/api/';
 const RDC=new Map();
@@ -1793,7 +1795,7 @@ const rdMapF=F=>{const M=new Map();for(const x of F)M.set(x.p.join(':'),x.t);ret
    if its verse numbers match the Hebrew exactly. Parsed pages are kept per day (cc_chen, last 12). Tanya/Rambam stay on
    Sefaria (same Kehot / Touger translations). */
 const chGrab=()=>{try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;return(C.Plugins&&C.Plugins.PageGrab)||(C.registerPlugin&&C.registerPlugin('PageGrab'))||null}catch(e){return null}};
-const CH_URL={chumash:'torahreading',tehillim:'tehillim'};
+const CH_URL={chumash:'torahreading'};
 const chUrl=(k,d)=>`https://www.chabad.org/dailystudy/${CH_URL[k]}.asp?tdate=${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
 /* the page fills in its text after it opens: wait until there's a whole day's worth of English (the menu alone has ~1500 letters) */
 /* v85: Cloudflare's "Performing security verification" page can come first (seen in the owner's outline: "Verification successful.
@@ -1845,7 +1847,7 @@ async function chFetch(k,d){const id=k+'|'+ds(d);if(!CH_URL[k]||!chGrab()||CH_DO
   if(RDS&&RDS.k===k&&ds(RDS.d)===ds(d)&&RD_LG()!=='he'){RDS.mode=null;rdRe()}return v}
  catch(e){if(/update the app|timeout|403|5\d\d/i.test(String(e&&e.message)))CH_DOWN=true;return null}finally{delete CH_BUSY[id]}}
 /* in the background, a while after opening: today's and tomorrow's pages (only for people who read English) */
-setTimeout(async()=>{if(RD_LG()==='he'||!chGrab())return;const d0=new Date(shDay(t0));for(const d of[d0,ad(d0,1)])for(const k of['chumash','tehillim'])await chFetch(k,d)},9000);
+setTimeout(async()=>{if(RD_LG()==='he'||!chGrab())return;const d0=new Date(shDay(t0));for(const d of[d0,ad(d0,1)])await chFetch('chumash',d)},9000);
 /* use it only if the verse numbers line up with the Hebrew */
 const chFits=(V,F)=>V&&V.length>0&&V.length===F.length&&F.every((x,i)=>isNaN(V[i].n)||V[i].n===x.p[x.p.length-1]);
 const rdEnT=async(url,ttl)=>{try{const pf=RD_PREF(url);let j=pf?await rdText(url,1,pf).catch(()=>({})):{};const ok=x=>{const v=(x.versions||[])[0];return v&&v.text&&(typeof v.text==='string'||JSON.stringify(v.text).length>40)};if(!ok(j))j=await rdText(url,1);const v=(j.versions||[])[0];if(v&&v.versionTitle)ttl.add(v.versionTitle);return{j,F:rdFlat(j)}}catch(e){return{j:{},F:[]}}};
@@ -1892,7 +1894,7 @@ const rdRashi=(a,e,mode)=>{e=e||[];
 const RD_ORD=['1st','2nd','3rd','4th','5th','6th','7th'];
 const rdHeadE=(kick,title,sub)=>`<header class="rdhd" dir="ltr" lang="en"><div class="rdk rdkE">${kick}</div><h2 class="rdh2E">${title}</h2>${sub?`<div class="rdsub">${sub}</div>`:''}</header>`;
 const rdChipE=t=>`<div class="rdc rdcE" dir="ltr"><span>${t}</span></div>`;
-async function rdBuild(k,d,mode){mode=mode||RD_LG();let CHV=null;const parts=await rdRefs(k,d);if(!parts.length)throw new Error('none');let html='';const h=hd(d),EN=mode!=='he',ttl=new Set();let enMiss=0,enAll=0;
+async function rdBuild(k,d,mode){mode=RD_NOEN[k]?'he':(mode||RD_LG());let CHV=null;const parts=await rdRefs(k,d);if(!parts.length)throw new Error('none');let html='';const h=hd(d),EN=mode!=='he',ttl=new Set();let enMiss=0,enAll=0;
  // one paragraph in the chosen languages (English missing for a line → that line stays Hebrew)
  const line=(cls,num,numE,heT,enT)=>{enAll++;if(EN&&!enT)enMiss++;
   if(!EN||!enT)return`<p class="${cls}">${num}${rdClean(heT)}</p>`;
@@ -1935,12 +1937,12 @@ function rdPosSet(dk,k,v){const A=rdPosAll(),id=dk+'|'+k;if(v)A[id]={...v,t:Date
 let RDS=null;const rdFS=()=>{try{return +localStorage.getItem('cc_rd_fs')||20.5}catch(e){return 20.5}};
 function rdOpen(k){const d=new Date(shDay(sel)),dk=dkey(),st=RDS={k,d,dk,ok:false};
  let b=$('#rdr');if(!b){b=document.createElement('div');b.id='rdr';b.className='rdr';b.innerHTML='<div class="rdb"><button type="button" class="rdx" aria-label="Back">←</button><div class="rdt"><b></b><small></small></div><button type="button" class="rdfs" aria-label="Text size">Aa</button><div class="rdpc" aria-live="off">0%</div><div class="rdp"><i></i></div></div><div class="rdlg" role="radiogroup" aria-label="Language"><button type="button" data-l="he" role="radio">Hebrew</button><button type="button" data-l="both" role="radio">Hebrew / English</button><button type="button" data-l="en" role="radio">English</button></div><div class="rdw"><div class="rdm" dir="rtl" lang="he"></div><div class="rdsb" aria-hidden="true"><div class="rdth"><span></span></div></div></div>';document.body.appendChild(b);b.querySelector('.rdx').onclick=()=>history.back();rdScrollUI(b);b.querySelectorAll('.rdlg button').forEach(x=>x.onclick=()=>rdLang(x.dataset.l));b.querySelector('.rdfs').onclick=()=>{const S=[18,20.5,23,26],i=(S.indexOf(rdFS())+1)%S.length;try{localStorage.setItem('cc_rd_fs',S[i])}catch(e){}H.sel();b.querySelector('.rdm').style.setProperty('--rdfs',S[i]+'px');b._rdUpd&&b._rdUpd()}}
- b.querySelector('.rdm').style.setProperty('--rdfs',rdFS()+'px');rdLgUI(b);
- b.querySelector('.rdt b').textContent=RD_LG()==='en'?RD_TITLE_EN[k]:RD_TITLE[k];b.querySelector('.rdt small').textContent=d.toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'})+' · '+hd(d).d+' '+hd(d).n[0];
+ b.querySelector('.rdm').style.setProperty('--rdfs',rdFS()+'px');rdLgUI(b);b.querySelector('.rdlg').hidden=!!RD_NOEN[k];
+ b.querySelector('.rdt b').textContent=rdMode(k)==='en'?RD_TITLE_EN[k]:RD_TITLE[k];b.querySelector('.rdt small').textContent=d.toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'})+' · '+hd(d).d+' '+hd(d).n[0];
  const m=b.querySelector('.rdm');m.scrollTop=0;m.innerHTML=LOAD;b._rdUpd&&b._rdUpd();
  requestAnimationFrame(()=>b.classList.add('on'));document.body.classList.add('rdo');H.tap();
  history.pushState({rdr:1},'');
- st.mode=RD_LG();rdBuild(k,d,st.mode).then(html=>{if(RDS!==st)return;rdDir(m);const sv=rdPosGet(dk,k);st.maxF=sv?sv.m||0:0;requestAnimationFrame(()=>{if(RDS!==st)return;if(sv&&sv.p>.003&&sv.p<.995){const mx=m.scrollHeight-m.clientHeight;if(mx>0)m.scrollTop=sv.p*mx}st.ok=true;b._rdUpd&&b._rdUpd();if(RD_LG()!==st.mode)rdRe()});m.innerHTML=html+`<p class="rdf rdfoot" dir="ltr">Text from Sefaria · <a href="https://www.chabad.org/dailystudy/default.asp?tdate=${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}" target="_blank" rel="noopener">Open on Chabad.org ↗</a></p>`})
+ st.mode=rdMode(k);rdBuild(k,d,st.mode).then(html=>{if(RDS!==st)return;rdDir(m);const sv=rdPosGet(dk,k);st.maxF=sv?sv.m||0:0;requestAnimationFrame(()=>{if(RDS!==st)return;if(sv&&sv.p>.003&&sv.p<.995){const mx=m.scrollHeight-m.clientHeight;if(mx>0)m.scrollTop=sv.p*mx}st.ok=true;b._rdUpd&&b._rdUpd();if(rdMode(k)!==st.mode)rdRe()});m.innerHTML=html+`<p class="rdf rdfoot" dir="ltr">Text from Sefaria · <a href="https://www.chabad.org/dailystudy/default.asp?tdate=${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}" target="_blank" rel="noopener">Open on Chabad.org ↗</a></p>`})
   .catch(err=>{if(RDS!==st)return;m.innerHTML=`<p class="rdl" dir="ltr">Could not load the text. Check your connection (in China, Sefaria may need your VPN), then try again.</p><p class="rdl" dir="ltr" style="font-size:12px">(${String(err&&err.message||err).replace(/[<>&]/g,'')})</p><p class="rdl" dir="ltr"><button type="button" class="rdr2">Try again</button></p>`;m.querySelector('.rdr2').onclick=()=>{history.back();setTimeout(()=>rdOpen(k),350)}})}
 /* Reading progress: % in the header + a thin line under it, and a side scroll bar that appears while scrolling,
    can be dragged (it widens and shows the %), or tapped to jump. Light haptic tick every 10% while dragging. */
@@ -3570,8 +3572,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=85;
+const CC_VER=86;
 const CC_LOG=[
+ {v:86,new:['Tehillim stays in Hebrew (no English switch there).']},
  {v:85,adm:1,new:['Admin: Chabad.org English gets past the security check page.']},
  {v:84,new:['Chabad.org’s English for Chumash with Rashi now shows in the app’s reader.']},
  {v:83,adm:1,new:['Admin: Chabad.org English now opens the text page the daily page points to.']},
@@ -4976,7 +4979,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
  <select id="ttOcc" style="width:100%"></select>
  <div class="qseg" id="ttWhen" style="margin-top:10px"><button type="button" data-w="am">Morning</button><button type="button" data-w="pm">Afternoon</button><button type="button" data-w="night">Night</button></div>
  <button class="btn" type="button" id="ttSdGo" style="width:100%;margin-top:10px">Go there and open the siddur</button><p class="mut" id="ttSdMsg" role="status" style="margin:8px 0 0;font-size:13px"></p>
- <h3 class="admh">Chabad.org English</h3><p class="mut" style="margin:0 0 6px">Downloads today's page on this phone and checks it lines up with the Hebrew.</p><div class="rw" style="flex-wrap:wrap;gap:8px"><button class="btn gh" type="button" id="ttChC">Test Chumash</button><button class="btn gh" type="button" id="ttChT">Test Tehillim</button><button class="btn gh" type="button" id="ttChX" hidden>Copy page outline</button></div><p class="mut" id="ttChM" role="status" style="margin:8px 0 0;font-size:13px;white-space:pre-wrap"></p>
+ <h3 class="admh">Chabad.org English</h3><p class="mut" style="margin:0 0 6px">Downloads today's page on this phone and checks it lines up with the Hebrew.</p><div class="rw" style="flex-wrap:wrap;gap:8px"><button class="btn gh" type="button" id="ttChC">Test Chumash</button><button class="btn gh" type="button" id="ttChX" hidden>Copy page outline</button></div><p class="mut" id="ttChM" role="status" style="margin:8px 0 0;font-size:13px;white-space:pre-wrap"></p>
  <h3 class="admh">Animations</h3><div class="rw" style="flex-wrap:wrap;gap:8px"><button class="btn gh" type="button" id="ttPlay">Play sun/moon opening</button><button class="btn gh" type="button" id="ttIntro">Play logo intro</button></div>
  <h3 class="admh">Feature switches</h3><p class="mut" style="margin:0 0 6px">On this phone only.</p><div id="ttFlags" style="display:grid;gap:8px;margin:6px 0 4px"></div>
  ${TEST?'<h3 class="admh">Test account</h3><button class="btn gh" type="button" id="ttReset">Reset test account</button>':''}`;
@@ -4989,7 +4992,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
     const LS=window.CH_LAST||{};M.textContent=`Text page: ${(LS.content||'(none found on the daily page)').replace('https://www.chabad.org','')}\nPage: ${raw.length.toLocaleString()} characters · visible English letters ${LS.letters||'?'}${LS.complete===false?' (waited the full time)':''}\nVerses found: ${V.length}${F.length?' · Hebrew has '+F.length:''}${k==='chumash'?' · Rashi comments: '+rs:''}\n${chFits(V,F)?'✅ Lines up: the reader will use Chabad.org English.':'⚠️ Does not line up yet: the reader uses Sefaria English. Tap “Copy page outline” and paste it in the chat.'}\n${V[0]?'First: '+V[0].en.replace(/<[^>]+>/g,'').slice(0,120):''}`}
    catch(e){M.textContent='Could not download: '+(e&&e.message||e)}
    X.hidden=!raw};
-  box.querySelector('#ttChC').onclick=()=>run('chumash');box.querySelector('#ttChT').onclick=()=>run('tehillim');
+  box.querySelector('#ttChC').onclick=()=>run('chumash');
   // a compact outline of the page (tags + classes around the English text) so the reader can be adjusted
   X.onclick=()=>{try{const doc=new DOMParser().parseFromString(raw,'text/html');
     doc.querySelectorAll('script,style,noscript,svg,iframe,form,header,footer,nav,#PrimaryNavigationContainer,.menu_wrapper,[id*=Popup],[class*=popup],[class*=subscribe]').forEach(x=>x.remove());
