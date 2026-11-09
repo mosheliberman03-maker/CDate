@@ -3537,8 +3537,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=79;
+const CC_VER=80;
 const CC_LOG=[
+ {v:80,adm:1,new:['Admin: new admin code.']},
  {v:79,new:['In the app, English Chumash with Rashi and Tehillim now come from Chabad.org (with permission) when available.']},
  {v:78,new:['English Chumash and Tehillim now use The Koren Jerusalem Bible, and Rashi in English is complete (Rosenbaum & Silbermann).']},
  {v:77,new:['The 3D opening is much lighter for the phone, so it plays smoothly from start to finish.']},
@@ -4889,7 +4890,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
    code as Keep in Touch; only its salted SHA-256 is here) → admin is ON for this account on this phone: ⋯ shows "Admin tools" with the
    test tools below (movable clock, siddur day tester, animations, feature switches). The same 5 taps again turn it OFF (real clock).
    The test account always has them. ===== */
-(function(){const U=()=>localStorage.getItem('cc_local_active_profile_v1')||'',AH='34d068ea17660c0fbd764ffddee3d59a576971f66ea8578d77ca5dffb38c56b8',on=!!(window.CC_TEST||window.CC_ADMIN);
+(function(){const U=()=>localStorage.getItem('cc_local_active_profile_v1')||'',AH='816e975bd4123d6abe1f2a030146455a4140bcfc57beeaca4808ae0f18b41257',on=!!(window.CC_TEST||window.CC_ADMIN);
  function sync(){const r=document.getElementById('shlAdm');if(r)r.hidden=!on;const t=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
   t('shsAdm',window.CC_TEST?'Always on in the test account':'Clock, siddur days, animations, features');if(window.CC_TEST)t('admNote','Always on in the test account.')}
  const reload=()=>{try{sessionStorage.setItem('cc_quiet','1')}catch(e){}location.reload()};
