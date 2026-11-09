@@ -1268,7 +1268,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   if(again&&!(arguments[1]>2)){const r2=await sync(u,(arguments[1]||0)+1);changed=changed||!!r2.changed}   // send the merged copy back
   return{ok:true,changed}}
  // register (or join) the account on the server with the password just typed; false = the name belongs to someone else
- async function link(u,p){const r=await post('new',{u,p});if(r.s===200&&r.j.t){const st=stGet(u);st.t=r.j.t;st.r=0;st.h={};stSet(u,st);return true}return r.s===409?'taken':false}
+ async function link(u,p){const r=await post('new',{u,p});if(r.s===200&&r.j.t){const st=stGet(u);st.t=r.j.t;st.r=0;st.h={};stSet(u,st);return true}return r.s===409?'taken':r.j&&r.j.error==='bad subscription'?'old':false}
  window.ccAcct={sync,link,stGet,hash,users,post,applyAll,
   // move a local profile to a new name (when the old name is already someone else's account on the server)
   rename(o,n){const db=users();if(!db[o]||db[n])return false;const pre='cc_profile_'+o+'_',K=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(pre))K.push(k)}
@@ -3725,8 +3725,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=89;
+const CC_VER=90;
 const CC_LOG=[
+ {v:90,new:['Account saving now says clearly when the server still needs its update.']},
  {v:89,big:1,feature:'Your account is saved',new:['Your account is now saved online: your shiurim and streak, plans, reminders and settings.','Sign in on another phone, or after reinstalling the app, and everything comes back.','If you were already signed in, the app asks for your password once to turn this on.']},
  {v:88,new:['Siddur pages load faster: the next pages are ready before you turn to them.']},
  {v:87,big:1,feature:'A siddur made for today',new:['The siddur now shows only what you say today: Tachanun, the Monday & Thursday prayers, the Torah reading, the Ten Days lines, Yaaleh V’yavo, Al HaNissim, Aneinu and the rest disappear on days they aren’t said.','What today adds is put right in its place: this week’s Torah reading on Monday and Thursday, Hallel and Musaf on Rosh Chodesh, the Chanukah reading, only today’s Song of the Day, tonight’s Omer count, and the Nasi in Nissan.','Instructions that only say where to skip are gone too.']},
@@ -3944,6 +3945,7 @@ document.getElementById('acctOut')?.addEventListener('click',()=>loShow(true));d
    if(!nb.hidden){nu=el.querySelector('#bkU').value.trim().toLowerCase();if(!/^[a-z0-9_.-]{3,32}$/.test(nu)||nu==='test'){E.textContent='Use 3–32 characters: letters, numbers, dot, dash, or underscore.';return}if(db[nu]&&nu!==u){E.textContent='That name is already used on this phone.';return}}
    E.textContent='Saving…';const ok=await A.link(nu,p);
    if(ok==='taken'){nb.hidden=false;E.textContent=nu===u?'':'That name is taken too. Try another.';return}
+   if(ok==='old'){E.textContent='The server hasn’t been updated yet (the Cloudflare step), so this can’t be saved yet.';return}
    if(!ok){E.textContent='Couldn’t reach the server. Check the internet and try again.';return}
    if(nu!==u){A.rename(u,nu);const d2=A.users();d2[nu].passwordHash=A.hash(nu+'|'+p);localStorage.setItem('cc_local_profiles_v1',JSON.stringify(d2));await A.sync(nu);reloadNow();return}
    E.textContent='';el.remove();try{H.ok()}catch(x){}run()}}
