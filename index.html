@@ -1796,7 +1796,11 @@ const chGrab=()=>{try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C.is
 const CH_URL={chumash:'torahreading',tehillim:'tehillim'};
 const chUrl=(k,d)=>`https://www.chabad.org/dailystudy/${CH_URL[k]}.asp?tdate=${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
 /* the page fills in its text after it opens: wait until there's a whole day's worth of English (the menu alone has ~1500 letters) */
-async function chGet(url,need){const P=chGrab();if(!P)throw new Error('only in the app');let r;
+/* v85: Cloudflare's "Performing security verification" page can come first (seen in the owner's outline: "Verification successful.
+   Waiting for www.chabad.org to respond"). The pass is kept as a cookie in the hidden browser, so open the page again (up to 2 more times). */
+const chChallenge=h=>/security verification|cf-chl-|challenge-platform|Just a moment/i.test(h||'')&&!/Co_Verse|co_VerseText|torahreading_cdo/.test(h||'');
+async function chGet(url,need){for(let i=0;i<3;i++){const h=await chGet1(url,need);if(!chChallenge(h))return h;if(i<2)await new Promise(r=>setTimeout(r,2500))}throw new Error('Chabad.org security check did not finish (try again in a minute)')}
+async function chGet1(url,need){const P=chGrab();if(!P)throw new Error('only in the app');let r;
  try{r=await P.get({url,timeout:28000,need:need||3000})}catch(e){const m=String(e&&e.message||e);throw new Error(/not implemented|UNIMPLEMENTED|not available/i.test(m)?'update the app (version 5 needed)':m)}
  if(!r||!r.html)throw new Error('empty page');window.CH_LAST={letters:r.letters,complete:r.complete,title:r.title};return r.html}
 /* v83: the daily page only POINTS to the text: today's portion lives at /parshah/torahreading_cdo/aid/<parsha>/p/<day>
@@ -3566,8 +3570,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=84;
+const CC_VER=85;
 const CC_LOG=[
+ {v:85,adm:1,new:['Admin: Chabad.org English gets past the security check page.']},
  {v:84,new:['Chabad.org’s English for Chumash with Rashi now shows in the app’s reader.']},
  {v:83,adm:1,new:['Admin: Chabad.org English now opens the text page the daily page points to.']},
  {v:82,adm:1,new:['Admin: Chabad.org page test waits for the full text; better page outline.']},
