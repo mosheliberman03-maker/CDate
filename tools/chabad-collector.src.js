@@ -5,20 +5,24 @@
    sits on the page (tags + classes), so the app can be built from it. Progress is kept on the phone (IndexedDB), so tapping
    the bookmark again continues. At the end it downloads chabad-en.json. */
 (async()=>{
-if(window.__chRun)return;window.__chRun=1;
-if(!/chabad\.org$/.test(location.hostname)){alert('Open www.chabad.org first, then tap the bookmark again.');window.__chRun=0;return}
+if(!/chabad\.org$/.test(location.hostname)){alert('Open www.chabad.org first, then tap the bookmark again.');return}
+if(window.__chRun&&document.getElementById('chBox')){alert('It is already running (see the box at the bottom).');return}
+window.__chRun=1;
+const old=document.getElementById('chBox');if(old)old.remove();
+const box=document.createElement('div');box.id='chBox';box.style.cssText='position:fixed;left:10px;right:10px;bottom:10px;z-index:2147483647;background:#161a2e;color:#fff;font:16px/1.4 system-ui,sans-serif;padding:16px;border-radius:16px;box-shadow:0 8px 40px #0008';
+box.innerHTML='<b>Collecting Chabad.org English</b><div id="chS" style="margin:8px 0">Starting…</div><div style="height:8px;background:#fff3;border-radius:4px"><div id="chB" style="height:8px;width:0;background:#8c9bff;border-radius:4px"></div></div><div style="margin-top:8px;font-size:13px;opacity:.8">Keep this screen on and Chrome open. About 15–20 minutes.</div><button id="chD" style="margin-top:10px;padding:10px 14px;border-radius:10px;border:0;font:600 15px system-ui">Save what I have now</button>';
+document.body.appendChild(box);const S=t=>box.querySelector('#chS').textContent=t,B=p=>box.querySelector('#chB').style.width=(p*100).toFixed(1)+'%';
+try{
 const jobs=[],add=(kind,a,b)=>{for(let d=new Date(a+'T12:00:00');d<=new Date(b+'T12:00:00');d.setDate(d.getDate()+1))jobs.push([kind,new Date(d)])};
 add('torah','2025-10-12','2026-10-10');add('tehillim','2026-09-12','2026-10-11');
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const PAGE={torah:'torahreading',tehillim:'tehillim'};
 // progress store
-const db=await new Promise((ok,no)=>{const r=indexedDB.open('cdate_chabad',1);r.onupgradeneeded=()=>r.result.createObjectStore('p');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
-const tx=(m,f)=>new Promise((ok,no)=>{const t=db.transaction('p',m),s=t.objectStore('p'),q=f(s);t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>no(t.error)});
-const getAll=()=>new Promise(ok=>{const out={},t=db.transaction('p'),c=t.objectStore('p').openCursor();c.onsuccess=()=>{const x=c.result;if(x){out[x.key]=x.value;x.continue()}else ok(out)}});
+const MEM={};let db=null;try{db=await Promise.race([new Promise((ok,no)=>{const r=indexedDB.open('cdate_chabad',1);r.onupgradeneeded=()=>r.result.createObjectStore('p');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}),new Promise((_,no)=>setTimeout(()=>no(new Error('slow')),4000))])}catch(e){db=null}
+const put=(v,k)=>db?new Promise((ok,no)=>{const t=db.transaction('p','readwrite');t.objectStore('p').put(v,k);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)}):(MEM[k]=v,Promise.resolve());
+const getAll=()=>!db?Promise.resolve({...MEM}):new Promise(ok=>{const out={},t=db.transaction('p'),c=t.objectStore('p').openCursor();c.onsuccess=()=>{const x=c.result;if(x){out[x.key]=x.value;x.continue()}else ok(out)}});
 let got=await getAll();
-const box=document.createElement('div');box.style.cssText='position:fixed;left:10px;right:10px;bottom:10px;z-index:2147483647;background:#161a2e;color:#fff;font:16px/1.4 system-ui,sans-serif;padding:16px;border-radius:16px;box-shadow:0 8px 40px #0008';
-box.innerHTML='<b>Collecting Chabad.org English</b><div id="chS" style="margin:8px 0">Starting…</div><div style="height:8px;background:#fff3;border-radius:4px"><div id="chB" style="height:8px;width:0;background:#8c9bff;border-radius:4px"></div></div><div style="margin-top:8px;font-size:13px;opacity:.8">Keep this screen on and Chrome open. About 15–20 minutes.</div><button id="chD" style="margin-top:10px;padding:10px 14px;border-radius:10px;border:0;font:600 15px system-ui">Save what I have now</button>';
-document.body.appendChild(box);const S=t=>box.querySelector('#chS').textContent=t,B=p=>box.querySelector('#chB').style.width=(p*100).toFixed(1)+'%';
+
 const save=async()=>{got=await getAll();const blob=new Blob([JSON.stringify({source:'chabad.org daily study (English), used with permission',collected:new Date().toISOString(),pages:got})],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='chabad-en.json';document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),2000)};
 box.querySelector('#chD').onclick=save;
 let wl=null;try{wl=await navigator.wakeLock.request('screen')}catch(e){}
@@ -42,10 +46,11 @@ for(let i=0;i<jobs.length;i++){const[kind,d]=jobs[i],k=kind+':'+iso(d);B(i/jobs.
    const doc=new DOMParser().parseFromString(await r.text(),'text/html');doc.querySelectorAll('script,style,noscript,iframe,svg,header,footer,nav').forEach(x=>x.remove());const root=area(doc);const items=flat(root);
    if(items.length<5)throw new Error('no text found');
    const v={url:location.origin+url,title:doc.title.trim(),heads:[...doc.querySelectorAll('h1,h2,h3')].map(x=>x.textContent.replace(/\s+/g,' ').trim()).filter(Boolean).slice(0,8),root:lab(root),items};
-   await tx('readwrite',s=>s.put(v,k));got[k]=1;ok=true;fails=0}
+   await put(v,k);got[k]=1;ok=true;fails=0}
   catch(e){S('#'+(i+1)+': '+e.message+'. Waiting and trying again…');await sleep(t<1?5000:30000)}}
  if(!ok){fails++;if(fails>=3){S('Chabad.org stopped answering. Tap “Save what I have now”, or wait a while and tap the bookmark again to continue.');window.__chRun=0;return}}
  await sleep(700)}
 B(1);S('Done. Saving the file…');await save();
 setTimeout(()=>S('Done. The file chabad-en.json is in your Downloads. Upload it in the chat.'),1500);
+}catch(e){S('Stopped: '+(e&&e.message||e)+'. Take a screenshot of this and send it in the chat.')}
 window.__chRun=0})();
