@@ -1810,8 +1810,8 @@ async function chContent(k,d){const daily=await chGet(chUrl(k,d),2500);
  const m=daily.match(/\/parshah\/torahreading_cdo\/aid\/\d+\/p\/\d+/)||daily.match(/\/library\/bible_cdo\/aid\/\d+(?:\/[\w-]+)*?(?=["'\s<>?])/);
  if(!m)return{html:daily,url:chUrl(k,d),daily};
  const base='https://www.chabad.org'+m[0].replace(/&amp;/g,'&');let url=k==='chumash'?base+'/showrashi/true':base,html='';
- try{html=await chGet(url,3000)}catch(e){html=''}
- if(!html||html.length<20000){url=base;html=await chGet(url,3000)}
+ try{html=await chGet(url,1800)}catch(e){html=''}
+ if(!html||html.length<20000){url=base;html=await chGet(url,1800)}
  window.CH_LAST={...(window.CH_LAST||{}),content:url};return{html,url,daily}}   // an "incomplete" page is still used: the count may miss hidden text
 const chIn=el=>{const c=el.cloneNode(true);c.querySelectorAll('script,style,sup,.footnote,[class*=footnote],[class*=Footnote],a[class*=note]').forEach(x=>x.remove());
  return c.innerHTML.replace(/<(?!\/?(?:b|i|em|strong|br)\b)[^>]*>/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim()};
