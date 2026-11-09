@@ -919,7 +919,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   try{var m=await navigator.mediaDevices.getUserMedia({audio:true});m.getTracks().forEach(function(t){t.stop()})}catch(e){}
   await new Promise(function(r){try{navigator.geolocation.getCurrentPosition(function(){r()},function(){r()},{timeout:15000,maximumAge:600000})}catch(e){r()}});
   done()})})();</script>
-<div class="account-shade" id="accountGate" role="dialog" aria-modal="true" aria-labelledby="accountTitle"><form class="account-card" id="accountForm"><h1 id="accountTitle">Chabad Calendar</h1><p id="accountBeta" style="color:#8c94ef;font-weight:500;margin-bottom:8px;text-align:center">✓ Beta Program</p><p id="accountSub">Sign in or create an account.</p><label for="accountUser">Username</label><input id="accountUser" autocomplete="username" minlength="3" maxlength="32" required placeholder="Choose a username"><label for="accountPass">Password</label><input id="accountPass" type="password" autocomplete="current-password" minlength="4" required placeholder="At least 4 characters"><div class="account-buttons"><button id="accountSubmit" type="submit">Log in</button><button id="accountMode" class="alt" type="button">Create account</button></div><div class="account-error" id="accountError" role="status"></div><p class="account-note">Your account is saved safely online, so if you sign in on another phone or reinstall the app, all your shiurim, plans and settings come back.</p></form></div>
+<div class="account-shade" id="accountGate" role="dialog" aria-modal="true" aria-labelledby="accountTitle"><form class="account-card" id="accountForm"><h1 id="accountTitle">Chabad Calendar</h1><p id="accountBeta" style="color:#8c94ef;font-weight:500;margin-bottom:8px;text-align:center">✓ Beta Program</p><p id="accountSub">Sign in or create an account.</p><label for="accountUser">Username</label><input id="accountUser" autocomplete="username" minlength="3" maxlength="32" required placeholder="Choose a username"><label for="accountPass">Password</label><input id="accountPass" type="password" autocomplete="current-password" minlength="4" required placeholder="At least 4 characters"><label for="accountPass2" id="accountPass2L" hidden>Confirm password</label><input id="accountPass2" type="password" autocomplete="new-password" minlength="4" placeholder="Type the same password again" hidden><div class="account-buttons"><button id="accountSubmit" type="submit">Log in</button><button id="accountMode" class="alt" type="button">Create account</button></div><div class="account-error" id="accountError" role="status"></div><p class="account-note">Your account is saved safely online, so if you sign in on another phone or reinstall the app, all your shiurim, plans and settings come back.</p></form></div>
 <div id="intro"></div><main>
 <section class="hero" id="hero"><header id="hdr"></header></section>
 <section class="top" id="top"><div class="ghost" id="gh" aria-hidden="true"></div>
@@ -1276,7 +1276,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
    for(const k of ['cc_seen_ver_','cc_local_tour_done_']){const v=localStorage.getItem(k+o);if(v!=null){localStorage.setItem(k+n,v);localStorage.removeItem(k+o)}}
    db[n]=db[o];delete db[o];localStorage.setItem(USERS_KEY,JSON.stringify(db));localStorage.setItem(ACTIVE_KEY,n);return true}};
  let creating=false,busy=false;
- function mode(v){creating=v;$('accountSubmit').textContent=v?'Create account':'Log in';$('accountMode').textContent=v?'Back to login':'Create account';$('accountTitle').textContent=v?'Create your calendar account':'Your Chabad Calendar';$('accountSub').textContent=v?'Choose a username and password. Everything you save is kept in your account.':'Sign in or create an account.';$('accountPass').autocomplete=v?'new-password':'current-password';msg('')}
+ function mode(v){creating=v;$('accountSubmit').textContent=v?'Create account':'Log in';$('accountMode').textContent=v?'Back to login':'Create account';$('accountTitle').textContent=v?'Create your calendar account':'Your Chabad Calendar';$('accountSub').textContent=v?'Choose a username and password. Everything you save is kept in your account.':'Sign in or create an account.';$('accountPass').autocomplete=v?'new-password':'current-password';$('accountPass2').hidden=$('accountPass2L').hidden=!v;$('accountPass2').required=v;$('accountPass2').value='';msg('')}
  $('accountMode').addEventListener('click',()=>mode(!creating));
  function enter(u){localStorage.setItem(ACTIVE_KEY,u);location.reload()}
  $('accountForm').addEventListener('submit',async e=>{e.preventDefault();if(busy)return;const u=clean($('accountUser').value),p=$('accountPass').value;
@@ -1284,6 +1284,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   const db=users(),wait=t=>{busy=true;$('accountSubmit').disabled=true;msg(t)},done=()=>{busy=false;$('accountSubmit').disabled=false};
   if(u==='test'){if(p!=='test'){msg('Username or password is incorrect.');return}if(!db[u]){db[u]={passwordHash:hash('test|test'),created:Date.now()};localStorage.setItem(USERS_KEY,JSON.stringify(db));localStorage.setItem('cc_local_tour_done_test','1')}enter(u);return}
   if(creating){if(db[u]){msg('That username already exists on this phone. Log in instead.');return}
+   if($('accountPass2').value!==p){msg('The two passwords don’t match. Please type them again.');$('accountPass2').value='';$('accountPass2').focus();return}
    wait('Creating your account…');const r=await post('new',{u,p});done();
    if(r.s===409){msg('That username is already taken. Please choose another one.');return}
    db[u]={passwordHash:hash(u+'|'+p),created:Date.now()};localStorage.setItem(USERS_KEY,JSON.stringify(db));
@@ -3725,8 +3726,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=90;
+const CC_VER=91;
 const CC_LOG=[
+ {v:91,new:['Creating an account now asks you to type the password twice, so you know it’s right.']},
  {v:90,new:['Account saving now says clearly when the server still needs its update.']},
  {v:89,big:1,feature:'Your account is saved',new:['Your account is now saved online: your shiurim and streak, plans, reminders and settings.','Sign in on another phone, or after reinstalling the app, and everything comes back.','If you were already signed in, the app asks for your password once to turn this on.']},
  {v:88,new:['Siddur pages load faster: the next pages are ready before you turn to them.']},
