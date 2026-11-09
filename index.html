@@ -1033,7 +1033,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     var al=gl.getAttribLocation(pr,'a');gl.enableVertexAttribArray(al);gl.vertexAttribPointer(al,2,gl.FLOAT,false,0,0);
     var U={};['uRes','uZoom','uStage','uYawB','uBookS','uBookY','uBookA','uBlink','uRoot','uHat','uSq','uHead'].forEach(function(n){U[n]=gl.getUniformLocation(pr,n)});
     cv.id='in-3d';cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0';
-    var sc=1,W=0,H=0;function size(){var d=Math.min(window.devicePixelRatio||1,2.5),w=innerWidth,h=innerHeight,k=Math.min(d,Math.sqrt(330000/(w*h)))*sc;
+    var sc=1,W=0,H=0;function size(){var d=Math.min(window.devicePixelRatio||1,2.5),w=innerWidth,h=innerHeight,k=Math.min(d,Math.sqrt(900000/(w*h)))*sc;
       var nw=Math.max(64,Math.round(w*k)),nh=Math.max(64,Math.round(h*k));if(nw!==W||nh!==H){W=cv.width=nw;H=cv.height=nh;gl.viewport(0,0,W,H)}}
     size();addEventListener('resize',size);
     try{gl.uniform2f(gl.getUniformLocation(pr,'uRes'),W,H);gl.drawArrays(gl.TRIANGLES,0,3)}catch(e){}   // compile + upload now, not in the first animation frame
@@ -3771,8 +3771,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=99;
+const CC_VER=100;
 const CC_LOG=[
+ {v:100,new:['The character in the opening animation is sharper (less pixelated).']},
  {v:99,new:['Opening animation: all the creaks are quieter.']},
  {v:98,new:['Opening animation: no sound when the character turns his head; his blinks make the soft blip instead.']},
  {v:97,new:['Opening animation: the small creaks are quieter.']},
