@@ -109,14 +109,10 @@ body.op .bd,body.om .bd{opacity:1;pointer-events:auto}body.op #sh,body.om #ms{tr
 .dfb[data-dm=he] .rw{flex-wrap:wrap}.dfb[data-dm=he] #go{flex:1 1 100%}
 .hp{display:flex;gap:8px;flex:1 1 100%}.hp .hd{flex:.9}.hp .hm{flex:1.8}.hp .hy{flex:1.1;min-width:0}
 .ds{margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}.ds h3{font:500 18px 'Frank Ruhl Libre',serif;margin:0 0 4px}
-.dr{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);color:inherit;text-decoration:none;transition:padding .25s,color .2s}.dr:hover{padding-left:6px;color:var(--ct)}.dr b{font-weight:600}.dr span{color:var(--mut);text-align:right;font-size:14px}.ds small{display:block;margin-top:10px;color:var(--mut)}.lnk{display:inline-block;text-decoration:none;margin-top:14px}.ev small .m{margin-right:7px}.panel>small{display:block;margin-top:10px;color:var(--mut)}div.dr:hover{padding-left:0;color:inherit}
+.dr{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);color:inherit;text-decoration:none;transition:padding .25s,color .2s}.dr:hover{padding-left:6px;color:var(--ct)}.dr b{font-weight:600}.dr span{color:var(--mut);text-align:right;font-size:14px}.ds small{display:block;margin-top:10px;color:var(--mut)}.ev small .m{margin-right:7px}.panel>small{display:block;margin-top:10px;color:var(--mut)}div.dr:hover{padding-left:0;color:inherit}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.rv{opacity:1!important}}
 
 #intro{position:fixed;inset:0;z-index:99999;background:radial-gradient(130% 85% at 50% 36%,#1a2244 0%,#0b1020 52%,#04050a 100%);display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;overflow:hidden;color-scheme:dark}
-#intro svg{width:min(90vw,calc(38vh * 770 / 675));height:auto;overflow:visible}
-#intro .p{fill:none;stroke:#c2bfb8;stroke-width:25;stroke-linecap:round;stroke-linejoin:round}
-#intro .w{fill:none;stroke:#fff;stroke-width:25;stroke-linecap:round;stroke-linejoin:round;opacity:0}
-#in-dot{fill:#c2bfb8}
 .sm{cursor:pointer}.sm .mr{color:var(--c);font-weight:600;white-space:nowrap}.sm:hover .mr{text-decoration:underline}
 .dmb{position:fixed;inset:0;z-index:60;background:rgba(10,12,28,.45);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
 .dmb.on{opacity:1;pointer-events:auto}
@@ -131,7 +127,6 @@ main{max-width:640px;padding:6px 16px 140px}
 .top.norail{grid-template-columns:minmax(0,1fr)}.top.norail .rail{display:none}
 .ab{min-width:0;position:relative;z-index:1}
 .top>.ghost{right:62px;top:-6px;font-size:190px;z-index:0}
-.eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ct);font-weight:700}
 #hdr{display:block;transform-origin:left top;will-change:transform,opacity;padding-top:14px}
 #hdr h1{font:500 clamp(30px,8.6vw,40px)/1.05 'Frank Ruhl Libre',Georgia,serif;margin:6px 0 0;letter-spacing:-.01em}
 #hdr .hb{font:500 clamp(23px,6.6vw,28px)/1.2 'Frank Ruhl Libre',serif;margin-top:6px}
@@ -168,7 +163,7 @@ main{max-width:640px;padding:6px 16px 140px}
 .rdfs{flex:none;border:1px solid var(--line);background:transparent;color:inherit;border-radius:99px;height:34px;padding:0 11px;font:600 14px Figtree,system-ui;margin-left:auto}.rdfs+.rdpc{margin-left:0}
 .cload{display:flex;align-items:center;justify-content:center;min-height:44vh;color:var(--ink)}.cload svg{width:50px;height:auto;overflow:visible;animation:cpulse 1.6s ease-in-out infinite;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--ink) 22%,transparent))}.cload path{fill:none;stroke:currentColor;stroke-width:28;stroke-linecap:round;stroke-linejoin:round}@keyframes cpulse{0%,100%{opacity:.32;transform:scale(.9)}50%{opacity:1;transform:scale(1.05)}}@media(prefers-reduced-motion:reduce){.cload svg{animation:none;opacity:.7}}.hyt .cload{min-height:120px}.hyt .cload svg{width:40px}
 .rdl{font:15px/1.5 Figtree,system-ui;color:var(--mut);text-align:center;margin-top:30px}.rdl button{border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:10px 14px;font:600 14px Figtree,system-ui}.rdf{font:12.5px Figtree,system-ui;color:var(--mut);text-align:center;margin-top:24px}.rdf a{color:var(--ct)}
-.hyt p{margin:10px 0 0;line-height:1.6}.hyt .hyh{font-size:12px;letter-spacing:.04em;color:var(--mut);margin-top:10px}.hyx.cut{max-height:15.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}.hym{border:0;background:none;color:var(--ct);font:600 14px Figtree,system-ui;padding:8px 0 0;cursor:pointer}.hyn,.hyc2{font-size:11.5px;color:var(--mut);margin-top:8px}
+.hyt p{margin:10px 0 0;line-height:1.6}.hyt .hyh{font-size:12px;letter-spacing:.04em;color:var(--mut);margin-top:10px}.hyx.cut{max-height:15.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}.hym{border:0;background:none;color:var(--ct);font:600 14px Figtree,system-ui;padding:8px 0 0;cursor:pointer}.hyn{font-size:11.5px;color:var(--mut);margin-top:8px}
 .hyr{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.hyr .btn{margin:0;display:inline-block;text-decoration:none}
 .btn.on{background:var(--ys);color:#fff;border-color:transparent}
 .rail{align-self:stretch;position:relative;z-index:1}
@@ -295,9 +290,8 @@ html.cc-webblock .cc-andr-yes,html.cc-webblock.cc-andr .cc-andr-no{display:none}
 .account-card{width:min(100%,390px);background:var(--card,#fff);border:1px solid var(--line,#ddd);border-radius:24px;padding:25px;box-shadow:0 20px 70px #0002}
 .account-card h1{font:500 30px/1.1 'Frank Ruhl Libre',Georgia,serif;margin:0 0 8px}.account-card p{font-size:14px;line-height:1.45;color:var(--mut,#666);margin:0 0 17px}
 .account-card label{display:block;font-size:13px;margin:12px 0 5px}.account-card input{width:100%;box-sizing:border-box;border:1px solid var(--line,#ddd);border-radius:12px;padding:13px;font:inherit;background:var(--bg,#f7f5ef);color:inherit}
-.account-buttons{display:flex;gap:9px;margin-top:16px}.account-buttons button,.tour-next{border:1px solid var(--ink,#222);border-radius:12px;padding:12px 15px;font:600 14px system-ui;cursor:pointer;flex:1;background:var(--ink,#222);color:var(--card,#fff)}.account-buttons button.alt{background:transparent;color:inherit;border-color:var(--line,#ddd)}
-.account-error{font-size:13px;color:#b42318;min-height:18px;margin-top:10px}.account-note{font-size:11px!important;margin-top:15px!important}.account-link{border:0;background:none;text-decoration:underline;color:inherit;padding:8px 0;font:inherit;cursor:pointer}
-.tour-shade{position:fixed;inset:0;z-index:100001;background:#080914a8;display:none;align-items:center;justify-content:center;padding:22px}.tour-shade.on{display:flex}.tour-card{width:min(100%,380px);border-radius:22px;padding:24px;background:var(--card,#fff);color:var(--ink,#222);box-shadow:0 20px 70px #0004}.tour-card .step{font-size:12px;color:var(--mut,#666);margin-bottom:10px}.tour-card h2{font:500 26px 'Frank Ruhl Libre',Georgia,serif;margin:0 0 9px}.tour-card p{font-size:14px;line-height:1.5;color:var(--mut,#666);margin:0 0 20px}.tour-next{width:100%}
+.account-buttons{display:flex;gap:9px;margin-top:16px}.account-buttons button{border:1px solid var(--ink,#222);border-radius:12px;padding:12px 15px;font:600 14px system-ui;cursor:pointer;flex:1;background:var(--ink,#222);color:var(--card,#fff)}.account-buttons button.alt{background:transparent;color:inherit;border-color:var(--line,#ddd)}
+.account-error{font-size:13px;color:#b42318;min-height:18px;margin-top:10px}.account-note{font-size:11px!important;margin-top:15px!important}
 
 /* ===== Home screen: just the date. Details arrive as you scroll. ===== */
 main{padding-top:0}
@@ -307,22 +301,12 @@ main{padding-top:0}
 #hdr .hd-big{font:500 clamp(48px,15vw,96px)/1 'Frank Ruhl Libre',Georgia,serif;letter-spacing:-.01em;white-space:nowrap}
 #hdr .hd-yr{font:500 clamp(16px,4.4vw,21px)/1 'Frank Ruhl Libre',Georgia,serif;color:var(--mut)}
 #hdr .hd-en{display:flex;flex-direction:column;gap:4px;font-family:'Frank Ruhl Libre',Georgia,serif;text-align:left}
-#hdr .hd-wd{font-size:clamp(24px,6.8vw,34px);font-weight:500;line-height:1.1}
-#hdr .hd-md{font-size:clamp(21px,5.8vw,29px);font-weight:400;line-height:1.1;color:var(--mut)}
 
 /* bottom cluster: today's chips + a small circle for the next special day */
 .foot{position:fixed;left:0;right:0;margin:0 auto;width:min(640px,100%);box-sizing:border-box;padding:0 18px;bottom:calc(150px + env(safe-area-inset-bottom,0px));z-index:9;display:flex;align-items:center;justify-content:center;gap:12px;will-change:transform,opacity,filter}
 .foot .chips2{margin:0;flex:0 1 auto;min-width:0;justify-content:center}
 .foot .c2{font-size:14px;padding:7px 13px;max-width:100%;box-sizing:border-box}
 .c2 .t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nxc{flex:none;width:42px;height:42px;padding:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:inherit;border:1px solid color-mix(in srgb,var(--c) 45%,var(--line));background:color-mix(in srgb,var(--c) 14%,var(--card));transition:transform .2s;-webkit-tap-highlight-color:transparent}
-.nxc:active{transform:scale(.9)}
-.nxc .m{width:14px;height:14px}
-.nxc .m.k-ct{width:11px;height:11px}
-.nxc .m.k-yb{width:13px;height:13px;border-radius:3px}
-.nxc .m.k-ys{box-shadow:inset 0 0 0 2.5px var(--c)}
-.nxc .m.k-fs{width:19px;height:4px}
-.nxc .m.k-my{width:16px;height:14px}
 
 /* small round "more below" button with a count of what's coming up */
 .hint{position:fixed;left:50%;margin-left:-19px;bottom:calc(82px + env(safe-area-inset-bottom,0px));z-index:9;width:38px;height:38px;padding:0;border-radius:50%;display:grid;place-items:center;color:var(--ink);cursor:pointer;border:1px solid var(--line);background:color-mix(in srgb,var(--card) 82%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);animation:nudge 2.6s ease-in-out 1.6s 3;-webkit-tap-highlight-color:transparent}
@@ -331,8 +315,7 @@ main{padding-top:0}
 @keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 .foot.gone,.hint.gone,body.om .foot,body.om .hint{visibility:hidden;pointer-events:none}
 body.om .foot,body.om .hint{opacity:0!important}
-.foot:focus-within,.hint:focus-visible,.nxc:focus-visible{outline:none}
-.nxc:focus-visible,.hint:focus-visible{outline:2px solid var(--ct);outline-offset:2px}
+.foot:focus-within,.hint:focus-visible{outline:none}
 
 /* below the fold: what today is, with the upcoming list sliding up beside it */
 .top{padding-top:10px}
@@ -355,7 +338,6 @@ body.om .foot,body.om .hint{opacity:0!important}
 .hero>*{position:relative;z-index:1}
 .moon,.wk{flex:0 0 100%;display:flex;justify-content:center}
 .moon svg{display:block;overflow:visible;width:62px;height:62px;filter:drop-shadow(0 0 16px color-mix(in srgb,var(--aura,var(--ct)) 60%,transparent))}
-.mo-d{fill:color-mix(in srgb,var(--ink) 10%,transparent);stroke:color-mix(in srgb,var(--ink) 24%,transparent);stroke-width:1}.mo-l{fill:#f7edc9}
 .wk{gap:4px;margin-top:4px}
 .wd{display:grid;justify-items:center;gap:6px;padding:6px 7px;font-style:normal;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .wd u{text-decoration:none;font-size:10px;letter-spacing:.08em;color:var(--mut)}
@@ -366,9 +348,8 @@ body.om .foot,body.om .hint{opacity:0!important}
 
 
 
-<style id="android-blank-screen-fix">#intro{display:none!important;pointer-events:none!important}
 #sky{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}#skyGrad{position:absolute;inset:0}#stars{position:absolute;left:0;top:0;width:1px;height:1px;border-radius:50%;opacity:0;transition:opacity 2s}
-.sky-scene{position:relative;flex:0 0 100%;height:140px;margin-bottom:8px}.sky-arc{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.sky-trailc{position:absolute;left:-26px;top:-26px;pointer-events:none}.sky-body.anim{transition:none!important}
+.sky-scene{position:relative;flex:0 0 100%;height:140px;margin-bottom:8px}.sky-trailc{position:absolute;left:-26px;top:-26px;pointer-events:none}.sky-body.anim{transition:none!important}
 .sky-body{position:absolute;width:112px;height:112px;margin:-56px 0 0 -56px;transition:left 1.2s ease,top 1.2s ease,opacity .6s}.skyimg{display:block;width:100%;height:100%;pointer-events:none;user-select:none}.moon .skyimg{width:96px;height:96px;margin:-18px 0}.sky-body.below .skyimg{filter:brightness(.5) saturate(.8)}
 :root:not([data-night="1"]) .sky-body.below{opacity:.45}
 .sky-cap{position:absolute;left:0;right:0;bottom:-6px;text-align:center;font-size:12px;letter-spacing:.02em;color:color-mix(in srgb,var(--ink) 72%,transparent)}
@@ -432,14 +413,6 @@ html.tour-on .ai-card,html.tour-on .sheet{will-change:transform}
 .qdot i{width:15px;height:15px;border-radius:50%;border:1.6px solid color-mix(in srgb,var(--ink) 24%,transparent);box-sizing:border-box}
 .qdot.f i{background:var(--ys);border-color:var(--ys)}.qdot.p i{background:linear-gradient(90deg,var(--ys) 50%,transparent 50%);border-color:var(--ys)}
 .qdot.now i{outline:2px solid color-mix(in srgb,var(--ys) 38%,transparent);outline-offset:2px}.qdot.now{color:var(--ink);font-weight:700}
-.qstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 16px}.qstats div{padding:10px 6px;border:1px solid var(--line);border-radius:14px;text-align:center}
-.qstats b{display:block;font:500 24px 'Frank Ruhl Libre',serif;line-height:1.1}.qstats span{font-size:11px;color:var(--mut)}
-.qwk,.qgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.qwk{margin-bottom:6px}.qwk span{text-align:center;font-size:10px;color:var(--mut)}
-.qcell{aspect-ratio:1;border-radius:11px;display:grid;place-items:center;font-size:12px;border:1px solid var(--line);color:var(--mut)}
-.qcell.f{background:var(--ys);color:#fff;border-color:transparent;font-weight:600}.qcell.p{background:color-mix(in srgb,var(--ys) 24%,transparent);color:var(--ink);border-color:transparent}
-.qcell.fu{opacity:.28;border-style:dashed}.qcell.now{box-shadow:0 0 0 2px var(--ink)}
-.rmopen{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
-.rmopen b{display:block;font-size:14px;font-weight:600}.rmopen small{display:block;color:var(--mut);font-size:12px;margin-top:1px}.rmopen i{font-style:normal;color:var(--mut);font-size:20px}
 #rmb .dmc{padding-bottom:18px}
 .qrow{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0!important;padding:13px 0;cursor:pointer;color:var(--ink)!important;font-size:inherit!important}
 .qrow .t b{display:block;font-size:15px;font-weight:600}.qrow .t small{display:block;color:var(--mut);font-size:12px;margin-top:2px;line-height:1.35;text-transform:none;letter-spacing:0}
@@ -664,7 +637,7 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .ai-fab{width:62px;height:62px;right:max(20px,env(safe-area-inset-right));bottom:calc(94px + env(safe-area-inset-bottom,0px));background:var(--navy);color:#fff;border:1px solid rgba(172,182,255,.34);font:300 38px/1 Figtree,system-ui,sans-serif;
  box-shadow:0 12px 30px rgba(2,4,20,.42),0 0 24px rgba(110,125,255,.14)}
 .dock{width:min(88vw,372px);box-sizing:border-box;justify-content:space-between;align-items:center;padding:6px;gap:0;border-radius:34px;background:var(--gl-bg);border:1px solid var(--gl-bd);box-shadow:0 14px 36px rgba(3,6,26,.30)}
-.dock #pd,.dock #nd{display:none}
+
 .dock #td,.dock #mo{display:inline-flex;align-items:center;gap:10px;height:50px;padding:0 22px;border-radius:26px;font:600 15.5px Figtree,system-ui,sans-serif}
 .dock #td::before,.dock #mo::before{content:'';flex:none;width:20px;height:20px;background:currentColor;
  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'%3E%3Crect x='3.5' y='5' width='17' height='15.5' rx='3'/%3E%3Cpath d='M3.5 10h17M8 3v4M16 3v4'/%3E%3C/svg%3E") center/contain no-repeat;
@@ -674,7 +647,6 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 .dock #mo{position:relative;margin-left:10px;color:color-mix(in srgb,var(--gl-tx) 82%,transparent)}
 .dock #mo::after{content:'';position:absolute;left:-6px;top:14px;bottom:14px;width:1px;background:color-mix(in srgb,var(--gl-tx) 22%,transparent)}
 .dock #mn{font-size:22px;letter-spacing:1px;padding:0 18px;color:color-mix(in srgb,var(--gl-tx) 82%,transparent)}
-.nxc{background:var(--gl-bg);border-color:var(--gl-bd)}
 /* living light: the silk canvas, and glass whose rim glint and glare follow the same light as you scroll */
 #skyGL{position:absolute;inset:0;width:100%;height:100%;display:block}
 #hdr .wk,.hyc{position:relative}
@@ -822,26 +794,24 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 /* v51: the light outline on dark backgrounds is a stroke drawn under each black part (paint-order), not a CSS filter:
    a filtered layer with moving parts inside flashed between animations in Android's WebView */
 .cch{--halo:transparent}:root[data-night="1"] .cch,:root[data-theme="dark"] .cch{--halo:rgba(255,255,255,.92)}
-:is(.cch,.cchI) .k{stroke:var(--halo);stroke-width:5;paint-order:stroke;stroke-linejoin:round}:is(.cch,.cchI) .c-halo{fill:none;stroke:var(--halo);stroke-width:13}
-:is(.cch,.cchI) .k{fill:var(--ink)}:is(.cch,.cchI) .w{fill:var(--fill)}:is(.cch,.cchI) .ln{fill:none;stroke:var(--ink);stroke-width:8;stroke-linecap:round}
-:is(.cch,.cchI) .c-face{fill:var(--fill);stroke:var(--ink);stroke-width:7}
-:is(.cch,.cchI) .c-e{stroke:none}
+.cch .k{stroke:var(--halo);stroke-width:5;paint-order:stroke;stroke-linejoin:round}.cch .c-halo{fill:none;stroke:var(--halo);stroke-width:13}
+.cch .k{fill:var(--ink)}.cch .w{fill:var(--fill)}.cch .ln{fill:none;stroke:var(--ink);stroke-width:8;stroke-linecap:round}
+.cch .c-face{fill:var(--fill);stroke:var(--ink);stroke-width:7}
+.cch .c-e{stroke:none}
 /* v53 (owner: "it still flashes when he changes expressions… just him"): no CSS transforms/transitions/animations on his parts
    at all. Every move is computed in JS (cchLive's little engine) and written as plain SVG transform/opacity attributes, one
    requestAnimationFrame loop that runs only while something moves. */
 /* the + button is the character */
-.ai-fab .fabplus{display:none}.ai-fab .fabc{--cw:42px;position:relative;z-index:3;margin-top:5px}
+.ai-fab .fabc{--cw:42px;position:relative;z-index:3;margin-top:5px}
 /* v68 (owner): no round button: just him standing there, with a small soft shadow under him like a bit of floor */
-:root:not(.tt-off-char) .ai-fab{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;width:66px;height:76px;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;animation:none!important;place-items:end center;overflow:visible}
-:root:not(.tt-off-char) .ai-fab::before{display:none!important}
-:root:not(.tt-off-char) .ai-fab::after{content:''!important;position:absolute!important;inset:auto!important;left:50%!important;bottom:3px!important;width:46px!important;height:11px!important;margin-left:-23px;padding:0!important;border-radius:50%!important;background:radial-gradient(closest-side,rgba(10,14,34,.42),rgba(10,14,34,.14) 60%,rgba(10,14,34,0))!important;-webkit-mask:none!important;mask:none!important;z-index:1!important;opacity:1!important;animation:none!important}
-:root:not(.tt-off-char)[data-night="1"] .ai-fab::after{background:radial-gradient(closest-side,rgba(0,0,0,.6),rgba(0,0,0,.2) 60%,rgba(0,0,0,0))!important}
-:root:not(.tt-off-char) .ai-fab .fabc{--cw:56px;margin:0 0 8px}
-:root.tt-off-char .ai-fab .fabplus{display:inline}:root.tt-off-char .ai-fab .fabc{display:none}
-.ai-av{--cw:58px;margin:-8px 0 -4px -2px}.ai-head h2{flex:1}:root.tt-off-char .ai-av{display:none}
+:root .ai-fab{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;width:66px;height:76px;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;animation:none!important;place-items:end center;overflow:visible}
+:root .ai-fab::before{display:none!important}
+:root .ai-fab::after{content:''!important;position:absolute!important;inset:auto!important;left:50%!important;bottom:3px!important;width:46px!important;height:11px!important;margin-left:-23px;padding:0!important;border-radius:50%!important;background:radial-gradient(closest-side,rgba(10,14,34,.42),rgba(10,14,34,.14) 60%,rgba(10,14,34,0))!important;-webkit-mask:none!important;mask:none!important;z-index:1!important;opacity:1!important;animation:none!important}
+:root[data-night="1"] .ai-fab::after{background:radial-gradient(closest-side,rgba(0,0,0,.6),rgba(0,0,0,.2) 60%,rgba(0,0,0,0))!important}
+:root .ai-fab .fabc{--cw:56px;margin:0 0 8px}
+.ai-av{--cw:58px;margin:-8px 0 -4px -2px}.ai-head h2{flex:1}
 .smot{display:flex!important;align-items:center;gap:12px}.smot .smav{--cw:46px}.smot>div{display:grid;gap:2px;min-width:0}
 #stkToast{display:flex!important;align-items:center;gap:12px}#stkToast .smav{--cw:44px}#stkToast>div{display:grid;gap:2px}
-:root.tt-off-char :is(.smot,#stkToast) .smav{display:none}
 </style>
 <style id="cc-siddur">
 /* ===== Siddur (Tehillat Hashem pages; v37 = paged). Pages are alpha stencils (siddur/p/N.webp) painted in var(--ink) via mask. ===== */
@@ -918,33 +888,18 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   await new Promise(function(r){try{navigator.geolocation.getCurrentPosition(function(){r()},function(){r()},{timeout:15000,maximumAge:600000})}catch(e){r()}});
   done()})})();</script>
 <div class="account-shade" id="accountGate" role="dialog" aria-modal="true" aria-labelledby="accountTitle"><form class="account-card" id="accountForm"><h1 id="accountTitle">Chabad Calendar</h1><p id="accountBeta" style="color:#8c94ef;font-weight:500;margin-bottom:8px;text-align:center">✓ Beta Program</p><p id="accountSub">Sign in or create a private profile for this device.</p><label for="accountUser">Username</label><input id="accountUser" autocomplete="username" minlength="3" maxlength="32" required placeholder="Choose a username"><label for="accountPass">Password</label><input id="accountPass" type="password" autocomplete="current-password" minlength="4" required placeholder="At least 4 characters"><div class="account-buttons"><button id="accountSubmit" type="submit">Log in</button><button id="accountMode" class="alt" type="button">Create account</button></div><div class="account-error" id="accountError" role="status"></div><p class="account-note">Your profile and schedule stay in this browser on this device. This is not a cloud account: another person or device has separate data, and your schedule will not sync between devices. This simple offline lock is not suitable for sensitive information.</p></form></div>
-<div id="intro"><svg id="in-logo" viewBox="95 85 770 675" role="img" aria-label="Logo">
-  <defs><linearGradient id="in-fade" gradientUnits="userSpaceOnUse" x1="556" y1="536" x2="548" y2="590"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient></defs>
-  <g id="in-all" style="display:none">
-    <g id="in-rest">
-      <circle id="in-dot" cx="508" cy="415" r="0"/>
-      <path id="in-nun" class="p" d=""/>
-      <path id="in-el" class="p" d=""/>
-      <path id="in-lam" class="p" d=""/>
-    </g>
-    <path id="in-zig" class="p" d="M512 518 L318 628 L212 550 L120 735"/>
-    <path id="in-zw" class="w" d="M512 518 L318 628 L212 550 L120 735"/>
-    <path id="in-sw" class="w" style="stroke:url(#in-fade)" d="M556 536 L522 725"/>
-    <path id="in-af" fill="#fff" opacity="0" d="M34 221Q34 272 97 344Q93 345 86.0 349.0Q79 353 68.5 364.0Q58 375 49.0 389.5Q40 404 33.5 429.5Q27 455 27 485Q27 522 46.0 551.5Q65 581 86 581Q88 581 88.5 578.0Q89 575 90.0 564.0Q91 553 94 540Q103 506 151.5 456.0Q200 406 244.0 373.0Q288 340 293 340L344 411Q316 427 288.5 453.5Q261 480 261.0 505.0Q261 530 283.0 557.0Q305 584 326 584Q330 584 331.0 581.5Q332 579 332 569Q332 545 356.5 523.5Q381 502 410.0 487.5Q439 473 463.5 448.0Q488 423 488 392Q488 352 460.0 321.5Q432 291 414 291Q413 291 403 338Q399 358 389.0 373.0Q379 388 371 393L363 398L314 321Q316 321 334.0 310.5Q352 300 377.5 279.0Q403 258 428.0 232.0Q453 206 470.5 170.0Q488 134 488 99Q488 33 476.0 14.0Q464 -5 437 -5Q436 -5 434.0 15.0Q432 35 417.0 67.5Q402 100 372 125Q325 164 263.0 213.5Q201 263 157.5 296.5Q114 330 112 330Q75 307 75 267Q75 244 95.0 215.0Q115 186 138.5 163.0Q162 140 182.0 109.5Q202 79 202 53Q202 43 199.0 35.0Q196 27 192.0 22.0Q188 17 180.5 12.0Q173 7 169.0 5.0Q165 3 155.0 -0.5Q145 -4 144 -5H29Q35 10 41 10Q49 11 53.0 12.0Q57 13 62.0 16.5Q67 20 69.0 28.5Q71 37 71.0 51.0Q71 65 52.5 132.5Q34 200 34 221Z"/>
-    <circle id="in-pt" cx="480" cy="422" r="0" fill="#fff"/>
-  </g>
-</svg></div><main>
+<div id="intro"></div><main>
 <section class="hero" id="hero"><header id="hdr"></header></section>
 <section class="top" id="top"><div class="ghost" id="gh" aria-hidden="true"></div>
 <div class="ab"><div class="about"><div id="p"></div><div id="hy"></div></div></div>
 <aside class="rail" id="rail" aria-label="Coming up"></aside></section>
 <section class="lists"><div class="panel" id="rc" hidden></div><div class="panel" id="sp" hidden></div><div class="panel" id="sd"></div><div class="panel" id="zm"></div></section>
 </main>
-<div class="foot" id="foot"><div class="chips2" id="ch"></div><button class="nxc" id="nxc" type="button" hidden></button></div>
+<div class="foot" id="foot"><div class="chips2" id="ch"></div></div>
 <button class="hint" id="hint" type="button" aria-label="See details"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg><b id="hintN" hidden></b></button>
 <div class="cb" id="cb" aria-hidden="true"><div class="cl" id="cbt"></div><div id="cbr"></div></div>
-<nav class="dock" aria-label="Day navigation"><button id="pd" aria-label="Previous day">‹</button><button id="td" class="tdb">Today</button><button id="nd" aria-label="Next day">›</button><button id="mo">Month</button><button id="sd" aria-label="Siddur">Siddur</button><button id="mn" aria-label="More: go to a date, add events, settings">⋯</button></nav>
-<button class="ai-fab" id="aiFab" aria-label="Add an event with the calendar assistant" title="Add with assistant"><b class="fabplus" aria-hidden="true">+</b><span class="cch fabc" id="fabCh" data-m="curious" aria-hidden="true"></span></button>
+<nav class="dock" aria-label="Day navigation"><button id="td" class="tdb">Today</button><button id="mo">Month</button><button id="sd" aria-label="Siddur">Siddur</button><button id="mn" aria-label="More: go to a date, add events, settings">⋯</button></nav>
+<button class="ai-fab" id="aiFab" aria-label="Add an event with the calendar assistant" title="Add with assistant"><span class="cch fabc" id="fabCh" data-m="curious" aria-hidden="true"></span></button>
 <div class="ai-backdrop" id="aiBackdrop" aria-hidden="true"><section class="ai-card" role="dialog" aria-modal="true" aria-labelledby="aiTitle"><div class="ai-head"><span class="cch ai-av" id="aiAv" data-m="curious" aria-hidden="true"></span><h2 id="aiTitle">Plan something</h2><button class="ai-close" id="aiClose" aria-label="Close">×</button></div><p class="ai-hint">Describe it naturally, e.g. “Tanya chavrusa with Yossi every Sunday and Tuesday at 8pm” or “yahrzeit of my father 20 Av”. To remove one: “cancel my chavrusa with Yossi”. Hebrew dates and terms like kvius, chavrusa and seder are welcome.</p><textarea class="ai-input" id="aiInput" placeholder="e.g. Set a monthly kvius with my chavrusa on the 15th of every Hebrew month…"></textarea><div class="ai-actions"><button class="ai-mic" id="aiMic" aria-label="Speak your request" title="Speak" aria-pressed="false" type="button">🎙</button><select class="ai-lang" id="aiLang" aria-label="Voice language"><option value="en-US">English</option><option value="he-IL">עברית</option></select><button class="ai-primary" id="aiPlan" style="flex:1">Make a plan</button></div><div class="ai-status" id="aiStatus" aria-live="polite"></div><div class="ai-preview" id="aiPreview"><h3 id="aiPreviewTitle"></h3><p id="aiPreviewDate"></p><p id="aiPreviewRepeat"></p><p id="aiPreviewNotes"></p><div class="ai-confirm"><button id="aiNo">No, change it</button><button class="ai-yes" id="aiYes">Yes, add it</button></div></div><div class="ai-multi" id="aiMulti"></div><div class="ai-preview" id="aiCancel"><h3 id="aiCancelTitle"></h3><p id="aiCancelBody"></p><div class="ai-choices" id="aiChoices"></div></div><button type="button" class="ai-undo" id="aiUndo" hidden>↩ Undo</button><div class="ai-memory">Your approved arrangements and preferences can be remembered on this device. <button id="aiMemoryBtn">View saved preferences</button></div></section></div>
 <div class="bd" id="bd"></div>
 <div class="sheet ms" id="ms" role="dialog" aria-label="Month"><div class="mh"><h2 id="t"></h2><div class="nav"><button id="pv" aria-label="Previous month">‹</button><button id="nx" aria-label="Next month">›</button></div></div><div class="sub" id="s"></div><section class="cal"><div class="dow"></div><div class="grid" id="g"></div></section></div>
@@ -956,45 +911,18 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
 <div class="rw"><button class="btn" id="sv">Save event</button><button class="btn gh" id="dl" hidden>Delete</button></div></div>
 <div id="my"></div></section><section class="shp" data-p="app"><div class="shh"><button class="shb" type="button" data-back aria-label="Back">‹</button><h2>App</h2></div><h2 id="appH" hidden>App</h2><div id="appSec"></div></section><section class="shp" data-p="help"><div class="shh"><button class="shb" type="button" data-back aria-label="Back">‹</button><h2>Help</h2></div><p class="shx">A short walk through the main screen, the shiurim and the assistant.</p><button class="btn gh" id="tourReplay" type="button">Replay the tour</button></section><section class="shp" data-p="adv" id="shpAdv"><div class="shh"><button class="shb" type="button" data-back aria-label="Back">‹</button><h2>Advanced</h2></div><div class="shl shtgs"><label class="qrow shtg"><span class="t"><b>Live sky</b><small>Moving sun and moon, and sky colours that follow the time of day</small></span><input type="checkbox" class="qsw" id="skyOn"></label><label class="qrow shtg"><span class="t"><b>Shiurim follow the English date</b><small>Otherwise the next day’s shiurim start at sunset, with the Hebrew date</small></span><input type="checkbox" class="qsw" id="shEng"></label></div><h3 class="shs">Coordinates</h3><p class="shx">Only if the city search can’t find your place.</p><details class="shd"><summary style="font-size:13px;color:var(--mut);cursor:pointer">Enter coordinates manually</summary><label for="pl">Place</label><input id="pl"><div class="rw" style="margin-top:0"><div style="flex:1"><label for="la">Latitude</label><input id="la" type="number" step="any"></div><div style="flex:1"><label for="lo">Longitude</label><input id="lo" type="number" step="any"></div></div><label for="tz">Time zone</label><input id="tz" placeholder="Asia/Shanghai"><div class="rw"><button class="btn" id="ls" type="button">Save location</button></div></details><h3 class="shs">Built-in dates</h3><p class="shx">Change or hide the calendar’s own dates on the day screen.</p><button class="btn gh" id="em">Turn on editing for built-in dates</button></section></div>
 <script>(function(){
-  var $=function(i){return document.getElementById('in-'+i)};
-  var dot=$('dot'),nun=$('nun'),el=$('el'),zig=$('zig'),lam=$('lam'),zw=$('zw'),sw=$('sw'),all=$('all'),rest=$('rest'),fade=$('fade'),svg=$('logo'),af=$('af'),pt=$('pt');
-  var ZL=zig.getTotalLength();
-  zig.style.strokeDasharray=ZL+' '+(ZL*2);
   var clamp=function(x){return x<0?0:x>1?1:x};
   var P=function(t,a,b){return clamp((t-a)/(b-a))};
-  var io=function(x){return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2};
-  var out=function(x){return 1-Math.pow(1-x,3)};
   var sm=function(x){return x*x*(3-2*x)};
   if(/[?&]introshot/.test(location.search))window.__INTRO_T=0;
-  var END=7.3,SPEED=1,SPEED2=1,ov=document.getElementById('intro'),app=document.querySelector('main');
-
-  var ZA=[[512,518],[318,628],[212,550],[120,735]],ZB=[[660,242],[480,472],[300,242],[300,602]];
-  var SA=[[556,536],[522,725]],SB=[[660,242],[660,602]];
-  function poly(A,B,k){
-    return A.map(function(p,i){
-      return (i?'L':'M')+(p[0]+(B[i][0]-p[0])*k).toFixed(2)+' '+(p[1]+(B[i][1]-p[1])*k).toFixed(2);
-    }).join(' ');
-  }
-  var KP=0;addEventListener('resize',function(){KP=0});
-  function K(){
-    /* v43: measured once (it was a forced layout on every frame of the intro) */
-    var ppu=KP||(KP=svg.getBoundingClientRect().width/770/(window.__zk||1));
-    return Math.min(innerWidth,innerHeight)*.86/(385*ppu);
-  }
-
-  var CH=null;
-  /* v58 (owner: "more professional, like the Pixar intro, almost 3D"): a lit stage (spotlight cone, a pool of light on the
-     floor, a soft contact shadow that grows and shrinks as he hops), shading on his parts (sphere-lit face, glossy black
-     hat/book/eyes with catch-lights, a faint rim light), a real 3D head turn (eyes travel round the sphere), and a slow camera
-     push-in. All drawn with SVG gradients, moved by attributes (no CSS filters or transitions). */
-  var CH=null;
+  var END=7.3,SPEED=1,ov=document.getElementById('intro'),app=document.querySelector('main');
   /* v74 (owner: "the character in the intro should be an actual 3D character, it looks very cheap"): a real 3D render.
      One WebGL fragment shader ray-marches him (signed distance fields): a white vinyl head with glossy painted eyes (decals on
      the sphere, so head turns are real), a felt fedora with a band, an open book with leather covers, a spine and page edges,
      on a dark stage under a warm key light with soft shadows, ambient occlusion and a cool rim light. The motion still comes
-     from chRender's timeline (same hops, springs, turns, sounds). Falls back to the SVG drawing if WebGL fails or is too slow. */
+     from chRender's timeline (same hops, springs, turns, sounds). If WebGL fails or the phone is too slow, the intro is skipped (fades straight into the app). */
   var G3=(function(){try{
-    if(/[?&]svgintro/.test(location.search))return null;
+    if(/[?&]nointro/.test(location.search))return null;
     var cv=document.createElement('canvas'),gl=cv.getContext('webgl',{antialias:false,alpha:false,depth:false,stencil:false,preserveDrawingBuffer:false,powerPreference:'high-performance'});
     if(!gl)return null;
     var VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
@@ -1092,37 +1020,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
       gl.uniform3f(U.uRoot,o.rx,o.ry,o.lean);gl.uniform3f(U.uHat,o.hy,o.hr,o.hx);gl.uniform2f(U.uSq,o.sx,o.sy);gl.uniform4f(U.uHead,o.headY,o.headYaw,o.headRoll,0);
       gl.drawArrays(gl.TRIANGLES,0,3);return true}}
   }catch(e){try{console.warn('3D intro off:',e&&e.message)}catch(_){}return null}})();
-  function chInit(){if(CH)return CH;if(typeof CCH_SVG==='undefined')return null;
-    var w=440,h=518,x=480-184*w/340,y=450-300*h/400,FY=y+378*h/400;
-    var m=CCH_SVG.replace('<svg viewBox="0 0 340 400"','<svg x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+w+'" height="'+h+'" viewBox="0 0 340 400" overflow="visible"')
-      .replace('<g class="c-head">','<clipPath id="in-hc"><rect x="-300" y="-900" width="940" height="1140"/></clipPath><g clip-path="url(#in-hc)"><g class="c-head">').replace('\n<g class="c-book">','</g>\n<g class="c-book">')
-      .replace('<path class="c-hap','<circle class="c-gl l" cx="144" cy="156" r="4.5" fill="#fff" opacity=".9"/><circle class="c-gl r" cx="210" cy="156" r="4.5" fill="#fff" opacity=".9"/><path class="c-hap');
-    var side='<g class="c-sd" opacity="0"><g transform="matrix(-1 0 0 1 376 0)"><g class="c-sdk"><path class="c-sf" style="fill:#2b3247;stroke:#05060c;stroke-width:4;stroke-linejoin:round"/><path class="w c-sp" style="stroke:#05060c;stroke-width:4;stroke-linejoin:round"/><path class="k c-sb"/><path class="c-ss" style="fill:#030409"/><path class="c-sh" style="fill:none;stroke:rgba(200,215,255,.35);stroke-width:3;stroke-linecap:round"/></g></g></g>';
-    m=m.replace('</svg>',side+'</svg>');
-    var defs='<defs>'
-      +'<radialGradient id="in-gf" cx=".36" cy=".3" r=".78"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#eef1f8"/><stop offset=".85" stop-color="#cdd4e4"/><stop offset="1" stop-color="#aeb7cc"/></radialGradient>'
-      +'<linearGradient id="in-gk" x1="0" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#3a4258"/><stop offset=".35" stop-color="#151a27"/><stop offset="1" stop-color="#030409"/></linearGradient>'
-      +'<radialGradient id="in-pool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#cfdcff" stop-opacity=".30"/><stop offset=".6" stop-color="#9fb3f0" stop-opacity=".10"/><stop offset="1" stop-color="#9fb3f0" stop-opacity="0"/></radialGradient>'
-      +'<radialGradient id="in-shd" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".75"/><stop offset=".6" stop-color="#000" stop-opacity=".3"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>'
-      +'<linearGradient id="in-cone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfe7ff" stop-opacity=".16"/><stop offset="1" stop-color="#dfe7ff" stop-opacity="0"/></linearGradient>'
-      +'<linearGradient id="in-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2342" stop-opacity="0"/><stop offset=".25" stop-color="#1b2342" stop-opacity=".55"/><stop offset="1" stop-color="#05060b" stop-opacity="1"/></linearGradient>'
-      +'</defs>';
-    svg.insertAdjacentHTML('beforeend',defs+'<g id="in-cam"><g id="in-stage" opacity="0">'
-      +'<rect x="-400" y="'+(FY-6)+'" width="1800" height="600" fill="url(#in-floor)"/>'
-      +'<path id="in-conep" d="M430 -100L530 -100L760 '+(FY+30)+'L200 '+(FY+30)+'Z" fill="url(#in-cone)"/>'
-      +'<ellipse cx="480" cy="'+(FY+6)+'" rx="300" ry="54" fill="url(#in-pool)"/>'
-      +'<ellipse id="in-shd" cx="480" cy="'+(FY+4)+'" rx="150" ry="20" fill="url(#in-shd)"/></g>'
-      +'<g id="in-ch" class="cchI" style="--ink:url(#in-gk);--fill:url(#in-gf);--halo:rgba(220,230,255,.28)" opacity="0">'+m+'</g></g>');
-    var g=document.getElementById('in-ch'),q=function(c){return g.querySelector(c)};
-    CH={g:g,cam:document.getElementById('in-cam'),stage:document.getElementById('in-stage'),shd:document.getElementById('in-shd'),FY:FY,
-      root:q('.c-root'),head:q('.c-head'),hat:q('.c-hatb'),look:q('.c-look'),eL:q('.c-e.l'),eR:q('.c-e.r'),gL:q('.c-gl.l'),gR:q('.c-gl.r'),book:q('.c-book'),
-      sd:q('.c-sd'),sb:q('.c-sb'),sp:q('.c-sp'),sf:q('.c-sf'),ss:q('.c-ss'),sh:q('.c-sh')};
-    return CH}
-  function chT(n,x,y,r,sx,sy,px,py){if(n)n.setAttribute('transform','translate('+(x+px).toFixed(2)+' '+(y+py).toFixed(2)+') rotate('+r.toFixed(2)+') scale('+sx.toFixed(3)+' '+sy.toFixed(3)+') translate('+(-px)+' '+(-py)+')')}
   var back=function(x){var c1=1.9,c3=c1+1;return x<=0?0:1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
-  var hop=function(u){return 4*u*(1-u)};
-  /* a point on his head sphere: eye at horizontal offset d from the centre, head turned by th (radians) */
-  function eye3(d,th){var R=80,p0=Math.asin(Math.max(-1,Math.min(1,d/R))),p=p0+th;return{dx:R*Math.sin(p)-d,s:Math.max(.12,Math.cos(p)/Math.cos(p0)),vis:Math.cos(p)>.15?1:0}}
   var bell=function(t,a,b){var u=P(t,a,b);return u<=0||u>=1?0:.5-.5*Math.cos(2*Math.PI*u)};       // smooth 0→1→0
   var soft=function(x){if(x<=0)return 0;if(x>=1)return 1;var c1=.9,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)}; // gentle overshoot
   var land=function(t,t0,A){var d=t-t0;return d<0?0:A*Math.exp(-7*d)*Math.sin(19*d)/.62};             // damped squash after a landing
@@ -1137,64 +1035,28 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     for(i=0;i<n;i++){tt=FS.t+h*(i+1);var e=.004,acc=(bodyY(tt+e).y-2*bodyY(tt).y+bodyY(tt-e).y)/(e*e);acc=Math.max(-9000,Math.min(9000,acc));
       FS.hv+=(-260*FS.h-17*FS.hv-acc*.012)*h;FS.h+=FS.hv*h;FS.kv+=(-150*FS.k-10*FS.kv-acc*.02)*h;FS.k+=FS.kv*h}
     FS.t=t;return{h:Math.max(-26,Math.min(26,FS.h)),k:Math.max(-40,Math.min(40,FS.k))}}
-  function chRender(t){var c=chInit();if(!c)return;c.g.setAttribute('opacity',t>.3?'1':'0');
-    // the stage lights up, the camera pushes in slowly
-    c.stage.setAttribute('opacity',sm(P(t,0,.45)).toFixed(3));
-    var cz=1+.06*sm(P(t,0,5.6));chT(c.cam,0,-8*sm(P(t,0,5.6)),0,cz,cz,480,c.FY);
-    // v62 (owner: "smoother and more professional"): smooth bell-shaped anticipations, gravity arcs, velocity-driven stretch,
-    // damped-spring squash on every landing, and follow-through on the head and hat (springs driven by the body's motion)
-    // 1. the book pops up (springy)
-    var bp=back(P(t,.35,.85));chT(c.book,0,46*(1-Math.min(1,bp)),0,bp,bp,184,378);
-    var sY=bodyY(t),air=-sY.y,y=sY.y,jx=sY.x;
-    var hp=back(P(t,1.32,1.8));
-    // 3. looks right, left, forward (a real head turn with a soft overshoot), blinks (eyelids close and open smoothly)
-    var th=.42*soft(P(t,2.05,2.45))-.84*soft(P(t,2.6,3.05))+.42*soft(P(t,3.15,3.5));
-    var bl=1-.92*bell(t,3.6,3.84);
-    // 4. the turn to the right during the second hop
+  /* the timeline (seconds) → the 3D character; false = the 3D can't run here */
+  function chRender(t){
+    // 1. the book pops up (springy); 2. hop, the head pops out at the top
+    var bp=back(P(t,.35,.85)),sY=bodyY(t),y=sY.y,jx=sY.x,hp=back(P(t,1.32,1.8));
+    // 3. looks right, left, forward (a real head turn with a soft overshoot), blinks
+    var th=.42*soft(P(t,2.05,2.45))-.84*soft(P(t,2.6,3.05))+.42*soft(P(t,3.15,3.5)),bl=1-.92*bell(t,3.6,3.84);
+    // 4. turns toward the right during the second hop; 5. long wind-up with the book shut; 6. jumps off to the side
     var tu=.5-.5*Math.cos(Math.PI*P(t,4.18,4.68));th+=1.5708*tu;
-    var j3=P(t,5.95,6.55),c3=sm(P(t,5.0,5.75))*(1-sm(P(t,5.9,6.0))),cl=c3*(1-sm(P(t,5.95,6.12)))+(t<5.95?0:0);
-    // squash & stretch: anticipation bells + landing springs + stretch from speed
-    var sq=.16*bell(t,.93,1.22)+.12*bell(t,3.96,4.17)+.27*c3+land(t,1.72,.13)+land(t,4.72,.12),st=sY.st;
-    var sx=1+sq*.7-st*.45,sy=1-sq+st;
-    // follow-through: head and hat lag behind the body like they're attached by springs
-    var F=follow(t,sY);
-    chT(c.head,0,215*(1-hp)+F.h,th*5*(1-tu)+2*Math.sin(th)+F.h*.08,1,1,182,262);
-    var L=eye3(-33.1,th),Rr=eye3(33.3,th);
-    chT(c.eL,L.dx,0,0,L.s,bl,149.5,171.3);chT(c.eR,Rr.dx,0,0,Rr.s,bl,215.9,171.1);
-    c.eL.setAttribute('opacity',L.vis);c.eR.setAttribute('opacity',Rr.vis);
-    c.gL.setAttribute('cx',(144+L.dx*1.05).toFixed(1));c.gR.setAttribute('cx',(210+Rr.dx*1.05).toFixed(1));
-    c.gL.setAttribute('opacity',(L.vis*(bl<.6?0:.9)).toFixed(2));c.gR.setAttribute('opacity',(Rr.vis*(bl<.6?0:.9)).toFixed(2));
-    chT(c.hat,6*Math.sin(th),F.k-14*Math.sin(Math.PI*P(t,1.5,2.0)),-F.k*.25-6*Math.sin(Math.PI*P(t,1.5,2.0))-3*Math.sin(th),1-.06*Math.abs(Math.sin(th)),1,172,104);
-    // body turn: the front book narrows like a real object turning, then the side view
-    var bt=Math.cos(1.5708*tu),side=tu>.75;
-    c.book.setAttribute('opacity',side?'0':'1');c.sd.setAttribute('opacity',side?'1':'0');
-    if(!side&&bp>=1)chT(c.book,0,0,0,Math.max(.4,bt),1-.04*Math.sin(Math.PI*tu),186,378);
+    var j3=P(t,5.95,6.55),c3=sm(P(t,5.0,5.75))*(1-sm(P(t,5.9,6.0))),cl=c3*(1-sm(P(t,5.95,6.12)));
+    // squash & stretch: anticipation bells + landing springs + stretch from speed; head/hat follow-through springs
+    var sq=.16*bell(t,.93,1.22)+.12*bell(t,3.96,4.17)+.27*c3+land(t,1.72,.13)+land(t,4.72,.12),st=sY.st,sx=1+sq*.7-st*.45,sy=1-sq+st,F=follow(t,sY);
     var lean=8*Math.sin(Math.PI*Math.min(1,j3*1.2))+2.5*bell(t,4.15,4.72);
-    if(G3){var s3=.62/83,wing3=Math.sin(Math.PI*Math.min(1,j3*1.4)),yb=1.2*tu,hl3=Math.sin(Math.PI*P(t,1.5,2.0));
-      if(G3.draw({t:t,zoom:cz,stage:sm(P(t,0,.45)),yawB:yb,bookS:bp,bookY:-46*(1-Math.min(1,bp))*s3,bookA:Math.max(.07,(1.0-.68*tu)*(1-cl)+.07*cl+.85*wing3),blink:bl,
-        rx:jx*s3,ry:-y*s3,lean:-lean*Math.PI/180,sx:1+(sx-1)*.7,sy:1+(sy-1)*.7,headY:-(215*(1-hp)+F.h)*s3,headYaw:th-1.5708*tu,headRoll:-(th*5*(1-tu)+2*Math.sin(th)+F.h*.08)*Math.PI/180,
-        hy:-(F.k-14*hl3)*s3,hr:(F.k*.25+6*hl3+3*Math.sin(th))*Math.PI/180,hx:6*Math.sin(th)*s3})){c.g.setAttribute('opacity','0');c.stage.setAttribute('opacity','0');return}}
-    chT(c.root,jx,y,lean,sx,sy,182,396);
-    chT(c.sd,jx,y,lean,sx,sy,188,396);
-    // v59/v60 (owner): from the side the book IS his body, centred under his head, with the SPINE FACING FRONT (the way he
-    // faces). We see the near cover's face; when the book opens the pages and the far cover fan out behind it (to the back),
-    // a little at rest, closed in the wind-up, wide like wings as he jumps. (Drawn facing left here; the group is mirrored.)
-    var op=1-cl,wing=Math.sin(Math.PI*Math.min(1,j3*1.4)),fan=10*op+46*wing,CX=188,W=104,F=CX-W/2,B=CX+W/2,T=226,Bo=376;
-    c.sf.setAttribute('d','M'+(F+6)+' '+T+'L'+(B+fan).toFixed(1)+' '+(T-fan*.35).toFixed(1)+'L'+(B+fan).toFixed(1)+' '+(Bo+fan*.35).toFixed(1)+'L'+(F+6)+' '+Bo+'Z');
-    var pf=fan*.6;c.sp.setAttribute('opacity',fan>3?'1':'0');
-    c.sp.setAttribute('d','M'+(F+8)+' '+(T+6)+'L'+(B+pf).toFixed(1)+' '+(T+4-pf*.3).toFixed(1)+'L'+(B+pf).toFixed(1)+' '+(Bo-4+pf*.3).toFixed(1)+'L'+(F+8)+' '+(Bo-6)+'Z');
-    c.sb.setAttribute('d','M'+F+' '+T+'L'+(B-4)+' '+T+'Q'+B+' '+T+' '+B+' '+(T+4)+'L'+B+' '+(Bo-4)+'Q'+B+' '+Bo+' '+(B-4)+' '+Bo+'L'+F+' '+Bo+'Z');
-    c.ss.setAttribute('d','M'+(F+14)+' '+T+'Q'+(F-6)+' '+T+' '+(F-6)+' '+(T+14)+'L'+(F-6)+' '+(Bo-14)+'Q'+(F-6)+' '+Bo+' '+(F+14)+' '+Bo+'Z');
-    c.sh.setAttribute('d','M'+(F-1)+' '+(T+18)+'L'+(F-1)+' '+(Bo-18));
-    // contact shadow: tighter and darker on the floor, wide and faint when he's in the air
-    var ha=Math.min(1,air/260),sh=bp>0?Math.min(1,bp):0;
-    c.shd.setAttribute('transform','translate('+(480+jx*440/340).toFixed(1)+' '+(c.FY+4)+') scale('+((1-.45*ha)*(.6+.4*sh)*(1+.15*sq)).toFixed(3)+' '+((1-.3*ha)*(1+.2*sq)).toFixed(3)+') translate(-480 '+(-(c.FY+4))+')');
-    c.shd.setAttribute('opacity',(sh*(1-.75*ha)).toFixed(3))}
+    var s3=.62/83,wing3=Math.sin(Math.PI*Math.min(1,j3*1.4)),yb=1.2*tu,hl3=Math.sin(Math.PI*P(t,1.5,2.0));
+    return !!G3&&G3.draw({t:t,zoom:1+.06*sm(P(t,0,5.6)),stage:sm(P(t,0,.45)),yawB:yb,bookS:bp,bookY:-46*(1-Math.min(1,bp))*s3,bookA:Math.max(.07,(1.0-.68*tu)*(1-cl)+.07*cl+.85*wing3),blink:bl,
+      rx:jx*s3,ry:-y*s3,lean:-lean*Math.PI/180,sx:1+(sx-1)*.7,sy:1+(sy-1)*.7,headY:-(215*(1-hp)+F.h)*s3,headYaw:th-1.5708*tu,headRoll:-(th*5*(1-tu)+2*Math.sin(th)+F.h*.08)*Math.PI/180,
+      hy:-(F.k-14*hl3)*s3,hr:(F.k*.25+6*hl3+3*Math.sin(th))*Math.PI/180,hx:6*Math.sin(th)*s3})}
   function render(t){
-    chRender(t);
+    if(!chRender(t))return false;
     ov.style.opacity=(1-sm(P(t,6.62,7.1))).toFixed(3);
     if(app.style.transformOrigin!=='50% 40vh'){app.style.transformOrigin='50% 40vh';app.style.willChange='transform'}
     var asc='scale('+(1+.08*(1-sm(P(t,6.5,7.3)))).toFixed(4)+')';if(app.style.transform!==asc)app.style.transform=asc;
+    return true;
   }
 
   // vibration feedback that follows how hard the animation is moving
@@ -1268,7 +1130,6 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   function tap(t,f,v){tone('sine',f,f*.92,t,.002,v||.16,.09);var s2=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain();s2.buffer=noise();bp.type='bandpass';bp.frequency.value=f*2.2;bp.Q.value=6;env(g,t,.001,(v||.16)*.6,.04);s2.connect(bp);bp.connect(g);g.connect(mst);s2.start(t);s2.stop(t+.08)}
   function whoosh(t,d,f0,f1,v){var s2=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain();s2.buffer=noise();bp.type='bandpass';bp.Q.value=1.4;bp.frequency.setValueAtTime(f0,t);bp.frequency.exponentialRampToValueAtTime(f1,t+d);
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v||.22,t+d*.45);g.gain.linearRampToValueAtTime(0,t+d);s2.connect(bp);bp.connect(g);g.connect(mst);s2.start(t);s2.stop(t+d+.05)}
-  function bellN(t,f,v){[[1,1],[2.76,.32],[5.4,.12]].forEach(function(p){tone('sine',f*p[0],0,t,.003,(v||.12)*p[1],1.4/p[0])})}
   function build(t,d){tone('triangle',196,330,t,d*.9,.03,d*.25);whoosh(t,d,250,900,.04)}
   /* v64 (owner: "no sparkle, do something else"): a soft cartoon "zip" as he springs away: a quick rising slide (like a
      slide whistle, very quiet) over a short airy whoosh */
@@ -1298,17 +1159,18 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     try{var tc=document.querySelector('meta[name=theme-color]');if(tc)tc.content=getComputedStyle(document.body).backgroundColor}catch(e){}
     setTimeout(function(){try{AC&&AC.close()}catch(e){}},4500);
   }
+  // the 3D can't run on this phone (no WebGL, or too slow): fade the dark screen straight into the app, quietly
+  function skip(){if(done)return;cancelAnimationFrame(raf);try{AC&&AC.close()}catch(e){}AC=null;ov.style.transition='opacity .35s';ov.style.opacity='0';setTimeout(finish,360)}
   function frame(now){
     // Shabbos / Yom Tov screen came up (first launch, before the times were saved): no intro and no sound
     if(document.documentElement.classList.contains('cc-shab')){try{AC&&AC.close()}catch(e){}AC=null;finish();return}
-    if(!chInit()){raf=requestAnimationFrame(frame);return}   // wait until the character's drawing is loaded
     if(!t0)t0=now;
     // if the phone was busy (still loading the app) and a frame came late, hold the animation instead of jumping ahead
     if(lastNow&&now-lastNow>50)t0+=now-lastNow-16.7;lastNow=now;
     // SPEED plays the whole timeline faster (10.7 s of animation in about 6.5 s)
     var t=(now-t0)/1000*SPEED;
     if(window.__INTRO_T!=null){t=window.__INTRO_T;render(t);raf=requestAnimationFrame(frame);return}   // test hook (?introshot only)
-    render(Math.min(t,END));
+    if(!render(Math.min(t,END))){skip();return}
     haptics(t);sound(t);
     if(t<END)raf=requestAnimationFrame(frame);else finish();
   }
@@ -1326,6 +1188,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     }
     ov.style.display='flex'; hl.style.display='block';
     if(window.CC_QUIET||matchMedia('(prefers-reduced-motion: reduce)').matches){ov.remove();hl.remove();document.documentElement.classList.remove('cc-boot');return}
+    if(!G3){ov.remove();hl.remove();document.documentElement.classList.remove('cc-boot');return}
     audioInit(); render(0); raf=requestAnimationFrame(frame);
   }
   startIntroAfterLogin();
@@ -1564,7 +1427,7 @@ async function citySearch(){const q=$('#cs').value.trim();if(!q)return;locMsg('S
 $('#csb').onclick=citySearch;$('#cs').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();citySearch()}});
 document.addEventListener('click',e=>{const t=e.target;if(!t.closest)return;
  if(t.closest('#pv,#nx'))return;
- if(t.closest('.day'))H.sel();else if(t.closest('#sv,#dl'))H.ok();else if(t.closest('button,.sm,a.dr,.row,.chip,.peek,.nxc'))H.tap()},true);
+ if(t.closest('.day'))H.sel();else if(t.closest('#sv,#dl'))H.ok();else if(t.closest('button,.sm,a.dr,.row,.chip,.peek'))H.tap()},true);
 const pd=s=>{const[y,m,d]=s.split('-').map(Number);return ad(new Date(y,m-1,d),0)};
 const HYC={};
 function hyear(y){if(HYC[y])return HYC[y];let s=ad(new Date(y-3761,7,25),0);
@@ -2157,13 +2020,6 @@ function rail(){const h0=hd(sel),a=[];
  {const hn=$('#hintN');hn.textContent=a.length>9?'9+':a.length;hn.hidden=!a.length;$('#hint').setAttribute('aria-label',a.length?'See details and '+a.length+' coming up':'See details')}
  reveal(r)}
 const routine=e=>{if(e.k!='my')return false;const c=my.find(m=>m.id==e.id);if(!c)return false;if(c.r=='weekly')return (Array.isArray(c.dows)&&c.dows.length?c.dows.length:1)>=4;return c.r=='every2'||(c.r=='custom'&&Number.isInteger(c.interval)&&c.interval<=2)};
-/* The round "next special day" button is no longer shown on the home screen (owner's choice): upcoming days live in the
-   Coming Up column further down. Kept hidden so the card animation starts from the arrow instead. */
-function nextUp(){const b=$('#nxc');b.hidden=true;b.removeAttribute('data-t');return;let f=null;
- for(let i=1;i<=400&&!f;i++){const dt=ad(sel,i),v=info(dt).ev.filter(e=>on[e.k]&&!routine(e));if(v.length)f={dt,v,df:i}}
- if(!f){b.hidden=true;b.removeAttribute('data-t');return}
- const p=f.v[0],lbl='Next: '+f.v.map(e=>e.t).join(', ')+' · '+f.dt.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})+(f.df==1?' (tomorrow)':' (in '+f.df+' days)');
- b.hidden=false;b.className='nxc k-'+p.k;b.dataset.t=+f.dt;b.title=lbl;b.setAttribute('aria-label',lbl);b.innerHTML='<i class="m k-'+p.k+'"></i>'}
 function chips(h,ev,rc){const a=[],w=sel.getDay();let evi=0;
  for(const e of ev)a.push(`<span class="c2 k-${e.k}" data-go="ev:${evi++}" role="button" tabindex="0" title="${e.t}"><i class="m k-${e.k}"></i><span class="t">${e.t}</span></span>`);
  if(rc)a.push(`<span class="c2 k-yt" data-go="rc" role="button" tabindex="0"><i class="m k-yt"></i>Rosh Chodesh ${rc}</span>`);
@@ -2232,7 +2088,7 @@ function panel(dir){const{h,ev,rc}=info(sel),w=hDay(sel).getDay()==6,ps=parsha(h
  $('#gh').textContent=sel.getDate();
  $('#cbt').innerHTML=`${sel.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})}<span lang="he" dir="rtl">${G(h.d)} ${h.n[1]}</span>`;
  $('#p').innerHTML=(editing?'<div class="eb">Editing mode <button class="ed" id="ex">Done</button></div>':'')+lead+pr+(ev.length?ev.map((e,i)=>evCard(e,i)).join(''):'<p class="nospec rv" style="--i:3">No special date on this day.</p>');
- zmn();chips(h,ev,rc);study();special();rail();nextUp();if(typeof rcRender=='function')rcRender();
+ zmn();chips(h,ev,rc);study();special();rail();if(typeof rcRender=='function')rcRender();
  $('#cbr').innerHTML=ring(0,ALLK.length);upd();
  ['#hdr','#ch','#p','#hy','#sp','#sd','#zm'].forEach(s=>reveal($(s)));
  if(dir&&!RM)for(const el of [$('.ab'),$('#hdr'),$('#foot')])el.animate([{opacity:.0,transform:`translateX(${dir*22}px)`},{opacity:1,transform:'none'}],{duration:390,easing:'cubic-bezier(.22,.75,.25,1)'});
@@ -2242,7 +2098,7 @@ function pick(dt){const nm=dt<V||dt>ad(V,hlen(V)-1),d=dt>sel?1:dt<sel?-1:0;sel=d
  if(nm){V=hm1(dt);render(d)}else{document.querySelectorAll('.day.sel').forEach(x=>x.classList.remove('sel'));g.querySelector(`[data-t="${+dt}"]`)?.classList.add('sel')}panel(d);scrollTo({top:0,behavior:RM?'auto':'smooth'})}
 const mo=v=>{document.body.classList.toggle('om',v);$('#ms').inert=!v;if(v)requestAnimationFrame(()=>$('#ms').classList.add('fullscreen'));else $('#ms').classList.remove('fullscreen')};
 const openMonth=()=>{V=hm1(sel);render(0);mo(true)};$('#mo').onclick=openMonth;
-$('#pd').onclick=()=>{H.step();pick(ad(sel,-1))};$('#nd').onclick=()=>{H.step();pick(ad(sel,1))};
+
 const hdr=$('#hdr'),cbar=$('#cb'),foot=$('#foot'),hint=$('#hint');let tk=0;
 var MZ=[];
 const mzCl=v=>Math.min(1,Math.max(0,v)),mzSm=t=>t*t*(3-2*t),mzEase=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,mzLp=(a,b,t)=>a+(b-a)*t;
@@ -2250,7 +2106,7 @@ function wkStrip(){const s=ad(sel,-sel.getDay());return Array.from({length:7},(_
 document.addEventListener('click',e=>{const w=e.target.closest&&e.target.closest('.wd');if(w){H.tap();pick(new Date(+w.dataset.t))}});
 function mzBuild(){let z=document.getElementById('gz');if(!z){z=document.createElement('div');z.id='gz';document.body.appendChild(z)}z.innerHTML='';MZ=[];
  if(RM){document.querySelectorAll('.mc').forEach(x=>x.classList.add('show','in'));return}
- const cards=[...document.querySelectorAll('#p .ev.mc')],tiles=[...document.querySelectorAll('#rail .rt.mc')],chips=[...document.querySelectorAll('#ch .c2')],nx=$('#nxc'),org=!nx.hidden?nx:$('#hint');
+ const cards=[...document.querySelectorAll('#p .ev.mc')],tiles=[...document.querySelectorAll('#rail .rt.mc')],chips=[...document.querySelectorAll('#ch .c2')],org=$('#hint');
  const mk=(real,src,t,i)=>{const kind=[...real.classList].find(c=>c.startsWith('k-')),g=document.createElement('div'),a=document.createElement('div'),b=real.cloneNode(true);
   g.className='gz '+kind;b.classList.remove('mc','show','in','rv');b.classList.add('gb');b.removeAttribute('id');
   if(t=='c'){a.className='ga c';const c=src.cloneNode(true);c.classList.remove('rv','in');a.appendChild(c)}
@@ -2460,7 +2316,6 @@ function skyBodySvg(st){return st.kind==='sun'?`<img class="skyimg" alt="" dragg
 const SKYA={run:false,arm:false,hiddenAt:0,rootT:0,lastDark:null};
 const skySm=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)};
 const skyHash=n=>{let k=Math.imul(n|0,374761393)^0x5bd1e995;k=Math.imul(k^(k>>>13),1274126177);return((k^(k>>>16))>>>0)/4294967296};
-const skyN1=x=>{const i=Math.floor(x),f=x-i,u=f*f*(3-2*f);return skyHash(i)*(1-u)+skyHash(i+1)*u};
 const SKT={key:'',off:null},SK_PAD=26;
 const skyDpr=()=>Math.min(2,window.devicePixelRatio||1);
 const skyPath=(f,W,H)=>[SK_PAD+skyArcX(f)/100*W,SK_PAD+skyArcY(f)/100*H];
@@ -2968,7 +2823,6 @@ function stkInner(){
  return `<span class="l">${l}</span><span class="qdots">${dots}</span><i class="qchev" aria-hidden="true">›</i>`}
 function stkHtml(){return `<button class="qstk rv" id="stk" type="button" aria-label="Streak history" style="--i:1">${stkInner()}</button>`}
 function stkRefresh(){const e=$('#stk');if(e)e.innerHTML=stkInner();}
-function stkFill(){}
 /* ===== Encouragement (owner, v46: "like Duolingo"): streak counts, milestones, gentle comebacks after a missed day,
    "streak at risk" nudges. One phrase bank for the stats sheet, the streak chip, the celebration and the reminders.
    Phrases rotate by date (stable within a day). ===== */
@@ -3427,11 +3281,6 @@ const CCH_SVG=`<svg viewBox="0 0 340 400" aria-hidden="true"><g class="c-root"><
 <g class="c-book"><path class="c-page" opacity="0" d="M186 240L186 172Q236 160 288 176L288 240Z" style="fill:var(--fill);stroke:var(--ink);stroke-width:6;stroke-linejoin:round"/><path class="w" d="${CCH_BOOKW}"/><path class="k" fill-rule="evenodd" d="${CCH_BOOK}"/></g>
 <g class="c-zz k" opacity="0" style="font:700 44px Figtree,system-ui,sans-serif"><text x="262" y="70">z</text><text x="290" y="34" style="font-size:32px">z</text><text x="312" y="6" style="font-size:24px">z</text></g><g class="c-thk k" opacity="0"><circle cx="250" cy="16" r="6"/><circle cx="272" cy="-4" r="8.5"/><circle cx="300" cy="-28" r="11"/></g></g></svg>`;
 const cchHtml=(p,cls)=>`<span class="cch ${cls||''}" data-m="${CCP[p]||p}" aria-hidden="true">${CCH_SVG}</span>`;
-const CCH_KF={hop:[[{transform:'translateY(0) scale(1)'},{transform:'translateY(-14%) scale(.97,1.05)',offset:.38},{transform:'translateY(1.5%) scale(1.05,.95)',offset:.72},{transform:'translateY(0) scale(1)'}],560],
- tap:[[{transform:'translateY(0)'},{transform:'translateY(1.5%) scale(1.02,.98)'},{transform:'translateY(0)'}],170],
- wobble:[[{transform:'rotate(0)'},{transform:'rotate(-5deg)'},{transform:'rotate(4deg)'},{transform:'rotate(-2deg)'},{transform:'rotate(0)'}],1000],
- pop:[[{transform:'scale(.2) translateY(30%)',opacity:0},{transform:'scale(1.1)',opacity:1,offset:.6},{transform:'scale(1)'}],520],
- droop:[[{transform:'translateY(0)'},{transform:'translateY(4%) scale(1.02,.97)',offset:.5},{transform:'translateY(1%)'},{transform:'translateY(0)'}],900]};
 /* a live character. set(mood, ms, anim) shows an expression for a while (it morphs there smoothly); setBase() is his resting
    expression; on his own he blinks, glances around, sways, tips his hat and turns a page now and then. */
 /* his rig: part → [selector, pivot x, pivot y]; state per part {x,y,r,sx,sy,o} */
@@ -3501,7 +3350,6 @@ function cchLive(el,base){if(!el)return{set(){},setBase(){},anim(){},nod(){},dar
   else if(v<.8)fx('hatb',[{t:0},{t:.3,y:-6,r:-3*s},{t:.6,y:1},{t:1}],560);                                       // small nudge
   else fx('hatb',[{t:0},{t:.25,y:-28,r:-13*s},{t:.55,y:-28,r:-13*s},{t:.8,y:3,r:2*s},{t:1}],1400)};            // big lift, held
  L.page=()=>fx('page',[{t:0,o:1,y:70},{t:.25,o:1,y:22,sx:.8},{t:.5,o:1,y:14,sx:.02},{t:.75,o:1,y:22,sx:-.8},{t:1,o:1,y:70,sx:-1}],1000);
- L.breathe=()=>fx('root',[{t:0},{t:.5,sx:1.012,sy:1.03},{t:1}],2200);
  L.nod=()=>fx('sway',[{t:0},{t:.5,y:5,r:1},{t:1}],220);
  let dx=-9;L.dart=()=>{dx=dx>=9?-9:dx+3;L.look(dx,4)};
  /* v70 moves (owner's picks) */
@@ -3595,8 +3443,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=74;
+const CC_VER=75;
 const CC_LOG=[
+ {v:75,new:['Cleanup: old code that newer features replaced was removed, so the app is lighter.']},
  {v:74,mid:1,new:['The opening animation is now real 3D: the assistant is a lit 3D character with a felt fedora, glossy eyes and a real open book, on a spotlit stage with soft shadows.']},
  {v:73,new:['The Shabbos / Yom Tov screen has a “Not right? Tap here to switch your location” button, in case the app is set to another place.']},
  {v:72,big:1,new:['The app now rests on Shabbos and Yom Tov. From candle lighting until nightfall it shows a Good Shabbos / Good Yom Tov screen with the time it opens again, and no reminders ring during that time.']},
@@ -3790,7 +3639,6 @@ function ccTourStart(key,replay,which){
 
  const firstShiur=()=>q('#sd .ck');
  const pressEl=async(el,t)=>{if(el){el.classList.add('tg-press');await sleep(360,t);el.classList.remove('tg-press')}};
- const toShiur=()=>{const sd=q('#sd');if(sd)scrollSmooth(Math.max(0,sd.getBoundingClientRect().top+scrollY-110))};
  const SETS={
   onboard:[
    {t:'Welcome',p:'Your Chabad calendar — Hebrew dates under a living sky, today’s learning and holidays, and a planner you just talk to. Swipe, or tap the week strip, to move between days. Let’s set it up.',els:()=>[q('#hdr')],pad:6,enter:async()=>{scrollTo(0,0)}},
@@ -5014,7 +4862,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   let tg;if(k==='sr')tg=T.sr+10*6e4;else if(k==='ss')tg=T.ss-10*6e4;else if(k==='noon')tg=(T.sr+T.ss)/2;else{const p=ad(t0,-1),x=new RD(p.getFullYear(),p.getMonth(),p.getDate(),21,30);tg=+x}
   if(tg){setClock(tg);applyClock(false)}});
  /* New features get a switch here (owner's standing request). Each one maps to a class on <html>: tt-off-<id> turns it off. */
- const FLAGS=[['char','The assistant character (instead of the + button)'],['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['reallight','Real light (sunrise/sunset colours on everything)'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll'],['siddur','Siddur button in the dock'],['charlife','The assistant’s extra life (reacting to taps, wind, sleep, stretches…)'],['shabbos','Shabbos & Yom Tov screen (the app rests; no reminders)']];
+ const FLAGS=[['glassui','Matching glass cards, sheets and buttons'],['occ','Birthday & yahrzeit touches (confetti, candle, customs)'],['aim','Semicircle faces the sun/moon'],['capdate','Rise/set label under the big date'],['swave','Softer, quieter night waves'],['duskglass','Liquid-glass evening and day sky'],['waterdate','Date letters made of water (tilt the phone)'],['reallight','Real light (sunrise/sunset colours on everything)'],['side','Big date when the middle of the sky is empty'],['dome','Semicircle swivels on scroll'],['siddur','Siddur button in the dock'],['charlife','The assistant’s extra life (reacting to taps, wind, sleep, stretches…)'],['shabbos','Shabbos & Yom Tov screen (the app rests; no reminders)']];
  const fl=()=>{try{return JSON.parse(localStorage.getItem('cc_test_flags')||'{}')}catch(e){return{}}},flApply=()=>{const f=fl();for(const[id,,opt]of FLAGS){if(opt)document.documentElement.classList.toggle('tt-on-'+id,f[id]===true);else document.documentElement.classList.toggle('tt-off-'+id,f[id]===false)}};
  box.querySelector('#ttFlags').innerHTML=FLAGS.map(([id,t])=>`<label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:500"><input type="checkbox" data-f="${id}" style="width:20px;height:20px;accent-color:#8c94ef"> ${t}</label>`).join('');
  box.querySelectorAll('[data-f]').forEach(c=>{const opt=(FLAGS.find(x=>x[0]===c.dataset.f)||[])[2];c.checked=opt?fl()[c.dataset.f]===true:fl()[c.dataset.f]!==false;c.onchange=()=>{const f=fl();f[c.dataset.f]=c.checked;localStorage.setItem('cc_test_flags',JSON.stringify(f));flApply();H.sel();if(c.dataset.f==='side'){SKY.last=null;skyTick();render(0)}if(c.dataset.f==='swave'&&GLS.kick)GLS.kick();if(c.dataset.f==='aim'&&SKY.last)skyDomeAim(SKY.last)}});flApply();
