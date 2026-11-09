@@ -2103,7 +2103,16 @@ function sdPaint(el,t){const fl=t.m==='flow',w=fl?SD.fw:SD.bw,s=w/1077,P=sdScr(t
  el.style.width=w+'px';el.style.height=SD.H+'px';el.style.left=(SD.W-w)/2+'px';el.style.top='0px';
  el.innerHTML=P.map((q,j)=>{const u='url(siddur/p/'+(q.i+1)+'.webp)',ms=w+'px '+(1861*s)+'px',mp='0 '+(-q.a*s)+'px';
   return`<i style="height:${((q.b-q.a)*s).toFixed(1)}px;margin-top:${j?(14*s).toFixed(1):fl?5:Math.max(0,(SD.H-tot)/2).toFixed(1)}px;-webkit-mask-image:${u};mask-image:${u};-webkit-mask-size:${ms};mask-size:${ms};-webkit-mask-position:${mp};mask-position:${mp}"></i>`}).join('')}
-const SD_PRE=new Map();function sdPre(t){if(!t)return;for(const q of sdScr(t)){const i=q.i;if(SD_PRE.has(i))continue;const im=new Image();im.src='siddur/p/'+(i+1)+'.webp';SD_PRE.set(i,im);if(SD_PRE.size>18){const k=SD_PRE.keys().next().value;SD_PRE.delete(k)}}}
+// v88 (owner: "make the loading of the pages a little faster"): pages are fetched ahead. The next 4 screens (and the one before)
+// load right away, then the rest of the open tefillah quietly in the background (3 at a time); the service worker keeps them on the phone.
+const SD_PRE=new Map();let SD_Q=[],SD_QN=0;
+function sdImg(i){if(SD_PRE.has(i))return Promise.resolve();const im=new Image();im.decoding='async';SD_PRE.set(i,im);
+ const p=new Promise(r=>{im.onload=()=>{(im.decode?im.decode():Promise.resolve()).catch(()=>{}).then(r)};im.onerror=r});im.src='siddur/p/'+(i+1)+'.webp';
+ if(SD_PRE.size>160){const k=SD_PRE.keys().next().value;SD_PRE.delete(k)}return p}
+function sdPre(t){if(t)for(const q of sdScr(t))sdImg(q.i)}
+function sdQ(){while(SD_QN<3&&SD_Q.length){const i=SD_Q.shift();if(SD_PRE.has(i))continue;SD_QN++;sdImg(i).then(()=>{SD_QN--;setTimeout(sdQ,30)})}}
+function sdWarm(){let t=sdCur();const B=sdStep(-1);sdPre(B);for(let n=0;n<4;n++){t=SD.m==='flow'?(t.k+1<(SD.scr||[]).length?{m:'flow',k:t.k+1}:null):(t.k+1<SD.n.length?{m:'book',k:t.k+1}:null);if(!t)break;sdPre(t)}
+ if(SD.m==='flow'&&SD.scr){const k=SD.k;SD_Q=[...new Set([...SD.scr.slice(k+5),...SD.scr.slice(0,k)].flat().map(q=>q.i))];sdQ()}}
 const sdCur=()=>({m:SD.m,k:SD.k});
 // next/previous screen: inside an insert, at its end go back; in a tefillah the next screen (after its end, the book goes on); else the book order
 function sdStep(dir){const t=sdCur();
@@ -2111,7 +2120,7 @@ function sdStep(dir){const t=sdCur();
  if(t.m==='flow'){const k=t.k+dir;if(k>=0&&k<SD.scr.length)return{m:'flow',k};if(dir>0){const s=SD.scr[t.k],q=s[s.length-1];return q.i+1<SD.n.length?{m:'book',k:q.i+1}:null}return null}
  const j=t.k+dir;return j>=0&&j<SD.n.length?{m:'book',k:j}:null}
 function sdShow(t,quiet){SD.m=t.m;SD.k=t.k;const A=$('#sdA');sdPaint(A,t);A.style.transform='';A.classList.remove('an');
- sdPre(sdStep(1));sdPre(sdStep(-1));
+ sdWarm();
  if(!quiet){const q=sdScr(t)[0]||{i:0,a:0};try{localStorage.setItem(sdK(),JSON.stringify({m:t.m,i:q.i,a:q.a,fk:SD.fk,at:Date.now()}))}catch(e){}}
  sdHead()}
 function sdHead(){const t=sdCur(),p=sdPg(t),s=sdSec(p),fl=sdFlows(),f=SD.fk&&fl[SD.fk];let prog=0,ttl=s[1];
@@ -2190,6 +2199,9 @@ function sdOpen(){const b=sdBuild();SD.open=true;SD.ins=null;SD.cueOff={};SD.las
  .catch(()=>{$('#sdSt').insertAdjacentHTML('beforeend','<p style="position:absolute;inset:40% 20px auto;text-align:center;color:var(--mut)">The siddur could not be loaded. Check the internet connection and try again.</p>')})}
 function sdClose(){const b=$('#sdr');if(!b||!SD.open)return;SD.open=false;clearTimeout(SD.hT);document.body.classList.remove('sd-hide');document.documentElement.classList.remove('cc-away');b.classList.remove('on');document.body.classList.remove('sdo');sdSheet(false);try{sc()}catch(e){}}
 addEventListener('popstate',()=>{if(SD.open)sdClose()});
+// a few seconds after the app opens: load the siddur's page list and the first pages of the tefillah for now, so opening it is instant
+addEventListener('load',()=>setTimeout(()=>{const go=()=>{if(SD.open)return;sdLoad().then(()=>{if(SD.open)return;const L=sdPieces(sdAuto());[...new Set(L.slice(0,8).map(q=>q.i))].forEach(i=>sdImg(i))}).catch(()=>{})};
+ 'requestIdleCallback' in window?requestIdleCallback(go,{timeout:4000}):go()},6000));
 document.addEventListener('click',e=>{if(e.target.closest('.dock #sd'))sdOpen()});
 
 document.addEventListener('click',e=>{const r=e.target.closest('.ck');if(r&&!e.target.closest('a')){if(RD_KEYS.includes(r.dataset.k)&&!e.target.closest('.bx'))return rdOpen(r.dataset.k);return tog(r.dataset.k)}if(e.target.closest('#hyb'))tog('hy')});
@@ -3647,8 +3659,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=87;
+const CC_VER=88;
 const CC_LOG=[
+ {v:88,new:['Siddur pages load faster: the next pages are ready before you turn to them.']},
  {v:87,big:1,feature:'A siddur made for today',new:['The siddur now shows only what you say today: Tachanun, the Monday & Thursday prayers, the Torah reading, the Ten Days lines, Yaaleh V’yavo, Al HaNissim, Aneinu and the rest disappear on days they aren’t said.','What today adds is put right in its place: this week’s Torah reading on Monday and Thursday, Hallel and Musaf on Rosh Chodesh, the Chanukah reading, only today’s Song of the Day, tonight’s Omer count, and the Nasi in Nissan.','Instructions that only say where to skip are gone too.']},
  {v:86,new:['Tehillim stays in Hebrew (no English switch there).']},
  {v:85,adm:1,new:['Admin: Chabad.org English gets past the security check page.']},
