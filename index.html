@@ -1785,6 +1785,36 @@ const RD_PREF=u=>/^Rashi_on_/.test(u)?'Pentateuch with Rashi\'s commentary by M.
 /* v76 (owner): English for the shiurim. Hebrew only / Hebrew + English / English only (toggle at the top of the reader), per phone. */
 const RD_LG=()=>{try{const v=localStorage.getItem('cc_rd_lang');return v==='both'||v==='en'?v:'he'}catch(e){return'he'}};
 const rdMapF=F=>{const M=new Map();for(const x of F)M.set(x.p.join(':'),x.t);return M};
+/* v79 (owner, with Chabad.org's permission): Chumash with Rashi and Tehillim in Chabad.org's English. Only in the Android app,
+   where the phone itself downloads the daily-study page (CapacitorHttp, native: no CORS, a normal phone request). The page is
+   read row by row (an English cell per verse, Rashi rows after their verse); it is used ONLY if its verse numbers match the
+   Hebrew exactly, otherwise (or offline / in China without VPN / outside the app) the Sefaria English is used. Parsed results
+   are kept per day (cc_chen, last 12) so reopening is instant. Tanya/Rambam stay on Sefaria (same Kehot / Touger translations). */
+const chHttp=()=>{try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;return(C.Plugins&&C.Plugins.CapacitorHttp)||(C.registerPlugin&&C.registerPlugin('CapacitorHttp'))||null}catch(e){return null}};
+const CH_URL={chumash:'torahreading',tehillim:'tehillim'};
+const chUrl=(k,d)=>`https://www.chabad.org/dailystudy/${CH_URL[k]}.asp?tdate=${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+async function chGet(url){const H=chHttp();if(!H)throw new Error('only in the app');
+ const r=await H.get({url,headers:{'Accept':'text/html','Accept-Language':'en-US,en;q=0.9','User-Agent':navigator.userAgent.replace(/; wv\)/,')')},responseType:'text',connectTimeout:9000,readTimeout:12000});
+ if(!r||r.status!==200)throw new Error('HTTP '+(r&&r.status));return typeof r.data==='string'?r.data:''}
+const chIn=el=>{const c=el.cloneNode(true);c.querySelectorAll('script,style,sup,.footnote,[class*=footnote],[class*=Footnote],a[class*=note]').forEach(x=>x.remove());
+ return c.innerHTML.replace(/<(?!\/?(?:b|i|em|strong|br)\b)[^>]*>/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim()};
+/* rows with an English cell → verses [{n, en, r:[rashi…]}] */
+function chParse(html){const doc=new DOMParser().parseFromString(html,'text/html'),out=[];
+ const cells=[...doc.querySelectorAll('td.english,td.English,div.english,.co_english,[class~="english"]')];
+ for(const en of cells){const row=en.closest('tr')||en.parentElement,rc=((row&&row.className)||'')+' '+en.className;
+  const rT=en.querySelector('[class*=RashiTitle],[class*=rashititle],[class*=rashi_title]'),rB=en.querySelector('[class*=RashiBody],[class*=rashibody],[class*=rashi_body]');
+  if(/rashi/i.test(rc)||rT||rB){if(out.length){const t=rT?chIn(rT):'',b=rB?chIn(rB):(rT?'':chIn(en));if(t||b)out[out.length-1].r.push((t?`<b>${t}</b> `:'')+b)}continue}
+  const nEl=en.querySelector('[class*=VerseNum],[class*=versenum],[class*=verse_num]'),num=nEl?parseInt(nEl.textContent,10):NaN;
+  const c=en.cloneNode(true);c.querySelectorAll('[class*=VerseNum],[class*=versenum],[class*=verse_num]').forEach(x=>x.remove());const t=chIn(c);if(t)out.push({n:num,en:t,r:[]})}
+ return out}
+const chCache=()=>{try{return JSON.parse(localStorage.getItem('cc_chen')||'{}')}catch(e){return{}}};
+let CH_DOWN=false;
+async function chEnglish(k,d){if(!CH_URL[k]||!chHttp()||CH_DOWN)return null;const id=k+'|'+ds(d),C=chCache();if(C[id])return C[id].v;
+ try{const v=chParse(await Promise.race([chGet(chUrl(k,d)),new Promise((_,j)=>setTimeout(()=>j(new Error('slow')),9000))]));if(!v.length)return null;
+  C[id]={v,t:Date.now()};const ks=Object.keys(C).sort((a,b)=>C[b].t-C[a].t);ks.slice(12).forEach(x=>delete C[x]);try{localStorage.setItem('cc_chen',JSON.stringify(C))}catch(e){}return v}
+ catch(e){CH_DOWN=/slow|HTTP 403|HTTP 5|timeout|Unable|failed/i.test(String(e&&e.message));return null}}
+/* use it only if the verse numbers line up with the Hebrew */
+const chFits=(V,F)=>V&&V.length===F.length&&F.every((x,i)=>isNaN(V[i].n)||V[i].n===x.p[x.p.length-1]);
 const rdEnT=async(url,ttl)=>{try{const pf=RD_PREF(url);let j=pf?await rdText(url,1,pf).catch(()=>({})):{};const ok=x=>{const v=(x.versions||[])[0];return v&&v.text&&(typeof v.text==='string'||JSON.stringify(v.text).length>40)};if(!ok(j))j=await rdText(url,1);const v=(j.versions||[])[0];if(v&&v.versionTitle)ttl.add(v.versionTitle);return{j,F:rdFlat(j)}}catch(e){return{j:{},F:[]}}};
 const rdClean=s=>String(s||'').replace(/<sup[^>]*>.*?<\/sup>/gs,'').replace(/<i[^>]*class="footnote"[^>]*>.*?<\/i>/gs,'').replace(/<(?!\/?(?:b|i|small|big|br|strong|em)\b)[^>]*>/g,'').replace(/\{[פס]\}/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
 // Sefaria text (nested arrays) -> [{p:[chapter,verse,...], t}] with real chapter/verse numbers
@@ -1829,7 +1859,7 @@ const rdRashi=(a,e,mode)=>{e=e||[];
 const RD_ORD=['1st','2nd','3rd','4th','5th','6th','7th'];
 const rdHeadE=(kick,title,sub)=>`<header class="rdhd" dir="ltr" lang="en"><div class="rdk rdkE">${kick}</div><h2 class="rdh2E">${title}</h2>${sub?`<div class="rdsub">${sub}</div>`:''}</header>`;
 const rdChipE=t=>`<div class="rdc rdcE" dir="ltr"><span>${t}</span></div>`;
-async function rdBuild(k,d,mode){mode=mode||RD_LG();const parts=await rdRefs(k,d);if(!parts.length)throw new Error('none');let html='';const h=hd(d),EN=mode!=='he',ttl=new Set();let enMiss=0,enAll=0;
+async function rdBuild(k,d,mode){mode=mode||RD_LG();let CHV=null;const parts=await rdRefs(k,d);if(!parts.length)throw new Error('none');let html='';const h=hd(d),EN=mode!=='he',ttl=new Set();let enMiss=0,enAll=0;
  // one paragraph in the chosen languages (English missing for a line → that line stays Hebrew)
  const line=(cls,num,numE,heT,enT)=>{enAll++;if(EN&&!enT)enMiss++;
   if(!EN||!enT)return`<p class="${cls}">${num}${rdClean(heT)}</p>`;
@@ -1840,12 +1870,15 @@ async function rdBuild(k,d,mode){mode=mode||RD_LG();const parts=await rdRefs(k,d
  const chip=(heT,enT)=>mode==='en'?rdChipE(enT):rdChip(heT);
  for(const part of parts){let j,F,jE={},E=new Map();
   if(part.kind==='tn'){const T=await rdTanya(part);j={heRef:T.he};F=T.F;if(EN){try{const TE=await rdTanya(part,1);jE={ref:TE.he};E=rdMapF(TE.F);if(TE.vt&&TE.F.length)ttl.add(TE.vt)}catch(e){}}}
-  else{j=await rdText(part.url);F=rdFlat(j);if(EN){const r=await rdEnT(part.url,ttl);jE=r.j;E=rdMapF(r.F)}}
+  else{j=await rdText(part.url);F=rdFlat(j);
+   if(EN&&parts.length===1&&CH_URL[k]){const V=await chEnglish(k,d);if(chFits(V,F)){F.forEach((x,i)=>E.set(x.p.join(':'),V[i].en));CHV=V;ttl.add('Chabad.org')}}
+   if(EN&&!CHV){const r=await rdEnT(part.url,ttl);jE=r.j;E=rdMapF(r.F)}}
   const en=x=>E.get(x.p.join(':'));let lastC=null;
   if(part.kind==='ch'){const wd=d.getDay();
    html+=head('חומש עם פירוש רש״י · '+RD_ALIYA[wd],part.ph?'פרשת '+part.ph:'',j.heRef||'','Chumash with Rashi · '+RD_ORD[wd]+' aliyah',part.pe?'Parshas '+part.pe:'Chumash',jE.ref||'');
    let rs=[];try{rs=rdFlat(await rdText('Rashi_on_'+part.url))}catch(e){}const RM=new Map(),RE=new Map(),add=(M,r)=>{const key=r.p[0]+':'+r.p[1];(M.get(key)||M.set(key,[]).get(key)).push(rdClean(r.t))};for(const r of rs)add(RM,r);
-   if(EN){const r=await rdEnT('Rashi_on_'+part.url,ttl);for(const x of r.F)add(RE,x)}
+   if(EN&&CHV){F.forEach((x,i)=>{const R=CHV[i].r;if(R&&R.length)RE.set(x.p[0]+':'+x.p[1],R)})}
+   else if(EN){const r=await rdEnT('Rashi_on_'+part.url,ttl);for(const x of r.F)add(RE,x)}
    for(const x of F){const[c,v]=x.p;if(c!==lastC&&lastC!==null)html+=chip('פרק '+heN(c),'Chapter '+c);lastC=c;html+=line('rdv',rdNum(v),nE(v),x.t,en(x));
     const rh=RM.get(c+':'+v)||[],re=EN?RE.get(c+':'+v)||[]:[];if(rh.length||re.length)html+=rdRashi(rh,re,mode)}}
   else if(part.kind==='ps'){const cs=[...new Set(F.map(x=>x.p[0]))];
@@ -3504,8 +3537,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=78;
+const CC_VER=79;
 const CC_LOG=[
+ {v:79,new:['In the app, English Chumash with Rashi and Tehillim now come from Chabad.org (with permission) when available.']},
  {v:78,new:['English Chumash and Tehillim now use The Koren Jerusalem Bible, and Rashi in English is complete (Rosenbaum & Silbermann).']},
  {v:77,new:['The 3D opening is much lighter for the phone, so it plays smoothly from start to finish.']},
  {v:76,big:1,new:['English for the shiurim: Chumash with Rashi, Tanya, Rambam and Tehillim can now be read in Hebrew, English, or both together. Switch at the top of the reader.']},
@@ -4903,10 +4937,24 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
  <select id="ttOcc" style="width:100%"></select>
  <div class="qseg" id="ttWhen" style="margin-top:10px"><button type="button" data-w="am">Morning</button><button type="button" data-w="pm">Afternoon</button><button type="button" data-w="night">Night</button></div>
  <button class="btn" type="button" id="ttSdGo" style="width:100%;margin-top:10px">Go there and open the siddur</button><p class="mut" id="ttSdMsg" role="status" style="margin:8px 0 0;font-size:13px"></p>
+ <h3 class="admh">Chabad.org English</h3><p class="mut" style="margin:0 0 6px">Downloads today's page on this phone and checks it lines up with the Hebrew.</p><div class="rw" style="flex-wrap:wrap;gap:8px"><button class="btn gh" type="button" id="ttChC">Test Chumash</button><button class="btn gh" type="button" id="ttChT">Test Tehillim</button><button class="btn gh" type="button" id="ttChX" hidden>Copy page outline</button></div><p class="mut" id="ttChM" role="status" style="margin:8px 0 0;font-size:13px;white-space:pre-wrap"></p>
  <h3 class="admh">Animations</h3><div class="rw" style="flex-wrap:wrap;gap:8px"><button class="btn gh" type="button" id="ttPlay">Play sun/moon opening</button><button class="btn gh" type="button" id="ttIntro">Play logo intro</button></div>
  <h3 class="admh">Feature switches</h3><p class="mut" style="margin:0 0 6px">On this phone only.</p><div id="ttFlags" style="display:grid;gap:8px;margin:6px 0 4px"></div>
  ${TEST?'<h3 class="admh">Test account</h3><button class="btn gh" type="button" id="ttReset">Reset test account</button>':''}`;
  {const ab=document.getElementById('admBody');if(ab)ab.appendChild(box);else{const adv=document.getElementById('shpAdv');if(adv)adv.appendChild(box)}}
+ {let raw='';const M=box.querySelector('#ttChM'),X=box.querySelector('#ttChX');
+  const run=async k=>{const d=new Date(shDay(t0));M.textContent='Downloading '+chUrl(k,d)+' …';X.hidden=true;raw='';
+   if(!chHttp()){M.textContent='Only works inside the Android app.';return}
+   try{raw=await chGet(chUrl(k,d));const V=chParse(raw);let F=[];try{const P=await rdRefs(k,d);if(P.length===1)F=rdFlat(await rdText(P[0].url))}catch(e){}
+    const rs=V.reduce((a,v)=>a+v.r.length,0);
+    M.textContent=`Page: ${raw.length.toLocaleString()} characters\nVerses found: ${V.length}${F.length?' · Hebrew has '+F.length:''}${k==='chumash'?' · Rashi comments: '+rs:''}\n${chFits(V,F)?'✅ Lines up: the reader will use Chabad.org English.':'⚠️ Does not line up yet: the reader uses Sefaria English. Tap “Copy page outline” and paste it in the chat.'}\n${V[0]?'First: '+V[0].en.replace(/<[^>]+>/g,'').slice(0,120):''}`}
+   catch(e){M.textContent='Could not download: '+(e&&e.message||e)}
+   X.hidden=!raw};
+  box.querySelector('#ttChC').onclick=()=>run('chumash');box.querySelector('#ttChT').onclick=()=>run('tehillim');
+  // a compact outline of the page (tags + classes around the English text) so the reader can be adjusted
+  X.onclick=()=>{try{const doc=new DOMParser().parseFromString(raw,'text/html');const L=[];const walk=(el,dp)=>{if(L.length>260||dp>14)return;for(const c of el.children){if(/^(SCRIPT|STYLE|SVG|NOSCRIPT|LINK|META|IFRAME)$/.test(c.tagName))continue;const tx=[...c.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent.trim()).join(' ').slice(0,40);L.push(' '.repeat(dp)+c.tagName.toLowerCase()+(c.id?'#'+c.id:'')+(c.className&&typeof c.className==='string'?'.'+c.className.trim().replace(/\s+/g,'.'):'')+(tx?' “'+tx+'”':''));walk(c,dp+1)}};
+    const main=[...doc.querySelectorAll('[class*=english],[class*=English]')][0];let root=main||doc.body;for(let i=0;i<5&&root.parentElement&&root!==doc.body;i++)root=root.parentElement;walk(root,0);
+    const txt='CHABAD PAGE OUTLINE\n'+L.join('\n');navigator.clipboard.writeText(txt).then(()=>{M.textContent+='\n\nCopied ('+L.length+' lines). Paste it in the chat.'},()=>{M.textContent+='\n\nCould not copy.'})}catch(e){M.textContent+='\n\n'+e.message}}}
  const $d=box.querySelector('#ttD'),$t=box.querySelector('#ttT'),$v=box.querySelector('#ttV');
  /* Always-visible reminder that the test account runs on a simulated clock, not the phone's time (prevents the
     "sunrise looks wrong" confusion). Tap it to jump to real now. */
