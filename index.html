@@ -1028,8 +1028,11 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
     /* watchdog (v77): the first second is noisy (the app is still loading behind the intro and frames come late), so it only
        judges from t = 1 s: two slow windows in a row (avg > 40 ms over 8 frames) → a lower resolution (85% → 70% → 55% → 45%);
        only if it is still slow at 45% does it give up (the intro then fades into the app). */
-    var fr=[],last=0,slow=0;
-    return{cv:cv,draw:function(o){if(dead)return false;var n=performance.now();
+    var fr=[],last=0,slow=0,n0=0,vs=0;
+    return{cv:cv,draw:function(o){if(dead)return false;var n=performance.now();if(!n0)n0=n;
+      /* a really slow GPU (every frame > 90 ms, not just the loading hiccup): step down at once; still crawling after 6 s → skip */
+      if(window.__INTRO_T==null&&last){if(n-n0>6000&&o.t<1){dead=true;cv.remove();return false}
+        if(n-n0>1500&&n-last>90){if(++vs>=6){vs=0;if(sc>.46){sc=sc>.9?.7:sc>.6?.55:.45;size()}else{dead=true;cv.remove();return false}}}else vs=0}
       if(window.__INTRO_T==null&&last&&o.t>=1&&o.t<=5.8){fr.push(n-last);if(fr.length>=8){var a=0;for(var i=0;i<fr.length;i++)a+=fr[i];a/=fr.length;fr=[];
         if(a>40){if(++slow>=2){slow=0;if(sc>.46){sc=sc>.9?.85:sc>.8?.7:sc>.6?.55:.45;size()}else{dead=true;cv.remove();return false}}}else slow=0}}
       last=n;
