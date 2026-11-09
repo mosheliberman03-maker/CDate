@@ -4972,7 +4972,12 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
       const tx=[...c.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent.trim()).join(' ').replace(/\s+/g,' ').slice(0,60);L.push(' '.repeat(dp)+lb+(tx?' “'+tx+'”':''));walk(c,dp+1)})};
     walk(R,0);
     const sample=R.innerHTML.replace(/\s(?!class=|id=)[\w-:]+="[^"]*"/g,'').replace(/\s+/g,' ').slice(0,3500);
-    const txt='CHABAD PAGE OUTLINE v2 · text area: '+lab(R)+' · letters '+tot+'\n'+L.join('\n')+'\n\nHTML SAMPLE\n'+sample;
+    // v3: where does the text come from? scripts with lots of English, addresses the page's code mentions, frames
+    const d2=new DOMParser().parseFromString(raw,'text/html'),SC=[...d2.querySelectorAll('script')];
+    const big=SC.filter(x=>!x.src&&(x.textContent.match(/[A-Za-z]/g)||[]).length>1500).map(x=>{const t=x.textContent;const k=t.search(/(Genesis|Exodus|Leviticus|Numbers|Deuteronomy|Psalm|verse|rashi|Rashi)/);return '['+t.length+' chars, type '+(x.type||'js')+'] '+t.slice(0,250).replace(/\s+/g,' ')+(k>0?' … AROUND TEXT: '+t.slice(Math.max(0,k-200),k+600).replace(/\s+/g,' '):'')}).slice(0,4);
+    const urls=[...new Set((raw.match(/["'](\/[^"'\s<>]{3,160}|https?:\/\/[^"'\s<>]{6,160})["']/g)||[]).map(x=>x.slice(1,-1)).filter(u=>/api|ajax|json|text|torah|chumash|rashi|reading|dailystudy|asp\?|aid/i.test(u)&&!/\.(css|png|jpg|gif|svg|woff2?)(\?|$)/i.test(u)))].slice(0,60);
+    const fr=[...d2.querySelectorAll('iframe')].map(x=>x.getAttribute('src')).filter(Boolean);
+    const txt='CHABAD PAGE OUTLINE v3 · page '+raw.length+' chars · text area: '+lab(R)+' · letters '+tot+'\n\nSCRIPTS WITH TEXT ('+big.length+')\n'+big.join('\n\n')+'\n\nADDRESSES\n'+urls.join('\n')+'\n\nFRAMES\n'+fr.join('\n')+'\n\nSCRIPT FILES\n'+SC.filter(x=>x.src).map(x=>x.getAttribute('src')).slice(0,25).join('\n')+'\n\nOUTLINE\n'+L.slice(0,80).join('\n');
     navigator.clipboard.writeText(txt).then(()=>{M.textContent+='\n\nCopied ('+L.length+' lines). Paste it in the chat.'},()=>{M.textContent+='\n\nCould not copy.'})}catch(e){M.textContent+='\n\n'+e.message}}}
  const $d=box.querySelector('#ttD'),$t=box.querySelector('#ttT'),$v=box.querySelector('#ttV');
  /* Always-visible reminder that the test account runs on a simulated clock, not the phone's time (prevents the
