@@ -1776,11 +1776,15 @@ const rdLocal=u=>'sefaria/'+rdKey(u.slice(SEF.length))+'.json';
 const rdJ=url=>{if(!RDC.has(url))RDC.set(url,rdGo(rdLocal(url)).catch(()=>RDP?rdGo(rdRelay(url)).catch(()=>rdGo(url)):rdGo(url).catch(e=>rdGo(rdRelay(url)).then(j=>{RDP=true;try{localStorage.setItem('cc_rd_relay','1')}catch(x){}return j}).catch(e2=>{throw new Error(e.message+' / relay: '+e2.message)}))).catch(e=>{RDC.delete(url);throw e}));return RDC.get(url)};
 const rdCal=d=>rdJ(`${SEF}calendars?year=${d.getFullYear()}&month=${d.getMonth()+1}&day=${d.getDate()}&diaspora=${LC.tz==='Asia/Jerusalem'?0:1}`);
 const rdUrl=ref=>ref.replace(/ (?=[\d:]+(?:-[\d:]+)?$)/,'.').replace(/ /g,'_').replace(/:/g,'.');
-const rdText=(url,en)=>rdJ(`${SEF}v3/texts/${encodeURI(url)}?version=${en?'english':'hebrew'}&return_format=strip_only_footnotes`);
+const rdText=(url,en,vt)=>rdJ(`${SEF}v3/texts/${encodeURI(url)}?version=${en?(vt?encodeURIComponent('english|'+vt):'english'):'hebrew'}&return_format=strip_only_footnotes`);
+/* preferred English translations (owner's audience): Chumash and Tehillim = The Koren Jerusalem Bible (Orthodox; Sefaria's default
+   is a gender-sensitive JPS edition), Rashi = Rosenbaum–Silbermann (complete). Tanya (Kehot) and Rambam (Touger) are Sefaria's defaults.
+   If the preferred one is missing for a passage, Sefaria's default English is used. */
+const RD_PREF=u=>/^Rashi_on_/.test(u)?'Pentateuch with Rashi\'s commentary by M. Rosenbaum and A.M. Silbermann, 1929-1934':/^(Genesis|Exodus|Leviticus|Numbers|Deuteronomy|Psalms)\./.test(u)?'The Koren Jerusalem Bible':'';
 /* v76 (owner): English for the shiurim. Hebrew only / Hebrew + English / English only (toggle at the top of the reader), per phone. */
 const RD_LG=()=>{try{const v=localStorage.getItem('cc_rd_lang');return v==='both'||v==='en'?v:'he'}catch(e){return'he'}};
 const rdMapF=F=>{const M=new Map();for(const x of F)M.set(x.p.join(':'),x.t);return M};
-const rdEnT=async(url,ttl)=>{try{const j=await rdText(url,1),v=(j.versions||[])[0];if(v&&v.versionTitle)ttl.add(v.versionTitle);return{j,F:rdFlat(j)}}catch(e){return{j:{},F:[]}}};
+const rdEnT=async(url,ttl)=>{try{const pf=RD_PREF(url);let j=pf?await rdText(url,1,pf).catch(()=>({})):{};const ok=x=>{const v=(x.versions||[])[0];return v&&v.text&&(typeof v.text==='string'||JSON.stringify(v.text).length>40)};if(!ok(j))j=await rdText(url,1);const v=(j.versions||[])[0];if(v&&v.versionTitle)ttl.add(v.versionTitle);return{j,F:rdFlat(j)}}catch(e){return{j:{},F:[]}}};
 const rdClean=s=>String(s||'').replace(/<sup[^>]*>.*?<\/sup>/gs,'').replace(/<i[^>]*class="footnote"[^>]*>.*?<\/i>/gs,'').replace(/<(?!\/?(?:b|i|small|big|br|strong|em)\b)[^>]*>/g,'').replace(/\{[פס]\}/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
 // Sefaria text (nested arrays) -> [{p:[chapter,verse,...], t}] with real chapter/verse numbers
 function rdFlat(j){const v=(j.versions||[])[0];if(!v)return[];const s=(j.sections||[]).map(Number),e=(j.toSections||j.sections||[]).map(Number),out=[];
@@ -3499,8 +3503,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=77;
+const CC_VER=78;
 const CC_LOG=[
+ {v:78,new:['English Chumash and Tehillim now use The Koren Jerusalem Bible, and Rashi in English is complete (Rosenbaum & Silbermann).']},
  {v:77,new:['The 3D opening is much lighter for the phone, so it plays smoothly from start to finish.']},
  {v:76,big:1,new:['English for the shiurim: Chumash with Rashi, Tanya, Rambam and Tehillim can now be read in Hebrew, English, or both together. Switch at the top of the reader.']},
  {v:75,new:['Cleanup: old code that newer features replaced was removed, so the app is lighter.']},
