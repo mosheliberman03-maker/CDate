@@ -4974,9 +4974,10 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
   box.querySelector('#ttChC').onclick=()=>run('chumash');box.querySelector('#ttChT').onclick=()=>run('tehillim');
   // a compact outline of the page (tags + classes around the English text) so the reader can be adjusted
   X.onclick=()=>{try{const doc=new DOMParser().parseFromString(raw,'text/html');
-    doc.querySelectorAll('script,style,noscript,svg,iframe,form,header,footer,nav,[id*=Navigation],[class*=navigation],[class*=menu],[class*=mobile_wrapper],[class*=footer],[class*=sidebar],[class*=related]').forEach(x=>x.remove());
+    doc.querySelectorAll('script,style,noscript,svg,iframe,form,header,footer,nav,#PrimaryNavigationContainer,.menu_wrapper,[id*=Popup],[class*=popup],[class*=subscribe]').forEach(x=>x.remove());
     const Lc=e=>(e.textContent.match(/[A-Za-z]/g)||[]).length,tot=Lc(doc.body);let R=doc.body;
-    doc.body.querySelectorAll('div,section,article,main,table,tbody').forEach(e=>{if(Lc(e)>=tot*.8&&e.textContent.length<R.textContent.length)R=e});
+    doc.body.querySelectorAll('div,section,article,main,table,tbody').forEach(e=>{if(Lc(e)>=tot*.7&&e.textContent.length<R.textContent.length)R=e});
+    const CN={};R.querySelectorAll('[class]').forEach(e=>{if(typeof e.className==='string')e.className.trim().split(/\s+/).forEach(c=>CN[c]=(CN[c]||0)+1)});const topC=Object.entries(CN).sort((a,b)=>b[1]-a[1]).slice(0,30).map(x=>x[0]+' ×'+x[1]).join(', ');
     const L=[];const lab=c=>c.tagName.toLowerCase()+(c.id?'#'+c.id:'')+(typeof c.className==='string'&&c.className.trim()?'.'+c.className.trim().replace(/\s+/g,'.'):'');
     const walk=(el,dp)=>{if(L.length>420||dp>16)return;const kids=[...el.children],cnt={};
      kids.forEach((c,ix)=>{if(L.length>420)return;const lb=lab(c);cnt[lb]=(cnt[lb]||0)+1;if(cnt[lb]>3){if(cnt[lb]===4)L.push(' '.repeat(dp)+'… more '+lb+' (×'+kids.filter(k=>lab(k)===lb).length+')');return}
@@ -4988,7 +4989,7 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
     const big=SC.filter(x=>!x.src&&(x.textContent.match(/[A-Za-z]/g)||[]).length>1500).map(x=>{const t=x.textContent;const k=t.search(/(Genesis|Exodus|Leviticus|Numbers|Deuteronomy|Psalm|verse|rashi|Rashi)/);return '['+t.length+' chars, type '+(x.type||'js')+'] '+t.slice(0,250).replace(/\s+/g,' ')+(k>0?' … AROUND TEXT: '+t.slice(Math.max(0,k-200),k+600).replace(/\s+/g,' '):'')}).slice(0,4);
     const urls=[...new Set((raw.match(/["'](\/[^"'\s<>]{3,160}|https?:\/\/[^"'\s<>]{6,160})["']/g)||[]).map(x=>x.slice(1,-1)).filter(u=>/api|ajax|json|text|torah|chumash|rashi|reading|dailystudy|asp\?|aid/i.test(u)&&!/\.(css|png|jpg|gif|svg|woff2?)(\?|$)/i.test(u)))].slice(0,60);
     const fr=[...d2.querySelectorAll('iframe')].map(x=>x.getAttribute('src')).filter(Boolean);
-    const txt='CHABAD PAGE OUTLINE v3 · page '+raw.length+' chars · text area: '+lab(R)+' · letters '+tot+'\n\nSCRIPTS WITH TEXT ('+big.length+')\n'+big.join('\n\n')+'\n\nADDRESSES\n'+urls.join('\n')+'\n\nFRAMES\n'+fr.join('\n')+'\n\nSCRIPT FILES\n'+SC.filter(x=>x.src).map(x=>x.getAttribute('src')).slice(0,25).join('\n')+'\n\nOUTLINE\n'+L.slice(0,80).join('\n');
+    const txt='CHABAD PAGE OUTLINE v3 · page '+raw.length+' chars · text area: '+lab(R)+' · letters '+tot+'\n\nSCRIPTS WITH TEXT ('+big.length+')\n'+big.join('\n\n')+'\n\nADDRESSES\n'+urls.join('\n')+'\n\nFRAMES\n'+fr.join('\n')+'\n\nSCRIPT FILES\n'+SC.filter(x=>x.src).map(x=>x.getAttribute('src')).slice(0,25).join('\n')+'\n\nMOST USED LABELS\n'+topC+'\n\nOUTLINE\n'+L.slice(0,120).join('\n')+'\n\nHTML SAMPLE\n'+sample;
     navigator.clipboard.writeText(txt).then(()=>{M.textContent+='\n\nCopied ('+L.length+' lines). Paste it in the chat.'},()=>{M.textContent+='\n\nCould not copy.'})}catch(e){M.textContent+='\n\n'+e.message}}}
  const $d=box.querySelector('#ttD'),$t=box.querySelector('#ttT'),$v=box.querySelector('#ttV');
  /* Always-visible reminder that the test account runs on a simulated clock, not the phone's time (prevents the
