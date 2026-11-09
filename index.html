@@ -1785,17 +1785,19 @@ const RD_PREF=u=>/^Rashi_on_/.test(u)?'Pentateuch with Rashi\'s commentary by M.
 /* v76 (owner): English for the shiurim. Hebrew only / Hebrew + English / English only (toggle at the top of the reader), per phone. */
 const RD_LG=()=>{try{const v=localStorage.getItem('cc_rd_lang');return v==='both'||v==='en'?v:'he'}catch(e){return'he'}};
 const rdMapF=F=>{const M=new Map();for(const x of F)M.set(x.p.join(':'),x.t);return M};
-/* v79 (owner, with Chabad.org's permission): Chumash with Rashi and Tehillim in Chabad.org's English. Only in the Android app,
-   where the phone itself downloads the daily-study page (CapacitorHttp, native: no CORS, a normal phone request). The page is
-   read row by row (an English cell per verse, Rashi rows after their verse); it is used ONLY if its verse numbers match the
-   Hebrew exactly, otherwise (or offline / in China without VPN / outside the app) the Sefaria English is used. Parsed results
-   are kept per day (cc_chen, last 12) so reopening is instant. Tanya/Rambam stay on Sefaria (same Kehot / Touger translations). */
-const chHttp=()=>{try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;return(C.Plugins&&C.Plugins.CapacitorHttp)||(C.registerPlugin&&C.registerPlugin('CapacitorHttp'))||null}catch(e){return null}};
+/* v79/v81 (owner, with Chabad.org's permission): Chumash with Rashi and Tehillim in Chabad.org's English, in the Android app.
+   Chabad.org refuses plain downloads (HTTP 403, even from the phone), so app version 5 has a hidden browser (PageGrab, a native
+   WebView) that opens the daily-study page like Chrome would. It runs in the BACKGROUND (today + tomorrow, after the app opens,
+   and when the reader opens without it); the reader never waits: it shows the Sefaria English and switches to Chabad.org's as
+   soon as it has arrived. The page is read row by row (an English cell per verse, Rashi rows after their verse) and used ONLY
+   if its verse numbers match the Hebrew exactly. Parsed pages are kept per day (cc_chen, last 12). Tanya/Rambam stay on
+   Sefaria (same Kehot / Touger translations). */
+const chGrab=()=>{try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;return(C.Plugins&&C.Plugins.PageGrab)||(C.registerPlugin&&C.registerPlugin('PageGrab'))||null}catch(e){return null}};
 const CH_URL={chumash:'torahreading',tehillim:'tehillim'};
 const chUrl=(k,d)=>`https://www.chabad.org/dailystudy/${CH_URL[k]}.asp?tdate=${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
-async function chGet(url){const H=chHttp();if(!H)throw new Error('only in the app');
- const r=await H.get({url,headers:{'Accept':'text/html','Accept-Language':'en-US,en;q=0.9','User-Agent':navigator.userAgent.replace(/; wv\)/,')')},responseType:'text',connectTimeout:9000,readTimeout:12000});
- if(!r||r.status!==200)throw new Error('HTTP '+(r&&r.status));return typeof r.data==='string'?r.data:''}
+async function chGet(url){const P=chGrab();if(!P)throw new Error('only in the app');let r;
+ try{r=await P.get({url,timeout:25000})}catch(e){const m=String(e&&e.message||e);throw new Error(/not implemented|UNIMPLEMENTED|not available/i.test(m)?'update the app (version 5 needed)':m)}
+ if(!r||!r.html)throw new Error('empty page');if(!r.complete)throw new Error('page did not finish loading ('+(r.title||'no title')+')');return r.html}
 const chIn=el=>{const c=el.cloneNode(true);c.querySelectorAll('script,style,sup,.footnote,[class*=footnote],[class*=Footnote],a[class*=note]').forEach(x=>x.remove());
  return c.innerHTML.replace(/<(?!\/?(?:b|i|em|strong|br)\b)[^>]*>/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim()};
 /* rows with an English cell → verses [{n, en, r:[rashi…]}] */
@@ -1808,11 +1810,15 @@ function chParse(html){const doc=new DOMParser().parseFromString(html,'text/html
   const c=en.cloneNode(true);c.querySelectorAll('[class*=VerseNum],[class*=versenum],[class*=verse_num]').forEach(x=>x.remove());const t=chIn(c);if(t)out.push({n:num,en:t,r:[]})}
  return out}
 const chCache=()=>{try{return JSON.parse(localStorage.getItem('cc_chen')||'{}')}catch(e){return{}}};
-let CH_DOWN=false;
-async function chEnglish(k,d){if(!CH_URL[k]||!chHttp()||CH_DOWN)return null;const id=k+'|'+ds(d),C=chCache();if(C[id])return C[id].v;
- try{const v=chParse(await Promise.race([chGet(chUrl(k,d)),new Promise((_,j)=>setTimeout(()=>j(new Error('slow')),9000))]));if(!v.length)return null;
-  C[id]={v,t:Date.now()};const ks=Object.keys(C).sort((a,b)=>C[b].t-C[a].t);ks.slice(12).forEach(x=>delete C[x]);try{localStorage.setItem('cc_chen',JSON.stringify(C))}catch(e){}return v}
- catch(e){CH_DOWN=/slow|HTTP 403|HTTP 5|timeout|Unable|failed/i.test(String(e&&e.message));return null}}
+const chCached=(k,d)=>{const C=chCache()[k+'|'+ds(d)];return C?C.v:null};
+let CH_DOWN=false;const CH_BUSY={};
+async function chFetch(k,d){const id=k+'|'+ds(d);if(!CH_URL[k]||!chGrab()||CH_DOWN||CH_BUSY[id]||chCached(k,d))return null;CH_BUSY[id]=1;
+ try{const v=chParse(await chGet(chUrl(k,d)));if(!v.length)return null;const C=chCache();C[id]={v,t:Date.now()};const ks=Object.keys(C).sort((a,b)=>C[b].t-C[a].t);ks.slice(12).forEach(x=>delete C[x]);try{localStorage.setItem('cc_chen',JSON.stringify(C))}catch(e){}
+  // the reader is open on this shiur and day in English: switch to Chabad.org's text now
+  if(RDS&&RDS.k===k&&ds(RDS.d)===ds(d)&&RD_LG()!=='he'){RDS.mode=null;rdRe()}return v}
+ catch(e){if(/update the app|timeout|403|5\d\d/i.test(String(e&&e.message)))CH_DOWN=true;return null}finally{delete CH_BUSY[id]}}
+/* in the background, a while after opening: today's and tomorrow's pages (only for people who read English) */
+setTimeout(async()=>{if(RD_LG()==='he'||!chGrab())return;const d0=new Date(shDay(t0));for(const d of[d0,ad(d0,1)])for(const k of['chumash','tehillim'])await chFetch(k,d)},9000);
 /* use it only if the verse numbers line up with the Hebrew */
 const chFits=(V,F)=>V&&V.length===F.length&&F.every((x,i)=>isNaN(V[i].n)||V[i].n===x.p[x.p.length-1]);
 const rdEnT=async(url,ttl)=>{try{const pf=RD_PREF(url);let j=pf?await rdText(url,1,pf).catch(()=>({})):{};const ok=x=>{const v=(x.versions||[])[0];return v&&v.text&&(typeof v.text==='string'||JSON.stringify(v.text).length>40)};if(!ok(j))j=await rdText(url,1);const v=(j.versions||[])[0];if(v&&v.versionTitle)ttl.add(v.versionTitle);return{j,F:rdFlat(j)}}catch(e){return{j:{},F:[]}}};
@@ -1871,7 +1877,7 @@ async function rdBuild(k,d,mode){mode=mode||RD_LG();let CHV=null;const parts=awa
  for(const part of parts){let j,F,jE={},E=new Map();
   if(part.kind==='tn'){const T=await rdTanya(part);j={heRef:T.he};F=T.F;if(EN){try{const TE=await rdTanya(part,1);jE={ref:TE.he};E=rdMapF(TE.F);if(TE.vt&&TE.F.length)ttl.add(TE.vt)}catch(e){}}}
   else{j=await rdText(part.url);F=rdFlat(j);
-   if(EN&&parts.length===1&&CH_URL[k]){const V=await chEnglish(k,d);if(chFits(V,F)){F.forEach((x,i)=>E.set(x.p.join(':'),V[i].en));CHV=V;ttl.add('Chabad.org')}}
+   if(EN&&parts.length===1&&CH_URL[k]){const V=chCached(k,d);if(chFits(V,F)){F.forEach((x,i)=>E.set(x.p.join(':'),V[i].en));CHV=V;ttl.add('Chabad.org')}else if(!V)chFetch(k,d)}
    if(EN&&!CHV){const r=await rdEnT(part.url,ttl);jE=r.j;E=rdMapF(r.F)}}
   const en=x=>E.get(x.p.join(':'));let lastC=null;
   if(part.kind==='ch'){const wd=d.getDay();
@@ -3537,8 +3543,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=80;
+const CC_VER=81;
 const CC_LOG=[
+ {v:81,mid:1,new:['English Chumash with Rashi and Tehillim from Chabad.org. Update the app (the button at the top) to get it.']},
  {v:80,adm:1,new:['Admin: new admin code.']},
  {v:79,new:['In the app, English Chumash with Rashi and Tehillim now come from Chabad.org (with permission) when available.']},
  {v:78,new:['English Chumash and Tehillim now use The Koren Jerusalem Bible, and Rashi in English is complete (Rosenbaum & Silbermann).']},
@@ -3694,7 +3701,7 @@ function findDemoDay(){try{for(let i=0;i<40;i++){const d=ad(t0,i),inf=info(d);if
 /* ===== Updating the app itself (owner, v54): "when I need to update the actual app, it should be sent to the app, with a button
    inside the app". CC_APK = the app version this page needs (native/app-version.txt, set into the APK by patch-android.js).
    An older app (or one too old to tell, = 0) gets a bar at the top and an "Update the app" button in ⋯ → App. ===== */
-const CC_APK=4;let APKV=null;
+const CC_APK=5;let APKV=null;
 async function ccApkVer(){if(!CC_NATIVE)return 99;if(APKV!=null)return APKV;try{const C=window.Capacitor,A=(C.Plugins&&C.Plugins.App)||C.registerPlugin('App');const i=await A.getInfo();APKV=+i.build||0}catch(e){APKV=0}return APKV}
 function apkUpdate(){try{H.tap()}catch(e){}let o=document.getElementById('apkBox');if(!o){o=document.createElement('div');o.id='apkBox';o.className='apk-box';document.body.appendChild(o)}
  o.innerHTML=`<div class="apk-card" role="dialog" aria-label="Update the app">${typeof cchHtml==='function'?cchHtml('alert','apk-av'):''}<h3>Update the app</h3><p>A new version of the app is ready. It installs over this one, and everything you saved stays.</p><ol><li>Tap <b>Download the update</b>.</li><li>When it finishes, open the downloaded file.</li><li>Tap <b>Update</b>, then open the app again.</li></ol><a class="btn" id="apkGo" href="${APK_URL}" style="display:block;text-align:center;text-decoration:none">Download the update</a><button class="btn gh" type="button" id="apkLater" style="width:100%;margin-top:8px">Later</button></div>`;
@@ -4944,8 +4951,8 @@ aiEl('aiMemoryBtn').addEventListener('click',()=>{const p=aiPrefs(),names=Object
  ${TEST?'<h3 class="admh">Test account</h3><button class="btn gh" type="button" id="ttReset">Reset test account</button>':''}`;
  {const ab=document.getElementById('admBody');if(ab)ab.appendChild(box);else{const adv=document.getElementById('shpAdv');if(adv)adv.appendChild(box)}}
  {let raw='';const M=box.querySelector('#ttChM'),X=box.querySelector('#ttChX');
-  const run=async k=>{const d=new Date(shDay(t0));M.textContent='Downloading '+chUrl(k,d)+' …';X.hidden=true;raw='';
-   if(!chHttp()){M.textContent='Only works inside the Android app.';return}
+  const run=async k=>{const d=new Date(shDay(t0));M.textContent='Opening '+chUrl(k,d)+' in the hidden browser (up to 30 seconds)…';X.hidden=true;raw='';
+   if(!chGrab()){M.textContent='Only works inside the Android app.';return}
    try{raw=await chGet(chUrl(k,d));const V=chParse(raw);let F=[];try{const P=await rdRefs(k,d);if(P.length===1)F=rdFlat(await rdText(P[0].url))}catch(e){}
     const rs=V.reduce((a,v)=>a+v.r.length,0);
     M.textContent=`Page: ${raw.length.toLocaleString()} characters\nVerses found: ${V.length}${F.length?' · Hebrew has '+F.length:''}${k==='chumash'?' · Rashi comments: '+rs:''}\n${chFits(V,F)?'✅ Lines up: the reader will use Chabad.org English.':'⚠️ Does not line up yet: the reader uses Sefaria English. Tap “Copy page outline” and paste it in the chat.'}\n${V[0]?'First: '+V[0].en.replace(/<[^>]+>/g,'').slice(0,120):''}`}

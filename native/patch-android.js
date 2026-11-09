@@ -73,3 +73,15 @@ try {
 } catch (e) {
   console.log('patch-android: app version not set (' + e.message + ')');
 }
+
+/* v81 (owner: Chabad.org English): our own Android code (native/android-src/java → the generated project). MainActivity
+   registers PageGrabPlugin, a hidden WebView that opens chabad.org pages like a real browser (plain downloads get HTTP 403). */
+try {
+  const path = require('path');
+  const copyDir = (a, b) => { fs.mkdirSync(b, { recursive: true }); for (const f of fs.readdirSync(a)) { const s = path.join(a, f), d = path.join(b, f); if (fs.statSync(s).isDirectory()) copyDir(s, d); else fs.copyFileSync(s, d); } };
+  copyDir('android-src/java', 'android/app/src/main/java');
+  console.log('patch-android: own Java code copied (MainActivity + PageGrabPlugin)');
+} catch (e) {
+  console.log('patch-android: own Java code NOT copied (' + e.message + ')');
+  process.exit(1);
+}
