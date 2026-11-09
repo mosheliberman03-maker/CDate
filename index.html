@@ -1212,18 +1212,18 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   var SE=[
     [0,function(t){pad(t,9.8)}],
     [.4,function(t){pop(t,180,520,.34)}],
-    [.93,function(t){creak(t,.3,.5,38,70)}],
+    [.93,function(t){creak(t,.3,.22,38,70)}],
     [1.2,function(t){boing(t,200,620,.38,.17)}],
     [1.36,function(t){pop(t,320,900,.26)}],
     [1.72,function(t){thud(t,.2)}],
     [2.08,function(t){tap(t,880,.06)}],[2.63,function(t){tap(t,780,.06)}],[3.18,function(t){tap(t,840,.06)}],
     [3.62,function(t){tone('sine',560,500,t,.025,.05,.22)}],   // v66 (owner): the blink is a soft, rounded 'blip' (no bright bell)
-    [3.95,function(t){creak(t,.22,.45,45,75)}],
+    [3.95,function(t){creak(t,.22,.2,45,75)}],
     [4.17,function(t){boing(t,220,560,.42,.15)}],
     [4.72,function(t){thud(t,.18)}],
     // the two tries: creak down, a weak 'bwoop' that falls back, a thud, a little 'oh'
-    [5.0,function(t){creak(t,.24,.55,40,72)}],[5.22,function(t){boing(t,230,520,.34,.14,1)}],[5.55,function(t){thud(t,.2)}],[5.72,function(t){tone('sine',440,330,t,.03,.035,.22)}],
-    [6.1,function(t){creak(t,.28,.62,36,80)}],[6.36,function(t){boing(t,220,600,.38,.16,1)}],[6.73,function(t){thud(t,.22)}],[6.9,function(t){tone('sine',400,300,t,.03,.03,.2)}],
+    [5.0,function(t){creak(t,.24,.25,40,72)}],[5.22,function(t){boing(t,230,520,.34,.14,1)}],[5.55,function(t){thud(t,.2)}],[5.72,function(t){tone('sine',440,330,t,.03,.035,.22)}],
+    [6.1,function(t){creak(t,.28,.28,36,80)}],[6.36,function(t){boing(t,220,600,.38,.16,1)}],[6.73,function(t){thud(t,.22)}],[6.9,function(t){tone('sine',400,300,t,.03,.03,.2)}],
     // the big wind-up: one long tightening creak, then the leap
     [7.2,function(t){creak(t,1.25,.45,26,95)}],
     [8.45,function(t){leap(t)}]
@@ -3772,8 +3772,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=96;
+const CC_VER=97;
 const CC_LOG=[
+ {v:97,new:['Opening animation: the small creaks are quieter.']},
  {v:96,new:['The opening animation has cartoon sounds now: a wooden creak when the character bends down and springy boings when he jumps.']},
  {v:95,new:['Opening animation: the character’s tries at the big jump now move like a real jump — crouch, push off, fall short, a disappointed beat — before the deep wind-up and the leap.']},
  {v:94,new:['Opening animation: the little hops now look like tries at the big jump, and the wind-up before it is longer.']},
