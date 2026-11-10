@@ -2122,7 +2122,7 @@ const sdAuto=()=>{const s=sdDays();return s.night?'ma':s.pm?'mi':'sh'};
 function sdNoTach(d){const h=hd(d),k=h.k,x=h.d;return x===30||(x===1&&k!=='Ti')||k==='N'||(k==='I'&&(x===14||x===18))||(k==='Si'&&x<=12)||(k==='Av'&&(x===9||x===15))||(k==='Ti'&&x>=9)||(k==='Ki'&&(x===19||x===20||x>=25))||(k==='Te'&&chIdx({h,dt:d})>0)||(k==='Sh'&&x===15)||((k==='A'||k==='AI')&&(x===14||x===15))||(k==='Ta'&&(x===12||x===13))}
 // what the day needs (the Hebrew day of that tefillah)
 function sdCx(fk){const s=sdDays(),day=fk==='ma'?s.eve:s.day,h=hd(day),ev=infoBase(day).ev,wd=day.getDay(),yt=strictYT(h),
-  rc=(h.d===30||h.d===1)&&!(h.k==='Ti'&&h.d===1),ch=chIdx({h,dt:day}),chm=ev.some(e=>/Chol Hamoed/.test(e.t)),pur=ev.some(e=>e.t==='Purim'),
+  rc=(h.d===30||h.d===1)&&!(h.k==='Ti'&&h.d===1),ch=chIdx({h,dt:day}),chm=(h.k==='Ti'&&h.d>=17&&h.d<=21)||(h.k==='N'&&h.d>=17&&h.d<=20)||ev.some(e=>/Chol Hamoed/.test(e.t)),pur=ev.some(e=>e.t==='Purim'),
   tb=h.k==='Av'&&(h.d===9||(h.d===10&&wd===0)),fast=ev.some(e=>e.k==='fs')&&!(h.k==='Ti'&&h.d===10);
  return{s,day,h,ev,wd,yt,rc,ch,chm,pur,tb,fast,noT:sdNoTach(day)||yt||chm,mt:wd===1||wd===4,td:h.k==='Ti'&&h.d<=10,
   ld:h.k==='E'||(h.k==='Av'&&h.d===30)||(h.k==='Ti'&&h.d<=21),mevar:ev.some(e=>e.id==='sp-mev'),om:omerIdx(h),ms:wd===0}}
@@ -2130,7 +2130,8 @@ function sdCx(fk){const s=sdDays(),day=fk==='ma'?s.eve:s.day,h=hd(day),ev=infoBa
    paragraphs that don't apply today are cut out and today's additions (Hallel, the Torah reading, Musaf, Sefirah, the Nasi…) are
    cut in from their own pages. siddur/gaps.json = per page [body top, body bottom, blank line gaps (start,len; len<0 inside a grey box)],
    so every cut lands on a blank line. Positions below = [book page, % of the page height]. Then the pieces are laid out on screens. ===== */
-function sdY(i,pct){const P=SD.G[i];if(pct==null||pct<=0)return P[0];if(pct>=100)return P[1];const y=pct*18.61,g=P[2];let best=null,bd=29;
+function sdY(i,pct){const P=SD.G[i];if(Array.isArray(pct))return Math.round(pct[0]*18.61);   // [pct] = exact row, no snapping (lines that touch)
+ if(pct==null||pct<=0)return P[0];if(pct>=100)return P[1];const y=pct*18.61,g=P[2];let best=null,bd=29;
  for(const box of [0,1])for(const mn of [4,1])if(best==null)for(let j=0;j<g.length;j+=2){if((g[j+1]<0)!==!!box||Math.abs(g[j+1])<mn)continue;const c=g[j]+Math.abs(g[j+1])/2,d=Math.abs(c-y);if(d<bd){bd=d;best=c}}
  return Math.max(P[0],Math.min(P[1],Math.round(best==null?y:best)))}
 function sdR(b0,p0,b1,p1){const i0=sdIdx(b0),i1=sdIdx(b1),o=[];for(let i=i0;i<=i1;i++){const a=i===i0?sdY(i,p0):SD.G[i][0],b=i===i1&&p1!=null?sdY(i,p1):SD.G[i][1];if(b-a>8)o.push({i,a,b})}return o}
@@ -2152,7 +2153,17 @@ function sdOmer(n){for(const[p,b]of SD_OM){if(n<b.length)return sdR(p,b[n-1],p,b
 const SD_SONG=[[71,70.9,72,24.95],[72,27.6,72,74.5],[72,77.1,73,19],[73,22.7,74,11.75],[74,15,74,71.3],[74,75.5,75,12]];
 function sdSong(wd,ho){const d=SD_SONG[Math.min(wd,5)],a=wd===0?sdR(71,67.1,72,24.95):[...sdR(71,67.1,71,70.9),...sdR(d[0],d[1],d[2],d[3])];return ho?[...a,...sdR(75,12,75,34.25)]:a}
 // Hallel; on Chanukah it ends with Half Kaddish and the Torah reading follows, on Rosh Chodesh / Chol Hamoed with the full Kaddish
-const sdHal=c=>[...sdR(307,null,311,null),...(c.rc?sdR(312,8.45,312,20.8):[]),...sdR(312,20.8,312,56.25),...(c.rc||c.chm?sdR(312,60.9,312,86.25):[])];
+// v103 (owner): Half Hallel (Rosh Chodesh, the last six days of Pesach) leaves out "Lo lanu" and "Ahavti"; the intro and the "omit" notes go
+const sdHal=c=>{const half=(c.rc&&!c.ch)||(c.h.k==='N'&&c.h.d>=17);let L=sdR(307,null,311,null);L=sdCut(L,307,12.15,307,37.3);
+  if(half){L=sdCut(L,308,[11.45],308,47.2);L=sdCut(L,308,[69.16],309,12.5)}else{L=sdCut(L,308,[11.45],308,12.45);L=sdCut(L,308,[69.16],308,70.1)}
+  return[...L,...(c.rc?sdR(312,8.45,312,20.8):[]),...sdR(312,20.8,312,56.25),...(c.rc||c.chm?sdR(312,60.9,312,86.25):[])]};
+// Chol Hamoed readings (pp. 475–478 Sukkos by day, 502–506 Pesach). Pesach: the weekday days read Kadesh, Im kesef, Pesal, Vayedaber in order;
+// when a Shabbos falls in Chol Hamoed, Pesal is read on Shabbos, so the weekdays read Kadesh, Im kesef, Vayedaber.
+const SD_CHS=[[475,44.25,475,96.8],[476,4.5,476,51.05],[476,54.4,477,11.05],[477,14.35,477,65.15],[477,68.75,478,26.35]];
+const SD_CHP={k:[502,5.5,503,10.45],i:[503,13.05,504,28.5],p:[504,31.9,505,72.95],v:[505,75.7,506,67.3]};
+function sdChm(c){const h=c.h;if(h.k==='Ti'&&h.d>=17&&h.d<=21)return SD_CHS[h.d-17];
+ if(h.k==='N'&&h.d>=17&&h.d<=20){const d17=ad(c.day,17-h.d),days=[0,1,2,3].map(j=>ad(d17,j)),shab=days.some(d=>d.getDay()===6),wk=days.filter(d=>d.getDay()!==6),
+  n=wk.findIndex(d=>ds(d)===ds(c.day)),order=shab?['k','i','v']:['k','i','p','v'];return n>=0?SD_CHP[order[n]]:null}return null}
 const sdRd=r=>r?sdR(r[0],r[1],r[2],r[3]):null;
 function sdWeekly(day){const p=parsha(day);if(!p||!p.p||!p.p[0])return null;const nm=p.p[0][0];let k=PN.findIndex(x=>x[0]===nm);if(nm===VZ[0])k=53;return k>=0?SD_WK[k]:null}
 function sdPieces(fk){const f=sdFlows()[fk];if(!f.wk){let L=f.seg.flatMap(s=>sdR(s[0],null,s[1],null));
@@ -2170,7 +2181,7 @@ function sdPieces(fk){const f=sdFlows()[fk];if(!f.wk){let L=f.seg.flatMap(s=>sdR
   // the reading of the Torah: only on reading days, with today's reading cut in after the blessing
   if(!rd){cut(60,74.8,66,14.3);cut(69,76.9,70,18.55)}
   else{cut(61,12.2,61,16.2);cut(62,84.4,62,100);cut(63,56,63,64.2);cut(64,0,65,61.5);if(!(c.pur||c.tb))cut(66,8.4,66,14.25);
-   const r=c.ch?SD_CH[c.ch-1]:c.rc?[468,13.6,468,74.2]:c.fast&&!c.tb?[468,78.9,469,69.7]:c.mt&&!c.chm&&!c.pur?sdWeekly(c.day):null;if(r)ins(63,37.3,sdRd(r))}
+   const r=c.ch?SD_CH[c.ch-1]:c.rc?[468,13.6,468,74.2]:c.fast&&!c.tb?[468,78.9,469,63.3]:c.chm?sdChm(c):c.pur?[495,62.3,496,7.75]:c.mt?sdWeekly(c.day):null;if(r)ins(63,37.3,sdRd(r))}
   if(!c.td)cut(69,65.3,69,68.45);cut(68,87.3,68,91.2);cut(70,18.55,70,27.15);
   if(c.noT){cut(67,4.5,67,34.1);cut(70,27.15,70,92)}
   // Song of the Day (today's only), Borchi Nafshi (Rosh Chodesh), L'Dovid (Elul to Hoshana Rabbah)
@@ -2247,7 +2258,7 @@ function sdHead(){const t=sdCur(),p=sdPg(t),s=sdSec(p),fl=sdFlows(),f=SD.fk&&fl[
 // cue cards: what the cut-to-today siddur can't do by itself (Shabbos & Yom Tov additions, Havdalah, the Megillah, Chol Hamoed readings)
 function sdCues(P){if(!SD.fk)return null;const c=sdCx(SD.fk),{h,s,rc,ch,chm,pur,yt,mevar}=c,shab=c.wd===6,C=[],add=(a,b,o)=>{if(P.some(p=>p>=a&&p<=b))C.push(o)};
  if(SD.fk==='sh'){
-  if(!sdYT(c.day)){if(chm||pur||c.tb)add(61,63,{t:'<b>'+(chm?'Chol Hamoed':pur?'Purim':'Tisha B’Av')+'</b> · today’s Torah reading is in the readings for the year.',b:'Readings',go:468})}
+  if(!sdYT(c.day)){if(c.tb)add(61,63,{t:'<b>Tisha B’Av</b> · today’s Torah reading (Devarim 4:25–40) isn’t printed in this siddur.'})}
   else{
    if(yt)add(211,211,{t:'<b>Yom Tov</b> · say the Amidah for Yom Tov.',b:'Amidah',go:332,end:336,ret:217});
    if(yt||rc||ch||chm)add(217,218,{t:'<b>'+(yt?'Yom Tov':ch?'Chanukah':chm?'Chol Hamoed':'Rosh Chodesh')+'</b> · Hallel now.',b:'Hallel',go:307,end:312,ret:yt?222:218});
@@ -3773,8 +3784,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=102;
+const CC_VER=103;
 const CC_LOG=[
+ {v:103,mid:1,new:['Siddur: on Half Hallel days (Rosh Chodesh, the end of Pesach) the paragraphs you skip are left out.','Siddur: the Torah reading for Chol Hamoed and Purim now appears right in Shacharis, like on Mondays and Thursdays.']},
  {v:102,new:['Rosh Chodesh now shows its card on the day (it used to say “No special date”), and 1 Kislev no longer shows Rosh Chodesh twice.','The assistant answers faster (it no longer waits for a server that doesn’t exist).','The siddur uses much less memory, and its Chol Hamoed reading button opens the right section.','“Keep your account safe” only asks once the account server is ready.']},
  {v:101,new:['The character in the opening animation is a little smaller.']},
  {v:100,new:['The character in the opening animation is sharper (less pixelated).']},
