@@ -85,3 +85,33 @@ try {
   console.log('patch-android: own Java code NOT copied (' + e.message + ')');
   process.exit(1);
 }
+
+/* App version 6 (owner): the home-screen widget. Copies its layout/resources and registers it in the manifest. */
+try {
+  const path = require('path');
+  const copyDir = (a, b) => { fs.mkdirSync(b, { recursive: true }); for (const f of fs.readdirSync(a)) { const s = path.join(a, f), d = path.join(b, f); if (fs.statSync(s).isDirectory()) copyDir(s, d); else fs.copyFileSync(s, d); } };
+  copyDir('android-src/res', 'android/app/src/main/res');
+  let x = fs.readFileSync(man, 'utf8');
+  if (!x.includes('.CalWidget')) {
+    const add = `
+        <receiver android:name=".CalWidget" android:exported="true" android:label="Chabad Calendar">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/cc_widget_info" />
+        </receiver>
+`;
+    if (!x.includes('</application>')) throw new Error('no </application> in the manifest');
+    x = x.replace('</application>', add + '    </application>');
+    fs.writeFileSync(man, x);
+  }
+  console.log('patch-android: widget resources copied and registered');
+} catch (e) {
+  console.log('patch-android: widget NOT added (' + e.message + ')');
+  process.exit(1);
+}
