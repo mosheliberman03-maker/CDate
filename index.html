@@ -1127,7 +1127,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
   // two vibrations only: a small one near the start, a big one as the M flies past into the app
   function buzz(big){
     try{
-      if(CAN){navigator.vibrate(big?320:20);return}
+      if(CAN){if(navigator.userActivation&&!navigator.userActivation.hasBeenActive)return;navigator.vibrate(big?320:20);return}
       // iOS Safari: no vibrate API; tick a hidden switch (three quick ticks for the big one)
       var n=big?3:1,k;
       for(k=0;k<n;k++)setTimeout(function(){try{hl.click()}catch(e){}},k*45);
@@ -1351,7 +1351,7 @@ function ccIOS(){return (/iPhone|iPad|iPod/.test(navigator.userAgent)||/Macintos
 const $=s=>document.querySelector(s),RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
 const H=(()=>{let lab,last=0;const can=!!navigator.vibrate;
  const tick=()=>{try{if(!lab){lab=document.createElement('label');lab.setAttribute('aria-hidden','true');lab.style.cssText='position:fixed;left:0;top:0;width:1px;height:1px;opacity:.01;pointer-events:none;overflow:hidden';const i=document.createElement('input');i.type='checkbox';i.setAttribute('switch','');i.tabIndex=-1;lab.appendChild(i);document.body.appendChild(lab)}lab.click()}catch(e){}};
- const fire=(ms,gap=0)=>{const now=performance.now();if(now-last<Math.max(35,gap))return;last=now;try{if(can)navigator.vibrate(ms);else tick()}catch(e){}};
+ const fire=(ms,gap=0)=>{const now=performance.now();if(now-last<Math.max(35,gap))return;last=now;if(navigator.userActivation&&!navigator.userActivation.hasBeenActive)return;try{if(can)navigator.vibrate(ms);else tick()}catch(e){}};
  return{tap:()=>fire(4),sel:()=>fire(5),step:()=>fire(6),ok:()=>fire(5),rev:()=>fire(3,450),scr:()=>{}}})();
 const T=[[400,'ת'],[300,'ש'],[200,'ר'],[100,'ק'],[90,'צ'],[80,'פ'],[70,'ע'],[60,'ס'],[50,'נ'],[40,'מ'],[30,'ל'],[20,'כ'],[10,'י'],[9,'ט'],[8,'ח'],[7,'ז'],[6,'ו'],[5,'ה'],[4,'ד'],[3,'ג'],[2,'ב'],[1,'א']];
 const G=n=>{let s='',x=n%100==15||n%100==16?n%100:0;n-=x;for(const[v,c]of T)while(n>=v){s+=c;n-=v}s+=x==15?'טו':x==16?'טז':'';return s.length>1?s.slice(0,-1)+'״'+s.slice(-1):s+'׳'};
@@ -2217,12 +2217,14 @@ function sdPaint(el,t){const fl=t.m==='flow',w=fl?SD.fw:SD.bw,s=w/1077,P=sdScr(t
   return`<i style="height:${((q.b-q.a)*s).toFixed(1)}px;margin-top:${j?(14*s).toFixed(1):fl?5:Math.max(0,(SD.H-tot)/2).toFixed(1)}px;-webkit-mask-image:${u};mask-image:${u};-webkit-mask-size:${ms};mask-size:${ms};-webkit-mask-position:${mp};mask-position:${mp}"></i>`}).join('')}
 // v88 (owner: "make the loading of the pages a little faster"): pages are fetched ahead. The next 4 screens (and the one before)
 // load right away, then the rest of the open tefillah quietly in the background (3 at a time); the service worker keeps them on the phone.
-const SD_PRE=new Map();let SD_Q=[],SD_QN=0;
-function sdImg(i){if(SD_PRE.has(i))return Promise.resolve();const im=new Image();im.decoding='async';SD_PRE.set(i,im);
+const SD_PRE=new Map(),SD_GOT=new Set();let SD_Q=[],SD_QN=0;
+// pages close to the reader are decoded (kept to 24, a decoded page is ~8 MB); the rest are only fetched so the phone has them saved
+function sdImg(i){if(SD_PRE.has(i))return Promise.resolve();const im=new Image();im.decoding='async';SD_PRE.set(i,im);SD_GOT.add(i);
  const p=new Promise(r=>{im.onload=()=>{(im.decode?im.decode():Promise.resolve()).catch(()=>{}).then(r)};im.onerror=r});im.src='siddur/p/'+(i+1)+'.webp';
- if(SD_PRE.size>160){const k=SD_PRE.keys().next().value;SD_PRE.delete(k)}return p}
+ while(SD_PRE.size>24){const k=SD_PRE.keys().next().value;SD_PRE.delete(k)}return p}
+function sdFetch(i){if(SD_GOT.has(i))return Promise.resolve();SD_GOT.add(i);return fetch('siddur/p/'+(i+1)+'.webp').then(r=>r.blob()).catch(()=>{SD_GOT.delete(i)})}
 function sdPre(t){if(t)for(const q of sdScr(t))sdImg(q.i)}
-function sdQ(){while(SD_QN<3&&SD_Q.length){const i=SD_Q.shift();if(SD_PRE.has(i))continue;SD_QN++;sdImg(i).then(()=>{SD_QN--;setTimeout(sdQ,30)})}}
+function sdQ(){while(SD_QN<3&&SD_Q.length){const i=SD_Q.shift();if(SD_GOT.has(i))continue;SD_QN++;sdFetch(i).then(()=>{SD_QN--;setTimeout(sdQ,30)})}}
 function sdWarm(){let t=sdCur();const B=sdStep(-1);sdPre(B);for(let n=0;n<4;n++){t=SD.m==='flow'?(t.k+1<(SD.scr||[]).length?{m:'flow',k:t.k+1}:null):(t.k+1<SD.n.length?{m:'book',k:t.k+1}:null);if(!t)break;sdPre(t)}
  if(SD.m==='flow'&&SD.scr){const k=SD.k;SD_Q=[...new Set([...SD.scr.slice(k+5),...SD.scr.slice(0,k)].flat().map(q=>q.i))];sdQ()}}
 const sdCur=()=>({m:SD.m,k:SD.k});
@@ -2245,7 +2247,7 @@ function sdHead(){const t=sdCur(),p=sdPg(t),s=sdSec(p),fl=sdFlows(),f=SD.fk&&fl[
 // cue cards: what the cut-to-today siddur can't do by itself (Shabbos & Yom Tov additions, Havdalah, the Megillah, Chol Hamoed readings)
 function sdCues(P){if(!SD.fk)return null;const c=sdCx(SD.fk),{h,s,rc,ch,chm,pur,yt,mevar}=c,shab=c.wd===6,C=[],add=(a,b,o)=>{if(P.some(p=>p>=a&&p<=b))C.push(o)};
  if(SD.fk==='sh'){
-  if(!sdYT(c.day)){if(chm||pur||c.tb)add(61,63,{t:'<b>'+(chm?'Chol Hamoed':pur?'Purim':'Tisha B’Av')+'</b> · today’s Torah reading is in the readings for the year.',b:'Readings',go:467})}
+  if(!sdYT(c.day)){if(chm||pur||c.tb)add(61,63,{t:'<b>'+(chm?'Chol Hamoed':pur?'Purim':'Tisha B’Av')+'</b> · today’s Torah reading is in the readings for the year.',b:'Readings',go:468})}
   else{
    if(yt)add(211,211,{t:'<b>Yom Tov</b> · say the Amidah for Yom Tov.',b:'Amidah',go:332,end:336,ret:217});
    if(yt||rc||ch||chm)add(217,218,{t:'<b>'+(yt?'Yom Tov':ch?'Chanukah':chm?'Chol Hamoed':'Rosh Chodesh')+'</b> · Hallel now.',b:'Hallel',go:307,end:312,ret:yt?222:218});
@@ -2312,7 +2314,7 @@ function sdOpen(){const b=sdBuild();SD.open=true;SD.ins=null;SD.cueOff={};SD.las
 function sdClose(){const b=$('#sdr');if(!b||!SD.open)return;SD.open=false;clearTimeout(SD.hT);document.body.classList.remove('sd-hide');document.documentElement.classList.remove('cc-away');b.classList.remove('on');document.body.classList.remove('sdo');sdSheet(false);try{sc()}catch(e){}}
 addEventListener('popstate',()=>{if(SD.open)sdClose()});
 // a few seconds after the app opens: load the siddur's page list and the first pages of the tefillah for now, so opening it is instant
-addEventListener('load',()=>setTimeout(()=>{const go=()=>{if(SD.open)return;sdLoad().then(()=>{if(SD.open)return;const L=sdPieces(sdAuto());[...new Set(L.slice(0,8).map(q=>q.i))].forEach(i=>sdImg(i))}).catch(()=>{})};
+addEventListener('load',()=>setTimeout(()=>{const go=()=>{if(SD.open)return;sdLoad().then(()=>{if(SD.open)return;const L=sdPieces(sdAuto());[...new Set(L.slice(0,8).map(q=>q.i))].forEach(i=>sdFetch(i))}).catch(()=>{})};
  'requestIdleCallback' in window?requestIdleCallback(go,{timeout:4000}):go()},6000));
 document.addEventListener('click',e=>{if(e.target.closest('.dock #sd'))sdOpen()});
 
@@ -2320,7 +2322,7 @@ document.addEventListener('click',e=>{const r=e.target.closest('.ck');if(r&&!e.t
 function study(){const S=shDay(sel),h=hd(S),u='https://www.chabad.org/dailystudy/default.asp?tdate='+encodeURIComponent(`${S.getMonth()+1}/${S.getDate()}/${S.getFullYear()}`),
  th=h.d==29&&hd(ad(S,1)).d==1?'140–150':TH[h.d-1],al=['Rishon','Sheini','Shlishi','Revii','Chamishi','Shishi','Shevii'][S.getDay()],ps=parsha(S),
  R=[['chumash','Chumash with Rashi',ps?al+' · '+ps.p.map(x=>x[0]).join('-'):al],['tehillim','Tehillim',th],['tanya','Tanya','Daily portion'],['rambam3','Rambam · 3 chapters','Daily portion'],['rambam1','Rambam · 1 chapter','Daily portion']];
- $('#sd').innerHTML=`<div class="ph rv"><div><h2>Today’s shiurim</h2><div class="mut" id="sdn"></div></div>${ring(0,4)}</div>`+stkHtml()+R.map((r,i)=>row(r[0],r[1],r[2],'',i+1)).join('')+`<small class="rv" style="--i:7">Tap a shiur to read it in Hebrew. Tap the circle to check it off.</small>`;
+ $('#sd').innerHTML=`<div class="ph rv"><div><h2>Today’s shiurim</h2><div class="mut" id="sdn"></div></div>${ring(0,4)}</div>`+stkHtml()+R.map((r,i)=>row(r[0],r[1],r[2],'',i+1)).join('')+`<small class="rv" style="--i:7">Tap a shiur to read it. Tap the circle to check it off.</small>`;
  $('#hy').innerHTML=`<div class="hyc rv"><h2>Hayom Yom</h2><div class="heb" lang="he" dir="rtl">${G(h.d)} ${h.n[1]}</div><div class="hyt" id="hyt"><p class="mut">The Rebbe’s daily collection of Chassidic teachings, one entry for each day of the year.</p></div><div class="hyr"><a class="btn" href="${u}" target="_blank" rel="noopener">Read ${h.d} ${h.n[0]} ↗</a><button class="btn gh" id="hyb"></button></div></div>`;hyFill(h)}
 /* English Hayom Yom text (Chabad.org translation, used with permission) from hayomyom-en.json, keyed "month-day".
    Loaded once, after the app opens. In a regular (non-leap) year Adar shows the Adar I and Adar II entries, as Chabad.org does. */
@@ -2350,7 +2352,7 @@ function rail(){const h0=hd(sel),a=[];
 const routine=e=>{if(e.k!='my')return false;const c=my.find(m=>m.id==e.id);if(!c)return false;if(c.r=='weekly')return (Array.isArray(c.dows)&&c.dows.length?c.dows.length:1)>=4;return c.r=='every2'||(c.r=='custom'&&Number.isInteger(c.interval)&&c.interval<=2)};
 function chips(h,ev,rc){const a=[],w=sel.getDay();let evi=0;
  for(const e of ev)a.push(`<span class="c2 k-${e.k}" data-go="ev:${evi++}" role="button" tabindex="0" title="${e.t}"><i class="m k-${e.k}"></i><span class="t">${e.t}</span></span>`);
- if(rc)a.push(`<span class="c2 k-yt" data-go="rc" role="button" tabindex="0"><i class="m k-yt"></i>Rosh Chodesh ${rc}</span>`);
+ if(rc&&!ev.some(e=>e.t==='Rosh Chodesh '+rc))a.push(`<span class="c2 k-yt" data-go="rc" role="button" tabindex="0"><i class="m k-yt"></i>Rosh Chodesh ${rc}</span>`);
  if(w==6)a.push('<span class="c2 plain" data-go="shabbos" role="button" tabindex="0">Shabbos</span>');
  const c=cln(),hv=ZR.find(r=>r[0]=='Havdalah');
  if(c)a.push(`<span class="c2 plain" data-go="zm:Candle" role="button" tabindex="0">Candle lighting ${tf(c[1])}</span>`);if(hv)a.push(`<span class="c2 plain" data-go="zm:Havdalah" role="button" tabindex="0">Havdalah ${tf(hv[1])}</span>`);
@@ -2415,7 +2417,7 @@ function panel(dir){const{h,ev,rc}=info(sel),w=hDay(sel).getDay()==6,ps=parsha(h
  $('#hdr').innerHTML=`${skyScene(h,df)}<h1 class="hd-he rv" lang="he" dir="rtl"><span class="hd-big"><span class="hd-d">${G(h.d)}</span> <span class="hd-m">${h.n[1]}</span></span></h1><div class="sky-cap2" id="skyCap2" aria-hidden="true"></div><div class="hd-div rv" style="--i:1"><i></i><b class="dm"></b><span class="hd-yr" lang="he" dir="rtl">${G(h.y%1000)}</span><b class="dm"></b><i></i></div><div class="hd-en rv" style="--i:1">${sel.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric'})}</div><div class="wk rv" style="--i:2">${wkStrip()}</div>`;capSync();$('#hero').style.setProperty('--aura','var(--'+(ev.length?ev[0].k:w?'yt':'ct')+')');
  $('#gh').textContent=sel.getDate();
  $('#cbt').innerHTML=`${sel.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})}<span lang="he" dir="rtl">${G(h.d)} ${h.n[1]}</span>`;
- $('#p').innerHTML=(editing?'<div class="eb">Editing mode <button class="ed" id="ex">Done</button></div>':'')+lead+pr+(ev.length?ev.map((e,i)=>evCard(e,i)).join(''):'<p class="nospec rv" style="--i:3">No special date on this day.</p>');
+ $('#p').innerHTML=(editing?'<div class="eb">Editing mode <button class="ed" id="ex">Done</button></div>':'')+lead+pr+(ev.length?ev.map((e,i)=>evCard(e,i)).join(''):'')+(rc&&!ev.some(e=>e.t==='Rosh Chodesh '+rc)?`<div class="ev mc k-yt" style="--i:${ev.length+3}"><small><i class="m k-yt"></i>${KN.yt}</small><h3>Rosh Chodesh ${rc} <span class="heb" lang="he">ראש חודש</span></h3><p>The new month begins: Yaaleh V’yavo in Shemoneh Esrei and Birkas Hamazon, Half Hallel and Musaf, and no Tachanun.</p></div>`:'')+(!ev.length&&!rc?'<p class="nospec rv" style="--i:3">No special date on this day.</p>':'');
  zmn();chips(h,ev,rc);study();special();rail();if(typeof rcRender=='function')rcRender();
  $('#cbr').innerHTML=ring(0,ALLK.length);upd();
  ['#hdr','#ch','#p','#hy','#sp','#sd','#zm'].forEach(s=>reveal($(s)));
@@ -3771,8 +3773,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=101;
+const CC_VER=102;
 const CC_LOG=[
+ {v:102,new:['Rosh Chodesh now shows its card on the day (it used to say “No special date”), and 1 Kislev no longer shows Rosh Chodesh twice.','The assistant answers faster (it no longer waits for a server that doesn’t exist).','The siddur uses much less memory, and its Chol Hamoed reading button opens the right section.','“Keep your account safe” only asks once the account server is ready.']},
  {v:101,new:['The character in the opening animation is a little smaller.']},
  {v:100,new:['The character in the opening animation is sharper (less pixelated).']},
  {v:99,new:['Opening animation: all the creaks are quieter.']},
@@ -4007,7 +4010,10 @@ document.getElementById('acctOut')?.addEventListener('click',()=>loShow(true));d
    if(nu!==u){A.rename(u,nu);const d2=A.users();d2[nu].passwordHash=A.hash(nu+'|'+p);localStorage.setItem('cc_local_profiles_v1',JSON.stringify(d2));await A.sync(nu);reloadNow();return}
    E.textContent='';el.remove();try{H.ok()}catch(x){}run()}}
  // signed in from before v89 (or made offline): ask once per opening, when nothing else is on screen
- (function ask(n){if(A.stGet(u).t)return stat();if(sessionStorage.getItem('cc_bk_later'))return stat();if(busy()||document.querySelector('.cc-gate:not([hidden])')&&getComputedStyle(document.querySelector('.cc-gate:not([hidden])')).display!=='none'||n<4){setTimeout(()=>ask(n+1),2500);return}card()})(0);
+ // only ask once the push server really has accounts (until the owner deploys it, the card could only fail)
+ let ready=null;const probe=()=>ready||(ready=A.post('login',{u:'zz-probe',p:'xxxx'},8000).then(r=>r.s===404&&r.j&&r.j.error==='no account'));
+ (function ask(n){if(A.stGet(u).t)return stat();if(sessionStorage.getItem('cc_bk_later'))return stat();
+  if(n===4){probe().then(ok=>{if(ok)ask(5);else stat()});return}if(busy()||document.querySelector('.cc-gate:not([hidden])')&&getComputedStyle(document.querySelector('.cc-gate:not([hidden])')).display!=='none'||n<4){setTimeout(()=>ask(n+1),2500);return}card()})(0);
 })();
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&lo.classList.contains('on')){e.stopPropagation();loShow(false)}},true);
 document.getElementById('loYes').addEventListener('click',()=>{try{localStorage.removeItem('cc_local_active_profile_v1')}catch(e){}location.reload()})})();
@@ -5043,7 +5049,7 @@ function aiSplitRequests(raw){
 
 async function aiInterpretOne(raw){let data=null;
  // Optional server-side interpreter. Only tried when the page is actually served over http(s); a missing or slow endpoint falls through to the on-device interpreter.
- if(/^https?:$/.test(location.protocol)){try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),4000);
+ if(window.CC_AI_API&&/^https?:$/.test(location.protocol)){try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),4000);
   const response=await fetch('/api/interpret',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,body:JSON.stringify({text:raw,selectedDate:ds(sel),selectedHebrewDate:aiHebrewDate(sel),preferences:aiPrefs(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone})});clearTimeout(to);
   if(response.ok&&/json/i.test(response.headers.get('content-type')||'')){const d=await response.json();if(d&&d.title)data=d}}catch(e){}}
  return data||aiLocalInterpret(raw)}
