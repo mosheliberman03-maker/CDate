@@ -28,12 +28,17 @@ import java.util.Locale;
  */
 public class CalWidget extends AppWidgetProvider {
     static final String TICK = "com.mosheliberman.cdate.CAL_WIDGET_TICK";
-    static final int[] L = {R.id.cw_l1, R.id.cw_l2, R.id.cw_l3, R.id.cw_l4, R.id.cw_l5};
+    static final int[] L = {R.id.cw_l1, R.id.cw_l2, R.id.cw_l3, R.id.cw_l4};
 
     @Override
     public void onUpdate(Context c, AppWidgetManager m, int[] ids) {
         for (int id : ids) draw(c, m, id);
         schedule(c);
+    }
+
+    @Override
+    public void onAppWidgetOptionsChanged(Context c, AppWidgetManager m, int id, android.os.Bundle o) {
+        draw(c, m, id);
     }
 
     @Override
@@ -69,6 +74,8 @@ public class CalWidget extends AppWidgetProvider {
             long ss = day.optLong("ss", 0);
             if (ss > now) next = Math.min(next, ss + 30_000L);
         }
+        long z = nextZmanAt(c, now);
+        if (z > now) next = Math.min(next, z + 30_000L);
         Intent i = new Intent(c, CalWidget.class).setAction(TICK);
         PendingIntent pi = PendingIntent.getBroadcast(c, 7, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
@@ -110,33 +117,85 @@ public class CalWidget extends AppWidgetProvider {
         }
     }
 
+    /** The next zman still ahead (sunrise, Shema, chatzos, sunset, nightfall, candle lighting…), e.g. "Sunset 4:58 PM". */
+    static long nextZmanAt(Context c, long now) {
+        JSONObject d = data(c);
+        JSONArray days = d == null ? null : d.optJSONArray("days");
+        if (days == null) return 0;
+        for (int i = 0; i < days.length(); i++) {
+            JSONObject o = days.optJSONObject(i);
+            JSONArray z = o == null ? null : o.optJSONArray("z");
+            if (z == null) continue;
+            for (int k = 0; k < z.length(); k++) {
+                JSONArray e = z.optJSONArray(k);
+                if (e != null && e.optLong(1, 0) > now) return e.optLong(1, 0);
+            }
+        }
+        return 0;
+    }
+
+    static String nextZman(Context c, long now) {
+        JSONObject d = data(c);
+        JSONArray days = d == null ? null : d.optJSONArray("days");
+        if (days == null) return "";
+        for (int i = 0; i < days.length(); i++) {
+            JSONObject o = days.optJSONObject(i);
+            JSONArray z = o == null ? null : o.optJSONArray("z");
+            if (z == null) continue;
+            for (int k = 0; k < z.length(); k++) {
+                JSONArray e = z.optJSONArray(k);
+                if (e != null && e.optLong(1, 0) > now) return e.optString(0) + " " + e.optString(2);
+            }
+        }
+        return "";
+    }
+
+    static String join(List<String> a) {
+        StringBuilder b = new StringBuilder();
+        for (String s : a) { if (b.length() > 0) b.append(" · "); b.append(s); }
+        return b.toString();
+    }
+
     static void draw(Context c, AppWidgetManager m, int id) {
         RemoteViews v = new RemoteViews(c.getPackageName(), R.layout.cc_widget);
         JSONObject day = today(c);
         long now = System.currentTimeMillis();
-        List<String> lines = new ArrayList<>();
+        List<String> extra = new ArrayList<>();
         if (day == null) {
             v.setTextViewText(R.id.cw_he, "Chabad Calendar");
-            v.setTextViewText(R.id.cw_en, "Open the app once to fill this in");
-            v.setViewVisibility(R.id.cw_sh, View.GONE);
+            v.setTextViewText(R.id.cw_en, "");
+            v.setTextViewText(R.id.cw_main, "Open the app once");
+            v.setTextViewText(R.id.cw_sub, "to fill this in");
         } else {
             boolean night = day.optLong("ss", Long.MAX_VALUE) <= now;
             v.setTextViewText(R.id.cw_he, night && day.has("heN") ? day.optString("heN") : day.optString("he"));
-            v.setTextViewText(R.id.cw_en, day.optString("en"));
-            if (night) addAll(lines, day.optJSONArray("spN"), "Tonight: ");
-            else addAll(lines, day.optJSONArray("sp"), "");
-            addAll(lines, day.optJSONArray("tk"), "");
+            v.setTextViewText(R.id.cw_en, day.optString("enS", day.optString("en")));
+            List<String> sp = new ArrayList<>(), tk = new ArrayList<>();
+            addAll(sp, day.optJSONArray(night ? "spN" : "sp"), "");
+            addAll(tk, day.optJSONArray("tk"), "");
+            String main;
+            if (!sp.isEmpty()) { main = (night ? "Tonight: " : "") + join(sp); extra.addAll(tk); }
+            else if (!tk.isEmpty()) { main = tk.get(0); extra.addAll(tk.subList(1, tk.size())); }
+            else main = "No special day";
+            v.setTextViewText(R.id.cw_main, main);
+            String sub = nextZman(c, now);
             int sh = day.optInt("sh", -1);
             if (sh >= 0) {
-                v.setViewVisibility(R.id.cw_sh, View.VISIBLE);
-                v.setTextViewText(R.id.cw_sh, sh >= 4 ? "✓ Shiurim" : sh + "/4 shiurim");
-            } else v.setViewVisibility(R.id.cw_sh, View.GONE);
-            if (lines.isEmpty()) lines.add("No special day today");
+                StringBuilder dots = new StringBuilder();
+                if (sh >= 4) dots.append("Shiurim ✓");
+                else for (int k = 0; k < 4; k++) dots.append(k < sh ? "●" : "○");
+                sub = sub.length() > 0 ? sub + "   " + dots : dots.toString();
+            }
+            v.setTextViewText(R.id.cw_sub, sub);
         }
+        int h = 0;
+        try { h = m.getAppWidgetOptions(id).getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 0); } catch (Exception e) { }
+        int room = h >= 150 ? 4 : h >= 120 ? 3 : h >= 95 ? 2 : 0;
+        v.setViewVisibility(R.id.cw_more, room > 0 && !extra.isEmpty() ? View.VISIBLE : View.GONE);
         for (int k = 0; k < L.length; k++) {
-            if (k < lines.size()) {
+            if (k < room && k < extra.size()) {
                 v.setViewVisibility(L[k], View.VISIBLE);
-                v.setTextViewText(L[k], lines.get(k));
+                v.setTextViewText(L[k], extra.get(k));
             } else v.setViewVisibility(L[k], View.GONE);
         }
         Intent open = c.getPackageManager().getLaunchIntentForPackage(c.getPackageName());

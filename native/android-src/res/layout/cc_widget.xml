@@ -4,8 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center_vertical"
     android:background="@drawable/cc_w_bg"
-    android:padding="16dp">
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,53 +17,77 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/cw_sh"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/cc_w_pill"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:textColor="#E6EBFF"
-            android:textSize="12sp"
-            android:text="0/4 shiurim" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/cw_he"
+            <TextView
+                android:id="@+id/cw_he"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textDirection="rtl"
+                android:fontFamily="serif"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:textSize="21sp"
+                android:singleLine="true"
+                android:includeFontPadding="false"
+                android:text="Chabad Calendar" />
+
+            <TextView
+                android:id="@+id/cw_en"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="#9FAAD8"
+                android:textSize="11sp"
+                android:singleLine="true"
+                android:text="" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="end"
-            android:textDirection="rtl"
-            android:fontFamily="serif"
-            android:textColor="#FFFFFF"
-            android:textSize="26sp"
-            android:singleLine="true"
-            android:text="Chabad Calendar" />
+            android:layout_marginLeft="14dp"
+            android:orientation="vertical"
+            android:gravity="end">
+
+            <TextView
+                android:id="@+id/cw_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#F2F4FF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:text="" />
+
+            <TextView
+                android:id="@+id/cw_sub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="#B9C2EA"
+                android:textSize="12sp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:text="" />
+        </LinearLayout>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/cw_en"
+    <LinearLayout
+        android:id="@+id/cw_more"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="end"
-        android:textColor="#AEB8E6"
-        android:textSize="13sp"
-        android:singleLine="true"
-        android:text="" />
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="8dp"
-        android:background="#26FFFFFF" />
-
-    <TextView android:id="@+id/cw_l1" style="@style/CcWLine" />
-    <TextView android:id="@+id/cw_l2" style="@style/CcWLine" />
-    <TextView android:id="@+id/cw_l3" style="@style/CcWLine" />
-    <TextView android:id="@+id/cw_l4" style="@style/CcWLine" />
-    <TextView android:id="@+id/cw_l5" style="@style/CcWLine" />
+        android:layout_marginTop="6dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <TextView android:id="@+id/cw_l1" style="@style/CcWLine" />
+        <TextView android:id="@+id/cw_l2" style="@style/CcWLine" />
+        <TextView android:id="@+id/cw_l3" style="@style/CcWLine" />
+        <TextView android:id="@+id/cw_l4" style="@style/CcWLine" />
+    </LinearLayout>
 </LinearLayout>

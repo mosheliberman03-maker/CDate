@@ -3545,8 +3545,11 @@ async function ccBridge(){const P=ccPrefs();if(!P)return;try{
    tk=dt=>info(dt).ev.filter(e=>e.k==='my').map(e=>{const m=my.find(z=>z.id===e.id)||{};return{t:e.t,tm:m.tm||''}}).sort((a,b)=>(a.tm||'99').localeCompare(b.tm||'99'))
      .map(x=>(x.tm?(()=>{const[H,M]=x.tm.split(':').map(Number);return((H+11)%12+1)+':'+String(M).padStart(2,'0')+(H<12?' AM':' PM')+'  '})():'')+x.t),
    dn=DN[ds(shDay(t0))]||{},sh=['chumash','tehillim','tanya'].filter(k=>dn[k]).length+((dn.rambam3||dn.rambam1)?1:0),days=[];
+  const zl=d=>{const nz=zAt(d,90.833,1),sk=zAt(d,90.833,0),ts=zAt(d,98.5,0);if(nz==null||sk==null)return[];const q=(sk-nz)/12,hy=ccHolyDay(d),hn=ccHolyDay(ad(d,1)),
+    z=[['Sunrise',nz],['Shema by',nz+3*q],['Chatzos',nz+6*q]];if(hn&&!hy)z.push(['Candles',sk-18*6e4]);z.push(['Sunset',sk]);z.push([hy&&!hn?(d.getDay()==6?'Shabbos ends':'Yom Tov ends'):'Nightfall',ts]);
+    return z.filter(x=>x[1]!=null).map(x=>[x[0],Math.round(x[1]),tf(x[1])])};
   for(let j=0;j<8;j++){const d=ad(t0,j),h=hd(d),hn=hd(ad(d,1)),ss=zAt(d,90.833,0);
-   days.push({d:ds(d),he:G(h.d)+' '+h.n[1],heN:G(hn.d)+' '+hn.n[1],ss:Math.round(ss||0),en:d.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric'}),sp:sp(d),spN:sp(ad(d,1)),tk:tk(d),...(j===0?{sh}:{})})}
+   days.push({d:ds(d),he:G(h.d)+' '+h.n[1],heN:G(hn.d)+' '+hn.n[1],ss:Math.round(ss||0),en:d.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric'}),enS:d.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'}),z:zl(d),sp:sp(d),spN:sp(ad(d,1)),tk:tk(d),...(j===0?{sh}:{})})}
   await P.set({key:'cc_widget',value:JSON.stringify({v:2,at:Date.now(),days})});
   const W=ccCalW();if(W&&W.refresh)W.refresh().catch(()=>{});
 }catch(e){}}
@@ -3787,8 +3790,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=105;
+const CC_VER=106;
 const CC_LOG=[
+ {v:106,new:['The home-screen widget is now a slim strip that shows more: the Hebrew date, today’s special day, the next zman (sunrise, sunset, candle lighting…) and your shiurim. Stretch it taller to see your plans too. Update the app, then remove the old widget and add it again.']},
  {v:105,new:['The home-screen widget now loads (it showed “Can’t load widget”). Update the app to get the fix.','Prayer changes in “To do today” (Yaaleh V’yavo, Hallel, no Tachanun, Musaf…) are notes now, not checkboxes.']},
  {v:104,big:1,feature:'A home-screen widget',new:['New: a home-screen widget with today’s Hebrew date, special days, your plans and how many shiurim you’ve done. It switches to the new Hebrew date at sunset by itself.','Update the app, then go to ⋯ → App → Add the widget to my home screen.']},
  {v:103,mid:1,new:['Siddur: on Half Hallel days (Rosh Chodesh, the end of Pesach) the paragraphs you skip are left out.','Siddur: the Torah reading for Chol Hamoed and Purim now appears right in Shacharis, like on Mondays and Thursdays.']},
@@ -3969,7 +3973,7 @@ function findDemoDay(){try{for(let i=0;i<40;i++){const d=ad(t0,i),inf=info(d);if
 /* ===== Updating the app itself (owner, v54): "when I need to update the actual app, it should be sent to the app, with a button
    inside the app". CC_APK = the app version this page needs (native/app-version.txt, set into the APK by patch-android.js).
    An older app (or one too old to tell, = 0) gets a bar at the top and an "Update the app" button in ⋯ → App. ===== */
-const CC_APK=7;let APKV=null;
+const CC_APK=8;let APKV=null;
 async function ccApkVer(){if(!CC_NATIVE)return 99;if(APKV!=null)return APKV;try{const C=window.Capacitor,A=(C.Plugins&&C.Plugins.App)||C.registerPlugin('App');const i=await A.getInfo();APKV=+i.build||0}catch(e){APKV=0}return APKV}
 function apkUpdate(){try{H.tap()}catch(e){}let o=document.getElementById('apkBox');if(!o){o=document.createElement('div');o.id='apkBox';o.className='apk-box';document.body.appendChild(o)}
  o.innerHTML=`<div class="apk-card" role="dialog" aria-label="Update the app">${typeof cchHtml==='function'?cchHtml('alert','apk-av'):''}<h3>Update the app</h3><p>A new version of the app is ready. It installs over this one, and everything you saved stays.</p><ol><li>Tap <b>Download the update</b>.</li><li>When it finishes, open the downloaded file.</li><li>Tap <b>Update</b>, then open the app again.</li></ol><a class="btn" id="apkGo" href="${APK_URL}" style="display:block;text-align:center;text-decoration:none">Download the update</a><button class="btn gh" type="button" id="apkLater" style="width:100%;margin-top:8px">Later</button></div>`;
