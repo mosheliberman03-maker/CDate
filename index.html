@@ -1848,7 +1848,7 @@ function groups(){const{h,ev,rc}=info(sel),W=hDay(sel).getDay(),o=[];
  const ba=bdayAliyahFrom(sel);if(ba)o.push({t:'Your birthday is '+ba.when,k:'my',id:'bdal',items:['Ask for an aliyah today, the closest Torah reading before your birthday']});
  return o}
 /* to-do lines: 'chk' = checkbox, 'rem' = only a reminder (bell, no checkbox), 'note' = plain line, no checkbox */
-const TODO_DROP=/Birkas HaChodesh/i,TODO_REM=/entire Tehillim|^Fast from|five Yom Kippur restrictions|Aneinu|Selichos|Light the menorah|^Ask for an aliyah/i,TODO_NOTE=/Al HaNissim|Chanukah gelt|farbrengen/i;
+const TODO_DROP=/Birkas HaChodesh/i,TODO_REM=/entire Tehillim|^Fast from|five Yom Kippur restrictions|Aneinu|Selichos|Light the menorah|^Ask for an aliyah/i,TODO_NOTE=/Al HaNissim|Chanukah gelt|farbrengen|Yaaleh V|Hallel|Tachanun|Musaf|Shemoneh Esrei|Hamelech|Avinu Malkeinu|V’sein Tal|Tal U’matar|Morid hatal|Mashiv|Psalm 27|L’Dovid Hashem Ori|prayer for dew|prayer for rain/i;   // v105 (owner): prayer changes are notes, not checklists
 const todoMode=t=>TODO_REM.test(t)?'rem':TODO_NOTE.test(t)?'note':'chk';
 const BELL='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"/><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0"/></svg>';
 const noteRow=(t,mode,i,gi,gk)=>`<div class="tdn rv ${mode}" style="--i:${i}"><span class="ic" aria-hidden="true">${mode=='rem'?BELL:'<i></i>'}</span><div class="tx"><b>${t}</b>${mode=='rem'?'<small>Reminder</small>':''}</div>${gi>=0?`<button class="gi" type="button" data-g="${gi}" data-k="${gk||'ys'}" aria-label="How and when: ${t.replace(/"/g,'')}">How &amp; when ›</button>`:''}</div>`;
@@ -3789,7 +3789,7 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
 const CC_VER=105;
 const CC_LOG=[
- {v:105,new:['The home-screen widget now loads (it showed “Can’t load widget”). Update the app to get the fix.']},
+ {v:105,new:['The home-screen widget now loads (it showed “Can’t load widget”). Update the app to get the fix.','Prayer changes in “To do today” (Yaaleh V’yavo, Hallel, no Tachanun, Musaf…) are notes now, not checkboxes.']},
  {v:104,big:1,feature:'A home-screen widget',new:['New: a home-screen widget with today’s Hebrew date, special days, your plans and how many shiurim you’ve done. It switches to the new Hebrew date at sunset by itself.','Update the app, then go to ⋯ → App → Add the widget to my home screen.']},
  {v:103,mid:1,new:['Siddur: on Half Hallel days (Rosh Chodesh, the end of Pesach) the paragraphs you skip are left out.','Siddur: the Torah reading for Chol Hamoed and Purim now appears right in Shacharis, like on Mondays and Thursdays.']},
  {v:102,new:['Rosh Chodesh now shows its card on the day (it used to say “No special date”), and 1 Kislev no longer shows Rosh Chodesh twice.','The assistant answers faster (it no longer waits for a server that doesn’t exist).','The siddur uses much less memory, and its Chol Hamoed reading button opens the right section.','“Keep your account safe” only asks once the account server is ready.']},
