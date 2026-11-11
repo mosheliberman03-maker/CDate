@@ -2218,7 +2218,7 @@ function sdPieces(fk){const f=sdFlows()[fk];if(!f.wk){let L=f.seg.flatMap(s=>sdR
 // lay the pieces out on screens (split only on blank lines)
 const sdBlank=q=>{const g=SD.G[q.i][2];for(let j=0;j<g.length;j+=2)if(g[j]<=q.a+2&&g[j]+Math.abs(g[j+1])>=q.b-2)return true;return q.b>=SD.G[q.i][1]&&q.a>=SD.G[q.i][1]-30};
 function sdLay(L0){const cap=SD.cap,sp=14,S=[],L=[],sec=[];let cur=[],used=0,pend=null;
- for(const q of L0){const p=L[L.length-1];if(p&&p.i===q.i&&Math.abs(p.b-q.a)<=2&&!q.sec)p.b=q.b;else L.push({...q})}
+ let px=null;for(const q of L0){const p=L[L.length-1],ps=q.x&&!(px&&px.x);px=q;if(p&&p.i===q.i&&Math.abs(p.b-q.a)<=2&&!q.sec&&!ps)p.b=q.b;else L.push({...q,ps})}
  const flush=()=>{if(cur.length){S.push(cur);cur=[];used=0}};
  for(let q of L){if(sdBlank(q)){if(q.sec&&!pend)pend={sec:q.sec,brk:q.brk};continue}q={...q};if(pend){if(!q.sec)Object.assign(q,pend);pend=null}
   if(q.brk)flush();if(q.sec)sec.push({t:q.sec,k:S.length,p:SD.n[q.i]});
@@ -2226,11 +2226,13 @@ function sdLay(L0){const cap=SD.cap,sp=14,S=[],L=[],sec=[];let cur=[],used=0,pen
    if(h<=rem){cur.push(q);used+=h+(cur.length>1?sp:0);q=null;break}
    // split between paragraphs (blank gaps ≥7 rows) if that still fills a fair part of the screen; else move on to a fresh screen
    const g=SD.G[q.i][2];let yl=null,yp=null;for(let j=0;j<g.length;j+=2){const c=g[j]+Math.abs(g[j+1])/2;if(c>q.a+60&&c<=q.a+rem&&c<q.b-30){yl=c;if(Math.abs(g[j+1])>=7)yp=c}}
-   let y=yp!=null&&yp-q.a>=rem*.4?yp:null;
-   if(y==null&&cur.length&&used>=cap*.45){flush();continue}
-   if(y==null)y=yp!=null?yp:yl;
+   // only a piece that BEGINS a paragraph may move to a fresh screen; the rest of a blessing after a cut (e.g. Sim Shalom after the
+   // Ten Days line) keeps filling this screen (owner, v108: "a massive empty gap under Sim Shalom")
+   const para=q.sec||q.ps;let y=yp!=null&&yp-q.a>=rem*(para?.4:.6)?yp:null;
+   if(y==null&&para&&cur.length&&used>=cap*.45){flush();continue}
+   if(y==null)y=yl!=null?yl:yp;
    if(y==null&&cur.length&&rem<cap*.6){flush();continue}
-   if(y==null)y=q.a+Math.max(60,rem);y=Math.round(y);cur.push({...q,b:y});flush();q={...q,a:y,sec:0,brk:false}}}
+   if(y==null)y=q.a+Math.max(60,rem);y=Math.round(y);cur.push({...q,b:y});flush();q={...q,a:y,sec:0,brk:false,ps:false}}}
  flush();S.sec=sec;return S}
 function sdGeo(){const st=$('#sdSt'),W=st.clientWidth,H2=st.clientHeight;SD.W=W;SD.H=H2;SD.fw=Math.min(W-8,H2*.72);SD.cap=Math.floor((H2-10)*1077/SD.fw);
  SD.bw=Math.min(W-6,(H2-6)*1077/1861)}
@@ -3815,8 +3817,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=107;
+const CC_VER=108;
 const CC_LOG=[
+ {v:108,new:['Siddur: no more big empty gaps in the middle of a blessing (like under Sim Shalom).']},
  {v:107,mid:1,new:['Siddur: each part (Shemoneh Esrei, Tachanun, Hallel, the Torah reading, Musaf…) now starts on its own page, and paragraphs are split less.','Siddur: “Where would you like to start?” and Contents list only today’s parts first (Hallel instead of Tachanun on Rosh Chodesh); everything else is under More.']},
  {v:106,new:['The home-screen widget is now a slim strip that shows more: the Hebrew date, today’s special day, the next zman (sunrise, sunset, candle lighting…) and your shiurim. Stretch it taller to see your plans too. Update the app, then remove the old widget and add it again.']},
  {v:105,new:['The home-screen widget now loads (it showed “Can’t load widget”). Update the app to get the fix.','Prayer changes in “To do today” (Yaaleh V’yavo, Hallel, no Tachanun, Musaf…) are notes now, not checkboxes.']},
