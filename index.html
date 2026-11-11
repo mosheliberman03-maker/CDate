@@ -2165,10 +2165,16 @@ function sdChm(c){const h=c.h;if(h.k==='Ti'&&h.d>=17&&h.d<=21)return SD_CHS[h.d-
  if(h.k==='N'&&h.d>=17&&h.d<=20){const d17=ad(c.day,17-h.d),days=[0,1,2,3].map(j=>ad(d17,j)),shab=days.some(d=>d.getDay()===6),wk=days.filter(d=>d.getDay()!==6),
   n=wk.findIndex(d=>ds(d)===ds(c.day)),order=shab?['k','i','v']:['k','i','p','v'];return n>=0?SD_CHP[order[n]]:null}return null}
 const sdRd=r=>r?sdR(r[0],r[1],r[2],r[3]):null;
+// v107 (owner): every section (Shemoneh Esrei, Tachanun, Hallel, the Torah reading, Musaf…) starts on its own screen and is listed
+// in the "where to start" sheet and Contents. sdMk marks the first remaining piece at (page, %); lab() marks the first piece of an insert.
+function sdMk(L,bp,pct,t,br){const i=sdIdx(bp),y=pct==null?SD.G[i][0]:sdY(i,pct);
+ for(let k=0;k<L.length;k++){const q=L[k];if(q.x)continue;if(q.i>i||(q.i===i&&q.b>y+8)){
+  if(q.i===i&&q.a<y-8)L.splice(k,1,{...q,b:y},{...q,a:y,sec:t,brk:br!==0});else L[k]={...q,sec:t,brk:br!==0};return L}}return L}
+const lab=(A,t)=>A&&A.length?[{...A[0],sec:t,brk:true},...A.slice(1)]:A;
 function sdWeekly(day){const p=parsha(day);if(!p||!p.p||!p.p[0])return null;const nm=p.p[0][0];let k=PN.findIndex(x=>x[0]===nm);if(nm===VZ[0])k=53;return k>=0?SD_WK[k]:null}
 function sdPieces(fk){const f=sdFlows()[fk];if(!f.wk){let L=f.seg.flatMap(s=>sdR(s[0],null,s[1],null));
   // Shabbos & Yom Tov: "Hashem Hashem… Ribono shel olam" when the Ark is opened only on a Yom Tov that falls on a weekday (owner)
-  if(fk==='sh'&&f.seg.some(s=>s[0]===181)){const c=sdCx(fk);if(!(c.yt&&c.wd!==6))L=sdCut(L,222,47.65,223,14.3)}return L}const c=sdCx(fk);let L,I=[];const cut=(...a)=>{L=sdCut(L,...a)},ins=(...a)=>I.push(a);
+  if(fk==='sh'&&f.seg.some(s=>s[0]===181)){const c=sdCx(fk);if(!(c.yt&&c.wd!==6))L=sdCut(L,222,47.65,223,14.3)}return L}const c=sdCx(fk);let L,I=[],M=[];const cut=(...a)=>{L=sdCut(L,...a)},ins=(...a)=>I.push(a);
  const TD=a=>{if(!c.td)for(const r of a)cut(...r)};
  if(fk==='sh'){L=sdR(5,null,84,null);
   // Amidah: the Ten Days, Aneinu (fasts), Yaaleh V'yavo (Rosh Chodesh, Chol Hamoed), Al HaNissim (Chanukah, Purim)
@@ -2182,38 +2188,50 @@ function sdPieces(fk){const f=sdFlows()[fk];if(!f.wk){let L=f.seg.flatMap(s=>sdR
   if(!rd){cut(60,74.8,66,14.3);cut(69,76.9,70,18.55)}
   else{cut(61,12.2,61,16.2);cut(62,84.4,62,100);cut(63,56,63,64.2);cut(64,0,65,61.5);if(!(c.pur||c.tb))cut(66,8.4,66,14.25);
    const r=c.ch?SD_CH[c.ch-1]:c.rc?[468,13.6,468,74.2]:c.fast&&!c.tb?[468,78.9,469,63.3]:c.chm?sdChm(c):c.pur?[495,62.3,496,7.75]:c.mt?sdWeekly(c.day):null;if(r)ins(63,37.3,sdRd(r))}
+  const rdT=c.ch?'Torah reading · Chanukah':c.rc?'Torah reading · Rosh Chodesh':c.chm?'Torah reading · Chol Hamoed':c.pur?'Torah reading · Purim':c.fast?'Torah reading · Fast day':'Torah reading';
   if(!c.td)cut(69,65.3,69,68.45);cut(68,87.3,68,91.2);cut(70,18.55,70,27.15);
   if(c.noT){cut(67,4.5,67,34.1);cut(70,27.15,70,92)}
   // Song of the Day (today's only), Borchi Nafshi (Rosh Chodesh), L'Dovid (Elul to Hoshana Rabbah)
   cut(71,67.1,75,12);cut(75,34.25,75,41.15);if(!c.rc)cut(75,41.15,76,37.2);if(!c.ld)cut(76,37.2,76,93.4);cut(77,75.3,77,100);
   if(c.rc||c.chm){// Rosh Chodesh / Chol Hamoed: after Hallel the Song of the Day … Kaddish, then the Torah reading; Musaf after the Torah returns
-   const tail=[...sdR(71,null,71,67.1),...sdSong(c.wd,1),...(c.rc?sdR(75,41.15,76,37.2):[]),...(c.ld?sdR(76,37.2,76,93.4):[]),...sdR(77,null,77,75.3)];
-   cut(71,0,77,75.3);cut(60,37.5,60,74.8);ins(54,43.2,[...sdHal(c),...tail]);ins(70,18.55,[...(c.rc?sdR(313,null,318,null):sdR(339,null,350,71.85)),...sdR(312,20.8,312,56.25),...sdR(312,60.9,312,86.25)])}
-  else{if(hal){ins(54,43.2,sdHal(c));cut(60,37.5,60,74.8)}ins(71,67.1,sdSong(c.wd))}
+   const tail=[...lab(sdR(71,null,71,67.1),'Song of the Day'),...sdSong(c.wd,1),...(c.rc?sdR(75,41.15,76,37.2):[]),...(c.ld?sdR(76,37.2,76,93.4):[]),...sdR(77,null,77,75.3)];
+   cut(71,0,77,75.3);cut(60,37.5,60,74.8);ins(54,43.2,[...lab(sdHal(c),'Hallel'),...tail]);ins(70,18.55,[...lab(c.rc?sdR(313,null,318,null):sdR(339,null,350,71.85),'Musaf'),...sdR(312,20.8,312,56.25),...sdR(312,60.9,312,86.25)])}
+  else{if(hal){ins(54,43.2,lab(sdHal(c),'Hallel'));cut(60,37.5,60,74.8)}ins(71,67.1,lab(sdSong(c.wd),'Song of the Day'))}
   // the Nasi (1–13 Nissan) at the end
-  if(c.h.k==='N'&&c.h.d<=13){const n=SD_NASI[c.h.d-1];L.push(...sdRd(n).map(q=>({...q,x:1})))}}
+  if(c.h.k==='N'&&c.h.d<=13){const n=SD_NASI[c.h.d-1];L.push(...lab(sdRd(n),'The Nasi').map(q=>({...q,x:1})))}
+  M=[[5,null,'Morning blessings'],[12,null,'Korbanos'],[27,null,'Hodu'],[30,null,'Pesukei D’zimra'],[39,26,'Barchu · Blessings of the Shema'],[45,54.5,'Shemoneh Esrei'],
+   ...(c.noT?[]:[[54,43.2,'Tachanun']]),...(rd?[[60,74.8,rdT]]:[]),[66,14.3,'Ashrei · Uva Letziyon',rd?1:0]]}
  if(fk==='mi'){L=sdR(99,null,117,null);
   TD([[103,47.1,103,58.6],[104,13,104,22],[104,69.1,104,74.2],[106,50,106,54.9],[110,52.1,110,62.7],[111,27.1,111,43.2],[112,9.3,112,12.6],[115,24.3,115,27.45]]);
   if(!c.fast){cut(105,53.6,105,80.7);cut(108,19.3,108,39.4);cut(110,77,110,94.7)}if(!c.tb){cut(107,38.5,107,40.35);cut(107,45.25,107,80.15)}
   if(!(c.rc||c.chm))cut(108,62,108,96.3);if(!(c.ch||c.pur))cut(109,73.4,110,43.5);
   if(c.noT)cut(112,42.7,114,51.75);else cut(112,42.7,112,48.4);
-  if(!c.ld)cut(115,35.85,115,92.2);if(!c.ch)cut(116,4.3,116,8)}
+  if(!c.ld)cut(115,35.85,115,92.2);if(!c.ch)cut(116,4.3,116,8);
+  M=[[99,null,'Korbanos'],[101,50.5,'Ashrei'],[103,null,'Shemoneh Esrei'],...(c.noT?[]:[[112,42.7,'Tachanun']])]}
  if(fk==='ma'){L=sdR(118,null,135,null);
   TD([[124,5.6,124,17.9],[124,67.6,124,76.9],[124,85.2,124,90.2],[126,50.3,126,55.4],[129,77.6,129,86.1],[130,35.6,130,50.7],[131,8.9,131,12.2],[134,10,134,13.2],[135,61.7,135,64.85]]);
   if(!c.ms)cut(125,9.3,125,32.4);if(!(c.rc||c.chm))cut(128,5.6,128,49.5);if(!(c.ch||c.pur))cut(129,5.4,129,70);
   cut(131,29.8,c.ms?131:133,c.ms?31.85:40.4);if(!c.pur)cut(134,19.9,134,24.45);cut(134,24.45,134,26.5);
-  if(c.om)ins(134,26.5,[...sdR(136,44.05,136,52.2),...sdOmer(c.om),...sdR(139,79.5,140,92.75)])}
- for(const a of I)L=sdIns(L,...a);return L}
+  if(c.om)ins(134,26.5,lab([...sdR(136,44.05,136,52.2),...sdOmer(c.om),...sdR(139,79.5,140,92.75)],'Sefiras HaOmer'));
+  M=[[118,null,'Maariv'],[120,null,'Shema'],[123,42.5,'Shemoneh Esrei']]}
+ for(const a of I)L=sdIns(L,...a);for(const m of M)L=sdMk(L,m[0],m[1],m[2],m[3]);return L}
 // lay the pieces out on screens (split only on blank lines)
 const sdBlank=q=>{const g=SD.G[q.i][2];for(let j=0;j<g.length;j+=2)if(g[j]<=q.a+2&&g[j]+Math.abs(g[j+1])>=q.b-2)return true;return q.b>=SD.G[q.i][1]&&q.a>=SD.G[q.i][1]-30};
-function sdLay(L0){const cap=SD.cap,sp=14,S=[],L=[];let cur=[],used=0;
- for(const q of L0){const p=L[L.length-1];if(p&&p.i===q.i&&Math.abs(p.b-q.a)<=2)p.b=q.b;else L.push({...q})}
- for(let q of L){if(sdBlank(q))continue;q={...q};while(q){const h=q.b-q.a,rem=cap-used-(cur.length?sp:0);
+function sdLay(L0){const cap=SD.cap,sp=14,S=[],L=[],sec=[];let cur=[],used=0,pend=null;
+ for(const q of L0){const p=L[L.length-1];if(p&&p.i===q.i&&Math.abs(p.b-q.a)<=2&&!q.sec)p.b=q.b;else L.push({...q})}
+ const flush=()=>{if(cur.length){S.push(cur);cur=[];used=0}};
+ for(let q of L){if(sdBlank(q)){if(q.sec&&!pend)pend={sec:q.sec,brk:q.brk};continue}q={...q};if(pend){if(!q.sec)Object.assign(q,pend);pend=null}
+  if(q.brk)flush();if(q.sec)sec.push({t:q.sec,k:S.length,p:SD.n[q.i]});
+  while(q){const h=q.b-q.a,rem=cap-used-(cur.length?sp:0);
    if(h<=rem){cur.push(q);used+=h+(cur.length>1?sp:0);q=null;break}
-   const g=SD.G[q.i][2];let y=null;for(let j=0;j<g.length;j+=2){const c=g[j]+Math.abs(g[j+1])/2;if(c>q.a+60&&c<=q.a+rem&&c<q.b-30)y=c}
-   if(y==null&&cur.length&&rem<cap*.6){S.push(cur);cur=[];used=0;continue}
-   if(y==null)y=q.a+Math.max(60,rem);y=Math.round(y);cur.push({...q,b:y});S.push(cur);cur=[];used=0;q={...q,a:y}}}
- if(cur.length)S.push(cur);return S}
+   // split between paragraphs (blank gaps ≥7 rows) if that still fills a fair part of the screen; else move on to a fresh screen
+   const g=SD.G[q.i][2];let yl=null,yp=null;for(let j=0;j<g.length;j+=2){const c=g[j]+Math.abs(g[j+1])/2;if(c>q.a+60&&c<=q.a+rem&&c<q.b-30){yl=c;if(Math.abs(g[j+1])>=7)yp=c}}
+   let y=yp!=null&&yp-q.a>=rem*.4?yp:null;
+   if(y==null&&cur.length&&used>=cap*.45){flush();continue}
+   if(y==null)y=yp!=null?yp:yl;
+   if(y==null&&cur.length&&rem<cap*.6){flush();continue}
+   if(y==null)y=q.a+Math.max(60,rem);y=Math.round(y);cur.push({...q,b:y});flush();q={...q,a:y,sec:0,brk:false}}}
+ flush();S.sec=sec;return S}
 function sdGeo(){const st=$('#sdSt'),W=st.clientWidth,H2=st.clientHeight;SD.W=W;SD.H=H2;SD.fw=Math.min(W-8,H2*.72);SD.cap=Math.floor((H2-10)*1077/SD.fw);
  SD.bw=Math.min(W-6,(H2-6)*1077/1861)}
 function sdFlowSet(fk){const key=fk+'|'+ds(sdCx(fk).day)+'|'+SD.cap;if(SD.fkey!==key||!SD.scr){SD.scr=sdLay(sdPieces(fk));SD.fkey=key}SD.fk=fk}
@@ -2279,6 +2297,7 @@ function sdBuild(){let b=$('#sdr');if(b)return b;b=document.createElement('div')
  b.querySelector('.sd-x').onclick=()=>{H.tap();history.back()};
  b.querySelector('.sd-m').onclick=()=>{H.tap();sdToc()};
  b.addEventListener('click',e=>{const sh=e.target.closest('.sd-sheet');if(sh&&e.target===sh){sdSheet(false);return}
+  const ok=e.target.closest('[data-k]');if(ok&&sh&&ok.dataset.f){H.sel();sdSheet(false);SD.ins=null;sdFlowSet(ok.dataset.f);sdShow({m:'flow',k:+ok.dataset.k});return}
   const o=e.target.closest('[data-p]');if(o&&sh){H.sel();sdSheet(false);SD.ins=null;if(o.dataset.f){sdFlowSet(o.dataset.f);sdShow(sdAt(+o.dataset.p))}else sdShow({m:'book',k:sdIdx(+o.dataset.p)});return}
   const t=e.target.closest('#sdTabs [data-f]');if(t){H.tap();sdPick(t.dataset.f)}});
  const st=b.querySelector('#sdSt');st.addEventListener('pointerdown',sdDown);st.addEventListener('pointermove',sdMove);st.addEventListener('pointerup',sdUp);st.addEventListener('pointercancel',sdUp);
@@ -2310,9 +2329,15 @@ function sdUp(e){const g=SD.drag;if(!g||e.pointerId!==g.id)return;SD.drag=null;i
 function sdTabs(){const f=sdFlows();$('#sdTabs').innerHTML=['sh','mi','ma','be','bs'].map(k=>`<button type="button" data-f="${k}" aria-pressed="false">${f[k].t}</button>`).join('')+'<button type="button" class="sd-more">Contents</button>';
  $('#sdTabs .sd-more').onclick=()=>{H.tap();sdToc()}}
 // a tefillah tab: ask where to start (Korbanos / Hodu / Ashrei / Shemoneh Esrei …)
-function sdPick(k){const f=sdFlows()[k];if(!f.opt.length){sdFlowSet(k);SD.ins=null;sdTurn({m:'flow',k:0},1);return}
- sdSheet(true,'<h3>'+f.t+'</h3><p>Where would you like to start?</p><div class="sd-l">'+f.opt.map(o=>`<button type="button" data-f="${k}" data-p="${o[1]}">${o[0]}<span>p. ${o[1]}</span></button>`).join('')+'</div>')}
-function sdToc(){const p=SD.n?sdPg(sdCur()):0,cur=sdSec(p);let g='',h='<h3>Contents</h3><div class="sd-row" style="margin-top:8px"><input id="sdPgIn" type="number" inputmode="numeric" min="4" max="621" placeholder="Page"><button type="button" id="sdPgGo">Go to page</button></div>';
+// v107 (owner): the list is today's: only the sections said today, in order (Hallel instead of Tachanun …); the rest is under More
+function sdTodayL(k){const f=sdFlows()[k];if(!f.wk)return f.opt.map(o=>`<button type="button" data-f="${k}" data-p="${o[1]}">${o[0]}<span>p. ${o[1]}</span></button>`).join('');
+ const S=k===SD.fk&&SD.scr&&SD.scr.sec?SD.scr:sdLay(sdPieces(k));
+ return(S.sec||[]).map(x=>`<button type="button" data-f="${k}" data-k="${x.k}">${x.t}<span>p. ${x.p}</span></button>`).join('')}
+function sdPick(k){const f=sdFlows()[k];if(!f.opt.length&&!f.wk){sdFlowSet(k);SD.ins=null;sdTurn({m:'flow',k:0},1);return}
+ sdSheet(true,'<h3>'+f.t+'</h3><p>Where would you like to start? These are today’s.</p><div class="sd-l">'+sdTodayL(k)+'<button type="button" class="sd-mo">More · the whole siddur<span>›</span></button></div>');
+ $('#sdSh .sd-mo').onclick=()=>{H.tap();sdToc()}}
+function sdToc(){const p=SD.n?sdPg(sdCur()):0,cur=sdSec(p),tk=SD.m==='flow'&&SD.fk?SD.fk:sdAuto(),tl=sdTodayL(tk);let g='',h='<h3>Contents</h3><div class="sd-row" style="margin-top:8px"><input id="sdPgIn" type="number" inputmode="numeric" min="4" max="621" placeholder="Page"><button type="button" id="sdPgGo">Go to page</button></div>'+
+  (tl?'<span class="sd-g">Today · '+sdFlows()[tk].t+'</span><div class="sd-l">'+tl+'</div><span class="sd-g" style="margin-top:18px;opacity:.75">More · the whole siddur</span>':'');
  for(const s of SD_TOC){if(s[0]!==g){h+=(g?'</div>':'')+'<span class="sd-g">'+s[0]+'</span><div class="sd-l">';g=s[0]}h+=`<button type="button" data-p="${s[2]}"${s===cur?' class="cur"':''}>${s[1]}<span>${s[2]}</span></button>`}
  sdSheet(true,h+'</div>');const sh=$('#sdSh');sh.querySelector('#sdPgGo').onclick=()=>{const v=+sh.querySelector('#sdPgIn').value;if(v){H.sel();sdSheet(false);SD.ins=null;sdShow({m:'book',k:sdIdx(v)})}};
  const cb=sh.querySelector('.cur');if(cb)requestAnimationFrame(()=>cb.scrollIntoView({block:'center'}))}
@@ -3790,8 +3815,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=106;
+const CC_VER=107;
 const CC_LOG=[
+ {v:107,mid:1,new:['Siddur: each part (Shemoneh Esrei, Tachanun, Hallel, the Torah reading, Musaf…) now starts on its own page, and paragraphs are split less.','Siddur: “Where would you like to start?” and Contents list only today’s parts first (Hallel instead of Tachanun on Rosh Chodesh); everything else is under More.']},
  {v:106,new:['The home-screen widget is now a slim strip that shows more: the Hebrew date, today’s special day, the next zman (sunrise, sunset, candle lighting…) and your shiurim. Stretch it taller to see your plans too. Update the app, then remove the old widget and add it again.']},
  {v:105,new:['The home-screen widget now loads (it showed “Can’t load widget”). Update the app to get the fix.','Prayer changes in “To do today” (Yaaleh V’yavo, Hallel, no Tachanun, Musaf…) are notes now, not checkboxes.']},
  {v:104,big:1,feature:'A home-screen widget',new:['New: a home-screen widget with today’s Hebrew date, special days, your plans and how many shiurim you’ve done. It switches to the new Hebrew date at sunset by itself.','Update the app, then go to ⋯ → App → Add the widget to my home screen.']},
