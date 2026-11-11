@@ -872,6 +872,9 @@ html.cc-boot,html.cc-boot body{background:#0a0b10!important}html.cc-boot #accoun
 #sdr .sd-st{position:relative;flex:1;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
 #sdr .sd-pg{position:absolute;left:0;top:0;overflow:hidden;will-change:transform}
 #sdr .sd-pg i{display:block;background:var(--ink);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+#sdr .sd-hd{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35em;box-sizing:border-box;padding-top:4px}
+#sdr .sd-hd u{display:block;background:var(--ink);-webkit-mask-image:url(siddur/p/58.webp);mask-image:url(siddur/p/58.webp);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+#sdr .sd-hd span{font-family:'Frank Ruhl Libre',Georgia,serif;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink);line-height:1.15;text-align:center;padding:0 8px}
 #sdr .sd-pg.an{transition:transform .24s cubic-bezier(.25,.8,.3,1)}
 #sdr .sd-cue{position:absolute;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:3;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-radius:18px;background:var(--gx-sheet,var(--card));border:1px solid color-mix(in srgb,var(--acc,#8c94ef) 55%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(3,6,26,.3);font:500 13.5px/1.35 Figtree,system-ui;transform:translateY(140%);opacity:0;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .2s}
 #sdr .sd-cue.on{transform:none;opacity:1}
@@ -2165,6 +2168,16 @@ function sdChm(c){const h=c.h;if(h.k==='Ti'&&h.d>=17&&h.d<=21)return SD_CHS[h.d-
  if(h.k==='N'&&h.d>=17&&h.d<=20){const d17=ad(c.day,17-h.d),days=[0,1,2,3].map(j=>ad(d17,j)),shab=days.some(d=>d.getDay()===6),wk=days.filter(d=>d.getDay()!==6),
   n=wk.findIndex(d=>ds(d)===ds(c.day)),order=shab?['k','i','v']:['k','i','p','v'];return n>=0?SD_CHP[order[n]]:null}return null}
 const sdRd=r=>r?sdR(r[0],r[1],r[2],r[3]):null;
+/* v109 (owner): the printed section titles (ornament + capitals) are cut out of the pages; each one starts a new section, which begins
+   on its own screen under our own title in the same style (sdPaint). SD_TT = [image, first row, last row, label] (scratchpad tt/). */
+const SD_TT=[[1,105,198,'Upon arising'],[1,552,645,'Morning blessings'],[5,1209,1302,'Tzitzis'],[6,123,216,'Tallis'],[7,123,216,'Tefillin'],[8,123,216,'Morning prayer'],[9,107,136,'The Akeidah'],[13,1517,1546,'Korbanos'],[15,274,303,'Ketores'],[18,1325,1353,'Mishnah'],[21,97,125,'Beraisa'],[23,141,234,'Hodu'],[26,97,125,'Pesukei D’zimra'],[35,848,877,'Blessings of the Shema'],[38,367,460,'Shema'],[41,1033,1126,'Shemoneh Esrei'],[50,958,987,'Tachanun'],[57,123,216,'Reading of the Torah'],[59,90,119,'Blessings over the Torah'],[60,107,171,'Birkas HaGomel'],[60,531,560,'Bar Mitzvah blessing'],[60,741,770,'After a birth'],[61,98,126,'For the sick'],[61,1177,1206,'Raising the Torah'],[65,1459,1488,'Returning the Torah'],[67,1271,1300,'Song of the Day'],[78,1006,1099,'Rabbeinu Tam’s tefillin'],[80,1172,1265,'The Six Remembrances'],[81,889,982,'Tefillas HaDerech'],[82,123,216,'Blessings for various occasions'],[84,94,126,'Bentching'],[92,123,216,'Al HaMichya'],[93,97,126,'Borei Nefashos'],[93,374,516,'Bentching at a bris'],[94,123,264,'Sheva Brachos'],[95,116,261,'Mincha'],[95,1014,1043,'Ketores'],[97,1000,1027,'Ashrei'],[99,123,216,'Shemoneh Esrei'],[108,919,948,'Tachanun'],[114,123,216,'Maariv'],[116,93,121,'Shema'],[119,880,973,'Shemoneh Esrei'],[132,123,216,'Sefiras HaOmer'],[137,123,216,'Shema at bedtime'],[303,123,215,'Hallel'],[309,123,216,'Musaf for Rosh Chodesh'],[335,699,831,'Musaf'],[387,767,860,'The Nasi'],[464,123,216,'Torah readings'],[464,275,302,'Rosh Chodesh reading'],[464,1475,1503,'Fast day reading'],[465,1304,1332,'Haftarah for fast days'],[471,704,733,'Chol Hamoed reading'],[486,400,429,'Chanukah reading'],[491,1175,1204,'Purim reading'],[492,268,297,'Pesach reading'],[498,114,143,'Chol Hamoed reading']];
+let SD_TTI=null;
+function sdTT(L){if(!SD_TTI){SD_TTI={};for(const t of SD_TT)(SD_TTI[t[0]]=SD_TTI[t[0]]||[]).push(t)}const o=[];
+ for(const q of L){const T=SD_TTI[q.i];if(!T){o.push(q);continue}let parts=[q];
+  for(const[,a,b,t]of T){const np=[];for(const p of parts){if(p.b<=a||p.a>=b){np.push(p);continue}const before=p.a<a-8;
+    if(before)np.push({...p,b:a});if(p.b>b+8)np.push({...p,a:b,sec:before?t:(p.sec||t),brk:true,ps:false})
+    else if(!before&&p.sec)np.push({...p,a:b,b:b+1,sec:p.sec,brk:true})}parts=np}
+  o.push(...parts)}return o}
 // v107 (owner): every section (Shemoneh Esrei, Tachanun, Hallel, the Torah reading, Musaf…) starts on its own screen and is listed
 // in the "where to start" sheet and Contents. sdMk marks the first remaining piece at (page, %); lab() marks the first piece of an insert.
 function sdMk(L,bp,pct,t,br){const i=sdIdx(bp),y=pct==null?SD.G[i][0]:sdY(i,pct);
@@ -2172,7 +2185,8 @@ function sdMk(L,bp,pct,t,br){const i=sdIdx(bp),y=pct==null?SD.G[i][0]:sdY(i,pct)
   if(q.i===i&&q.a<y-8)L.splice(k,1,{...q,b:y},{...q,a:y,sec:t,brk:br!==0});else L[k]={...q,sec:t,brk:br!==0};return L}}return L}
 const lab=(A,t)=>A&&A.length?[{...A[0],sec:t,brk:true},...A.slice(1)]:A;
 function sdWeekly(day){const p=parsha(day);if(!p||!p.p||!p.p[0])return null;const nm=p.p[0][0];let k=PN.findIndex(x=>x[0]===nm);if(nm===VZ[0])k=53;return k>=0?SD_WK[k]:null}
-function sdPieces(fk){const f=sdFlows()[fk];if(!f.wk){let L=f.seg.flatMap(s=>sdR(s[0],null,s[1],null));
+const sdPieces=fk=>{const L=sdTT(sdPieces0(fk));if(fk==='be'&&L.length&&!L[0].sec)L[0]={...L[0],sec:'Bentching',brk:true};return L};
+function sdPieces0(fk){const f=sdFlows()[fk];if(!f.wk){let L=f.seg.flatMap(s=>sdR(s[0],null,s[1],null));
   // Shabbos & Yom Tov: "Hashem Hashem… Ribono shel olam" when the Ark is opened only on a Yom Tov that falls on a weekday (owner)
   if(fk==='sh'&&f.seg.some(s=>s[0]===181)){const c=sdCx(fk);if(!(c.yt&&c.wd!==6))L=sdCut(L,222,47.65,223,14.3)}return L}const c=sdCx(fk);let L,I=[],M=[];const cut=(...a)=>{L=sdCut(L,...a)},ins=(...a)=>I.push(a);
  const TD=a=>{if(!c.td)for(const r of a)cut(...r)};
@@ -2188,42 +2202,48 @@ function sdPieces(fk){const f=sdFlows()[fk];if(!f.wk){let L=f.seg.flatMap(s=>sdR
   if(!rd){cut(60,74.8,66,14.3);cut(69,76.9,70,18.55)}
   else{cut(61,12.2,61,16.2);cut(62,84.4,62,100);cut(63,56,63,64.2);cut(64,0,65,61.5);if(!(c.pur||c.tb))cut(66,8.4,66,14.25);
    const r=c.ch?SD_CH[c.ch-1]:c.rc?[468,13.6,468,74.2]:c.fast&&!c.tb?[468,78.9,469,63.3]:c.chm?sdChm(c):c.pur?[495,62.3,496,7.75]:c.mt?sdWeekly(c.day):null;if(r)ins(63,37.3,sdRd(r))}
-  const rdT=c.ch?'Torah reading · Chanukah':c.rc?'Torah reading · Rosh Chodesh':c.chm?'Torah reading · Chol Hamoed':c.pur?'Torah reading · Purim':c.fast?'Torah reading · Fast day':'Torah reading';
   if(!c.td)cut(69,65.3,69,68.45);cut(68,87.3,68,91.2);cut(70,18.55,70,27.15);
   if(c.noT){cut(67,4.5,67,34.1);cut(70,27.15,70,92)}
   // Song of the Day (today's only), Borchi Nafshi (Rosh Chodesh), L'Dovid (Elul to Hoshana Rabbah)
   cut(71,67.1,75,12);cut(75,34.25,75,41.15);if(!c.rc)cut(75,41.15,76,37.2);if(!c.ld)cut(76,37.2,76,93.4);cut(77,75.3,77,100);
   if(c.rc||c.chm){// Rosh Chodesh / Chol Hamoed: after Hallel the Song of the Day … Kaddish, then the Torah reading; Musaf after the Torah returns
-   const tail=[...lab(sdR(71,null,71,67.1),'Song of the Day'),...sdSong(c.wd,1),...(c.rc?sdR(75,41.15,76,37.2):[]),...(c.ld?sdR(76,37.2,76,93.4):[]),...sdR(77,null,77,75.3)];
+   const tail=[...sdR(71,null,71,67.1),...sdSong(c.wd,1),...(c.rc?sdR(75,41.15,76,37.2):[]),...(c.ld?sdR(76,37.2,76,93.4):[]),...sdR(77,null,77,75.3)];
    cut(71,0,77,75.3);cut(60,37.5,60,74.8);ins(54,43.2,[...lab(sdHal(c),'Hallel'),...tail]);ins(70,18.55,[...lab(c.rc?sdR(313,null,318,null):sdR(339,null,350,71.85),'Musaf'),...sdR(312,20.8,312,56.25),...sdR(312,60.9,312,86.25)])}
   else{if(hal){ins(54,43.2,lab(sdHal(c),'Hallel'));cut(60,37.5,60,74.8)}ins(71,67.1,lab(sdSong(c.wd),'Song of the Day'))}
   // the Nasi (1–13 Nissan) at the end
   if(c.h.k==='N'&&c.h.d<=13){const n=SD_NASI[c.h.d-1];L.push(...lab(sdRd(n),'The Nasi').map(q=>({...q,x:1})))}
-  M=[[5,null,'Morning blessings'],[12,null,'Korbanos'],[27,null,'Hodu'],[30,null,'Pesukei D’zimra'],[39,26,'Barchu · Blessings of the Shema'],[45,54.5,'Shemoneh Esrei'],
-   ...(c.noT?[]:[[54,43.2,'Tachanun']]),...(rd?[[60,74.8,rdT]]:[]),[66,14.3,'Ashrei · Uva Letziyon',rd?1:0]]}
+  M=[[66,14.3,'Ashrei · Uva Letziyon',0]]}
  if(fk==='mi'){L=sdR(99,null,117,null);
   TD([[103,47.1,103,58.6],[104,13,104,22],[104,69.1,104,74.2],[106,50,106,54.9],[110,52.1,110,62.7],[111,27.1,111,43.2],[112,9.3,112,12.6],[115,24.3,115,27.45]]);
   if(!c.fast){cut(105,53.6,105,80.7);cut(108,19.3,108,39.4);cut(110,77,110,94.7)}if(!c.tb){cut(107,38.5,107,40.35);cut(107,45.25,107,80.15)}
   if(!(c.rc||c.chm))cut(108,62,108,96.3);if(!(c.ch||c.pur))cut(109,73.4,110,43.5);
   if(c.noT)cut(112,42.7,114,51.75);else cut(112,42.7,112,48.4);
-  if(!c.ld)cut(115,35.85,115,92.2);if(!c.ch)cut(116,4.3,116,8);
-  M=[[99,null,'Korbanos'],[101,50.5,'Ashrei'],[103,null,'Shemoneh Esrei'],...(c.noT?[]:[[112,42.7,'Tachanun']])]}
+  if(!c.ld)cut(115,35.85,115,92.2);if(!c.ch)cut(116,4.3,116,8);}
  if(fk==='ma'){L=sdR(118,null,135,null);
   TD([[124,5.6,124,17.9],[124,67.6,124,76.9],[124,85.2,124,90.2],[126,50.3,126,55.4],[129,77.6,129,86.1],[130,35.6,130,50.7],[131,8.9,131,12.2],[134,10,134,13.2],[135,61.7,135,64.85]]);
   if(!c.ms)cut(125,9.3,125,32.4);if(!(c.rc||c.chm))cut(128,5.6,128,49.5);if(!(c.ch||c.pur))cut(129,5.4,129,70);
   cut(131,29.8,c.ms?131:133,c.ms?31.85:40.4);if(!c.pur)cut(134,19.9,134,24.45);cut(134,24.45,134,26.5);
-  if(c.om)ins(134,26.5,lab([...sdR(136,44.05,136,52.2),...sdOmer(c.om),...sdR(139,79.5,140,92.75)],'Sefiras HaOmer'));
-  M=[[118,null,'Maariv'],[120,null,'Shema'],[123,42.5,'Shemoneh Esrei']]}
+  if(c.om)ins(134,26.5,lab([...sdR(136,44.05,136,52.2),...sdOmer(c.om),...sdR(139,79.5,140,92.75)],'Sefiras HaOmer'));}
  for(const a of I)L=sdIns(L,...a);for(const m of M)L=sdMk(L,m[0],m[1],m[2],m[3]);return L}
 // lay the pieces out on screens (split only on blank lines)
 const sdBlank=q=>{const g=SD.G[q.i][2];for(let j=0;j<g.length;j+=2)if(g[j]<=q.a+2&&g[j]+Math.abs(g[j+1])>=q.b-2)return true;return q.b>=SD.G[q.i][1]&&q.a>=SD.G[q.i][1]-30};
+const SD_TH=150;
 function sdLay(L0){const cap=SD.cap,sp=14,S=[],L=[],sec=[];let cur=[],used=0,pend=null;
  let px=null;for(const q of L0){const p=L[L.length-1],ps=q.x&&!(px&&px.x);px=q;if(p&&p.i===q.i&&Math.abs(p.b-q.a)<=2&&!q.sec&&!ps)p.b=q.b;else L.push({...q,ps})}
+ // a section whose last screen would hold only a few lines: share its last two screens evenly (owner, v109)
+ const F=x=>x.reduce((a,q)=>a+q.b-q.a,0)+Math.max(0,x.length-1)*sp+(x.h?SD_TH:0);
+ const bal=()=>{if(!S.length||!cur.length||cur.h||F(cur)>cap*.25)return;const A=S[S.length-1],pool=[...A,...cur],tgt=(F(A)+F(cur))/2,X=[],Y=[];X.h=A.h;let acc=A.h?SD_TH:0,done=false;
+  for(const q of pool){if(done){Y.push(q);continue}const h=q.b-q.a,gap=X.length?sp:0;if(acc+gap+h<=tgt){X.push(q);acc+=gap+h;continue}
+   const want=q.a+(tgt-acc-gap),g=SD.G[q.i][2];let y=null,bd=1e9;
+   for(const para of [1,0])if(y==null)for(let j=0;j<g.length;j+=2){if(para&&Math.abs(g[j+1])<7)continue;const c=g[j]+Math.abs(g[j+1])/2;if(c<q.a+40||c>q.b-30)continue;const d=Math.abs(c-want);if(d<bd&&(!para||d<cap*.12)&&acc+gap+(c-q.a)<=cap){bd=d;y=c}}
+   if(y!=null){y=Math.round(y);X.push({...q,b:y});Y.push({...q,a:y,sec:0,brk:false})}else if(X.length)Y.push(q);else X.push(q);done=true}
+  if(X.length&&Y.length&&F(X)<=cap&&F(Y)<=cap){S[S.length-1]=X;cur=Y}};
  const flush=()=>{if(cur.length){S.push(cur);cur=[];used=0}};
  for(let q of L){if(sdBlank(q)){if(q.sec&&!pend)pend={sec:q.sec,brk:q.brk};continue}q={...q};if(pend){if(!q.sec)Object.assign(q,pend);pend=null}
-  if(q.brk)flush();if(q.sec)sec.push({t:q.sec,k:S.length,p:SD.n[q.i]});
+  if(q.brk){bal();flush();if(q.sec){cur.h=q.sec;used=SD_TH}}if(q.sec&&!(sec.length&&sec[sec.length-1].t===q.sec&&sec[sec.length-1].k===S.length))sec.push({t:q.sec,k:S.length,p:SD.n[q.i]});
   while(q){const h=q.b-q.a,rem=cap-used-(cur.length?sp:0);
    if(h<=rem){cur.push(q);used+=h+(cur.length>1?sp:0);q=null;break}
+   if(q.b-q.a<=12){q=null;break}
    // split between paragraphs (blank gaps ≥7 rows) if that still fills a fair part of the screen; else move on to a fresh screen
    const g=SD.G[q.i][2];let yl=null,yp=null;for(let j=0;j<g.length;j+=2){const c=g[j]+Math.abs(g[j+1])/2;if(c>q.a+60&&c<=q.a+rem&&c<q.b-30){yl=c;if(Math.abs(g[j+1])>=7)yp=c}}
    // only a piece that BEGINS a paragraph may move to a fresh screen; the rest of a blessing after a cut (e.g. Sim Shalom after the
@@ -2233,7 +2253,7 @@ function sdLay(L0){const cap=SD.cap,sp=14,S=[],L=[],sec=[];let cur=[],used=0,pen
    if(y==null)y=yl!=null?yl:yp;
    if(y==null&&cur.length&&rem<cap*.6){flush();continue}
    if(y==null)y=q.a+Math.max(60,rem);y=Math.round(y);cur.push({...q,b:y});flush();q={...q,a:y,sec:0,brk:false,ps:false}}}
- flush();S.sec=sec;return S}
+ bal();flush();S.sec=sec;return S}
 function sdGeo(){const st=$('#sdSt'),W=st.clientWidth,H2=st.clientHeight;SD.W=W;SD.H=H2;SD.fw=Math.min(W-8,H2*.72);SD.cap=Math.floor((H2-10)*1077/SD.fw);
  SD.bw=Math.min(W-6,(H2-6)*1077/1861)}
 function sdFlowSet(fk){const key=fk+'|'+ds(sdCx(fk).day)+'|'+SD.cap;if(SD.fkey!==key||!SD.scr){SD.scr=sdLay(sdPieces(fk));SD.fkey=key}SD.fk=fk}
@@ -2244,8 +2264,9 @@ const sdPgs=t=>[...new Set(sdScr(t).map(q=>SD.n[q.i]))];
 function sdAt(p){if(SD.scr&&SD.fk){const k=SD.scr.findIndex(s=>s.some(q=>SD.n[q.i]>=p));if(k>=0&&SD.scr[k].some(q=>SD.n[q.i]===p||SD.n[q.i]>p))return{m:'flow',k}}return{m:'book',k:sdIdx(p)}}
 function sdPaint(el,t){const fl=t.m==='flow',w=fl?SD.fw:SD.bw,s=w/1077,P=sdScr(t),tot=P.reduce((a,q)=>a+(q.b-q.a)*s,0)+(fl?(P.length-1)*14*s:0);
  el.style.width=w+'px';el.style.height=SD.H+'px';el.style.left=(SD.W-w)/2+'px';el.style.top='0px';
- el.innerHTML=P.map((q,j)=>{const u='url(siddur/p/'+(q.i+1)+'.webp)',ms=w+'px '+(1861*s)+'px',mp='0 '+(-q.a*s)+'px';
-  return`<i style="height:${((q.b-q.a)*s).toFixed(1)}px;margin-top:${j?(14*s).toFixed(1):fl?5:Math.max(0,(SD.H-tot)/2).toFixed(1)}px;-webkit-mask-image:${u};mask-image:${u};-webkit-mask-size:${ms};mask-size:${ms};-webkit-mask-position:${mp};mask-position:${mp}"></i>`}).join('')}
+ const hd=fl&&P.h?`<b class="sd-hd" style="height:${(SD_TH*s).toFixed(1)}px"><u style="width:${(161*s).toFixed(1)}px;height:${(35*s).toFixed(1)}px;-webkit-mask-size:${w}px ${1861*s}px;mask-size:${w}px ${1861*s}px;-webkit-mask-position:${(-463*s).toFixed(1)}px ${(-126*s).toFixed(1)}px;mask-position:${(-463*s).toFixed(1)}px ${(-126*s).toFixed(1)}px"></u><span style="font-size:${(34*s).toFixed(1)}px">${P.h}</span></b>`:'';
+ el.innerHTML=hd+P.map((q,j)=>{const u='url(siddur/p/'+(q.i+1)+'.webp)',ms=w+'px '+(1861*s)+'px',mp='0 '+(-q.a*s)+'px';
+  return`<i style="height:${((q.b-q.a)*s).toFixed(1)}px;margin-top:${j?(14*s).toFixed(1):P.h?0:fl?5:Math.max(0,(SD.H-tot)/2).toFixed(1)}px;-webkit-mask-image:${u};mask-image:${u};-webkit-mask-size:${ms};mask-size:${ms};-webkit-mask-position:${mp};mask-position:${mp}"></i>`}).join('')}
 // v88 (owner: "make the loading of the pages a little faster"): pages are fetched ahead. The next 4 screens (and the one before)
 // load right away, then the rest of the open tefillah quietly in the background (3 at a time); the service worker keeps them on the phone.
 const SD_PRE=new Map(),SD_GOT=new Set();let SD_Q=[],SD_QN=0;
@@ -3817,8 +3838,9 @@ function aiHebrewDate(d){const h=hd(d);return `${h.d} ${h.n[0]} ${h.y}`}
    adm:1 = admin-only → counts as small in the version but is never announced.
    The shown version (bottom of ⋯, popups) is worked out from these sizes by ccVerStr(). A batch shows the biggest kind it contains.
    Whole new feature -> may also set `tour:'<id>'` (an id in SETS inside ccTourStart) so "Show me" runs a live tour. */
-const CC_VER=108;
+const CC_VER=109;
 const CC_LOG=[
+ {v:109,mid:1,new:['Siddur: every section now starts on its own page with a clear title at the top (Hodu, Shemoneh Esrei, Tachanun, Hallel, the Torah reading…), and the titles printed in the middle of pages are gone.']},
  {v:108,new:['Siddur: no more big empty gaps in the middle of a blessing (like under Sim Shalom).']},
  {v:107,mid:1,new:['Siddur: each part (Shemoneh Esrei, Tachanun, Hallel, the Torah reading, Musaf…) now starts on its own page, and paragraphs are split less.','Siddur: “Where would you like to start?” and Contents list only today’s parts first (Hallel instead of Tachanun on Rosh Chodesh); everything else is under More.']},
  {v:106,new:['The home-screen widget is now a slim strip that shows more: the Hebrew date, today’s special day, the next zman (sunrise, sunset, candle lighting…) and your shiurim. Stretch it taller to see your plans too. Update the app, then remove the old widget and add it again.']},
