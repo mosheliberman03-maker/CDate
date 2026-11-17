@@ -393,7 +393,7 @@ body.tour.tpass #top,body.tour.tpass #bar{z-index:41}
 #suG .sel{display:flex;align-items:center;gap:8px;padding:12px 14px;border-radius:14px;background:rgba(111,214,160,.12);color:#c8f1dc;font-size:14px}
 #suG .sel b{flex:1}#suG .sel button{border:0;background:none;color:var(--acc);font:inherit;font-weight:700}
 #suG #sgP{margin-bottom:10px}
-#sgM .r{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.06);margin-bottom:6px;cursor:pointer}#sgM .r>div{flex:1;min-width:0}#sgM .r b{display:block}#sgM .r small{opacity:.7}#sgM .tag{font-size:12px;opacity:.8}#sgM{margin:-4px 0 10px}
+#sgM .r{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.06);margin-bottom:6px;cursor:pointer}#sgM .r>div{flex:1;min-width:0}#sgM .r b{display:block}#sgM .r small{opacity:.7}#sgM .tag{font-size:12px;opacity:.8}#sgM{margin:-4px 0 10px}#sgLW input{width:100%;box-sizing:border-box;margin-top:8px}
 .su-gen #suN,.su-gen #suH,.su-gen #suM,.su-gen #suPW,.su-gen #suPN,.su-gen #suCW,.su-gen #suB,.su-gen #suGo{display:none!important}
 .su-gen #suG{display:block!important}
 .su-gen .sucard>p{display:none}
@@ -485,7 +485,7 @@ body:has(#sheet[style*="block"] .cm) #cmBar,body:has(#sheet[style*="block"] .ap)
 body:has(#sheet[style*="block"]) #emH{display:none}
 </style></head><body>
 <canvas id="g"></canvas>
-<div id="su"><div class="sucard glass"><span class="lg lg-l" role="img" aria-label="Logo"></span><h1>Shluchim Keep in Touch <span class="beta">Beta</span></h1><p>This app is in beta, so things may change or break while we test it. Pick your name from the list. First time: add your number and choose a code. Already signed up: enter your code.</p><input id="suN" placeholder="Your name" autocomplete="off" autocapitalize="words"><div id="suH"></div><div id="suM"></div><div id="suPW" style="display:none"></div><div id="suPN"></div><div id="suCW" style="display:none"><input id="suC" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Code"><div class="phh" id="suCH"></div></div><button class="btn p" id="suB" style="width:100%" disabled>Continue</button><button class="sulink" id="suGo">Not in a yeshiva? Sign up here</button><div id="suG" style="display:none"><p class="sgp">Not in a yeshiva? No problem. Add your name, number and city to keep in touch with friends and family.</p><input id="sgN" placeholder="Your name" autocomplete="name" autocapitalize="words"><div id="sgM"></div><div id="sgP"></div><div class="cw"><input id="sgC" placeholder="Your city" autocomplete="off"><div id="sgS"></div><div id="sgSel"></div></div><input id="sgK" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Code (4–8 digits)"><div class="phh" id="sgH">New here? Choose a code. Signed up before? Enter your code.</div><button class="btn p" id="sgB" style="width:100%" disabled>Continue</button><button class="sulink" id="sgBack">← I’m in a yeshiva</button></div></div></div>
+<div id="su"><div class="sucard glass"><span class="lg lg-l" role="img" aria-label="Logo"></span><h1>Shluchim Keep in Touch <span class="beta">Beta</span></h1><p>This app is in beta, so things may change or break while we test it. Pick your name from the list. First time: add your number and choose a code. Already signed up: enter your code.</p><input id="suN" placeholder="Your name" autocomplete="off" autocapitalize="words"><div id="suH"></div><div id="suM"></div><div id="suPW" style="display:none"></div><div id="suPN"></div><div id="suCW" style="display:none"><input id="suC" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Code"><div class="phh" id="suCH"></div></div><button class="btn p" id="suB" style="width:100%" disabled>Continue</button><button class="sulink" id="suGo">Not in a yeshiva? Sign up here</button><div id="suG" style="display:none"><p class="sgp">Not in a yeshiva? No problem. Add your name, number and city to keep in touch with friends and family.</p><input id="sgN" placeholder="Your name" autocomplete="name" autocapitalize="words"><div id="sgM"></div><div id="sgP"></div><div class="cw"><input id="sgC" placeholder="Your city" autocomplete="off"><div id="sgS"></div><div id="sgSel"></div></div><input id="sgK" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Code (4–8 digits)"><div class="phh" id="sgH">New here? Choose a code. Signed up before? Enter your code.</div><button class="btn p" id="sgB" style="width:100%" disabled>Continue</button><button class="sulink" id="sgL">Got a link from someone? Paste it here</button><div id="sgLW" style="display:none"><input id="sgLI" placeholder="Link or code" autocomplete="off" autocapitalize="none"><div class="phh" id="sgLH"></div></div><button class="sulink" id="sgBack">← I’m in a yeshiva</button></div></div></div>
 <div id="cards"></div><div id="cmBar"></div>
 <div id="fcard"><div class="fw"><button class="btn" id="fback">‹ Back</button><div class="fbig"><div id="fcity"></div><div id="ftime"></div><div id="fmeta"></div></div><div id="fpl"></div><div class="fhint">Swipe a name left to remove</div></div></div>
 <div id="tour"><div class="tcard" id="tc"></div></div>
@@ -986,7 +986,7 @@ const sim=(a,b)=>a==b?1:1-lev(a,b)/Math.max(a.length,b.length,1);
 const toks=x=>x.toLowerCase().replace(/\(.*?\)/g," ").replace(/[^a-z\u00c0-\u024f\s]/g," ").split(/\s+/).filter(Boolean);
 function matches(q){const qt=toks(q);if(!qt.length)return[];const qs=qt.join("");
  return (su?suSrc():DIRP).map(p=>{const ct=toks(p.name);if(!ct.length)return{p,sc:0};const full=sim(qs,ct.join("")),tk=qt.reduce((a,t)=>a+Math.max(...ct.map(c=>Math.max(sim(t,c),NG[t]!=null&&NG[t]==NG[c]?.96:0))),0)/qt.length;let sc=Math.max(full,tk*.95);if(qt.length<2)sc*=.6;return{p,sc}}).filter(x=>x.sc>=.62).sort((a,b)=>b.sc-a.sc).slice(0,6)}
-const SU_JOIN=(()=>{const m=location.search.match(/[?&]join=([a-z0-9]+)/i);if(m)return m[1].toLowerCase();try{return sessionStorage.getItem("kit_join")||""}catch(e){return""}})(),SU_SHL=SU_JOIN=="shluchim";
+let SU_JOIN=(()=>{const m=location.search.match(/[?&]join=([a-z0-9]+)/i);if(m)return m[1].toLowerCase();try{return sessionStorage.getItem("kit_join")||""}catch(e){return""}})();let SU_SHL=SU_JOIN=="shluchim";
 let SU_CM=null;
 function suSrc(){return SU_SHL?DIRP0:DIRP0.filter(p=>accts[pkey(p.name,p.city)])}
 let selM=null;const suN=$("suN"),suM=$("suM"),suB=$("suB"),suH=$("suH");
@@ -1094,10 +1094,10 @@ const tour={i:0,T:[],off:[],who:null,
  // 1. the globe and its colours
  s0(){setView("world");focusK=null;tween=null;auto=true;zoomT=1;
   if(!DIRP.length){this.card("bot","Welcome!","Your globe fills up with the people you keep in touch with. Each pin’s colour tells you if it’s a good time to call there.<br><br>To start: open ☰ and tap <b>Join with a link or code</b> (if someone sent you one), or <b>Add a friend or family</b>.",{extra:TOUR_LEG,next:"Next"});return}
-  this.card("bot","Who’s awake right now?","Every pin is a yeshiva or a shliach. Its colour tells you if it’s a good time to call there.",{extra:TOUR_LEG,next:"Next"})},
+  const shl=isShlMember();this.card("bot","Who’s awake right now?",shl?"Every pin is a yeshiva or a shliach. Its colour tells you if it’s a good time to call there.":"Every pin is a place where people in your community live. Its colour tells you if it’s a good time to call there.",{extra:TOUR_LEG,next:"Next"})},
  // 2. search a bochur (the real search bar)
  s1(){setView("world");auto=false;this.pass();this.pulse($("sb"));
-  this.card("top","Find a bochur","Type the name of a bochur you know in the search bar below, then tap Search on your keyboard (or tap his name).",{});
+  this.card("top",isShlMember()?"Find a bochur":"Find someone",isShlMember()?"Type the name of a bochur you know in the search bar below, then tap Search on your keyboard (or tap his name).":"Type the name of someone in your community in the search bar below, then tap Search on your keyboard (or tap the name).",{});
   this.t(()=>{try{q.focus()}catch(e){}},450);
   const go=v=>{if(!v)return false;this.who=v;q.value="";q.blur();res.style.display="none";this.next();return true};
   const find=()=>{const s=q.value.trim();if(!s)return null;const exact=DIRP.find(v=>v.name.toLowerCase()==s.toLowerCase());if(exact)return exact;const m=matches(s);if(m.length)return m[0].p;return DIRP.find(v=>mt(v.name,s.toLowerCase()))||null};
@@ -1109,16 +1109,16 @@ const tour={i:0,T:[],off:[],who:null,
  s2(){const v=this.who,g=DIRG.find(x=>x.city==v.city);if(!g){this.next();return}
   auto=false;fly(g.lon,g.lat,1500);zoomT=7;sheet.style.display="none";
   const first=v.name.split(" ")[0];
-  this.card("top","Here’s "+esc(v.city),"Flying you there…",{});
+  this.card("top","Here’s "+esc(baseCity(v.city)),"Flying you there…",{});
   this.t(()=>{showSheet([g]);this.pass();
-   const mark=()=>{const b=sheet.querySelector('[data-n="'+v.name.replace(/"/g,'\\"')+'"]');if(!b)return;const isSaved=saved.some(x=>x.name==v.name&&x.city==v.city);
+   const mark=()=>{const b=sheet.querySelector('[data-n="'+v.name.replace(/"/g,'\\"')+'"]');if(!b)return;const isSaved=savedIdx(v.name,v.city)>=0;
     if(isSaved){this.next();return}if(!b.classList.contains("tpulse")){document.querySelectorAll(".tpulse").forEach(e=>e.classList.remove("tpulse"));b.classList.add("tpulse");b.closest(".r").scrollIntoView({block:"center",behavior:"smooth"})}};
-   if(saved.some(x=>x.name==v.name&&x.city==v.city)){this.card("top",esc(first)+" is already saved","He’s already in your list. Let’s go see it.",{next:"Next"});return}
-   this.card("top","Save "+esc(first),"This is "+esc(v.city)+", with everyone who learns there. Tap the glowing <b>Save</b> next to "+esc(v.name)+" to add him to your list.",{});
+   if(savedIdx(v.name,v.city)>=0){this.al=1;this.card("top",esc(first)+" is already saved","He’s already in your list. Let’s go see it.",{next:"Next"});return}
+   this.card("top","Save "+esc(first),"This is "+esc(baseCity(v.city))+(g.comm?", with everyone in your community who lives there":", with everyone who learns there")+". Tap the glowing <b>Save</b> next to "+esc(v.name)+" to add him to your list.",{});
    mark();this.every(mark,300)},1300)},
  // 4. go to your list (the cards button)
  s3(){hap([12,40,12]);this.pass();this.t(()=>{sheet.style.display="none"},700);const b=$("gb");b.style.display="grid";this.pulse(b);
-  this.card("top","Saved! Now open your list","Tap the glowing button at the top right to see everyone you’ve saved.",{});
+  const al=this.al;this.al=0;this.card("top",al?"Now open your list":"Saved! Now open your list","Tap the glowing button at the top right to see everyone you’ve saved.",{});
   this.every(()=>{if(view=="cards")this.next()},200)},
  // 5. the list
  s4(){sheet.style.display="none";
@@ -1133,7 +1133,12 @@ const tour={i:0,T:[],off:[],who:null,
  end(){this.clear();document.body.classList.remove("tour");$("tc").innerHTML="";lsSet("sc_tour","1");zoomT=1;auto=true;setView(saved.length?"cards":"world")}};
 $("tour").addEventListener("click",e=>{if(e.target.closest("#tk"))tour.end();else if(e.target.closest("#tn")){if(tour.i>=6)tour.end();else tour.next()}});
 $("tr").onclick=()=>{open(false);tour.show()};
-function welcome(){if(lsGet("sc_tour")){setTimeout(()=>{try{kitNews()}catch(e){}},800);return}try{lsSet(kitSeenKey(),KIT_VER)}catch(e){}tour.show()}
+function welcome(){if(lsGet("sc_tour")){setTimeout(()=>{try{kitNews()}catch(e){}},800);return}try{lsSet(kitSeenKey(),KIT_VER)}catch(e){}
+ // owner: signing up from a link showed the first card, then Next jumped to the end (not in the community yet) → wait for the join first
+ let jc="";try{jc=sessionStorage.getItem("kit_join")||""}catch(e){}if(jc){tour.wait=1;setTimeout(()=>{if(tour.wait)joinDone()},20000);return}
+ tour.show()}
+// after a link's join (or Cancel): start the waiting tour once the community's people are on the globe
+function joinDone(){if(!tour.wait)return;tour.wait=0;let n=0;const go=()=>{if(DIRP.length||n++>16){try{cmRebuild()}catch(e){}tour.show();return}setTimeout(go,300)};go()}
 function removeSaved(id){const i=saved.findIndex(v=>v.id==id);if(i<0)return;const v=saved.splice(i,1)[0];persist();hap(25);render();commit();toast("Removed "+(v.name||v.city),()=>{saved.splice(Math.min(i,saved.length),0,v);persist();render();commit()})}
 function checkRem(){let ch=0;Object.keys(rem).forEach(k=>{const r=rem[k];if(status(r.tz)=="day"){delete rem[k];ch=1;hap([200,100,200]);toast("⏰ "+r.name+" is up. Good to call now.",null,null,9000);try{if("Notification" in window&&Notification.permission=="granted")new Notification(r.name+" is up",{body:"Good to call now in "+r.city})}catch(e){}}});if(ch){saveF();renderCards()}}
 function toggleBell(v){const k=fk(v);if(rem[k]){delete rem[k];toast("Reminder off for "+v.name)}else{rem[k]={name:v.name,city:v.city,tz:v.tz};try{if("Notification" in window&&Notification.permission=="default")Notification.requestPermission()}catch(e){}toast("We’ll tell you when "+v.name+" is up. Keep this page open.")}saveF();hap(10);renderFull()}
@@ -1232,7 +1237,7 @@ sync()})();
 // neither = SMALL (looks, tweaks, fixes) → only a little round "i" in the corner, version X.Y.Z.
 // adm:1 = admin-only change → counts as a small update in the version number, but NO notification at all (owner). The shown version is worked out from these sizes.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=57,KIT_APK=3;
+const KIT_VER=58,KIT_APK=3;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,mid:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1281,7 +1286,8 @@ const KIT_LOG=[
  {v:54,t:"If someone added you to a community, signing up with that phone number puts you straight in it"},
  {v:55,t:"Only a community’s admins can add people to it"},
  {v:56,adm:1,t:"New web address",d:"The app moved to justaboredbocher.github.io/CDate/friends."},
- {v:57,mid:1,t:"Signing up from a community’s link shows only that community’s people",d:"Open the link someone sent you, start typing your name, and tap it. The yeshiva list only comes up with the Shluchim link."}
+ {v:57,mid:1,t:"Signing up from a community’s link shows only that community’s people",d:"Open the link someone sent you, start typing your name, and tap it. The yeshiva list only comes up with the Shluchim link."},
+ {v:58,t:"The tour works when you sign up from a link, and you can paste a link on the sign-up screen"}
 ];
 function kitVerStr(b){let M=0,m=0,p=0;const by={};KIT_LOG.forEach(x=>{const l=x.big?3:x.mid?2:1;by[x.v]=Math.max(by[x.v]||0,l)});
  Object.keys(by).map(Number).sort((a,c)=>a-c).forEach(v=>{if(v>b)return;if(by[v]==3){M++;m=0;p=0}else if(by[v]==2){m++;p=0}else p++});return M+"."+m+"."+p}
@@ -1555,7 +1561,15 @@ function invAsk(list){const it=list[0];if(!it)return;if(document.body.classList.
  N.addEventListener("input",()=>{if(mPick&&N.value.trim()!=mPick.n)mPick=null;mShow()});
  // which screen opens first: the yeshiva list only with the Shluchim link; otherwise the plain sign-up (with a way back to log in)
  if(!SU_SHL){$("su").classList.add("su-gen");$("suGo").textContent="New here? Sign up here";$("sgBack").textContent="Already have a yeshiva account? Log in";
-  if(SU_JOIN)cmFetch(SU_JOIN).then(d=>{if(!d)return;SU_CM=d;const pp=document.querySelector("#suG .sgp");if(pp)pp.innerHTML="You’re joining <b>"+esc(d.name)+"</b>. Start typing your name and tap it when it shows up.";$("sgBack").style.display="none";mShow()})}
+  if(SU_JOIN)suJoin(SU_JOIN)}
+ // a link or code typed/pasted on the sign-up screen (the Android app can't open links before signing in)
+ async function suJoin(code){const d=await cmFetch(code);if(!d)return false;try{sessionStorage.setItem("kit_join",code)}catch(e){}SU_JOIN=code;
+  if(code=="shluchim"){SU_SHL=true;SU_CM=null;$("su").classList.remove("su-gen");$("suGo").textContent="Not in a yeshiva? Sign up here";$("sgBack").textContent="← I’m in a yeshiva";$("sgBack").style.display="";suN.value="";suN.oninput();return true}
+  SU_CM=d;$("su").classList.add("su-gen");const pp=document.querySelector("#suG .sgp");if(pp)pp.innerHTML="You’re joining <b>"+esc(d.name)+"</b>. Start typing your name and tap it when it shows up.";$("sgBack").style.display="none";$("sgL").style.display="none";mShow();return true}
+ const L=$("sgL");if(L){if(SU_JOIN)L.style.display="none";L.onclick=()=>{const w=$("sgLW");w.style.display=w.style.display=="none"?"":"none";if(w.style.display=="")setTimeout(()=>$("sgLI").focus(),60)};
+  let lt=0;$("sgLI").oninput=()=>{clearTimeout(lt);lt=setTimeout(async()=>{const v=$("sgLI").value.trim(),m=v.match(/join=([a-z0-9]+)/i),id=(m?m[1]:v).toLowerCase().replace(/[^a-z0-9]/g,""),H2=$("sgLH");
+   if(!/^([a-z0-9]{8}|shluchim)$/.test(id)){H2.textContent=v?"Paste the whole link, or the 8-letter code.":"";return}H2.textContent="Checking…";
+   if(await suJoin(id)){$("sgLW").style.display="none";hap(12);setTimeout(()=>{try{(SU_SHL?suN:N).focus()}catch(e){}},80)}else H2.textContent="No community with that code."},300)}}
  B.onclick=async()=>{if(B.disabled)return;if(Date.now()<lock2){H.className="phh bad";H.textContent="Too many tries. Wait a few seconds.";return}
   B.disabled=true;H.className="phh";H.textContent="Checking…";const ph=pwG.val().e164,code=K.value;
   try{const uid=await userId(ph),doc=await kitGet1("users3",uid);let salt,h;
@@ -1814,8 +1828,8 @@ function cmNew(){open(false);sheet._gs=null;sheet.innerHTML='<div class="cm"><h3
  const N=$("cmN"),G=$("cmGo");setTimeout(()=>N.focus(),80);N.oninput=()=>G.disabled=!N.value.trim();$("cmX").onclick=()=>sheet.style.display="none";
  G.onclick=async()=>{const info=meInfo();if(!info){toast("Couldn’t find your location.");return}G.disabled=true;const s2=cmSecret();
   try{const r=await cmPost("create",{fk:cmFk(),s:s2,name:N.value.trim(),me:info});const l=cmList();l.push({id:r.id,s:s2,st:"member",all:"auto"});cmSave(l);hap([12,40,12]);await cmRefresh();cmOpen(r.id)}catch(x){G.disabled=false;toast("Couldn’t create it. Check your internet and try again.")}}}
-function cmJoinAsk(code){open(false);sheet._gs=null;sheet.innerHTML='<div class="cm"><h3>Join a community</h3><p>Paste the link or code someone sent you.</p><input class="ain" id="cmC" placeholder="Link or code" autocomplete="off" autocapitalize="none" value="'+esc(code||"")+'"><div id="cmI"></div><div class="btns"><button class="btn" id="cmX">Cancel</button><button class="btn p" id="cmGo" disabled>Join</button></div></div>';sheet.style.display="block";
- const C=$("cmC"),G=$("cmGo"),I=$("cmI");let id="",t=0;$("cmX").onclick=()=>sheet.style.display="none";
+function cmJoinAsk(code,done){open(false);sheet._gs=null;sheet.innerHTML='<div class="cm"><h3>Join a community</h3><p>Paste the link or code someone sent you.</p><input class="ain" id="cmC" placeholder="Link or code" autocomplete="off" autocapitalize="none" value="'+esc(code||"")+'"><div id="cmI"></div><div class="btns"><button class="btn" id="cmX">Cancel</button><button class="btn p" id="cmGo" disabled>Join</button></div></div>';sheet.style.display="block";
+ const C=$("cmC"),G=$("cmGo"),I=$("cmI");let id="",t=0;$("cmX").onclick=()=>{sheet.style.display="none";if(done)done()};
  const look=async()=>{const v=C.value.trim(),m=v.match(/join=([a-z0-9]+)/i);id=(m?m[1]:v).toLowerCase().replace(/[^a-z0-9]/g,"");G.disabled=true;I.innerHTML="";
   if(!/^([a-z0-9]{8}|shluchim)$/.test(id))return;const d=await cmFetch(id);if(!d){I.innerHTML='<div class="note">No community with that code.</div>';return}
   const e=cmEntry(id);if(e&&e.st=="member"){I.innerHTML='<div class="note">You’re already in '+esc(d.name)+'.</div>';return}
@@ -1823,7 +1837,7 @@ function cmJoinAsk(code){open(false);sheet._gs=null;sheet.innerHTML='<div class=
  C.oninput=()=>{clearTimeout(t);t=setTimeout(look,250)};if(code)look();else setTimeout(()=>C.focus(),80);
  G.onclick=async()=>{const info=meInfo();if(!info){toast("Couldn’t find your location.");return}G.disabled=true;const e=cmEntry(id),s2=(e&&e.s)||cmSecret();
   try{const r=await cmPost("join",{id,fk:cmFk(),s:s2,me:info});const l=cmList().filter(x=>x.id!=id);l.push({id,s:s2,st:r.status});cmSave(l);hap([12,40,12]);
-   toast(r.status=="member"?"You joined":"Request sent. You’ll be added once an admin approves.");sheet.style.display="none";await cmRefresh()}catch(x){G.disabled=false;toast(String(x.message).includes("403")?"That name is already taken in this community.":"Couldn’t join. Check your internet and try again.")}}}
+   toast(r.status=="member"?"You joined":"Request sent. You’ll be added once an admin approves.");sheet.style.display="none";await cmRefresh();if(done){CM_VIEW="";try{cmRebuild()}catch(y){}done()}}catch(x){G.disabled=false;toast(String(x.message).includes("403")?"That name is already taken in this community.":"Couldn’t join. Check your internet and try again.")}}}
 $("cmNew").onclick=cmNew;$("cmJoin").onclick=()=>cmJoinAsk("");
 // a join link opened the page: ask after signing in
 (()=>{const m=location.search.match(/[?&]join=([a-z0-9]+)/i);if(m)try{sessionStorage.setItem("kit_join",m[1].toLowerCase())}catch(e){}})();
@@ -1832,7 +1846,9 @@ function emptyHint(){let el=$("emH");const on=!!(me&&me.match)&&!DIRP.length&&!s
  el.innerHTML='<b>Your globe is empty</b><small>Join a community with a link or code someone sent you, or add your own friends and family.</small><div><button class="btn p" id="emJ">Join a community</button><button class="btn" id="emA">Add a friend</button></div>';
  document.body.appendChild(el);$("emJ").onclick=()=>cmJoinAsk("");$("emA").onclick=apOpen}
 setInterval(emptyHint,1500);
-function cmPendingJoin(){if(!me||!me.match)return;let c="";try{c=sessionStorage.getItem("kit_join")||"";sessionStorage.removeItem("kit_join")}catch(e){}if(c)setTimeout(()=>cmJoinAsk(c),900)}
+function cmPendingJoin(){if(!me||!me.match)return;let c="";try{c=sessionStorage.getItem("kit_join")||"";sessionStorage.removeItem("kit_join")}catch(e){}if(!c){joinDone();return}
+ // the account may already be in it (someone added this number): then no question, straight on
+ setTimeout(async()=>{try{await cmRefresh()}catch(e){}const e=cmEntry(c);if(e&&e.st=="member"){CM_VIEW="";try{cmRebuild()}catch(x){}joinDone();return}cmJoinAsk(c,joinDone)},2500)}
 cmRebuild();setTimeout(()=>{cmRefresh();cmPendingJoin()},1200);setInterval(()=>{if(!document.hidden)cmRefresh()},60000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)cmRefresh()});
 
