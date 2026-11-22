@@ -1071,8 +1071,13 @@ function kitBridge(){try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C
  const P=(C.Plugins&&C.Plugins.KitWidget)||(C.registerPlugin&&C.registerPlugin("KitWidget"));if(!P)return;
  const seen=new Set(),ppl=[];
  // owner: the widgets only ever show SAVED contacts (my list), never community members I haven't saved
- saved.forEach(v=>{if(!v.name)return;const k=fk(v);if(seen.has(k))return;seen.add(k);ppl.push({n:v.name,c:String(v.city).replace(/ ·$/,"").split(" · ")[0],tz:v.tz,p:vPhone(v).replace(/\D/g,""),f:favs.has(k)?1:0,s:1,g:v.cm&&CM_DOCS[v.cm]?CM_DOCS[v.cm].name:""})});
- const d=JSON.stringify({v:2,me:me&&me.match?me.match.name:"",ppl});if(d==kitLast)return;kitLast=d;P.save({data:d}).catch(()=>{kitLast=""})}catch(e){}}
+ // owner: a widget can show just one community → each person carries the ids of my communities they are in (gs)
+ const cms=[],mem={};try{cmIds().forEach(id=>{const d=CM_DOCS[id];if(!d&&id!="shluchim")return;if(id=="shluchim"&&!isShlMember())return;cms.push({i:id,n:id=="shluchim"?"Shluchim":d.name});
+  const S=mem[id]={n:new Set(),p:new Set()};Object.values((d&&d.members)||{}).forEach(m=>{if(!m||!m.n)return;S.n.add(m.n.toLowerCase()+"|"+baseCity(m.c).toLowerCase());const q=String(m.p||"").replace(/\D/g,"");if(q.length>=6)S.p.add(q)});
+  if(id=="shluchim")DIRP0.forEach(x=>{S.n.add(x.name.toLowerCase()+"|"+baseCity(x.city).toLowerCase());const q=phoneOf(x.name,x.city).replace(/\D/g,"");if(q.length>=6)S.p.add(q)})})}catch(e){}
+ const gsOf=v=>{const nk=v.name.toLowerCase()+"|"+baseCity(v.city).toLowerCase(),q=vPhone(v).replace(/\D/g,"");return cms.filter(c=>c.i==v.cm||mem[c.i].n.has(nk)||(q.length>=6&&mem[c.i].p.has(q))).map(c=>c.i).join(",")};
+ saved.forEach(v=>{if(!v.name)return;const k=fk(v);if(seen.has(k))return;seen.add(k);ppl.push({n:v.name,c:String(v.city).replace(/ ·$/,"").split(" · ")[0],tz:v.tz,p:vPhone(v).replace(/\D/g,""),f:favs.has(k)?1:0,s:1,g:v.cm&&CM_DOCS[v.cm]?CM_DOCS[v.cm].name:"",gs:gsOf(v)})});
+ const d=JSON.stringify({v:3,me:me&&me.match?me.match.name:"",ppl,cms});if(d==kitLast)return;kitLast=d;P.save({data:d}).catch(()=>{kitLast=""})}catch(e){}}
 function toast(msg,act,lab,ms){const t=$("toast");t.innerHTML="<span>"+esc(msg)+"</span>"+(act?"<button>"+(lab||"Undo")+"</button>":"");const b=t.querySelector("button");if(b)b.onclick=()=>{act();t.classList.remove("on")};t.classList.add("on");clearTimeout(tT);tT=setTimeout(()=>t.classList.remove("on"),ms||(act?6000:4500))}
 // ---------- guided tour (hands-on): what the colours mean → search a bochur → save him → your list → back to the globe
 const TOUR_LEG='<div class="tl"><span><i style="background:'+PINCOL.day+';box-shadow:0 0 8px '+PINCOL.day+'"></i>Awake</span><span><i style="background:'+PINCOL.gray+';border:1px solid #8cc4ff88"></i>Maybe up</span><span><i style="background:'+PINCOL.night+';border:1px solid '+PINCOL.gray+'"></i>Asleep</span></div>';
@@ -1237,7 +1242,7 @@ sync()})();
 // neither = SMALL (looks, tweaks, fixes) → only a little round "i" in the corner, version X.Y.Z.
 // adm:1 = admin-only change → counts as a small update in the version number, but NO notification at all (owner). The shown version is worked out from these sizes.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=58,KIT_APK=3;
+const KIT_VER=59,KIT_APK=3;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,mid:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1287,7 +1292,8 @@ const KIT_LOG=[
  {v:55,t:"Only a community’s admins can add people to it"},
  {v:56,adm:1,t:"New web address",d:"The app moved to justaboredbocher.github.io/CDate/friends."},
  {v:57,mid:1,t:"Signing up from a community’s link shows only that community’s people",d:"Open the link someone sent you, start typing your name, and tap it. The yeshiva list only comes up with the Shluchim link."},
- {v:58,t:"The tour works when you sign up from a link, and you can paste a link on the sign-up screen"}
+ {v:58,t:"The tour works when you sign up from a link, and you can paste a link on the sign-up screen"},
+ {v:59,mid:1,apk:4,t:"Widgets can show just one community",d:"Tap ▾ on a widget and pick a community, or Everyone. Each widget remembers its own choice. Needs the app update."}
 ];
 function kitVerStr(b){let M=0,m=0,p=0;const by={};KIT_LOG.forEach(x=>{const l=x.big?3:x.mid?2:1;by[x.v]=Math.max(by[x.v]||0,l)});
  Object.keys(by).map(Number).sort((a,c)=>a-c).forEach(v=>{if(v>b)return;if(by[v]==3){M++;m=0;p=0}else if(by[v]==2){m++;p=0}else p++});return M+"."+m+"."+p}

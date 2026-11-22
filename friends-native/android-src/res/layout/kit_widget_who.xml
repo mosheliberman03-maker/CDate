@@ -21,6 +21,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/kit_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Who’s up now"
@@ -39,6 +40,20 @@
                 android:singleLine="true"
                 android:ellipsize="end" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/kit_cm"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginEnd="6dp"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:background="@drawable/kit_chip_off"
+            android:textColor="#FFC9D0EE"
+            android:textSize="12sp"
+            android:singleLine="true"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/kit_sort"

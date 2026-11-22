@@ -28,6 +28,13 @@ public class BestWidget extends AppWidgetProvider {
     }
 
     @Override
+    public void onDeleted(Context ctx, int[] ids) {
+        android.content.SharedPreferences.Editor e = KitData.state(ctx).edit();
+        for (int id : ids) e.remove("c_" + id);
+        e.apply();
+    }
+
+    @Override
     public void onReceive(Context ctx, Intent i) {
         if (Intent.ACTION_TIMEZONE_CHANGED.equals(i.getAction()) || Intent.ACTION_TIME_CHANGED.equals(i.getAction())) {
             KitData.updateAll(ctx);
@@ -38,16 +45,20 @@ public class BestWidget extends AppWidgetProvider {
 
     static void draw(Context ctx, AppWidgetManager m, int id) {
         RemoteViews v = new RemoteViews(ctx.getPackageName(), R.layout.kit_widget_best);
-        List<KitData.Person> all = KitData.load(ctx);
+        String comm = KitData.commOf(ctx, id), cn = comm.isEmpty() ? "" : KitData.commName(ctx, comm);
+        List<KitData.Person> all = KitData.load(ctx, comm);
         List<KitData.Person> best = new ArrayList<>();
-        for (KitData.Person p : KitData.query(ctx, KitData.F_UP, KitData.S_BEST)) if (p.hasPhone()) best.add(p);
+        for (KitData.Person p : KitData.query(ctx, KitData.F_UP, KitData.S_BEST, comm)) if (p.hasPhone()) best.add(p);
+        v.setViewVisibility(R.id.kit_bcm, KitData.comms(ctx).isEmpty() ? View.GONE : View.VISIBLE);
+        v.setTextViewText(R.id.kit_bcm, (cn.isEmpty() ? "Everyone" : cn) + " ▾");
+        v.setOnClickPendingIntent(R.id.kit_bcm, PickCommunity.open(ctx, id, id * 16 + 13));
         int up = 0;
         for (KitData.Person p : all) if ("day".equals(p.st)) up++;
 
         v.setTextViewText(R.id.kit_bcount, String.valueOf(up));
         v.setTextColor(R.id.kit_bcount, up > 0 ? KitData.C_DAY : KitData.C_NIGHT);
         v.setTextViewText(R.id.kit_btitle, up == 1 ? "friend is up now" : "friends are up now");
-        v.setTextViewText(R.id.kit_bsub, all.isEmpty() ? "Tap to open the app" : best.isEmpty() ? "" : "Best to call right now:");
+        v.setTextViewText(R.id.kit_bsub, all.isEmpty() ? (cn.isEmpty() ? "Tap to open the app" : "Nobody saved from " + cn + " yet") : best.isEmpty() ? "" : "Best to call right now:");
         v.setOnClickPendingIntent(R.id.kit_bhead, WidgetAction.open(ctx, id * 16 + 10));
 
         for (int k = 0; k < ROWS.length; k++) {

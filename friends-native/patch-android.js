@@ -55,6 +55,12 @@ if (!x.includes('.WhoWidget')) {
   if (!x.includes('</application>')) { console.log('patch-android: no </application> in the manifest'); process.exit(1); }
   x = x.replace('</application>', add + '    </application>');
 }
+if (!x.includes('.PickCommunity')) {
+  x = x.replace('</application>', `        <activity android:name=".PickCommunity" android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" android:excludeFromRecents="true"
+            android:noHistory="true" android:taskAffinity="" />
+    </application>`);
+}
 fs.writeFileSync(man, x);
 console.log('patch-android: widgets registered in the manifest');
 

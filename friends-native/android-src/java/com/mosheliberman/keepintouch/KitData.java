@@ -28,7 +28,7 @@ public final class KitData {
     private KitData() {}
 
     /** Version of the installed app (the native part). The web app asks for at least KIT_APK. */
-    static final int APP_VER = 3;
+    static final int APP_VER = 4;
 
     static final String PREFS = "kit_widget";
     static final String KEY = "data";
@@ -44,6 +44,7 @@ public final class KitData {
         String name, city, tz, phone;
         boolean fav, mine;     // mine = in my own list (saved); otherwise a member of one of my communities
         String group = "";     // community name for community members
+        java.util.Set<String> gs = new java.util.HashSet<>(); // ids of my communities this person is in
         int min;          // minutes since local midnight where they are
         String st;        // "day" (good to call), "gray" (borderline), "night" (asleep)
         double rank;      // lower = better time to call (only for "day")
@@ -94,6 +95,7 @@ public final class KitData {
                 p.fav = o.optInt("f", 0) == 1;
                 p.mine = o.optInt("s", 1) == 1;
                 p.group = o.optString("g", "");
+                for (String g : o.optString("gs", "").split(",")) if (!g.isEmpty()) p.gs.add(g);
                 if (p.name.isEmpty()) continue;
                 p.min = localMin(p.tz);
                 p.st = status(p.min);
@@ -104,12 +106,52 @@ public final class KitData {
         return out;
     }
 
+    /** Only the people in one community ("" = everyone). */
+    static List<Person> load(Context ctx, String comm) {
+        List<Person> all = load(ctx);
+        if (comm == null || comm.isEmpty()) return all;
+        List<Person> out = new ArrayList<>();
+        for (Person p : all) if (p.gs.contains(comm)) out.add(p);
+        return out;
+    }
+
+    /** My communities as [id, name] pairs, in the app's order. */
+    static List<String[]> comms(Context ctx) {
+        List<String[]> out = new ArrayList<>();
+        String raw = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY, null);
+        if (raw == null) return out;
+        try {
+            JSONArray a = new JSONObject(raw).optJSONArray("cms");
+            if (a != null) for (int i = 0; i < a.length(); i++) {
+                JSONObject o = a.getJSONObject(i);
+                String id = o.optString("i", ""), n = o.optString("n", "");
+                if (!id.isEmpty() && !n.isEmpty()) out.add(new String[]{id, n});
+            }
+        } catch (Exception ignored) {}
+        return out;
+    }
+
+    /** The community a widget shows ("" = everyone); falls back to everyone if I left it. */
+    static String commOf(Context ctx, int id) {
+        String c = state(ctx).getString("c_" + id, "");
+        if (c.isEmpty()) return "";
+        for (String[] x : comms(ctx)) if (x[0].equals(c)) return c;
+        return "";
+    }
+
+    static String commName(Context ctx, String c) {
+        for (String[] x : comms(ctx)) if (x[0].equals(c)) return x[1];
+        return "";
+    }
+
     static boolean hasData(Context ctx) {
         return ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY, null) != null;
     }
 
-    static List<Person> query(Context ctx, String filter, String sort) {
-        List<Person> all = load(ctx), out = new ArrayList<>();
+    static List<Person> query(Context ctx, String filter, String sort) { return query(ctx, filter, sort, ""); }
+
+    static List<Person> query(Context ctx, String filter, String sort, String comm) {
+        List<Person> all = load(ctx, comm), out = new ArrayList<>();
         for (Person p : all) {
             if (F_UP.equals(filter) && !"day".equals(p.st)) continue;
             if (F_FAV.equals(filter) && !p.fav) continue;

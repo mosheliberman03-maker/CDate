@@ -28,7 +28,7 @@ public class WhoWidgetService extends RemoteViewsService {
 
         @Override
         public void onDataSetChanged() {
-            rows = KitData.query(ctx, KitData.filterOf(ctx, id), KitData.sortOf(ctx, id));
+            rows = KitData.query(ctx, KitData.filterOf(ctx, id), KitData.sortOf(ctx, id), KitData.commOf(ctx, id));
         }
 
         @Override public int getCount() { return rows.size(); }

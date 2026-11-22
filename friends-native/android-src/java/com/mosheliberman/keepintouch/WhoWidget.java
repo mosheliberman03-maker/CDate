@@ -37,7 +37,7 @@ public class WhoWidget extends AppWidgetProvider {
     @Override
     public void onDeleted(Context ctx, int[] ids) {
         android.content.SharedPreferences.Editor e = KitData.state(ctx).edit();
-        for (int id : ids) e.remove("f_" + id).remove("s_" + id);
+        for (int id : ids) e.remove("f_" + id).remove("s_" + id).remove("c_" + id);
         e.apply();
     }
 
@@ -79,13 +79,21 @@ public class WhoWidget extends AppWidgetProvider {
     static void draw(Context ctx, AppWidgetManager m, int id) {
         RemoteViews v = new RemoteViews(ctx.getPackageName(), R.layout.kit_widget_who);
         String filter = KitData.filterOf(ctx, id), sort = KitData.sortOf(ctx, id);
-        List<KitData.Person> all = KitData.load(ctx);
+        String comm = KitData.commOf(ctx, id);
+        List<KitData.Person> all = KitData.load(ctx, comm);
+        // Community button (owner: a widget can show just one community). Hidden when I'm in no community.
+        boolean anyC = !KitData.comms(ctx).isEmpty();
+        v.setViewVisibility(R.id.kit_cm, anyC ? View.VISIBLE : View.GONE);
+        String cn = comm.isEmpty() ? "" : KitData.commName(ctx, comm);
+        v.setTextViewText(R.id.kit_title, cn.isEmpty() ? "Who’s up now" : cn);
+        v.setTextViewText(R.id.kit_cm, (cn.isEmpty() ? "Everyone" : "Change") + " ▾");
+        v.setOnClickPendingIntent(R.id.kit_cm, PickCommunity.open(ctx, id, id * 16 + 13));
 
         // Header: how many are good to call right now (the whole point), then the others.
         int day = 0, gray = 0, night = 0;
         for (KitData.Person p : all) { if ("day".equals(p.st)) day++; else if ("gray".equals(p.st)) gray++; else night++; }
         SpannableStringBuilder sub = new SpannableStringBuilder();
-        if (all.isEmpty()) sub.append("Open the app to add friends");
+        if (all.isEmpty()) sub.append(comm.isEmpty() ? "Open the app to add friends" : "Nobody saved from here yet");
         else {
             int s0 = sub.length();
             sub.append(String.valueOf(day)).append(" good to call");
@@ -120,7 +128,7 @@ public class WhoWidget extends AppWidgetProvider {
         svc.setData(Uri.parse(svc.toUri(Intent.URI_INTENT_SCHEME)));
         v.setRemoteAdapter(R.id.kit_list, svc);
         v.setEmptyView(R.id.kit_list, R.id.kit_empty);
-        v.setTextViewText(R.id.kit_empty, emptyText(ctx, all, filter));
+        v.setTextViewText(R.id.kit_empty, emptyText(ctx, all, filter, comm));
         v.setOnClickPendingIntent(R.id.kit_empty, WidgetAction.open(ctx, id * 16 + 11));
         Intent tpl = new Intent(ctx, WidgetAction.class);
         v.setPendingIntentTemplate(R.id.kit_list, PendingIntent.getActivity(ctx, id * 16 + 12, tpl, KitData.piFlags(true)));
@@ -128,7 +136,9 @@ public class WhoWidget extends AppWidgetProvider {
         m.updateAppWidget(id, v);
     }
 
-    static CharSequence emptyText(Context ctx, List<KitData.Person> all, String filter) {
+    static CharSequence emptyText(Context ctx, List<KitData.Person> all, String filter, String comm) {
+        if (!comm.isEmpty() && all.isEmpty())
+            return "Nobody saved from " + KitData.commName(ctx, comm) + " yet.\nOpen the app and save people from it, or tap ▾ to pick another.";
         if (!KitData.hasData(ctx) || all.isEmpty())
             return "No friends saved yet.\nTap here to open Keep in Touch and save the people you want to call.";
         if (KitData.F_FAV.equals(filter)) return "No favourites yet.\nTap ☆ next to a name in the app.";
