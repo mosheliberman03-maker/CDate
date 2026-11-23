@@ -111,13 +111,13 @@ public class WhoWidget extends AppWidgetProvider {
             v.setTextColor(CHIP_IDS[k], on ? 0xFF0B1022 : 0xFFC9D0EE);
             Intent fi = new Intent(ctx, WhoWidget.class).setAction(ACTION_FILTER)
                     .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id).putExtra("v", FILTERS[k])
-                    .setData(Uri.parse("kit://filter/" + id + "/" + FILTERS[k]));
+                    .setData(Uri.parse("kit://filter/" + id + "/" + FILTERS[k])).addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
             v.setOnClickPendingIntent(CHIP_IDS[k], PendingIntent.getBroadcast(ctx, id * 16 + k, fi, KitData.piFlags(false)));
         }
         v.setViewVisibility(R.id.kit_f_mine, android.view.View.GONE); // owner: only saved people, so no separate "My list" chip
         v.setTextViewText(R.id.kit_sort, "⇅ " + sortLabel(sort));
         Intent si = new Intent(ctx, WhoWidget.class).setAction(ACTION_SORT)
-                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id).setData(Uri.parse("kit://sort/" + id));
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id).setData(Uri.parse("kit://sort/" + id)).addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         v.setOnClickPendingIntent(R.id.kit_sort, PendingIntent.getBroadcast(ctx, id * 16 + 9, si, KitData.piFlags(false)));
 
         // Title opens the app.

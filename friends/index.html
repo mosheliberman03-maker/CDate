@@ -1242,7 +1242,7 @@ sync()})();
 // neither = SMALL (looks, tweaks, fixes) → only a little round "i" in the corner, version X.Y.Z.
 // adm:1 = admin-only change → counts as a small update in the version number, but NO notification at all (owner). The shown version is worked out from these sizes.
 // apk:N = this needs app version N (a new download); the app then also shows "Update the app".
-const KIT_VER=60,KIT_APK=3;
+const KIT_VER=61,KIT_APK=3;
 const KIT_LOG=[
  {v:1,big:1,t:"Home-screen widgets",d:"See who’s awake without opening the app, with Call and WhatsApp buttons, filters and sorting.",go:"widgets"},
  {v:2,mid:1,t:"Add widgets from inside the app",d:"Menu → Home-screen widgets → Add. No more digging through your phone’s widget list.",go:"widgets",apk:1},
@@ -1294,7 +1294,8 @@ const KIT_LOG=[
  {v:57,mid:1,t:"Signing up from a community’s link shows only that community’s people",d:"Open the link someone sent you, start typing your name, and tap it. The yeshiva list only comes up with the Shluchim link."},
  {v:58,t:"The tour works when you sign up from a link, and you can paste a link on the sign-up screen"},
  {v:59,mid:1,apk:4,t:"Widgets can show just one community",d:"Tap ▾ on a widget and pick a community, or Everyone. Each widget remembers its own choice. Needs the app update."},
- {v:60,t:"Shooting stars fly between the places in every community, not only Shluchim"}
+ {v:60,t:"Shooting stars fly between the places in every community, not only Shluchim"},
+ {v:61,apk:4,t:"Widget buttons react right away, and Call opens the dialer reliably (needs the app update)"}
 ];
 function kitVerStr(b){let M=0,m=0,p=0;const by={};KIT_LOG.forEach(x=>{const l=x.big?3:x.mid?2:1;by[x.v]=Math.max(by[x.v]||0,l)});
  Object.keys(by).map(Number).sort((a,c)=>a-c).forEach(v=>{if(v>b)return;if(by[v]==3){M++;m=0;p=0}else if(by[v]==2){m++;p=0}else p++});return M+"."+m+"."+p}

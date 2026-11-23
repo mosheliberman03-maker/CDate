@@ -241,7 +241,7 @@ public final class KitData {
     static void schedule(Context ctx, boolean any) {
         AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
         if (am == null) return;
-        Intent i = new Intent(ctx, WhoWidget.class).setAction(ACTION_TICK);
+        Intent i = new Intent(ctx, WhoWidget.class).setAction(ACTION_TICK).addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         PendingIntent pi = PendingIntent.getBroadcast(ctx, 7, i, piFlags(false));
         am.cancel(pi);
         if (!any) return;
